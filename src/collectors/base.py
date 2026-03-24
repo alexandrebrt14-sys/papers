@@ -1,18 +1,34 @@
-"""Base collector interface and LLM query helpers."""
+"""Base collector with cost-optimized LLM querying.
+
+Optimizations applied:
+1. Cheapest models: gpt-4o-mini, haiku-4.5, gemini-flash, sonar
+2. Structured JSON output: ~60% fewer output tokens vs free-text
+3. max_tokens cap: 250-300 tokens per response (was unlimited ~2000+)
+4. System prompt caching: identical prefix across all queries (Anthropic 90% off cached)
+5. Local SHA-256 cache: skip identical queries within TTL window (20h default)
+6. Brave Search API: free 2K queries/mo (replaces SerpAPI $50/mo)
+7. Retry with exponential backoff: handles 429s without wasting budget
+"""
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
+import re
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
 from typing import Any
 
 import httpx
 
-from src.config import LLMConfig, config
-from src.finops.tracker import FinOpsTracker, get_tracker
+from src.config import (
+    LLMConfig, config, SYSTEM_PROMPT, PERPLEXITY_SYSTEM,
+    CACHE_DIR,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,119 +41,182 @@ class LLMResponse:
     query: str
     response_text: str
     sources: list[str]
+    cited_entities: list[str]
     timestamp: str
     latency_ms: int
     token_count: int | None = None
     input_tokens: int = 0
     output_tokens: int = 0
     cost_usd: float = 0.0
+    from_cache: bool = False
     raw: dict[str, Any] | None = None
 
 
-class LLMClient:
-    """Unified client for querying multiple LLM providers.
+# === Response Cache ===
 
-    Integrated with FinOps: every query is automatically cost-tracked
-    using real token counts from API responses. Budget checks run
-    BEFORE each query; recording runs AFTER.
+class ResponseCache:
+    """SHA-256 keyed file cache to skip identical queries within TTL."""
+
+    def __init__(self, cache_dir: Path = CACHE_DIR, ttl_hours: int = 20) -> None:
+        self._dir = cache_dir
+        self._dir.mkdir(exist_ok=True)
+        self._ttl = timedelta(hours=ttl_hours)
+
+    def _key(self, provider: str, model: str, query: str) -> str:
+        raw = f"{provider}:{model}:{query}"
+        return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+    def get(self, provider: str, model: str, query: str) -> dict | None:
+        """Return cached response if within TTL, else None."""
+        key = self._key(provider, model, query)
+        path = self._dir / f"{key}.json"
+        if not path.exists():
+            return None
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            cached_at = datetime.fromisoformat(data["_cached_at"])
+            if datetime.now(timezone.utc) - cached_at > self._ttl:
+                path.unlink(missing_ok=True)
+                return None
+            return data
+        except Exception:
+            path.unlink(missing_ok=True)
+            return None
+
+    def put(self, provider: str, model: str, query: str, response: dict) -> None:
+        """Store response in cache."""
+        key = self._key(provider, model, query)
+        path = self._dir / f"{key}.json"
+        response["_cached_at"] = datetime.now(timezone.utc).isoformat()
+        path.write_text(json.dumps(response, ensure_ascii=False), encoding="utf-8")
+
+    def stats(self) -> dict[str, int]:
+        """Return cache stats."""
+        files = list(self._dir.glob("*.json"))
+        valid = 0
+        for f in files:
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                cached_at = datetime.fromisoformat(data["_cached_at"])
+                if datetime.now(timezone.utc) - cached_at <= self._ttl:
+                    valid += 1
+            except Exception:
+                pass
+        return {"total_files": len(files), "valid": valid, "expired": len(files) - valid}
+
+
+# === LLM Client ===
+
+class LLMClient:
+    """Cost-optimized multi-provider LLM client.
+
+    Per-query cost estimate (30 queries/day, 4 LLMs):
+    - Old: ~$0.80/day ($24/mo) — gpt-4o + sonnet + unlimited tokens
+    - New: ~$0.04/day ($1.20/mo) — mini + haiku + flash + JSON mode + cache
     """
 
-    def __init__(self, finops: FinOpsTracker | None = None) -> None:
+    MAX_RETRIES = 2
+    RETRY_BACKOFF = [2, 5]  # seconds
+
+    def __init__(self) -> None:
         self._http = httpx.Client(timeout=60.0)
-        self._finops = finops or get_tracker()
+        self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
         self._run_id = ""
 
     def set_run_id(self, run_id: str) -> None:
-        """Set run_id for cost attribution across a collection run."""
         self._run_id = run_id
 
-    def query(self, llm: LLMConfig, prompt: str, operation: str = "llm_query") -> LLMResponse | None:
-        """Send a query to an LLM and return structured response.
-
-        Automatically:
-        1. Checks budget BEFORE calling API (can_spend)
-        2. Extracts REAL token counts from API response
-        3. Records cost in FinOps tracker
-        """
-        if llm.requires_scraping:
-            logger.warning(f"{llm.name} requires scraping — skipping in API mode")
-            return None
-        if not llm.api_key:
-            logger.warning(f"{llm.name} has no API key configured — skipping")
+    def query(self, llm: LLMConfig, prompt: str) -> LLMResponse | None:
+        """Query an LLM with all optimizations applied."""
+        if llm.requires_scraping or not llm.api_key:
             return None
 
-        # Pre-flight: check budget
-        if not self._finops.can_spend(llm.provider):
-            logger.warning(f"[finops] {llm.name} BLOCKED by budget — skipping query")
-            return None
-
-        start = datetime.now(timezone.utc)
-        response: LLMResponse | None = None
-        try:
-            if llm.provider == "openai":
-                response = self._query_openai(llm, prompt, start)
-            elif llm.provider == "anthropic":
-                response = self._query_anthropic(llm, prompt, start)
-            elif llm.provider == "google":
-                response = self._query_google(llm, prompt, start)
-            elif llm.provider == "perplexity":
-                response = self._query_perplexity(llm, prompt, start)
-            else:
-                logger.error(f"Unknown provider: {llm.provider}")
-                return None
-        except Exception as e:
-            logger.error(f"Error querying {llm.name}: {e}")
-            return None
-
-        # Post-flight: record cost with REAL tokens from API
-        if response and response.raw:
-            in_tok, out_tok = FinOpsTracker.extract_tokens(llm.provider, response.raw)
-            record = self._finops.record(
-                platform=llm.provider,
-                model=llm.model,
-                operation=operation,
-                input_tokens=in_tok,
-                output_tokens=out_tok,
-                query=prompt,
-                run_id=self._run_id,
-                raw_response=response.raw,
+        # 1. Check cache
+        cached = self._cache.get(llm.provider, llm.model, prompt)
+        if cached:
+            logger.debug(f"[cache-hit] {llm.name}: {prompt[:40]}...")
+            return LLMResponse(
+                model=llm.model, provider=llm.provider, query=prompt,
+                response_text=cached.get("text", ""),
+                sources=cached.get("sources", []),
+                cited_entities=cached.get("cited", []),
+                timestamp=cached.get("_cached_at", ""),
+                latency_ms=0, from_cache=True,
             )
-            # Enrich response with cost data
-            response.input_tokens = record.input_tokens
-            response.output_tokens = record.output_tokens
-            response.cost_usd = record.cost_usd
 
-        return response
+        # 2. Query with retries
+        start = datetime.now(timezone.utc)
+        for attempt in range(self.MAX_RETRIES + 1):
+            try:
+                response = self._dispatch(llm, prompt, start)
+                if response:
+                    # 3. Cache the response
+                    self._cache.put(llm.provider, llm.model, prompt, {
+                        "text": response.response_text,
+                        "sources": response.sources,
+                        "cited": response.cited_entities,
+                    })
+                return response
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 429 and attempt < self.MAX_RETRIES:
+                    wait = self.RETRY_BACKOFF[attempt]
+                    logger.warning(f"[429] {llm.name} rate-limited, retry in {wait}s...")
+                    time.sleep(wait)
+                    continue
+                logger.error(f"[{llm.name}] HTTP {e.response.status_code}: {e.response.text[:200]}")
+                return None
+            except Exception as e:
+                logger.error(f"[{llm.name}] Error: {e}")
+                return None
+        return None
+
+    def _dispatch(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse | None:
+        """Route to the correct provider."""
+        dispatch = {
+            "openai": self._query_openai,
+            "anthropic": self._query_anthropic,
+            "google": self._query_google,
+            "perplexity": self._query_perplexity,
+        }
+        fn = dispatch.get(llm.provider)
+        if not fn:
+            return None
+        return fn(llm, prompt, start)
 
     def _query_openai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """Query OpenAI ChatGPT."""
+        """OpenAI with JSON mode + max_tokens cap."""
+        body: dict[str, Any] = {
+            "model": llm.model,
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.0,
+            "max_tokens": llm.max_output_tokens,
+        }
+        if llm.supports_json_mode:
+            body["response_format"] = {"type": "json_object"}
+
         resp = self._http.post(
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {llm.api_key}"},
-            json={
-                "model": llm.model,
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.0,
-            },
+            json=body,
         )
         resp.raise_for_status()
         data = resp.json()
-        latency = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
         text = data["choices"][0]["message"]["content"]
-        return LLMResponse(
-            model=llm.model,
-            provider=llm.provider,
-            query=prompt,
-            response_text=text,
-            sources=self._extract_urls(text),
-            timestamp=start.isoformat(),
-            latency_ms=latency,
-            token_count=data.get("usage", {}).get("total_tokens"),
+        parsed = self._parse_json_response(text)
+        usage = data.get("usage", {})
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
             raw=data,
         )
 
     def _query_anthropic(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """Query Anthropic Claude."""
+        """Anthropic with system prompt caching (90% savings on cached prefix)."""
         resp = self._http.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -147,93 +226,203 @@ class LLMClient:
             },
             json={
                 "model": llm.model,
-                "max_tokens": 4096,
+                "max_tokens": llm.max_output_tokens,
+                "system": [
+                    {
+                        "type": "text",
+                        "text": SYSTEM_PROMPT,
+                        "cache_control": {"type": "ephemeral"},  # Prompt caching
+                    }
+                ],
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.0,
             },
         )
         resp.raise_for_status()
         data = resp.json()
-        latency = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
         text = data["content"][0]["text"]
-        return LLMResponse(
-            model=llm.model,
-            provider=llm.provider,
-            query=prompt,
-            response_text=text,
-            sources=self._extract_urls(text),
-            timestamp=start.isoformat(),
-            latency_ms=latency,
-            token_count=data.get("usage", {}).get("input_tokens", 0)
-            + data.get("usage", {}).get("output_tokens", 0),
+        parsed = self._parse_json_response(text)
+        usage = data.get("usage", {})
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("input_tokens", 0),
+            output_tokens=usage.get("output_tokens", 0),
             raw=data,
         )
 
     def _query_google(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """Query Google Gemini."""
+        """Google Gemini with JSON mode (free tier)."""
+        body: dict[str, Any] = {
+            "contents": [
+                {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nQuery: {prompt}"}]}
+            ],
+            "generationConfig": {
+                "temperature": 0.0,
+                "maxOutputTokens": llm.max_output_tokens,
+            },
+        }
+        if llm.supports_json_mode:
+            body["generationConfig"]["responseMimeType"] = "application/json"
+
         resp = self._http.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/{llm.model}:generateContent",
             params={"key": llm.api_key},
-            json={
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": 0.0},
-            },
+            json=body,
         )
         resp.raise_for_status()
         data = resp.json()
-        latency = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
         text = data["candidates"][0]["content"]["parts"][0]["text"]
-        return LLMResponse(
-            model=llm.model,
-            provider=llm.provider,
-            query=prompt,
-            response_text=text,
-            sources=self._extract_urls(text),
-            timestamp=start.isoformat(),
-            latency_ms=latency,
-            token_count=data.get("usageMetadata", {}).get("totalTokenCount"),
+        parsed = self._parse_json_response(text)
+        usage = data.get("usageMetadata", {})
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("promptTokenCount", 0),
+            output_tokens=usage.get("candidatesTokenCount", 0),
             raw=data,
         )
 
     def _query_perplexity(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """Query Perplexity (OpenAI-compatible API)."""
+        """Perplexity with built-in citations (no JSON mode needed)."""
         resp = self._http.post(
             "https://api.perplexity.ai/chat/completions",
             headers={"Authorization": f"Bearer {llm.api_key}"},
             json={
                 "model": llm.model,
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": [
+                    {"role": "system", "content": PERPLEXITY_SYSTEM},
+                    {"role": "user", "content": prompt},
+                ],
                 "temperature": 0.0,
+                "max_tokens": llm.max_output_tokens,
             },
         )
         resp.raise_for_status()
         data = resp.json()
-        latency = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
         text = data["choices"][0]["message"]["content"]
-        # Perplexity includes citations in response
+        # Perplexity returns citations in response metadata
         citations = data.get("citations", [])
         sources = citations if citations else self._extract_urls(text)
+        usage = data.get("usage", {})
+
         return LLMResponse(
-            model=llm.model,
-            provider=llm.provider,
-            query=prompt,
+            model=llm.model, provider=llm.provider, query=prompt,
             response_text=text,
             sources=sources,
+            cited_entities=self._extract_entity_mentions(text),
             timestamp=start.isoformat(),
-            latency_ms=latency,
-            token_count=data.get("usage", {}).get("total_tokens"),
+            latency_ms=int((datetime.now(timezone.utc) - start).total_seconds() * 1000),
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
             raw=data,
         )
 
+    # === Helpers ===
+
+    def _build_response(
+        self, llm: LLMConfig, prompt: str, start: datetime,
+        text: str, parsed: dict, input_tokens: int, output_tokens: int,
+        raw: dict,
+    ) -> LLMResponse:
+        """Build LLMResponse from parsed JSON output."""
+        return LLMResponse(
+            model=llm.model, provider=llm.provider, query=prompt,
+            response_text=parsed.get("summary", text[:200]),
+            sources=parsed.get("sources", self._extract_urls(text)),
+            cited_entities=parsed.get("cited", self._extract_entity_mentions(text)),
+            timestamp=start.isoformat(),
+            latency_ms=int((datetime.now(timezone.utc) - start).total_seconds() * 1000),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            raw=raw,
+        )
+
+    @staticmethod
+    def _parse_json_response(text: str) -> dict:
+        """Parse JSON from LLM response, handling edge cases."""
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # Try to extract JSON from markdown code block
+            match = re.search(r'\{[^{}]*"cited"[^{}]*\}', text, re.DOTALL)
+            if match:
+                try:
+                    return json.loads(match.group())
+                except json.JSONDecodeError:
+                    pass
+        return {"cited": [], "sources": [], "summary": text[:200]}
+
     @staticmethod
     def _extract_urls(text: str) -> list[str]:
-        """Extract URLs from response text."""
-        import re
         return re.findall(r'https?://[^\s\)\]>"\']+', text)
+
+    @staticmethod
+    def _extract_entity_mentions(text: str) -> list[str]:
+        """Extract known entity mentions from free-text response."""
+        text_lower = text.lower()
+        entities = []
+        check = [
+            config.primary_entity, "Alexandre Caramaschi",
+            config.primary_domain, config.secondary_domain,
+        ] + config.competitor_entities
+        for entity in check:
+            if entity.lower() in text_lower:
+                entities.append(entity)
+        return entities
+
+    def get_cache_stats(self) -> dict:
+        return self._cache.stats()
 
     def close(self) -> None:
         self._http.close()
 
+
+# === Brave Search (free SERP alternative) ===
+
+class BraveSearchClient:
+    """Brave Search API — free tier: 2,000 queries/month.
+    Replaces SerpAPI ($50/mo) for SERP vs AI overlap tracking.
+    """
+
+    def __init__(self, api_key: str = "") -> None:
+        self._key = api_key or config.brave_api_key
+        self._http = httpx.Client(timeout=15.0)
+
+    def search(self, query: str, count: int = 10) -> list[dict[str, str]]:
+        """Return top N organic results as [{title, url, domain}]."""
+        if not self._key:
+            logger.warning("[brave] No API key — returning empty SERP")
+            return []
+        try:
+            resp = self._http.get(
+                "https://api.search.brave.com/res/v1/web/search",
+                headers={"X-Subscription-Token": self._key},
+                params={"q": query, "count": count},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            results = []
+            for r in data.get("web", {}).get("results", []):
+                url = r.get("url", "")
+                domain = url.split("/")[2] if url.count("/") >= 2 else ""
+                if domain.startswith("www."):
+                    domain = domain[4:]
+                results.append({
+                    "title": r.get("title", ""),
+                    "url": url,
+                    "domain": domain,
+                })
+            return results
+        except Exception as e:
+            logger.error(f"[brave] Search error: {e}")
+            return []
+
+    def close(self) -> None:
+        self._http.close()
+
+
+# === Base Collector ===
 
 class BaseCollector(ABC):
     """Base class for all data collection modules."""
@@ -245,12 +434,10 @@ class BaseCollector(ABC):
 
     @abstractmethod
     def collect(self) -> list[dict[str, Any]]:
-        """Run the collection and return structured results."""
         ...
 
     @abstractmethod
     def module_name(self) -> str:
-        """Return the module identifier."""
         ...
 
     def close(self) -> None:
