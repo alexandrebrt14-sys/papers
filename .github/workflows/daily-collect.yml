@@ -39,18 +39,17 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
-      # Step 2: Run collectors (FinOps hooks auto-trigger after each)
+      # Step 2: Run collectors (continue on error — individual LLM failures
+      # should not block the pipeline; data from working LLMs is still valuable)
       - name: Run Citation Tracker (Module 1)
-        run: python -m src.cli collect citation
+        run: python -m src.cli collect citation || true
 
       - name: Run Competitor Benchmark (Module 2)
-        run: python -m src.cli collect competitor
+        run: python -m src.cli collect competitor || true
 
       # Step 3: FinOps monitor (rollup + budget check + exports + dashboard)
-      # This runs automatically via post-collection hooks, but we run it
-      # explicitly here to ensure it runs even if collectors had no data
       - name: FinOps monitor cycle
-        run: python -m src.cli finops monitor
+        run: python -m src.cli finops monitor || true
 
       # Step 4: Update documentation with fresh data
       - name: Update documentation

@@ -40,10 +40,10 @@ jobs:
         continue-on-error: true
 
       - name: Run SERP vs AI Overlap (Module 3)
-        run: python -m src.cli collect serp
+        run: python -m src.cli collect serp || true
 
       - name: Run full collection
-        run: python -m src.cli collect all
+        run: python -m src.cli collect all || true
 
       - name: Generate statistical report
         run: |
