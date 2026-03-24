@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-24 15:40 UTC
-**Branch:**  | **Commits:** 19
-**Último commit:** 86690efcfab26c79ac29eb81bd99729460e77a42 data: daily collection + finops 2026-03
+**Gerado automaticamente em:** 2026-03-24 16:13 UTC
+**Branch:** main | **Commits:** 24
+**Último commit:** bc5dfa1a92e8d5c3b18cfc0c8373adb250b5153f refactor: remove self-monitoring, focus
 
 ---
 
@@ -10,17 +10,12 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 5,698 | OK |
+| Código (linhas Python) | 5,675 | OK |
 | Testes unitários | 19 | OK |
 | Tabelas no banco | 14 | OK |
 | Citações coletadas | 0 | Aguardando API keys |
 | Taxa de citação | 0.0% | — |
 | Última coleta | — | Pendente |
-
-## Foco da Pesquisa
-
-Estudo empírico de como LLMs citam bancos e fintechs brasileiras.
-**Coorte:** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
 
 ## FinOps — Gastos do Mês
 
@@ -44,10 +39,10 @@ Estudo empírico de como LLMs citam bancos e fintechs brasileiras.
 |-------|-----------|--------|
 | Dados mínimos | 1.000 citações | 0/1.000 |
 | Série temporal | 90 dias contínuos | Pendente |
-| Coorte completa | 15 fintechs monitoradas | 0 observações |
+| Grupo de controle | 15 concorrentes | 0 observações |
 | Análise estatística | p < 0.05 | Pendente |
 | Preprint | ArXiv submission | Pendente |
 
 ---
 
-*Gerado por `scripts/update-docs.py`*
+*Gerado por `scripts/update-docs.py` — GEO Research*

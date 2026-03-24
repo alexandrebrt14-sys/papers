@@ -115,13 +115,14 @@ class LLMClient:
     - New: ~$0.04/day ($1.20/mo) — mini + haiku + flash + JSON mode + cache
     """
 
-    MAX_RETRIES = 2
-    RETRY_BACKOFF = [2, 5]  # seconds
+    MAX_RETRIES = 1
+    RETRY_BACKOFF = [3]  # seconds — single retry, then circuit break
 
     def __init__(self) -> None:
         self._http = httpx.Client(timeout=60.0)
         self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
         self._run_id = ""
+        self._circuit_broken: set[str] = set()  # providers with 429, skip rest
 
     def set_run_id(self, run_id: str) -> None:
         self._run_id = run_id
@@ -129,6 +130,10 @@ class LLMClient:
     def query(self, llm: LLMConfig, prompt: str) -> LLMResponse | None:
         """Query an LLM with all optimizations applied."""
         if llm.requires_scraping or not llm.api_key:
+            return None
+
+        # Circuit breaker: if this provider already 429'd, skip immediately
+        if llm.provider in self._circuit_broken:
             return None
 
         # 1. Check cache
@@ -158,11 +163,16 @@ class LLMClient:
                     })
                 return response
             except httpx.HTTPStatusError as e:
-                if e.response.status_code == 429 and attempt < self.MAX_RETRIES:
-                    wait = self.RETRY_BACKOFF[attempt]
-                    logger.warning(f"[429] {llm.name} rate-limited, retry in {wait}s...")
-                    time.sleep(wait)
-                    continue
+                if e.response.status_code == 429:
+                    if attempt < self.MAX_RETRIES:
+                        wait = self.RETRY_BACKOFF[attempt]
+                        logger.warning(f"[429] {llm.name} rate-limited, retry in {wait}s...")
+                        time.sleep(wait)
+                        continue
+                    # Circuit break: skip all remaining queries for this provider
+                    self._circuit_broken.add(llm.provider)
+                    logger.warning(f"[circuit-break] {llm.name} 429 after retries — skipping remaining queries")
+                    return None
                 logger.error(f"[{llm.name}] HTTP {e.response.status_code}: {e.response.text[:200]}")
                 return None
             except Exception as e:
