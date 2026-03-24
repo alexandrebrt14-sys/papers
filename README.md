@@ -9,16 +9,21 @@ Desenvolvido pela [Brasil GEO](https://brasilgeo.ai) como infraestrutura de supo
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    GitHub Actions (Cron)                     │
-│              daily-collect · weekly-benchmark                │
+│         daily-collect (06:00 BRT) · weekly-benchmark         │
 └──────────────────────┬──────────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────────┐
-│                     7 Módulos de Coleta                      │
+│                  CLI (click + rich)                           │
+│             python -m src.cli <command>                       │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                  7 Módulos de Coleta                          │
 │                                                              │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ │
 │  │ 1. Citation   │ │ 2. Competitor│ │ 3. SERP vs AI        │ │
 │  │    Tracker    │ │    Benchmark │ │    Overlap           │ │
-│  │ (5 LLMs)     │ │ (controle)   │ │ (divergência)        │ │
+│  │ (4 LLMs API) │ │ (15 fintech) │ │ (divergência)        │ │
 │  └──────────────┘ └──────────────┘ └──────────────────────┘ │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ │
 │  │ 4. Content   │ │ 6. Statistical│ │ 7. Citation          │ │
@@ -28,54 +33,85 @@ Desenvolvido pela [Brasil GEO](https://brasilgeo.ai) como infraestrutura de supo
 └──────────────────────┬──────────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────────┐
-│              5. Persistência de Série Temporal                │
-│              Supabase + SQLite fallback                       │
-│              Granularidade: diária / por-evento / semanal     │
+│           5. Persistência + Logging                          │
+│     SQLite/Supabase · JSONL structured · Rich console        │
+│     Rotação diária · 30d texto · 90d erros                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Módulos
+## Status
 
 | # | Módulo | Função | Status |
 |---|--------|--------|--------|
-| 1 | Multi-LLM Citation Tracker | Monitora citações em 5 LLMs (ChatGPT, Claude, Gemini, Perplexity, Copilot) | Em desenvolvimento |
-| 2 | Competitor Benchmark Dataset | Grupo de controle com 5-10 entidades comparáveis | Em desenvolvimento |
-| 3 | SERP vs AI Overlap Tracker | Divergência entre Google SERP e respostas de IA | Em desenvolvimento |
-| 4 | Content Intervention Tracker | A/B testing de otimizações com medição before/after | Em desenvolvimento |
-| 5 | Persistência de Série Temporal | Supabase + SQLite, dados longitudinais 6-12 meses | Em desenvolvimento |
-| 6 | Statistical Analysis Module | Testes de significância, correlação, regressão, visualização | Em desenvolvimento |
-| 7 | Citation Context Analyzer | Sentimento, atribuição, precisão factual, posição | Em desenvolvimento |
+| 1 | Multi-LLM Citation Tracker | Citações em ChatGPT, Claude, Gemini, Perplexity | Pronto |
+| 2 | Competitor Benchmark | Grupo de controle: 15 fintechs (Nubank, Stone, Cielo...) | Pronto |
+| 3 | SERP vs AI Overlap | Divergência Google SERP vs respostas IA | Pronto |
+| 4 | Intervention Tracker | A/B testing de otimizações (schema, llms.txt, citações) | Pronto |
+| 5 | Time Series Persistence | SQLite + Supabase, snapshots diários, 6-12 meses | Pronto |
+| 6 | Statistical Analysis | Chi-squared, t-test, ANOVA, regressão logística, viz | Pronto |
+| 7 | Citation Context Analyzer | Sentimento, atribuição, precisão factual, hedging | Pronto |
 
-## Objetivo Científico
+## API Keys Configuradas
 
-Gerar datasets longitudinais de 6-12 meses que permitam:
-- Publicação em conferências tier-1 (KDD, SIGIR, WWW, WSDM)
-- Submissão a journals peer-reviewed (IJDSML, IJRASET, Infonomy)
-- Preprints no ArXiv com dados reprodutíveis
+| Provedor | Modelo | Status | Custo |
+|----------|--------|--------|-------|
+| OpenAI | gpt-4o | GitHub Secret | ~$3/mês |
+| Anthropic | claude-sonnet-4 | GitHub Secret | ~$2/mês |
+| Google AI | gemini-2.0-flash | GitHub Secret | Grátis |
+| Perplexity | sonar | Pendente | ~$5/mês |
 
-### Métricas-alvo por query
+## Concorrentes Monitorados (Ecossistema Fintech)
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `cited` | bool | LLM citou a entidade? |
-| `position` | int | Posição na resposta (1=primeiro terço) |
-| `context` | text | Resposta completa do LLM |
-| `sentiment` | enum | positivo / neutro / negativo |
-| `sources` | array | Fontes listadas pelo LLM |
-| `attribution` | enum | nomeou / linkou / parafraseou |
-| `factual_accuracy` | bool | Reproduziu corretamente? |
-| `confidence_language` | text | Hedging ("segundo...", "possivelmente...") |
-| `timestamp` | datetime | UTC |
-| `model` | string | Modelo e versão exatos |
+Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
+
+## Queries: 55 padronizadas
+
+8 categorias: brand, entity, concept, technical, b2a, market, academic, fintech (product/trust/b2b)
+
+## Observabilidade
+
+| Destino | Formato | Retenção |
+|---------|---------|----------|
+| Console | Rich (colorido) | Sessão |
+| `logs/papers.log` | Texto, rotação diária | 30 dias |
+| `logs/papers.jsonl` | JSON Lines estruturado | Ilimitado |
+| `logs/errors.log` | Erros, rotação diária | 90 dias |
+| `logs/run_*.jsonl` | Log completo por execução | Ilimitado |
+
+Cada execução gera um `run_id` para rastreabilidade. Eventos estruturados: started, query_cited, query_not_cited, query_error, completed.
 
 ## Setup
 
 ```bash
 pip install -e ".[dev]"
-cp .env.example .env  # Preencher API keys
 python -m src.cli db migrate
-python -m src.cli collect --all
+python -m src.cli collect all
 ```
+
+## Comandos
+
+```bash
+# Coleta
+python -m src.cli collect all          # Todos os módulos
+python -m src.cli collect citation     # Só Citation Tracker
+python -m src.cli collect competitor   # Só Competitor Benchmark
+python -m src.cli collect serp         # Só SERP Overlap
+
+# Análise
+python -m src.cli analyze report       # Relatório estatístico
+
+# Intervenções
+python -m src.cli intervention add <slug> --type schema_org --desc "..." --url "..."
+
+# Banco de dados
+python -m src.cli db migrate           # Aplicar schema
+python -m src.cli db export --format csv
+python -m src.cli db health            # Verificar completude
+```
+
+## Documentação
+
+- **[Manual do Sistema](docs/MANUAL.md)** — Referência completa com todos os módulos, schema, queries, custos e roadmap de 12 meses
 
 ## Licença
 

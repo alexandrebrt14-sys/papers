@@ -25,6 +25,12 @@ data/*.json
 .DS_Store
 Thumbs.db
 
+# Logs (keep structure, ignore runtime logs)
+logs/*.log
+logs/*.jsonl
+logs/run_*.jsonl
+!logs/.gitkeep
+
 # Output
 output/
 reports/
