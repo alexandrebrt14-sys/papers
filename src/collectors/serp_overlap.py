@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.config import STANDARD_QUERIES
 from src.collectors.base import BaseCollector, BraveSearchClient
 
 
@@ -26,7 +25,7 @@ class SerpAIOverlap(BaseCollector):
         brave = BraveSearchClient()
 
         # Use EN queries for SERP
-        serp_queries = [q for q in STANDARD_QUERIES if q["lang"] == "en"]
+        serp_queries = [q for q in self.queries if q["lang"] == "en"]
 
         for q in serp_queries:
             serp_results = brave.search(q["query"], count=10)

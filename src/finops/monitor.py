@@ -66,23 +66,26 @@ def check_openai_balance() -> dict[str, Any] | None:
 
 
 def check_anthropic_balance() -> dict[str, Any] | None:
-    """Check Anthropic credit balance via API."""
+    """Verify Anthropic API key is valid via GET /v1/models.
+
+    The previous endpoint (/v1/messages/count_tokens) does not exist.
+    GET /v1/models returns 200 with a valid key, 401/403 otherwise.
+    """
     api_key = os.getenv("ANTHROPIC_API_KEY", "")
     if not api_key:
         return None
     try:
         r = httpx.get(
-            "https://api.anthropic.com/v1/messages/count_tokens",
+            "https://api.anthropic.com/v1/models",
             headers={"x-api-key": api_key, "anthropic-version": "2023-06-01"},
             timeout=10,
         )
-        # If we get 400 (bad request) instead of 401/403, credits are OK
-        if r.status_code in (200, 400):
-            return {"platform": "anthropic", "status": "credits_ok"}
+        if r.status_code == 200:
+            return {"platform": "anthropic", "status": "api_key_valid"}
         elif r.status_code in (401, 403):
             return {"platform": "anthropic", "status": "auth_error", "code": r.status_code}
         else:
-            return {"platform": "anthropic", "status": "credit_low_or_error", "code": r.status_code}
+            return {"platform": "anthropic", "status": "unknown_error", "code": r.status_code}
     except Exception as e:
         return {"platform": "anthropic", "status": "error", "error": str(e)}
 

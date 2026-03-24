@@ -254,10 +254,10 @@ class CollectionConfig:
         LLMConfig(
             name="Claude",
             provider="anthropic",
-            model="claude-haiku-4-5-20251001",  # $1.00/$5.00 per MTok (cheapest Anthropic)
+            model="claude-haiku-4-5-20251001",  # $0.80/$4.00 per MTok (cheapest Anthropic)
             api_key=os.getenv("ANTHROPIC_API_KEY"),
-            input_cost_per_mtok=1.00,
-            output_cost_per_mtok=5.00,
+            input_cost_per_mtok=0.80,
+            output_cost_per_mtok=4.00,
             max_output_tokens=250,
             supports_json_mode=True,
             supports_batch=True,

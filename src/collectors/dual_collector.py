@@ -15,7 +15,7 @@ import logging
 import re
 from typing import Any
 
-from src.config import config, SYSTEM_PROMPT, PERPLEXITY_SYSTEM, STANDARD_QUERIES, LLMConfig
+from src.config import config, SYSTEM_PROMPT, PERPLEXITY_SYSTEM, LLMConfig
 from src.collectors.base import BaseCollector, LLMClient, LLMResponse
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class DualCollector(BaseCollector):
 
     def collect(self) -> list[dict[str, Any]]:
         results = []
-        queries = [q for q in STANDARD_QUERIES if q["category"] in ("concept", "technical", "fintech", "fintech_trust")][:10]
+        queries = [q for q in self.queries if q["category"] in ("concept", "technical") or q["category"].startswith(self.vertical)][:10]
 
         for llm_cfg in self.config.llms:
             if llm_cfg.requires_scraping or not llm_cfg.api_key:
@@ -112,7 +112,7 @@ class DualCollector(BaseCollector):
             return []
         text_lower = text.lower()
         entities = []
-        for entity in self.config.cohort_entities:
+        for entity in self.cohort:
             if entity.lower() in text_lower:
                 entities.append(entity)
         return entities

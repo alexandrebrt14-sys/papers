@@ -168,6 +168,85 @@ class DatabaseClient:
         )
         self._conn.commit()
 
+    def insert_citation_context(self, citation_id: int, result: dict[str, Any]) -> None:
+        """Insert a citation context analysis result."""
+        sql = """
+            INSERT INTO citation_context (
+                citation_id, entity, sentiment, attribution,
+                factual_accuracy_json, position_tercile, hedging,
+                hedging_phrases, context_window, sentiment_signals
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        self._conn.execute(sql, (
+            citation_id,
+            result["entity"],
+            result.get("sentiment"),
+            result.get("attribution"),
+            json.dumps(result.get("factual_accuracy"), ensure_ascii=False) if result.get("factual_accuracy") else None,
+            result.get("position_tercile"),
+            result.get("hedging", False),
+            json.dumps(result.get("hedging_phrases", []), ensure_ascii=False),
+            result.get("context_window"),
+            json.dumps(result.get("sentiment_signals", []), ensure_ascii=False),
+        ))
+        self._conn.commit()
+
+    def insert_intervention(self, record: dict[str, Any]) -> int:
+        """Insert a new intervention record. Returns rowid."""
+        sql = """
+            INSERT INTO interventions (
+                slug, intervention_type, description, url,
+                queries_json, baseline_json, registered_at, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        cursor = self._conn.execute(sql, (
+            record["slug"],
+            record["intervention_type"],
+            record["description"],
+            record["url"],
+            json.dumps(record.get("queries", []), ensure_ascii=False),
+            json.dumps(record.get("baseline_citations", {}), ensure_ascii=False),
+            record.get("registered_at", datetime.now(timezone.utc).isoformat()),
+            record.get("status", "active"),
+        ))
+        self._conn.commit()
+        return cursor.lastrowid
+
+    def insert_intervention_measurement(self, record: dict[str, Any]) -> int:
+        """Insert an intervention measurement. Returns rowid."""
+        sql = """
+            INSERT INTO intervention_measurements (
+                intervention_slug, timestamp, days_since_intervention,
+                citations_json, citation_rate, delta_from_baseline, details_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """
+        cursor = self._conn.execute(sql, (
+            record["intervention_slug"],
+            record.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            record["days_since_intervention"],
+            json.dumps(record.get("citations_by_llm", {}), ensure_ascii=False),
+            record.get("citation_rate"),
+            record.get("delta_from_baseline"),
+            json.dumps(record.get("details", {}), ensure_ascii=False),
+        ))
+        self._conn.commit()
+        return cursor.lastrowid
+
+    def get_active_interventions(self) -> list[dict[str, Any]]:
+        """Return all active interventions."""
+        rows = self._conn.execute(
+            "SELECT * FROM interventions WHERE status = 'active'"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def get_intervention_measurements(self, slug: str) -> list[dict[str, Any]]:
+        """Return all measurements for an intervention."""
+        rows = self._conn.execute(
+            "SELECT * FROM intervention_measurements WHERE intervention_slug = ? ORDER BY days_since_intervention",
+            (slug,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
     # === Query methods ===
 
     def get_citation_rate(

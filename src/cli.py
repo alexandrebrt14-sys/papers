@@ -16,6 +16,7 @@ from src.db.client import DatabaseClient
 from src.collectors.citation_tracker import CitationTracker
 from src.collectors.competitor import CompetitorBenchmark
 from src.collectors.serp_overlap import SerpAIOverlap
+from src.collectors.context_analyzer import CitationContextAnalyzer
 from src.collectors.intervention import InterventionTracker
 from src.persistence.timeseries import TimeSeriesManager
 
@@ -101,6 +102,34 @@ def collect_all(ctx: click.Context) -> None:
                 duration = int((time.time() - start) * 1000)
                 db.insert_collection_run(name, 0, duration, status="error", error_msg=str(e), vertical=vert)
                 console.print(f"  [red]Erro: {e}[/red]")
+
+        # Run context analyzer on citations just collected
+        console.print(f"\n[bold cyan]Analisando contexto das citações...[/bold cyan]")
+        try:
+            analyzer = CitationContextAnalyzer()
+            ctx_rows = db._conn.execute(
+                "SELECT id, query, response_text FROM citations "
+                "WHERE vertical = ? AND response_text IS NOT NULL "
+                "ORDER BY id DESC LIMIT 200",
+                (vert,),
+            ).fetchall()
+            ctx_count = 0
+            cohort = get_cohort(vert)
+            for row in ctx_rows:
+                # Skip if already analyzed
+                existing = db._conn.execute(
+                    "SELECT 1 FROM citation_context WHERE citation_id = ?", (row["id"],)
+                ).fetchone()
+                if existing:
+                    continue
+                for entity in cohort:
+                    result = analyzer.analyze(entity, row["response_text"])
+                    if result["cited"]:
+                        db.insert_citation_context(row["id"], result)
+                        ctx_count += 1
+            console.print(f"  [green]{ctx_count} registros de contexto salvos[/green]")
+        except Exception as e:
+            console.print(f"  [yellow]Context analyzer: {e}[/yellow]")
 
         # Save daily snapshot per vertical
         ts = TimeSeriesManager(db)
@@ -244,6 +273,101 @@ def analyze_report(ctx: click.Context) -> None:
     db.close()
 
 
+@analyze.command("visualize")
+@click.option("--output-dir", "-o", default="output", help="Diretório de saída para gráficos.")
+@click.pass_context
+def analyze_visualize(ctx: click.Context, output_dir: str) -> None:
+    """Gerar gráficos de publicação (5 visualizações)."""
+    from pathlib import Path
+    from src.analysis.visualization import (
+        plot_citation_rate_by_llm,
+        plot_citation_trend,
+        plot_serp_ai_overlap,
+        plot_competitor_comparison,
+        plot_intervention_impact,
+        OUTPUT_DIR,
+    )
+    import pandas as pd
+
+    # Override output dir if specified
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    import src.analysis.visualization as viz
+    viz.OUTPUT_DIR = out
+
+    db = get_db()
+    verticals = resolve_verticals(ctx)
+    generated = []
+
+    for vert in verticals:
+        console.print(f"\n[bold magenta]--- Visualizações: {vert} ---[/bold magenta]")
+
+        where = "WHERE vertical = ?"
+        params = [vert]
+
+        # 1. Citation rate by LLM
+        rows = db._conn.execute(f"SELECT * FROM citations {where}", params).fetchall()
+        if rows:
+            df = pd.DataFrame([dict(r) for r in rows])
+            path = plot_citation_rate_by_llm(df, output=f"citation_rate_by_llm_{vert}.png")
+            generated.append(path)
+            console.print(f"  [green]1/5 Taxa de citação por LLM: {path}[/green]")
+
+            # 2. Citation trend
+            path = plot_citation_trend(df, output=f"citation_trend_{vert}.png")
+            generated.append(path)
+            console.print(f"  [green]2/5 Tendência de citação: {path}[/green]")
+        else:
+            console.print(f"  [yellow]1-2/5 Sem dados de citação para {vert}[/yellow]")
+
+        # 3. SERP vs AI overlap
+        serp_rows = db._conn.execute(
+            f"SELECT * FROM serp_ai_overlap {where}", params
+        ).fetchall()
+        if serp_rows:
+            df_serp = pd.DataFrame([dict(r) for r in serp_rows])
+            path = plot_serp_ai_overlap(df_serp, output=f"serp_ai_overlap_{vert}.png")
+            generated.append(path)
+            console.print(f"  [green]3/5 Sobreposição SERP-IA: {path}[/green]")
+        else:
+            console.print(f"  [yellow]3/5 Sem dados de overlap SERP para {vert}[/yellow]")
+
+        # 4. Competitor comparison
+        comp_rows = db._conn.execute(
+            f"SELECT * FROM competitor_citations {where}", params
+        ).fetchall()
+        if comp_rows:
+            df_comp = pd.DataFrame([dict(r) for r in comp_rows])
+            path = plot_competitor_comparison(df_comp, output=f"competitor_comparison_{vert}.png")
+            generated.append(path)
+            console.print(f"  [green]4/5 Comparativo de competidores: {path}[/green]")
+        else:
+            console.print(f"  [yellow]4/5 Sem dados de benchmark para {vert}[/yellow]")
+
+        # 5. Intervention impact
+        interventions = db._conn.execute(
+            "SELECT * FROM interventions WHERE status IN ('active', 'completed')"
+        ).fetchall()
+        if interventions:
+            for intv in interventions:
+                measurements = db.get_intervention_measurements(intv["slug"])
+                if measurements:
+                    baseline = json.loads(intv["baseline_json"]) if intv["baseline_json"] else {}
+                    baseline_rate = sum(baseline.values()) / max(len(baseline), 1) if baseline else 0.0
+                    path = plot_intervention_impact(
+                        measurements, baseline_rate,
+                        output=f"intervention_impact_{intv['slug']}.png",
+                    )
+                    generated.append(path)
+                    console.print(f"  [green]5/5 Impacto intervenção '{intv['slug']}': {path}[/green]")
+        else:
+            console.print(f"  [yellow]5/5 Sem intervenções registradas[/yellow]")
+
+    db.close()
+    console.print(f"\n[bold green]{len(generated)} gráficos gerados em {out}[/bold green]")
+
+
 # === Database Commands ===
 
 @main.group()
@@ -305,15 +429,35 @@ def intervention(ctx: click.Context) -> None:
 @click.option("--url", required=True, help="URL do conteúdo modificado")
 def intervention_add(slug: str, itype: str, desc: str, url: str) -> None:
     """Registrar nova intervenção de conteúdo."""
+    db = get_db()
     record = InterventionTracker.create_intervention(
         slug=slug,
         intervention_type=itype,
         description=desc,
         url=url,
-        queries=[q["query"] for q in config.llms[:5]],  # Default queries
+        queries=[q["query"] for q in get_queries("fintech")[:5]],
     )
-    console.print(f"[green]Intervenção registrada: {slug} ({itype})[/green]")
+    db.insert_intervention(record)
+    db.close()
+    console.print(f"[green]Intervenção registrada e salva: {slug} ({itype})[/green]")
     console.print(json.dumps(record, indent=2, ensure_ascii=False))
+
+
+@intervention.command("check")
+def intervention_check() -> None:
+    """Verificar intervenções ativas e registrar medições (dia +7, +14, +30)."""
+    db = get_db()
+    results = InterventionTracker.check_active_interventions(db)
+    if results:
+        console.print(f"[green]{len(results)} medições registradas.[/green]")
+        for m in results:
+            console.print(
+                f"  {m['intervention_slug']} dia +{m['days_since_intervention']}: "
+                f"taxa={m['citation_rate']:.1%}"
+            )
+    else:
+        console.print("[yellow]Nenhuma medição pendente (ou sem intervenções ativas).[/yellow]")
+    db.close()
 
 
 # Alias 'db' to 'db_cmd'

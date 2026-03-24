@@ -5,6 +5,10 @@ on:
     - cron: '0 */6 * * *'  # Every 6 hours
   workflow_dispatch:
 
+concurrency:
+  group: papers-${{ github.workflow }}
+  cancel-in-progress: true
+
 env:
   PAPERS_DB_PATH: data/papers.db
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

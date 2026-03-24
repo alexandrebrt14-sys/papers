@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from src.config import config, STANDARD_QUERIES
 from src.collectors.base import BaseCollector, LLMClient
 
 logger = logging.getLogger(__name__)
@@ -130,7 +129,7 @@ class PromptSensitivityAnalyzer(BaseCollector):
         text = (response.response_text or "").lower()
         entities = [e.lower() for e in (response.cited_entities or [])]
 
-        for target in self.config.cohort_entities:
+        for target in self.cohort:
             target_lower = target.lower()
             if target_lower in text or target_lower in entities:
                 return True

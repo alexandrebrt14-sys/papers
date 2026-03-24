@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-24T12:49:21.677565+00:00",
+  "generated_at": "2026-03-24T17:25:06.371510+00:00",
   "budgets": [
     {
       "platform": "openai",
@@ -53,7 +53,7 @@
   "alerts_recent": [],
   "daily_rollups": [
     {
-      "id": 2,
+      "id": 8,
       "date": "2026-03-24",
       "platform": "openai",
       "total_queries": 1,
@@ -62,7 +62,8 @@
       "total_cost_usd": 0.000262,
       "avg_cost_per_query": 0.0002625,
       "max_single_query_cost": 0.000262,
-      "models_used": "[\"gpt-4o-mini\"]"
+      "models_used": "[\"gpt-4o-mini\"]",
+      "vertical": "fintech"
     }
   ],
   "stale_check": {
@@ -71,7 +72,7 @@
     "platforms": {
       "openai": {
         "last_activity": "2026-03-24T12:41:37.616964+00:00",
-        "hours_ago": 0.1,
+        "hours_ago": 4.7,
         "stale": false
       },
       "anthropic": {
@@ -91,20 +92,5 @@
       }
     }
   },
-  "pricing_warnings": [
-    {
-      "type": "missing_model",
-      "platform": "bing",
-      "model": "copilot",
-      "message": "Model copilot not in pricing table for bing"
-    },
-    {
-      "type": "price_drift",
-      "platform": "anthropic",
-      "model": "claude-sonnet-4-20250514",
-      "config_price": 0.003,
-      "tracker_price": 0.009,
-      "message": "Price drift detected for claude-sonnet-4-20250514: config=0.003 vs tracker=0.009"
-    }
-  ]
+  "pricing_warnings": []
 }
