@@ -34,11 +34,31 @@ class DatabaseClient:
         logger.info(f"Conectado ao banco: {self.db_path}")
 
     def _apply_schema(self) -> None:
-        """Apply SQL schema from file."""
+        """Apply SQL schema from file, with incremental migration for vertical column."""
         if not SCHEMA_PATH.exists():
             raise FileNotFoundError(f"Schema not found: {SCHEMA_PATH}")
+        # First, migrate existing tables to add vertical column if missing
+        self._migrate_add_vertical()
         schema = SCHEMA_PATH.read_text(encoding="utf-8")
         self._conn.executescript(schema)
+        self._conn.commit()
+
+    def _migrate_add_vertical(self) -> None:
+        """Add vertical column to existing tables if not present."""
+        tables_needing_vertical = [
+            "citations", "competitor_citations", "serp_ai_overlap",
+            "daily_snapshots", "collection_runs", "dual_responses",
+            "finops_usage", "finops_daily_rollup",
+        ]
+        for table in tables_needing_vertical:
+            try:
+                cols = [r[1] for r in self._conn.execute(f"PRAGMA table_info({table})").fetchall()]
+                if cols and "vertical" not in cols:
+                    default = "'fintech'"
+                    self._conn.execute(f"ALTER TABLE {table} ADD COLUMN vertical TEXT NOT NULL DEFAULT {default}")
+                    logger.info(f"Migração: coluna 'vertical' adicionada a {table}")
+            except Exception:
+                pass  # Table doesn't exist yet, schema will create it
         self._conn.commit()
 
     def close(self) -> None:

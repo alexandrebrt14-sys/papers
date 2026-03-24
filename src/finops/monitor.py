@@ -156,7 +156,7 @@ def validate_pricing() -> list[dict[str, Any]]:
         model_prices = provider_prices.get(llm.model, provider_prices.get("_default", {}))
         if model_prices:
             avg_price = (model_prices.get("input", 0) + model_prices.get("output", 0)) / 2 / 1000
-            config_price = llm.cost_per_1k_tokens
+            config_price = (llm.input_cost_per_mtok + llm.output_cost_per_mtok) / 2 / 1000
             if config_price > 0 and abs(avg_price - config_price) / max(config_price, 0.0001) > 0.5:
                 warnings.append({
                     "type": "price_drift",
