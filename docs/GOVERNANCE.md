@@ -1,0 +1,152 @@
+# Governança — Papers
+
+**Última atualização:** 2026-03-24
+**Responsável:** Alexandre Caramaschi — CEO da Brasil GEO
+
+---
+
+## 1. Princípios de Governança
+
+### 1.1 Integridade dos Dados
+- Dados coletados nunca são editados manualmente
+- Toda modificação é registrada com timestamp e run_id
+- Datasets exportados incluem metadados de coleta (LLM, modelo, versão)
+
+### 1.2 Reprodutibilidade
+- Queries padronizadas e versionadas no código
+- Schema SQL versionado no repositório
+- Seeds documentados quando aplicável
+
+### 1.3 Transparência de Custos
+- Todo uso de API registrado com custo calculado
+- Dashboard FinOps acessível em tempo real
+- Alertas proativos antes de atingir limites
+
+---
+
+## 2. Políticas de Gasto (FinOps)
+
+### 2.1 Limites por Plataforma
+
+| Plataforma | Mensal (USD) | Diário (USD) | Alerta | Hard Stop |
+|-----------|-------------|-------------|--------|-----------|
+| OpenAI | $10.00 | $1.00 | 70% | 95% |
+| Anthropic | $10.00 | $1.00 | 70% | 95% |
+| Gemini | $5.00 | $0.50 | 80% | 100% |
+| Perplexity | $10.00 | $1.00 | 70% | 95% |
+| **Global** | **$30.00** | **$3.00** | **70%** | **95%** |
+
+### 2.2 Regras de Escalação
+
+| Nível | Trigger | Ação |
+|-------|---------|------|
+| Info | Coleta concluída | Log estruturado (JSONL) |
+| Warning | 70% do limite | Email para caramaschiai@caramaschiai.io |
+| Critical | 90% do limite | Email urgente + log |
+| Exceeded | 100% do limite | Email + bloqueio automático de novas queries |
+
+### 2.3 Revisão de Limites
+- Limites revisados mensalmente com base no relatório FinOps
+- Aumento requer justificativa documentada neste arquivo
+- Redução pode ser feita a qualquer momento via CLI
+
+---
+
+## 3. Política de Dados
+
+### 3.1 Retenção
+- **Dados brutos (SQLite):** Indefinida (são o produto da pesquisa)
+- **Logs de execução:** 30 dias (text), 90 dias (errors), ilimitado (JSONL)
+- **Artifacts GitHub:** 90 dias (daily), 365 dias (weekly)
+- **Exports CSV:** Gerados sob demanda, não persistidos
+
+### 3.2 Acesso
+- Repositório público (MIT license)
+- API keys em GitHub Secrets (criptografadas)
+- Dados pessoais de leads: NÃO coletados neste projeto
+
+### 3.3 Ética de Pesquisa
+- Apenas dados públicos de APIs são coletados
+- Nenhum scraping de conteúdo protegido
+- Respostas de LLMs são dados observacionais, não intervenções em sujeitos humanos
+- Concorrentes monitorados são entidades públicas com presença digital
+
+---
+
+## 4. Processo de Publicação
+
+### 4.1 Pré-requisitos para Submissão
+- [ ] Mínimo 90 dias de dados longitudinais contínuos
+- [ ] N >= 1000 observações por LLM
+- [ ] Grupo de controle (concorrentes) com mesma granularidade
+- [ ] Testes estatísticos com p < 0.05 e effect sizes reportados
+- [ ] Datasets reprodutíveis (CSV exportável)
+
+### 4.2 Journals e Conferências Alvo
+
+| Venue | Tipo | Área | Deadline |
+|-------|------|------|----------|
+| KDD | Conferência | Data Mining | Fevereiro |
+| SIGIR | Conferência | Information Retrieval | Janeiro |
+| WWW | Conferência | Web | Outubro |
+| WSDM | Conferência | Web Search & Data Mining | Agosto |
+| Information Sciences | Journal | IS | Rolling |
+| JASIST | Journal | Information Science | Rolling |
+
+### 4.3 Títulos Candidatos
+1. "How LLMs Cite: A Longitudinal Study of Entity Visibility in Generative Search"
+2. "GEO vs SEO: Empirical Evidence of Source Divergence in AI-Powered Search"
+3. "The Invisible Excellence Paradox: When Technical Optimization Fails to Produce AI Citations"
+
+---
+
+## 5. Decisões Arquiteturais (ADR)
+
+### ADR-001: SQLite como storage primário
+- **Data:** 2026-03-24
+- **Decisão:** SQLite local como banco principal, Supabase como futuro
+- **Motivo:** Zero infra, portabilidade, backup como artifact do GitHub Actions
+- **Trade-off:** Sem concorrência de escrita, mas coleta é single-threaded
+
+### ADR-002: Coleta diária + benchmark semanal
+- **Data:** 2026-03-24
+- **Decisão:** Citation tracker diário, SERP overlap semanal
+- **Motivo:** SERP não muda diariamente; economiza quota SerpAPI
+- **Trade-off:** Menor granularidade para overlap, mas custo 7x menor
+
+### ADR-003: 55 queries padronizadas
+- **Data:** 2026-03-24
+- **Decisão:** Queries fixas em 8 categorias, PT-BR e EN
+- **Motivo:** Reprodutibilidade; mesmas queries para entidade primária e concorrentes
+- **Trade-off:** Pode não capturar tendências emergentes
+
+### ADR-004: FinOps com hard stop
+- **Data:** 2026-03-24
+- **Decisão:** Bloqueio automático de queries quando atingir 95% do budget
+- **Motivo:** Prevenir surpresas financeiras em pesquisa de longo prazo
+- **Trade-off:** Pode interromper coleta em dias de alta demanda
+
+---
+
+## 6. Registro de Mudanças de Governança
+
+| Data | Mudança | Justificativa |
+|------|---------|---------------|
+| 2026-03-24 | Documento criado | Estabelecer governança formal para pesquisa |
+| 2026-03-24 | FinOps limites definidos | $30/mês global baseado em estimativa de 55 queries × 5 LLMs × 30 dias |
+
+---
+
+<!-- AUTOGENERATED: Resumo FinOps -->
+## Resumo FinOps (auto-atualizado)
+
+| Plataforma | Gasto Mensal | Limite | % Usado |
+|-----------|-------------|--------|---------|
+| openai | $0.0006 | $10.00 | 0.0% |
+| anthropic | $0.0015 | $10.00 | 0.0% |
+| gemini | $0.0003 | $5.00 | 0.0% |
+| perplexity | $0.0000 | $10.00 | 0.0% |
+| **global** | **$0.0024** | **$30.00** | **0.0%** |
+
+*Atualizado automaticamente em 2026-03-24 12:32 UTC*
+<!-- END AUTOGENERATED -->

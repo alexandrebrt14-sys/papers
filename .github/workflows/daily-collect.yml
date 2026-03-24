@@ -46,14 +46,19 @@ jobs:
           path: data/papers.db
           retention-days: 90
 
-      - name: Commit data snapshot
+      - name: Update documentation
+        env:
+          PAPERS_DB_PATH: data/papers.db
+        run: python scripts/update-docs.py
+
+      - name: Commit data + docs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -f data/papers.db ]; then
-            # Export daily CSV for git tracking (DB is gitignored)
             python -m src.cli db export --format csv --output data/daily
             git add data/daily_*.csv 2>/dev/null || true
-            git diff --cached --quiet || git commit -m "data: daily collection $(date -u +%Y-%m-%d)"
-            git push
           fi
+          git add docs/ 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "data+docs: daily collection $(date -u +%Y-%m-%d)"
+          git push
