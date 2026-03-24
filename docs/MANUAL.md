@@ -179,14 +179,25 @@ Cada execução de coleta gera um `CollectionLogger` com:
 
 ### daily-collect.yml
 - **Cron:** 09:00 UTC (06:00 BRT)
-- **Módulos:** Citation Tracker + Competitor Benchmark
+- **Módulos:** Citation Tracker + Competitor Benchmark (4 LLMs)
+- **FinOps:** Rollup + budget check + dashboard
+- **Relatório:** Enviado automaticamente por email para caramaschiai@caramaschiai.io
 - **Artifact:** `papers-db-{run}` (90 dias)
-- **Commit:** CSV exportado automaticamente
+- **Commit:** CSV + docs + FinOps commitados automaticamente
 
 ### weekly-benchmark.yml
 - **Cron:** Domingo 11:00 UTC (08:00 BRT)
-- **Módulos:** Todos (SERP Overlap + coleta completa + relatório)
+- **Módulos:** Todos (SERP Overlap + coleta completa + análise estatística)
+- **Relatório:** Enviado por email com métricas semanais acumuladas
 - **Artifact:** `weekly-report-{run}` (365 dias)
+
+### Relatório por Email
+Após cada coleta (diária e semanal), um relatório HTML é enviado automaticamente via Resend API com:
+- Taxa de citação do dia e acumulada
+- Custo e tokens por plataforma (FinOps)
+- Status de cada execução (módulo, registros, duração)
+- Alertas de orçamento ativos
+- Script: `scripts/send-report.py`
 
 ---
 
@@ -196,11 +207,13 @@ Cada execução de coleta gera um `CollectionLogger` com:
 
 | Variável | Obrigatória | Descrição |
 |----------|-------------|-----------|
-| OPENAI_API_KEY | Sim | ChatGPT queries |
-| ANTHROPIC_API_KEY | Sim | Claude queries |
-| GOOGLE_AI_API_KEY | Sim | Gemini queries (grátis) |
-| PERPLEXITY_API_KEY | Recomendada | Perplexity queries |
-| SERPAPI_KEY | Opcional | Google SERP data |
+| OPENAI_API_KEY | Sim | ChatGPT gpt-4o-mini ($0,15/$0,60 MTok) |
+| ANTHROPIC_API_KEY | Sim | Claude haiku-4.5 ($1/$5 MTok, $55 crédito) |
+| GOOGLE_AI_API_KEY | Sim | Gemini 2.5 Flash ($0,15/$0,60 MTok, billing Cloud ativo) |
+| PERPLEXITY_API_KEY | Sim | Perplexity sonar ($1/$1 MTok + $0,005/busca, $89 crédito) |
+| RESEND_API_KEY | Sim | Envio de relatórios diários por email |
+| FINOPS_ALERT_EMAIL | Sim | Destino dos relatórios (caramaschiai@caramaschiai.io) |
+| SERPAPI_KEY | Opcional | Google SERP data (substituído por Brave Search grátis) |
 | SUPABASE_URL | Opcional | Persistência cloud |
 | SUPABASE_KEY | Opcional | Persistência cloud |
 | PAPERS_DB_PATH | Opcional | Caminho SQLite (default: data/papers.db) |

@@ -73,6 +73,13 @@ jobs:
             output/finops_dashboard.html
           retention-days: 365
 
+      - name: Enviar relatório semanal por email
+        run: python scripts/send-report.py || true
+        env:
+          PAPERS_DB_PATH: data/papers.db
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
+
       - name: Commit data + docs + reports + finops
         run: |
           git config user.name "github-actions[bot]"

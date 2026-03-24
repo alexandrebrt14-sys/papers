@@ -139,6 +139,14 @@ jobs:
           path: data/papers.db
           retention-days: 90
 
+      # Enviar relatório por email
+      - name: Enviar relatório diário por email
+        run: python scripts/send-report.py || true
+        env:
+          PAPERS_DB_PATH: data/papers.db
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
+
       # Commit everything to Git
       - name: Commit data + docs + finops
         run: |
