@@ -223,3 +223,113 @@ CREATE TABLE IF NOT EXISTS finops_daily_rollup (
     models_used             TEXT DEFAULT '[]',
     UNIQUE(date, platform)
 );
+
+-- ============================================================
+-- METHODOLOGY v2 — Recommended by expert review panel
+-- ============================================================
+
+-- Dual collection: both JSON structured and natural language responses
+-- per query, to measure self-report vs organic citation discrepancy
+CREATE TABLE IF NOT EXISTS dual_responses (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    run_id          TEXT DEFAULT '',
+    llm             TEXT NOT NULL,
+    model           TEXT NOT NULL,
+    model_version   TEXT DEFAULT '',
+    query           TEXT NOT NULL,
+    query_category  TEXT DEFAULT '',
+    -- JSON mode response (self-report: what the LLM says it would cite)
+    json_response   TEXT DEFAULT '',
+    json_cited      TEXT DEFAULT '[]',
+    json_sources    TEXT DEFAULT '[]',
+    -- Natural language response (organic: what the LLM actually writes)
+    natural_response TEXT DEFAULT '',
+    natural_cited    TEXT DEFAULT '[]',
+    natural_sources  TEXT DEFAULT '[]',
+    -- Discrepancy metrics
+    self_report_match REAL DEFAULT 0.0,
+    -- Classification
+    citation_type   TEXT DEFAULT 'none',
+    CHECK (citation_type IN ('parametric', 'retrieval', 'none', 'both'))
+);
+CREATE INDEX IF NOT EXISTS idx_dual_ts ON dual_responses(timestamp);
+CREATE INDEX IF NOT EXISTS idx_dual_llm ON dual_responses(llm);
+CREATE INDEX IF NOT EXISTS idx_dual_type ON dual_responses(citation_type);
+
+-- Model version tracking for temporal drift detection
+CREATE TABLE IF NOT EXISTS model_versions (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    provider        TEXT NOT NULL,
+    model_alias     TEXT NOT NULL,
+    model_version   TEXT DEFAULT '',
+    response_hash   TEXT DEFAULT '',
+    knowledge_cutoff TEXT DEFAULT '',
+    detected_change INTEGER DEFAULT 0,
+    UNIQUE(provider, model_alias, model_version)
+);
+
+-- URL verification for source hallucination detection
+CREATE TABLE IF NOT EXISTS url_verifications (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    url             TEXT NOT NULL,
+    llm             TEXT NOT NULL,
+    query           TEXT DEFAULT '',
+    http_status     INTEGER DEFAULT 0,
+    is_real         INTEGER DEFAULT 0,
+    domain          TEXT DEFAULT '',
+    content_type    TEXT DEFAULT '',
+    UNIQUE(url, llm, timestamp)
+);
+CREATE INDEX IF NOT EXISTS idx_urlv_url ON url_verifications(url);
+
+-- Prompt sensitivity analysis: store results from paraphrased queries
+CREATE TABLE IF NOT EXISTS prompt_variants (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    original_query  TEXT NOT NULL,
+    variant_query   TEXT NOT NULL,
+    variant_type    TEXT DEFAULT 'paraphrase',
+    llm             TEXT NOT NULL,
+    original_cited  INTEGER DEFAULT 0,
+    variant_cited   INTEGER DEFAULT 0,
+    agreement       INTEGER DEFAULT 0,
+    timestamp       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    CHECK (variant_type IN ('paraphrase', 'translation', 'reformulation', 'negation'))
+);
+
+-- Scaling analysis: compare citation behavior across model sizes
+CREATE TABLE IF NOT EXISTS scaling_observations (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    provider        TEXT NOT NULL,
+    model_small     TEXT NOT NULL,
+    model_large     TEXT NOT NULL,
+    query           TEXT NOT NULL,
+    small_cited     INTEGER DEFAULT 0,
+    large_cited     INTEGER DEFAULT 0,
+    small_position  INTEGER DEFAULT 0,
+    large_position  INTEGER DEFAULT 0,
+    cost_small      REAL DEFAULT 0.0,
+    cost_large      REAL DEFAULT 0.0
+);
+
+-- Pre-registered hypotheses
+CREATE TABLE IF NOT EXISTS hypotheses (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    registered_at   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    hypothesis_id   TEXT UNIQUE NOT NULL,
+    null_hypothesis TEXT NOT NULL,
+    alt_hypothesis  TEXT NOT NULL,
+    test_method     TEXT NOT NULL,
+    expected_effect_size REAL DEFAULT 0.0,
+    min_sample_size INTEGER DEFAULT 0,
+    alpha           REAL DEFAULT 0.05,
+    power           REAL DEFAULT 0.80,
+    status          TEXT DEFAULT 'registered',
+    result_p_value  REAL DEFAULT NULL,
+    result_effect   REAL DEFAULT NULL,
+    concluded_at    TEXT DEFAULT NULL,
+    CHECK (status IN ('registered', 'collecting', 'analyzing', 'confirmed', 'rejected', 'inconclusive'))
+);

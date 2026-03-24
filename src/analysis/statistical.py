@@ -197,15 +197,32 @@ class StatisticalAnalyzer:
             logger.error(f"Logistic regression failed: {e}")
             return {"converged": False, "error": str(e)}
 
-    def anova_repeated_measures(
+    def anova_between_groups(
         self, data: dict[str, list[float]],
     ) -> SignificanceResult:
-        """One-way ANOVA for comparing citation rates across LLMs.
+        """One-way ANOVA for independent groups.
 
-        Use case: do different LLMs cite at significantly different rates?
+        Use case: compare citation rates between different entity categories
+        (e.g., fintech vs GEO vs SaaS competitors).
+
+        Automatically checks homogeneity of variance (Levene's test).
+        Falls back to Kruskal-Wallis if assumptions violated.
         """
         groups = list(data.values())
-        stat, p = stats.f_oneway(*groups)
+        group_names = list(data.keys())
+
+        # Check homogeneity of variance (Levene's test)
+        levene_stat, levene_p = stats.levene(*groups)
+        homogeneous = levene_p > 0.05
+
+        if homogeneous:
+            stat, p = stats.f_oneway(*groups)
+            test_used = "ANOVA (one-way)"
+        else:
+            # Use non-parametric alternative when variance is not homogeneous
+            stat, p = stats.kruskal(*groups)
+            test_used = "Kruskal-Wallis (non-parametric, Levene p={:.4f})".format(levene_p)
+            logger.warning(f"Variance not homogeneous (Levene p={levene_p:.4f}), using Kruskal-Wallis")
 
         # Eta-squared
         grand_mean = np.mean([v for group in groups for v in group])
@@ -214,15 +231,44 @@ class StatisticalAnalyzer:
         eta_sq = ss_between / max(ss_total, 1e-10)
 
         return SignificanceResult(
-            test_name="ANOVA (one-way)",
+            test_name=test_used,
             statistic=round(stat, 4),
             p_value=round(p, 6),
             significant=p < 0.05,
             effect_size=round(eta_sq, 4),
             interpretation=(
-                f"Comparação entre {len(data)} grupos (LLMs). "
+                f"Comparação entre {len(data)} grupos ({', '.join(group_names)}). "
                 f"{'Diferença significativa' if p < 0.05 else 'Sem diferença significativa'} "
-                f"(F={stat:.2f}, p={p:.4f}, η²={eta_sq:.3f})."
+                f"({test_used}: stat={stat:.2f}, p={p:.4f}, η²={eta_sq:.3f})."
+            ),
+        )
+
+    def mann_whitney_position(
+        self, group_a: list[float], group_b: list[float],
+        label_a: str = "pre", label_b: str = "post",
+    ) -> SignificanceResult:
+        """Mann-Whitney U test for ordinal/non-normal data.
+
+        Use case: compare citation POSITION (ordinal: 1, 2, 3) between groups.
+        Position data is ordinal and non-normal — t-test assumptions are violated.
+        Mann-Whitney is the correct non-parametric alternative.
+        """
+        stat, p = stats.mannwhitneyu(group_a, group_b, alternative='two-sided')
+
+        # Effect size: rank-biserial correlation
+        n1, n2 = len(group_a), len(group_b)
+        r = 1 - (2 * stat) / (n1 * n2)
+
+        return SignificanceResult(
+            test_name="Mann-Whitney U",
+            statistic=round(stat, 4),
+            p_value=round(p, 6),
+            significant=p < 0.05,
+            effect_size=round(r, 4),
+            interpretation=(
+                f"Mediana {label_a}: {np.median(group_a):.1f} vs {label_b}: {np.median(group_b):.1f}. "
+                f"{'Diferença significativa' if p < 0.05 else 'Sem diferença significativa'} "
+                f"(U={stat:.0f}, p={p:.4f}, r={r:.3f})."
             ),
         )
 
@@ -273,6 +319,6 @@ class StatisticalAnalyzer:
             for llm, group in citation_data.groupby("llm")
         }
         if len(llm_groups) >= 2:
-            report["anova_llms"] = self.anova_repeated_measures(llm_groups).__dict__
+            report["anova_llms"] = self.anova_between_groups(llm_groups).__dict__
 
         return report

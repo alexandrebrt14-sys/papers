@@ -132,6 +132,30 @@ Este documento define o plano de desenvolvimento incremental da plataforma **Pap
 
 ---
 
+### Fase 1.5 — Rigor Metodológico (Semana 3) — RECOMENDADA POR PAINEL DE ESPECIALISTAS
+
+**Objetivo:** Corrigir falhas metodológicas identificadas por revisão de nível SIGIR/TOIS.
+**Contexto:** Simulação de revisão por Bengio, Hinton, LeCun, Karpathy, Gomez e Kaplan.
+
+| ID | Tarefa | Inspirado por | Status | Critério de Aceitação |
+|----|--------|---------------|--------|-----------------------|
+| M-01 | Coleta dual (JSON + linguagem natural) | Hinton | Implementado | `dual_collector.py` coleta ambas as respostas, mede Jaccard de self-report vs orgânico |
+| M-02 | Separar análise RAG vs paramétrico | Gomez | Implementado | `citation_type` campo em dual_responses (parametric/retrieval/none) |
+| M-03 | Verificação de URLs (alucinação de fontes) | Gomez | Implementado | `url_verifier.py` faz HTTP HEAD em cada URL retornada, calcula hallucination_rate |
+| M-04 | Detecção de drift de modelos | Hinton, Karpathy | Implementado | `drift_detector.py` registra version strings + hashes de resposta, alerta em mudanças |
+| M-05 | Análise de sensibilidade ao prompt | Bengio | Implementado | `prompt_sensitivity.py` testa 11 variantes parafraseadas, mede agreement rate |
+| M-06 | Corrigir ANOVA para between-groups + Mann-Whitney para dados ordinais | Karpathy | Implementado | `anova_between_groups()` com Levene test + fallback Kruskal-Wallis; `mann_whitney_position()` para posição ordinal |
+| M-07 | Schema v2 para dados metodológicos | Todos | Implementado | 6 tabelas novas: dual_responses, model_versions, url_verifications, prompt_variants, scaling_observations, hypotheses |
+| M-08 | Pré-registrar hipóteses no OSF | Todos | Planejado | Tabela `hypotheses` no banco + registro externo em osf.io |
+| M-09 | Análise de poder a priori | Todos | Planejado | Cálculo de n mínimo por efeito esperado antes de cada experimento |
+| M-10 | DAG causal + Difference-in-Differences | Bengio | Planejado | Formalizar mecanismo causal, usar DiD com URLs controle do mesmo domínio |
+| M-11 | Scaling analysis (modelos maiores) | Kaplan | Planejado | Adicionar gpt-4o + sonnet semanal, plotar citation rate vs model size |
+| M-12 | Validar sentiment com anotação humana + Cohen's kappa | LeCun | Planejado | Anotar 200 respostas manualmente, calcular inter-rater reliability |
+
+**Entrega:** 7 módulos implementados (M-01 a M-07), 5 planejados para execução durante Fase 3.
+
+---
+
 ### Fase 2 — Qualidade e Resiliência (Semanas 3-4)
 
 **Objetivo:** Cobertura de testes >80%, resiliência em produção.
