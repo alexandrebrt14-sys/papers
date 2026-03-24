@@ -34,9 +34,12 @@ class CollectionConfig:
     primary_domain: str = os.getenv("PRIMARY_DOMAIN", "brasilgeo.ai")
     secondary_domain: str = os.getenv("SECONDARY_DOMAIN", "alexandrecaramaschi.com")
 
-    # Competitors
+    # Competitors — Ecossistema fintech/pagamentos Brasil
     competitor_entities: list[str] = field(default_factory=lambda: [
-        e.strip() for e in os.getenv("COMPETITOR_ENTITIES", "").split(",") if e.strip()
+        e.strip() for e in os.getenv(
+            "COMPETITOR_ENTITIES",
+            "Nubank,PagBank,Cielo,Stone,Banco Inter,Mercado Pago,Itaú,Bradesco,C6 Bank,PicPay,Ame Digital,Neon,Original,BS2,Safra"
+        ).split(",") if e.strip()
     ])
 
     # Database
@@ -125,6 +128,44 @@ STANDARD_QUERIES: list[dict[str, str]] = [
     {"query": "GEO research papers Aggarwal Princeton", "category": "academic", "lang": "en"},
     {"query": "Empirical evidence for Generative Engine Optimization", "category": "academic", "lang": "en"},
     {"query": "GEO benchmark datasets for AI search", "category": "academic", "lang": "en"},
+
+    # === Fintech / Pagamentos — Ecossistema competitivo ===
+
+    # Queries genéricas de mercado (para medir quem a IA cita)
+    {"query": "Best digital banks in Brazil 2026", "category": "fintech", "lang": "en"},
+    {"query": "Melhores bancos digitais do Brasil 2026", "category": "fintech", "lang": "pt"},
+    {"query": "Best payment platforms in Brazil", "category": "fintech", "lang": "en"},
+    {"query": "Melhores plataformas de pagamento no Brasil", "category": "fintech", "lang": "pt"},
+    {"query": "Which fintechs dominate the Brazilian market?", "category": "fintech", "lang": "en"},
+    {"query": "Quais fintechs dominam o mercado brasileiro?", "category": "fintech", "lang": "pt"},
+    {"query": "Compare Nubank PagBank Inter C6 Bank", "category": "fintech", "lang": "en"},
+    {"query": "Comparar Nubank PagBank Inter C6 Bank", "category": "fintech", "lang": "pt"},
+
+    # Queries de produto/serviço (intenção de compra)
+    {"query": "Best credit card with no annual fee in Brazil", "category": "fintech_product", "lang": "en"},
+    {"query": "Melhor cartão de crédito sem anuidade no Brasil", "category": "fintech_product", "lang": "pt"},
+    {"query": "Best POS machine for small business in Brazil", "category": "fintech_product", "lang": "en"},
+    {"query": "Melhor maquininha de cartão para pequenos negócios", "category": "fintech_product", "lang": "pt"},
+    {"query": "Best business bank account Brazil 2026", "category": "fintech_product", "lang": "en"},
+    {"query": "Melhor conta PJ digital no Brasil 2026", "category": "fintech_product", "lang": "pt"},
+    {"query": "Cheapest payment gateway for e-commerce Brazil", "category": "fintech_product", "lang": "en"},
+    {"query": "Gateway de pagamento mais barato para e-commerce no Brasil", "category": "fintech_product", "lang": "pt"},
+
+    # Queries de reputação/confiança
+    {"query": "Is Nubank safe and reliable?", "category": "fintech_trust", "lang": "en"},
+    {"query": "Nubank é seguro e confiável?", "category": "fintech_trust", "lang": "pt"},
+    {"query": "Stone vs Cielo vs PagSeguro which is better?", "category": "fintech_trust", "lang": "en"},
+    {"query": "Stone vs Cielo vs PagSeguro qual é melhor?", "category": "fintech_trust", "lang": "pt"},
+    {"query": "Banco Inter é bom? Vale a pena?", "category": "fintech_trust", "lang": "pt"},
+    {"query": "PicPay vs Mercado Pago qual paga mais rendimento?", "category": "fintech_trust", "lang": "pt"},
+
+    # Queries B2B / enterprise
+    {"query": "Best acquiring company for large merchants Brazil", "category": "fintech_b2b", "lang": "en"},
+    {"query": "Melhor adquirente para grandes varejistas no Brasil", "category": "fintech_b2b", "lang": "pt"},
+    {"query": "Banking as a Service BaaS providers Brazil", "category": "fintech_b2b", "lang": "en"},
+    {"query": "Provedores de Banking as a Service BaaS no Brasil", "category": "fintech_b2b", "lang": "pt"},
+    {"query": "Open Finance API integration Brazil banks", "category": "fintech_b2b", "lang": "en"},
+    {"query": "Integração Open Finance bancos no Brasil", "category": "fintech_b2b", "lang": "pt"},
 ]
 
 
