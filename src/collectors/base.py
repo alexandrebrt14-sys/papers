@@ -123,11 +123,11 @@ class LLMClient:
     RETRY_BACKOFF = [3]  # seconds — single retry, then circuit break
 
     # Per-provider rate limiting (seconds between queries)
-    # Gemini free tier = 15 RPM → 4s between queries avoids 429
+    # Gemini billing ativo (R$500 credito) = 30 RPM → 2s between queries
     PROVIDER_DELAY: dict[str, float] = {
         "openai": 0.3,
         "anthropic": 0.3,
-        "google": 4.0,      # 15 RPM limit → 60/15 = 4s spacing
+        "google": 2.0,      # 30 RPM limit → 60/30 = 2s spacing (billing ativo)
         "perplexity": 0.5,
     }
 

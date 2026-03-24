@@ -292,10 +292,10 @@ class CollectionConfig:
         LLMConfig(
             name="Gemini",
             provider="google",
-            model="gemini-2.5-flash",      # Free tier: 15 RPM — 2.0-flash has limit:0 as of 2026-03-24
+            model="gemini-2.5-flash",      # Billing ativo (R$500 credito). 30+ RPM.
             api_key=os.getenv("GOOGLE_AI_API_KEY"),
-            input_cost_per_mtok=0.0,
-            output_cost_per_mtok=0.0,
+            input_cost_per_mtok=0.15,
+            output_cost_per_mtok=0.60,
             max_output_tokens=800,          # Increased from 250 (Proposal 4)
             supports_json_mode=True,
             supports_batch=False,
