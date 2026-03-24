@@ -460,5 +460,20 @@ def finops_dashboard_cmd() -> None:
     console.print(f"[green]Dashboard gerado: {path}[/green]")
 
 
+# ============================================================
+# API Server
+# ============================================================
+
+@main.command("serve")
+@click.option("--host", default="0.0.0.0", help="Host para bind do servidor.")
+@click.option("--port", default=8000, type=int, help="Porta do servidor.")
+@click.option("--reload", "do_reload", is_flag=True, help="Hot-reload para desenvolvimento.")
+def serve(host: str, port: int, do_reload: bool) -> None:
+    """Inicia o servidor API REST."""
+    import uvicorn
+    console.print(f"[bold green]Iniciando API em {host}:{port}...[/bold green]")
+    uvicorn.run("src.api.main:app", host=host, port=port, reload=do_reload)
+
+
 if __name__ == "__main__":
     main()

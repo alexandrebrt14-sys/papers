@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEO Research — Multi-Vertical Citation Tracker</title>
+<style>
+/* === Reset & Base === */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; }
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { color: #3b82f6; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* === Layout === */
+.container { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
+
+/* === Header === */
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 0; border-bottom: 1px solid #1e293b; margin-bottom: 20px;
+}
+.header-left h1 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; letter-spacing: -0.02em; }
+.header-left p { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.connection-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.75rem; color: #94a3b8;
+  background: #1e293b; padding: 6px 12px; border-radius: 6px;
+}
+.connection-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ef4444; flex-shrink: 0;
+  transition: background 0.3s;
+}
+.connection-dot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e55; }
+.last-update { font-size: 0.72rem; color: #475569; }
+
+/* === Error Banner === */
+.error-banner {
+  background: #7f1d1d; border: 1px solid #ef4444; border-radius: 8px;
+  padding: 10px 16px; margin-bottom: 16px; font-size: 0.8rem;
+  color: #fca5a5; display: none; align-items: center; gap: 8px;
+}
+.error-banner.visible { display: flex; }
+.error-banner .dismiss { cursor: pointer; margin-left: auto; opacity: 0.7; }
+.error-banner .dismiss:hover { opacity: 1; }
+
+/* === Vertical Selector === */
+.vertical-selector {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 12px; margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .vertical-selector { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .vertical-selector { grid-template-columns: repeat(2, 1fr); }
+}
+.vert-card {
+  background: #1e293b; border: 2px solid transparent;
+  border-radius: 10px; padding: 14px 16px; cursor: pointer;
+  transition: all 0.2s ease; position: relative; overflow: hidden;
+}
+.vert-card:hover { background: #243044; transform: translateY(-1px); }
+.vert-card.active { border-color: #3b82f6; background: #1e3a5f; }
+.vert-card .vert-icon { font-size: 1.3rem; margin-bottom: 4px; display: block; }
+.vert-card .vert-name { font-size: 0.85rem; font-weight: 600; color: #f1f5f9; }
+.vert-card .vert-meta { font-size: 0.68rem; color: #64748b; margin-top: 4px; }
+
+/* === KPI Row === */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 800px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+.kpi-card {
+  background: #1e293b; border-radius: 10px; padding: 16px 18px;
+  border-left: 3px solid #334155; transition: border-color 0.3s;
+}
+.kpi-card .kpi-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+.kpi-card .kpi-value { font-size: 1.6rem; font-weight: 700; margin: 4px 0 2px; color: #f1f5f9; }
+.kpi-card .kpi-sub { font-size: 0.7rem; color: #64748b; }
+.kpi-card .kpi-trend { font-size: 0.75rem; font-weight: 600; }
+.kpi-card .kpi-trend.up { color: #22c55e; }
+.kpi-card .kpi-trend.down { color: #ef4444; }
+.kpi-card .kpi-trend.neutral { color: #f59e0b; }
+.kpi-card.accent-blue { border-left-color: #3b82f6; }
+.kpi-card.accent-green { border-left-color: #22c55e; }
+.kpi-card.accent-orange { border-left-color: #f59e0b; }
+.kpi-card.accent-purple { border-left-color: #a855f7; }
+
+/* === Section / Card === */
+.section { margin-bottom: 20px; }
+.card {
+  background: #1e293b; border-radius: 10px; padding: 18px;
+  border: 1px solid #253346;
+}
+.card-title {
+  font-size: 0.82rem; font-weight: 600; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin-bottom: 14px; padding-bottom: 8px;
+  border-bottom: 1px solid #253346;
+}
+
+/* === Citation Bars === */
+.bar-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px; font-size: 0.8rem;
+}
+.bar-label { width: 90px; flex-shrink: 0; color: #94a3b8; font-weight: 500; text-align: right; }
+.bar-track {
+  flex: 1; height: 26px; background: #0f172a; border-radius: 4px;
+  overflow: hidden; position: relative;
+}
+.bar-fill {
+  height: 100%; border-radius: 4px; transition: width 0.6s ease;
+  min-width: 2px; display: flex; align-items: center; padding-left: 8px;
+  font-size: 0.7rem; font-weight: 600; color: #fff;
+}
+.bar-fill.green { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.bar-fill.yellow { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.bar-fill.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.bar-fill.blue { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.bar-count { width: 80px; flex-shrink: 0; text-align: right; color: #64748b; font-size: 0.72rem; }
+
+/* === Table === */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead th {
+  text-align: left; padding: 8px 10px; font-size: 0.7rem;
+  color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;
+  border-bottom: 1px solid #334155; cursor: pointer; user-select: none;
+  white-space: nowrap;
+}
+.data-table thead th:hover { color: #94a3b8; }
+.data-table thead th.sorted-asc::after { content: ' ▲'; font-size: 0.6rem; }
+.data-table thead th.sorted-desc::after { content: ' ▼'; font-size: 0.6rem; }
+.data-table thead th.num { text-align: right; }
+.data-table tbody td {
+  padding: 8px 10px; font-size: 0.78rem; border-bottom: 1px solid #1a2637;
+  color: #cbd5e1;
+}
+.data-table tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.data-table tbody tr:hover { background: #253346; }
+.data-table tbody tr.highlight { background: #1e3a5f22; }
+.rate-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 0.7rem; font-weight: 600;
+}
+.rate-badge.high { background: #22c55e22; color: #22c55e; }
+.rate-badge.mid { background: #f59e0b22; color: #f59e0b; }
+.rate-badge.low { background: #ef444422; color: #ef4444; }
+
+/* === Two-column row === */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+@media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+/* === Collection History === */
+.run-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid #1a2637; font-size: 0.78rem;
+}
+.run-item:last-child { border-bottom: none; }
+.status-badge {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.status-badge.success { background: #22c55e; }
+.status-badge.error { background: #ef4444; }
+.status-badge.partial { background: #f59e0b; }
+.status-badge.running { background: #3b82f6; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.run-module { color: #94a3b8; width: 140px; flex-shrink: 0; }
+.run-records { color: #64748b; width: 70px; text-align: right; }
+.run-time { color: #475569; margin-left: auto; font-size: 0.7rem; }
+
+/* === FinOps Gauge === */
+.gauge-wrapper { text-align: center; padding: 10px 0; }
+.gauge-svg { max-width: 200px; margin: 0 auto; }
+.gauge-label { font-size: 0.72rem; color: #64748b; margin-top: 8px; }
+.gauge-value { font-size: 1.4rem; font-weight: 700; }
+.finops-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a2637; font-size: 0.78rem; }
+.finops-row:last-child { border-bottom: none; }
+.finops-label { color: #94a3b8; }
+.finops-val { color: #cbd5e1; font-weight: 500; }
+
+/* === Time Series (SVG) === */
+.timeseries-wrapper { position: relative; width: 100%; overflow: hidden; }
+.timeseries-svg { width: 100%; height: 200px; display: block; }
+.ts-legend { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.ts-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #94a3b8; }
+.ts-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* === Footer === */
+.footer {
+  margin-top: 24px; padding: 16px 0; border-top: 1px solid #1e293b;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+  font-size: 0.7rem; color: #475569;
+}
+.footer-left { }
+.footer-right { display: flex; gap: 16px; }
+.footer-badge { display: flex; align-items: center; gap: 4px; }
+
+/* === Loading === */
+.loading-spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid #334155; border-top-color: #3b82f6;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; color: #64748b; gap: 8px; font-size: 0.8rem;
+}
+.placeholder-msg { text-align: center; padding: 30px; color: #475569; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <h1>GEO Research -- Multi-Vertical Citation Tracker</h1>
+      <p>Monitoramento de citacoes em LLMs para empresas brasileiras</p>
+    </div>
+    <div class="header-right">
+      <div class="connection-badge">
+        <span class="connection-dot" id="connDot"></span>
+        <span id="connLabel">Conectando...</span>
+      </div>
+      <span class="last-update" id="lastUpdate">--</span>
+    </div>
+  </header>
+
+  <!-- Error Banner -->
+  <div class="error-banner" id="errorBanner">
+    <span id="errorMsg">Erro de conexao com a API.</span>
+    <span class="dismiss" onclick="document.getElementById('errorBanner').classList.remove('visible')">&times;</span>
+  </div>
+
+  <!-- Vertical Selector -->
+  <div class="vertical-selector" id="verticalSelector">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi-card accent-blue" id="kpiObs">
+      <div class="kpi-label">Total Observacoes</div>
+      <div class="kpi-value">--</div>
+      <div class="kpi-sub kpi-trend neutral">--</div>
+    </div>
+    <div class="kpi-card accent-green" id="kpiRate">
+      <div class="kpi-label">Taxa de Citacao Geral</div>
+      <div class="kpi-value">--</div>
+      <div class="kpi-sub">--</div>
+    </div>
+    <div class="kpi-card accent-orange" id="kpiEntities">
+      <div class="kpi-label">Entidades Monitoradas</div>
+      <div class="kpi-value">--</div>
+      <div class="kpi-sub">--</div>
+    </div>
+    <div class="kpi-card accent-purple" id="kpiLastRun">
+      <div class="kpi-label">Ultima Coleta</div>
+      <div class="kpi-value" style="font-size:1rem">--</div>
+      <div class="kpi-sub">--</div>
+    </div>
+  </div>
+
+  <!-- Citation Bars -->
+  <div class="section">
+    <div class="card">
+      <div class="card-title">Taxa de Citacao por LLM</div>
+      <div id="citationBars">
+        <div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entity Ranking Table -->
+  <div class="section">
+    <div class="card">
+      <div class="card-title">Top Entidades Citadas</div>
+      <div id="entityTable">
+        <div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two columns: Collection History + FinOps -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Historico de Coletas</div>
+      <div id="collectionHistory">
+        <div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">FinOps -- Status de Custos</div>
+      <div id="finopsPanel">
+        <div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time Series -->
+  <div class="section">
+    <div class="card">
+      <div class="card-title">Serie Temporal -- Taxa de Citacao (30 dias)</div>
+      <div id="timeseriesPanel">
+        <div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-left">
+      GEO Research -- Pesquisa empirica multi-vertical | Brasil GEO
+    </div>
+    <div class="footer-right">
+      <span class="footer-badge" id="footerApi">API: <span>--</span></span>
+      <span class="footer-badge" id="footerDb">DB: <span>--</span></span>
+      <span class="footer-badge" id="footerVersion">v1.0.0</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ================================================================
+   GEO Research Dashboard — Frontend Logic
+   ================================================================ */
+
+const API_BASE = window.location.origin + '/api';
+let currentVertical = 'fintech';
+let verticalsData = [];
+let sortCol = null;
+let sortDir = 'desc';
+
+/* === LLM Colors === */
+const LLM_COLORS = {
+  'ChatGPT': '#10a37f',
+  'Claude': '#d4a574',
+  'Gemini': '#4285f4',
+  'Perplexity': '#20b2aa'
+};
+
+const VERT_ICONS = {
+  'fintech': '\u25A3',
+  'varejo': '\u25C8',
+  'saude': '\u271A',
+  'tecnologia': '\u2699',
+  'todos': '\u229E'
+};
+
+/* === Utility === */
+function relativeTime(isoStr) {
+  if (!isoStr) return '--';
+  const d = new Date(isoStr);
+  const now = new Date();
+  const diffMs = now - d;
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'agora';
+  if (mins < 60) return 'ha ' + mins + ' min';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return 'ha ' + hrs + 'h';
+  const days = Math.floor(hrs / 24);
+  return 'ha ' + days + 'd';
+}
+
+function pct(val) {
+  return (val * 100).toFixed(1) + '%';
+}
+
+function rateClass(rate) {
+  if (rate >= 0.50) return 'high';
+  if (rate >= 0.25) return 'mid';
+  return 'low';
+}
+
+function barColorClass(rate) {
+  if (rate >= 0.50) return 'green';
+  if (rate >= 0.25) return 'yellow';
+  return 'red';
+}
+
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorBanner').classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('errorBanner').classList.remove('visible');
+}
+
+function setConnection(online) {
+  const dot = document.getElementById('connDot');
+  const label = document.getElementById('connLabel');
+  if (online) {
+    dot.classList.add('online');
+    label.textContent = 'Conectado';
+  } else {
+    dot.classList.remove('online');
+    label.textContent = 'Desconectado';
+  }
+}
+
+/* === API Fetch Helpers === */
+async function apiFetch(path) {
+  const resp = await fetch(API_BASE + path);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return resp.json();
+}
+
+async function fetchVerticals() {
+  try {
+    return await apiFetch('/verticals');
+  } catch (e) {
+    return { verticals: [], total_entities: 0 };
+  }
+}
+
+async function fetchCitationRates(vertical, days) {
+  try {
+    const q = vertical === 'todos' ? '' : '&vertical=' + vertical;
+    return await apiFetch('/citations/rates?days=' + (days || 30) + q);
+  } catch (e) {
+    return { rates_by_llm: [], overall_rate: 0, total_observations: 0 };
+  }
+}
+
+async function fetchEntityRanking(vertical, days, top) {
+  try {
+    const q = vertical === 'todos' ? '' : '&vertical=' + vertical;
+    return await apiFetch('/citations/entities?days=' + (days || 30) + '&top=' + (top || 10) + q);
+  } catch (e) {
+    return { entities: [] };
+  }
+}
+
+async function fetchCollections(vertical) {
+  try {
+    const q = vertical === 'todos' ? '' : '?vertical=' + vertical;
+    return await apiFetch('/collections' + q);
+  } catch (e) {
+    return { runs: [] };
+  }
+}
+
+async function fetchFinOps() {
+  try {
+    return await apiFetch('/finops');
+  } catch (e) {
+    return null;
+  }
+}
+
+async function fetchHealth() {
+  try {
+    return await apiFetch('/health');
+  } catch (e) {
+    return null;
+  }
+}
+
+async function fetchTimeSeries(vertical, days) {
+  try {
+    const q = vertical === 'todos' ? '' : '&vertical=' + vertical;
+    return await apiFetch('/citations/timeseries?days=' + (days || 30) + q);
+  } catch (e) {
+    return { series: [] };
+  }
+}
+
+/* === Render: Vertical Selector === */
+function renderVerticalSelector(verticals, selected) {
+  const container = document.getElementById('verticalSelector');
+  verticalsData = verticals;
+
+  const allCard = {
+    slug: 'todos',
+    name: 'Todos',
+    entity_count: verticals.reduce((s, v) => s + (v.entity_count || 0), 0),
+    last_collection: null
+  };
+
+  const cards = [allCard, ...verticals];
+  let html = '';
+
+  cards.forEach(v => {
+    const isActive = v.slug === selected;
+    const icon = VERT_ICONS[v.slug] || '\u25A0';
+    const lastCol = v.last_collection ? relativeTime(v.last_collection) : '--';
+    html += '<div class="vert-card' + (isActive ? ' active' : '') + '" onclick="selectVertical(\'' + v.slug + '\')">';
+    html += '<span class="vert-icon">' + icon + '</span>';
+    html += '<span class="vert-name">' + v.name + '</span>';
+    html += '<div class="vert-meta">' + (v.entity_count || 0) + ' entidades | ' + lastCol + '</div>';
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+/* === Render: KPIs === */
+function renderKPIs(metrics, entityCount, lastRunTime) {
+  const obsCard = document.getElementById('kpiObs');
+  const rateCard = document.getElementById('kpiRate');
+  const entCard = document.getElementById('kpiEntities');
+  const runCard = document.getElementById('kpiLastRun');
+
+  const obs = metrics.total_observations || 0;
+  obsCard.querySelector('.kpi-value').textContent = obs.toLocaleString('pt-BR');
+  obsCard.querySelector('.kpi-sub').textContent = 'ultimos 30 dias';
+
+  const rate = metrics.overall_rate || 0;
+  const rc = rateClass(rate);
+  rateCard.querySelector('.kpi-value').textContent = pct(rate);
+  rateCard.querySelector('.kpi-value').style.color = rc === 'high' ? '#22c55e' : rc === 'mid' ? '#f59e0b' : '#ef4444';
+  rateCard.querySelector('.kpi-sub').textContent = rc === 'high' ? 'Acima de 50%' : rc === 'mid' ? 'Entre 25-50%' : 'Abaixo de 25%';
+
+  entCard.querySelector('.kpi-value').textContent = entityCount || '--';
+  entCard.querySelector('.kpi-sub').textContent = currentVertical === 'todos' ? '4 verticais' : currentVertical;
+
+  runCard.querySelector('.kpi-value').textContent = lastRunTime ? relativeTime(lastRunTime) : '--';
+  runCard.querySelector('.kpi-sub').textContent = lastRunTime ? new Date(lastRunTime).toLocaleString('pt-BR') : '--';
+}
+
+/* === Render: Citation Bars === */
+function renderCitationBars(rates) {
+  const container = document.getElementById('citationBars');
+
+  if (!rates || !rates.rates_by_llm || rates.rates_by_llm.length === 0) {
+    container.innerHTML = '<div class="placeholder-msg">Sem dados de citacao disponveis. Execute uma coleta primeiro.</div>';
+    return;
+  }
+
+  const sorted = [...rates.rates_by_llm].sort((a, b) => b.citation_rate - a.citation_rate);
+  const maxRate = Math.max(...sorted.map(r => r.citation_rate), 0.01);
+
+  let html = '';
+  sorted.forEach(r => {
+    const widthPct = Math.max((r.citation_rate / Math.max(maxRate, 0.01)) * 100, 1);
+    const colorClass = barColorClass(r.citation_rate);
+    const color = LLM_COLORS[r.llm] || '#3b82f6';
+    html += '<div class="bar-row">';
+    html += '<span class="bar-label">' + r.llm + '</span>';
+    html += '<div class="bar-track">';
+    html += '<div class="bar-fill ' + colorClass + '" style="width:' + widthPct + '%;background:linear-gradient(90deg,' + color + ',' + color + 'cc)">';
+    html += pct(r.citation_rate);
+    html += '</div></div>';
+    html += '<span class="bar-count">' + r.cited_count + '/' + r.total_queries + '</span>';
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+/* === Render: Entity Table === */
+function renderEntityTable(data) {
+  const container = document.getElementById('entityTable');
+
+  if (!data || !data.entities || data.entities.length === 0) {
+    container.innerHTML = '<div class="placeholder-msg">Sem dados de entidade. Execute uma coleta primeiro.</div>';
+    return;
+  }
+
+  let entities = data.entities;
+
+  let html = '<table class="data-table">';
+  html += '<thead><tr>';
+  html += '<th data-col="rank">#</th>';
+  html += '<th data-col="entity">Entidade</th>';
+  html += '<th class="num" data-col="citation_count">Citacoes</th>';
+  html += '<th class="num" data-col="citation_rate">Taxa %</th>';
+  html += '<th data-col="top_llm">Top LLM</th>';
+  html += '</tr></thead><tbody>';
+
+  entities.forEach((e, i) => {
+    const rc = rateClass(e.citation_rate);
+    const highlight = e.citation_rate >= 0.50 ? ' highlight' : '';
+    html += '<tr class="' + highlight + '">';
+    html += '<td class="num">' + (i + 1) + '</td>';
+    html += '<td>' + e.entity + '</td>';
+    html += '<td class="num">' + e.citation_count + '</td>';
+    html += '<td class="num"><span class="rate-badge ' + rc + '">' + pct(e.citation_rate) + '</span></td>';
+    html += '<td>' + (e.top_llm || '--') + '</td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+
+  /* Column sort */
+  container.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortCol = col;
+        sortDir = 'desc';
+      }
+      container.querySelectorAll('th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
+      th.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+      const sorted = [...entities].sort((a, b) => {
+        let va = a[col], vb = b[col];
+        if (col === 'rank') { va = entities.indexOf(a); vb = entities.indexOf(b); }
+        if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      renderEntityTable({ entities: sorted });
+    });
+  });
+}
+
+/* === Render: Collection History === */
+function renderCollectionHistory(data) {
+  const container = document.getElementById('collectionHistory');
+
+  if (!data || !data.runs || data.runs.length === 0) {
+    container.innerHTML = '<div class="placeholder-msg">Nenhuma coleta registrada.</div>';
+    return;
+  }
+
+  const runs = data.runs.slice(0, 10);
+  let html = '';
+
+  runs.forEach(r => {
+    html += '<div class="run-item">';
+    html += '<span class="status-badge ' + (r.status || 'success') + '"></span>';
+    html += '<span class="run-module">' + (r.module || '--') + '</span>';
+    html += '<span style="color:#94a3b8;font-size:0.72rem">' + (r.vertical || '') + '</span>';
+    html += '<span class="run-records">' + (r.records_count || r.records || 0) + ' reg.</span>';
+    html += '<span class="run-time">' + relativeTime(r.timestamp) + '</span>';
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+/* === Render: FinOps Gauge === */
+function renderFinOpsPanel(data) {
+  const container = document.getElementById('finopsPanel');
+
+  if (!data) {
+    container.innerHTML = '<div class="placeholder-msg">FinOps indisponvel.</div>';
+    return;
+  }
+
+  const pctUsed = data.pct_used || 0;
+  const spent = data.spent_monthly || 0;
+  const budget = data.budget_monthly || 10;
+  const gaugeColor = pctUsed > 90 ? '#ef4444' : pctUsed > 70 ? '#f59e0b' : '#22c55e';
+
+  /* Semi-circle gauge via SVG */
+  const angle = Math.min(pctUsed / 100, 1) * 180;
+  const rad = angle * Math.PI / 180;
+  const cx = 100, cy = 90, r = 70;
+  const x1 = cx - r, y1 = cy;
+  const x2 = cx + r * Math.cos(Math.PI - rad);
+  const y2 = cy - r * Math.sin(Math.PI - rad);
+  const largeArc = angle > 90 ? 1 : 0;
+
+  let html = '<div class="gauge-wrapper">';
+  html += '<svg class="gauge-svg" viewBox="0 0 200 110">';
+  /* Background arc */
+  html += '<path d="M ' + x1 + ' ' + y1 + ' A ' + r + ' ' + r + ' 0 1 1 ' + (cx + r) + ' ' + cy + '" fill="none" stroke="#1a2637" stroke-width="12" stroke-linecap="round"/>';
+  /* Value arc */
+  if (pctUsed > 0) {
+    html += '<path d="M ' + x1 + ' ' + y1 + ' A ' + r + ' ' + r + ' 0 ' + largeArc + ' 1 ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" fill="none" stroke="' + gaugeColor + '" stroke-width="12" stroke-linecap="round"/>';
+  }
+  html += '<text x="' + cx + '" y="' + (cy - 10) + '" text-anchor="middle" fill="' + gaugeColor + '" font-size="22" font-weight="700">' + pctUsed.toFixed(1) + '%</text>';
+  html += '<text x="' + cx + '" y="' + (cy + 8) + '" text-anchor="middle" fill="#64748b" font-size="10">do budget mensal</text>';
+  html += '</svg>';
+  html += '</div>';
+
+  html += '<div class="finops-row"><span class="finops-label">Gasto mensal</span><span class="finops-val">$' + spent.toFixed(4) + '</span></div>';
+  html += '<div class="finops-row"><span class="finops-label">Budget mensal</span><span class="finops-val">$' + budget.toFixed(2) + '</span></div>';
+
+  if (data.by_platform) {
+    Object.entries(data.by_platform).forEach(([plat, info]) => {
+      html += '<div class="finops-row"><span class="finops-label">' + plat + '</span><span class="finops-val">$' + (info.spent || 0).toFixed(4) + '</span></div>';
+    });
+  }
+
+  if (data.alerts && data.alerts.length > 0) {
+    html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid #253346">';
+    html += '<div style="font-size:0.7rem;color:#f59e0b;margin-bottom:6px">Alertas recentes:</div>';
+    data.alerts.slice(0, 3).forEach(a => {
+      html += '<div style="font-size:0.7rem;color:#94a3b8;padding:2px 0">' + (a.message || a.alert_type || '--') + '</div>';
+    });
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+/* === Render: Time Series === */
+function renderTimeSeries(data) {
+  const container = document.getElementById('timeseriesPanel');
+
+  if (!data || !data.series || data.series.length === 0) {
+    container.innerHTML = '<div class="placeholder-msg">Sem dados de serie temporal. Coletas precisam ter pelo menos 2 dias de dados.</div>';
+    return;
+  }
+
+  /* data.series = [{llm, points: [{date, value}]}] */
+  const series = data.series;
+  const allDates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort();
+  if (allDates.length < 2) {
+    container.innerHTML = '<div class="placeholder-msg">Dados insuficientes para gerar grafico (minimo 2 dias).</div>';
+    return;
+  }
+
+  const allVals = series.flatMap(s => s.points.map(p => p.value));
+  const minVal = Math.min(0, ...allVals);
+  const maxVal = Math.max(0.01, ...allVals);
+
+  const W = 800, H = 180, padL = 40, padR = 10, padT = 10, padB = 30;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  function xScale(i) { return padL + (i / Math.max(allDates.length - 1, 1)) * chartW; }
+  function yScale(v) { return padT + chartH - ((v - minVal) / Math.max(maxVal - minVal, 0.001)) * chartH; }
+
+  let svg = '<svg class="timeseries-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">';
+
+  /* Grid lines */
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (chartH / 4) * i;
+    const val = maxVal - (i / 4) * (maxVal - minVal);
+    svg += '<line x1="' + padL + '" y1="' + y + '" x2="' + (W - padR) + '" y2="' + y + '" stroke="#1a2637" stroke-width="1"/>';
+    svg += '<text x="' + (padL - 4) + '" y="' + (y + 3) + '" text-anchor="end" fill="#475569" font-size="8">' + (val * 100).toFixed(0) + '%</text>';
+  }
+
+  /* X axis labels */
+  const labelStep = Math.max(1, Math.floor(allDates.length / 6));
+  allDates.forEach((d, i) => {
+    if (i % labelStep === 0 || i === allDates.length - 1) {
+      svg += '<text x="' + xScale(i) + '" y="' + (H - 5) + '" text-anchor="middle" fill="#475569" font-size="7">' + d.slice(5) + '</text>';
+    }
+  });
+
+  /* Lines */
+  const defaultColors = ['#10a37f', '#d4a574', '#4285f4', '#20b2aa'];
+  series.forEach((s, si) => {
+    const color = LLM_COLORS[s.llm] || defaultColors[si % defaultColors.length];
+    const dateMap = {};
+    s.points.forEach(p => { dateMap[p.date] = p.value; });
+
+    let path = '';
+    allDates.forEach((d, i) => {
+      const v = dateMap[d];
+      if (v !== undefined && v !== null) {
+        const x = xScale(i);
+        const y = yScale(v);
+        path += (path ? ' L ' : 'M ') + x.toFixed(1) + ' ' + y.toFixed(1);
+      }
+    });
+
+    if (path) {
+      svg += '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round"/>';
+      /* Last point dot */
+      const lastPt = s.points[s.points.length - 1];
+      if (lastPt) {
+        const li = allDates.indexOf(lastPt.date);
+        if (li >= 0) {
+          svg += '<circle cx="' + xScale(li).toFixed(1) + '" cy="' + yScale(lastPt.value).toFixed(1) + '" r="3" fill="' + color + '"/>';
+        }
+      }
+    }
+  });
+
+  svg += '</svg>';
+
+  /* Legend */
+  let legend = '<div class="ts-legend">';
+  series.forEach((s, si) => {
+    const color = LLM_COLORS[s.llm] || defaultColors[si % defaultColors.length];
+    legend += '<span class="ts-legend-item"><span class="ts-legend-dot" style="background:' + color + '"></span>' + s.llm + '</span>';
+  });
+  legend += '</div>';
+
+  container.innerHTML = '<div class="timeseries-wrapper">' + svg + legend + '</div>';
+}
+
+/* === Render: Footer health === */
+function renderFooter(health) {
+  const apiEl = document.getElementById('footerApi').querySelector('span');
+  const dbEl = document.getElementById('footerDb').querySelector('span');
+  const verEl = document.getElementById('footerVersion');
+
+  if (health) {
+    apiEl.textContent = health.status === 'ok' ? 'OK' : 'Erro';
+    apiEl.style.color = health.status === 'ok' ? '#22c55e' : '#ef4444';
+    dbEl.textContent = health.db_ok ? 'OK' : 'Erro';
+    dbEl.style.color = health.db_ok ? '#22c55e' : '#ef4444';
+    if (health.version) verEl.textContent = health.version;
+  } else {
+    apiEl.textContent = 'Offline';
+    apiEl.style.color = '#ef4444';
+    dbEl.textContent = '--';
+  }
+}
+
+/* === Vertical Selection === */
+function selectVertical(slug) {
+  currentVertical = slug;
+  /* Update active state in selector */
+  document.querySelectorAll('.vert-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.vert-card').forEach(c => {
+    if (c.onclick && c.onclick.toString().includes("'" + slug + "'")) {
+      c.classList.add('active');
+    }
+  });
+  /* Re-render selector to update active class reliably */
+  renderVerticalSelector(verticalsData, slug);
+  refreshDashboard();
+}
+
+/* === Main Refresh === */
+async function refreshDashboard() {
+  const vert = currentVertical;
+
+  /* Set loading states */
+  document.getElementById('citationBars').innerHTML = '<div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>';
+  document.getElementById('entityTable').innerHTML = '<div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>';
+  document.getElementById('collectionHistory').innerHTML = '<div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>';
+  document.getElementById('finopsPanel').innerHTML = '<div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>';
+  document.getElementById('timeseriesPanel').innerHTML = '<div class="loading-overlay"><span class="loading-spinner"></span> Carregando...</div>';
+
+  /* Fire all fetches in parallel */
+  const [rates, entities, collections, finops, health, timeseries] = await Promise.all([
+    fetchCitationRates(vert, 30),
+    fetchEntityRanking(vert, 30, 10),
+    fetchCollections(vert),
+    fetchFinOps(),
+    fetchHealth(),
+    fetchTimeSeries(vert, 30)
+  ]);
+
+  /* Determine connection status */
+  const isOnline = health !== null;
+  setConnection(isOnline);
+  if (isOnline) {
+    hideError();
+  } else {
+    showError('Nao foi possivel conectar a API. Verifique se o servidor esta rodando.');
+  }
+
+  /* Entity count */
+  let entityCount = 0;
+  if (vert === 'todos') {
+    entityCount = verticalsData.reduce((s, v) => s + (v.entity_count || 0), 0);
+  } else {
+    const found = verticalsData.find(v => v.slug === vert);
+    entityCount = found ? found.entity_count : 0;
+  }
+
+  /* Last collection time */
+  let lastRunTime = null;
+  if (collections && collections.runs && collections.runs.length > 0) {
+    lastRunTime = collections.runs[0].timestamp;
+  }
+
+  /* Render all sections */
+  renderKPIs(rates, entityCount, lastRunTime);
+  renderCitationBars(rates);
+  renderEntityTable(entities);
+  renderCollectionHistory(collections);
+  renderFinOpsPanel(finops);
+  renderTimeSeries(timeseries);
+  renderFooter(health);
+
+  /* Update timestamp */
+  document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+}
+
+/* === Auto-refresh every 5 minutes === */
+setInterval(refreshDashboard, 300000);
+
+/* === Initial Load === */
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const data = await fetchVerticals();
+    const verticals = data.verticals || [];
+    renderVerticalSelector(verticals, currentVertical);
+    refreshDashboard();
+  } catch (e) {
+    setConnection(false);
+    showError('Falha ao carregar verticais. API pode estar offline.');
+    renderVerticalSelector([], currentVertical);
+    refreshDashboard();
+  }
+});
+</script>
+</body>
+</html>
