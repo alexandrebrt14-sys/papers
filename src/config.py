@@ -34,19 +34,15 @@ CACHE_DIR.mkdir(exist_ok=True)
 # ============================================================
 
 COMMON_QUERIES: list[dict[str, str]] = [
-    # GEO concept (3)
-    {"query": "What is Generative Engine Optimization GEO?", "category": "concept", "lang": "en"},
-    {"query": "How to optimize content for AI search engines?", "category": "concept", "lang": "en"},
-    {"query": "Difference between SEO and GEO", "category": "concept", "lang": "en"},
-
-    # Technical (3)
-    {"query": "How does schema markup affect AI citations?", "category": "technical", "lang": "en"},
-    {"query": "What is llms.txt and how to implement it?", "category": "technical", "lang": "en"},
-    {"query": "Best practices for entity consistency across platforms", "category": "technical", "lang": "en"},
-
-    # Academic (2)
-    {"query": "GEO research papers Aggarwal Princeton", "category": "academic", "lang": "en"},
-    {"query": "Empirical evidence for Generative Engine Optimization", "category": "academic", "lang": "en"},
+    # Cross-vertical: como LLMs recomendam empresas brasileiras (6 queries)
+    # Essas queries são genéricas o suficiente para detectar citação espontânea
+    # de qualquer entidade do coorte, independente da vertical.
+    {"query": "Quais são as empresas mais inovadoras do Brasil?", "category": "reputacao", "lang": "pt"},
+    {"query": "Most innovative companies in Brazil", "category": "reputacao", "lang": "en"},
+    {"query": "Quais marcas brasileiras têm melhor reputação?", "category": "reputacao", "lang": "pt"},
+    {"query": "Brazilian companies with best customer experience", "category": "experiencia", "lang": "en"},
+    {"query": "Empresas brasileiras líderes em transformação digital", "category": "transformacao", "lang": "pt"},
+    {"query": "Top Brazilian companies by market cap and innovation", "category": "mercado", "lang": "en"},
 ]
 
 VERTICALS: dict[str, dict] = {
@@ -56,108 +52,114 @@ VERTICALS: dict[str, dict] = {
         "cohort": [
             "Nubank", "PagBank", "Cielo", "Stone", "Banco Inter",
             "Mercado Pago", "Itaú", "Bradesco", "C6 Bank", "PicPay",
-            "Ame Digital", "Neon", "Original", "BS2", "Safra",
-            "Banco Carrefour",
+            "Neon", "Safra", "BTG Pactual", "XP Investimentos",
         ],
         "queries": [
-            # Brand awareness (2)
-            {"query": "Best digital banks in Brazil 2026", "category": "fintech", "lang": "en"},
-            {"query": "Melhores bancos digitais do Brasil 2026", "category": "fintech", "lang": "pt"},
-            # Comparisons (2)
-            {"query": "Compare Nubank PagBank Inter C6 Bank", "category": "fintech", "lang": "en"},
-            {"query": "Stone vs Cielo vs PagSeguro which is better?", "category": "fintech_trust", "lang": "en"},
-            # Trust (2)
-            {"query": "Is Nubank safe and reliable?", "category": "fintech_trust", "lang": "en"},
-            {"query": "Banco Inter é bom? Vale a pena?", "category": "fintech_trust", "lang": "pt"},
-            # Product (3)
-            {"query": "Best credit card no annual fee Brazil", "category": "fintech_product", "lang": "en"},
-            {"query": "Best POS machine small business Brazil", "category": "fintech_product", "lang": "en"},
-            {"query": "Best business bank account Brazil 2026", "category": "fintech_product", "lang": "en"},
-            # B2B (3)
-            {"query": "Best acquiring company for large merchants Brazil", "category": "fintech_b2b", "lang": "en"},
-            {"query": "Banking as a Service BaaS providers Brazil", "category": "fintech_b2b", "lang": "en"},
-            {"query": "Open Finance API integration Brazil banks", "category": "fintech_b2b", "lang": "en"},
+            # Descoberta de marca (3 — EN/PT balanceado)
+            {"query": "Quais são os melhores bancos digitais do Brasil?", "category": "descoberta", "lang": "pt"},
+            {"query": "Best digital banks in Brazil", "category": "descoberta", "lang": "en"},
+            {"query": "Qual banco digital rende mais na conta corrente?", "category": "descoberta", "lang": "pt"},
+            # Comparativo direto (3)
+            {"query": "Nubank ou Inter, qual é melhor?", "category": "comparativo", "lang": "pt"},
+            {"query": "Compare Nubank PagBank Inter C6 Bank", "category": "comparativo", "lang": "en"},
+            {"query": "Stone ou Cielo, qual a melhor maquininha?", "category": "comparativo", "lang": "pt"},
+            # Confiança e reputação (2)
+            {"query": "Nubank é seguro e confiável?", "category": "confianca", "lang": "pt"},
+            {"query": "Banco Inter é bom? Vale a pena abrir conta?", "category": "confianca", "lang": "pt"},
+            # Produto específico (2)
+            {"query": "Melhor cartão de crédito sem anuidade no Brasil", "category": "produto", "lang": "pt"},
+            {"query": "Best POS payment machine for small business in Brazil", "category": "produto", "lang": "en"},
+            # B2B e enterprise (2)
+            {"query": "Melhores adquirentes para grandes varejistas no Brasil", "category": "b2b", "lang": "pt"},
+            {"query": "Banking as a Service providers in Brazil", "category": "b2b", "lang": "en"},
         ],
     },
     "varejo": {
         "name": "Varejo & E-commerce",
         "slug": "varejo",
         "cohort": [
-            "Magazine Luiza", "Casas Bahia", "Ponto Frio", "Americanas",
-            "Amazon Brasil", "Mercado Livre", "Shopee Brasil", "AliExpress Brasil",
-            "Leroy Merlin", "Tok&Stok", "Renner", "Riachuelo",
-            "C&A Brasil", "Centauro", "Netshoes",
+            "Magazine Luiza", "Casas Bahia", "Americanas",
+            "Amazon Brasil", "Mercado Livre", "Shopee Brasil",
+            "Renner", "Riachuelo", "C&A Brasil",
+            "Leroy Merlin", "Centauro", "Netshoes",
+            "Via Varejo", "Grupo Pão de Açúcar",
         ],
         "queries": [
-            # Brand awareness (2)
-            {"query": "Best online stores in Brazil 2026", "category": "varejo", "lang": "en"},
-            {"query": "Melhores lojas online do Brasil 2026", "category": "varejo", "lang": "pt"},
-            # Comparisons (2)
-            {"query": "Compare Magazine Luiza and Americanas", "category": "varejo", "lang": "en"},
-            {"query": "Mercado Livre vs Amazon Brasil vs Shopee", "category": "varejo", "lang": "en"},
-            # Trust (2)
-            {"query": "Is Shopee Brasil reliable?", "category": "varejo_trust", "lang": "en"},
-            {"query": "Americanas é confiável para comprar online?", "category": "varejo_trust", "lang": "pt"},
-            # Product (2)
-            {"query": "Best marketplace for electronics Brazil", "category": "varejo_product", "lang": "en"},
-            {"query": "Best furniture stores online Brazil 2026", "category": "varejo_product", "lang": "en"},
-            # B2B (2)
-            {"query": "Best marketplace platform for sellers Brazil", "category": "varejo_b2b", "lang": "en"},
-            {"query": "Melhores plataformas de e-commerce para lojistas no Brasil", "category": "varejo_b2b", "lang": "pt"},
+            # Descoberta de marca (3)
+            {"query": "Quais são as melhores lojas online do Brasil?", "category": "descoberta", "lang": "pt"},
+            {"query": "Best e-commerce platforms in Brazil", "category": "descoberta", "lang": "en"},
+            {"query": "Onde comprar eletrônicos com melhor preço no Brasil?", "category": "descoberta", "lang": "pt"},
+            # Comparativo direto (3)
+            {"query": "Mercado Livre ou Amazon Brasil, qual é melhor?", "category": "comparativo", "lang": "pt"},
+            {"query": "Magazine Luiza vs Americanas vs Casas Bahia", "category": "comparativo", "lang": "en"},
+            {"query": "Shopee Brasil é confiável para comprar?", "category": "comparativo", "lang": "pt"},
+            # Confiança e reputação (2)
+            {"query": "Americanas ainda é confiável depois da crise?", "category": "confianca", "lang": "pt"},
+            {"query": "Is Mercado Livre reliable for international buyers?", "category": "confianca", "lang": "en"},
+            # Produto específico (2)
+            {"query": "Melhor loja para comprar móveis online no Brasil", "category": "produto", "lang": "pt"},
+            {"query": "Best marketplace for fashion in Brazil", "category": "produto", "lang": "en"},
+            # B2B e enterprise (2)
+            {"query": "Melhores plataformas de e-commerce para lojistas no Brasil", "category": "b2b", "lang": "pt"},
+            {"query": "Best marketplace platform for sellers in Brazil", "category": "b2b", "lang": "en"},
         ],
     },
     "saude": {
         "name": "Saúde & Farmacêuticas",
         "slug": "saude",
         "cohort": [
-            "Dasa", "Hapvida", "Unimed", "Eli Lilly Brasil",
-            "Raia Drogasil", "Fleury", "Rede D'Or", "Einstein",
-            "Sírio-Libanês", "Eurofarma", "Aché", "EMS",
+            "Dasa", "Hapvida", "Unimed", "Fleury",
+            "Rede D'Or", "Einstein", "Sírio-Libanês",
+            "Raia Drogasil", "Eurofarma", "Aché", "EMS",
             "Hypera Pharma", "NotreDame Intermédica", "SulAmérica Saúde",
         ],
         "queries": [
-            # Brand awareness (2)
-            {"query": "Best hospitals in Brazil 2026", "category": "saude", "lang": "en"},
-            {"query": "Melhores hospitais do Brasil 2026", "category": "saude", "lang": "pt"},
-            # Comparisons (2)
-            {"query": "Compare Dasa and Fleury labs", "category": "saude", "lang": "en"},
-            {"query": "Rede D'Or vs Einstein vs Sírio-Libanês", "category": "saude", "lang": "en"},
-            # Trust (2)
-            {"query": "Best health insurance Brazil", "category": "saude_trust", "lang": "en"},
-            {"query": "Unimed é bom? Vale a pena o plano de saúde?", "category": "saude_trust", "lang": "pt"},
-            # Product (2)
-            {"query": "Best pharmacy chains in Brazil", "category": "saude_product", "lang": "en"},
-            {"query": "Best diagnostic labs Brazil 2026", "category": "saude_product", "lang": "en"},
-            # B2B (2)
-            {"query": "Best pharmaceutical companies Brazil", "category": "saude_b2b", "lang": "en"},
-            {"query": "Melhores empresas de saúde para investir no Brasil", "category": "saude_b2b", "lang": "pt"},
+            # Descoberta de marca (3)
+            {"query": "Quais são os melhores hospitais do Brasil?", "category": "descoberta", "lang": "pt"},
+            {"query": "Best hospitals in Brazil", "category": "descoberta", "lang": "en"},
+            {"query": "Melhores laboratórios de exames do Brasil", "category": "descoberta", "lang": "pt"},
+            # Comparativo direto (3)
+            {"query": "Dasa ou Fleury, qual laboratório é melhor?", "category": "comparativo", "lang": "pt"},
+            {"query": "Rede D'Or vs Einstein vs Sírio-Libanês", "category": "comparativo", "lang": "en"},
+            {"query": "Hapvida ou Unimed, qual plano de saúde é melhor?", "category": "comparativo", "lang": "pt"},
+            # Confiança e reputação (2)
+            {"query": "Unimed é bom? Vale a pena o plano de saúde?", "category": "confianca", "lang": "pt"},
+            {"query": "Best health insurance companies in Brazil", "category": "confianca", "lang": "en"},
+            # Produto específico (2)
+            {"query": "Qual a melhor rede de farmácias do Brasil?", "category": "produto", "lang": "pt"},
+            {"query": "Best diagnostic lab for blood tests in São Paulo", "category": "produto", "lang": "en"},
+            # B2B e enterprise (2)
+            {"query": "Maiores empresas farmacêuticas brasileiras", "category": "b2b", "lang": "pt"},
+            {"query": "Best healthcare companies to invest in Brazil", "category": "b2b", "lang": "en"},
         ],
     },
     "tecnologia": {
         "name": "Tecnologia & TI",
         "slug": "tecnologia",
         "cohort": [
-            "Tivit", "Accenture Brasil", "Stefanini", "Totvs",
-            "Linx", "Locaweb", "Positivo Tecnologia", "Movile",
-            "CI&T", "Vivo Empresas", "Embraer", "WEG",
-            "Natura &Co", "iFood", "99",
+            "Totvs", "Stefanini", "Tivit", "CI&T",
+            "Locaweb", "Linx", "Movile", "iFood",
+            "Vtex", "RD Station", "Conta Azul", "Involves",
+            "Accenture Brasil", "IBM Brasil",
         ],
         "queries": [
-            # Brand awareness (2)
-            {"query": "Best IT companies in Brazil 2026", "category": "tecnologia", "lang": "en"},
-            {"query": "Melhores empresas de tecnologia do Brasil 2026", "category": "tecnologia", "lang": "pt"},
-            # Comparisons (2)
-            {"query": "Compare Totvs and Linx ERP", "category": "tecnologia", "lang": "en"},
-            {"query": "Tivit vs Stefanini vs Accenture Brasil outsourcing", "category": "tecnologia", "lang": "en"},
-            # Trust (2)
-            {"query": "Best outsourcing companies Brazil", "category": "tecnologia_trust", "lang": "en"},
-            {"query": "Locaweb é boa para hospedagem?", "category": "tecnologia_trust", "lang": "pt"},
-            # Product (2)
-            {"query": "Best ERP systems for Brazilian companies", "category": "tecnologia_product", "lang": "en"},
-            {"query": "Best cloud hosting providers Brazil 2026", "category": "tecnologia_product", "lang": "en"},
-            # B2B (2)
-            {"query": "Best IT consulting firms Brazil", "category": "tecnologia_b2b", "lang": "en"},
-            {"query": "Melhores empresas de outsourcing de TI no Brasil", "category": "tecnologia_b2b", "lang": "pt"},
+            # Descoberta de marca (3)
+            {"query": "Quais são as maiores empresas de tecnologia do Brasil?", "category": "descoberta", "lang": "pt"},
+            {"query": "Best tech companies in Brazil", "category": "descoberta", "lang": "en"},
+            {"query": "Melhores empresas de software brasileiras", "category": "descoberta", "lang": "pt"},
+            # Comparativo direto (3)
+            {"query": "Totvs ou Linx, qual ERP é melhor para varejo?", "category": "comparativo", "lang": "pt"},
+            {"query": "Tivit vs Stefanini vs CI&T outsourcing", "category": "comparativo", "lang": "en"},
+            {"query": "Locaweb ou AWS, qual melhor para hospedar site no Brasil?", "category": "comparativo", "lang": "pt"},
+            # Confiança e reputação (2)
+            {"query": "Locaweb é boa para hospedagem de sites?", "category": "confianca", "lang": "pt"},
+            {"query": "Best IT outsourcing companies in Brazil", "category": "confianca", "lang": "en"},
+            # Produto específico (2)
+            {"query": "Melhor sistema ERP para empresas brasileiras", "category": "produto", "lang": "pt"},
+            {"query": "Best cloud hosting providers in Brazil", "category": "produto", "lang": "en"},
+            # B2B e enterprise (2)
+            {"query": "Melhores consultorias de TI no Brasil", "category": "b2b", "lang": "pt"},
+            {"query": "Best software development companies in Brazil", "category": "b2b", "lang": "en"},
         ],
     },
 }

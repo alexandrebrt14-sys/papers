@@ -128,11 +128,13 @@ class LLMClient:
         "perplexity": 0.5,
     }
 
-    # Perplexity query routing: only high-value categories (saves ~57% search cost)
+    # Perplexity query routing: only high-value categories (saves ~50% search cost)
     # Other LLMs receive all queries. Perplexity only where web search adds value.
     PERPLEXITY_CATEGORIES: set[str] = {
-        "brand", "entity", "concept",  # Core value: web search finds our content
-        "tecnologia", "fintech",       # Primary vertical queries
+        "descoberta",    # Queries de descoberta de marca — alto valor de busca web
+        "comparativo",   # Comparativos diretos — Perplexity traz fontes reais
+        "reputacao",     # Cross-vertical reputação — busca web essencial
+        "mercado",       # Dados de mercado — requer fontes atualizadas
     }
 
     def __init__(self, cohort: list[str] | None = None, vertical: str = "") -> None:
