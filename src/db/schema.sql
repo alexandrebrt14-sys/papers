@@ -161,3 +161,65 @@ CREATE TABLE IF NOT EXISTS collection_runs (
     error_msg   TEXT,
     created_at  TEXT DEFAULT (datetime('now'))
 );
+
+-- ============================================================
+-- FINOPS — Cost tracking, budgets, alerts, daily rollups
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS finops_usage (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    platform        TEXT NOT NULL,
+    model           TEXT NOT NULL,
+    operation       TEXT NOT NULL,
+    input_tokens    INTEGER NOT NULL DEFAULT 0 CHECK (input_tokens >= 0),
+    output_tokens   INTEGER NOT NULL DEFAULT 0 CHECK (output_tokens >= 0),
+    total_tokens    INTEGER NOT NULL DEFAULT 0,
+    cost_usd        REAL NOT NULL DEFAULT 0.0 CHECK (cost_usd >= 0),
+    query           TEXT DEFAULT '',
+    run_id          TEXT DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS idx_finops_usage_ts ON finops_usage(timestamp);
+CREATE INDEX IF NOT EXISTS idx_finops_usage_platform ON finops_usage(platform);
+CREATE INDEX IF NOT EXISTS idx_finops_usage_platform_ts ON finops_usage(platform, timestamp);
+
+CREATE TABLE IF NOT EXISTS finops_budgets (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    platform            TEXT UNIQUE NOT NULL,
+    monthly_limit_usd   REAL NOT NULL DEFAULT 10.0 CHECK (monthly_limit_usd >= 0),
+    daily_limit_usd     REAL NOT NULL DEFAULT 1.0 CHECK (daily_limit_usd >= 0),
+    alert_threshold_pct REAL NOT NULL DEFAULT 0.70 CHECK (alert_threshold_pct > 0 AND alert_threshold_pct <= 1),
+    hard_stop_pct       REAL NOT NULL DEFAULT 0.95 CHECK (hard_stop_pct > 0 AND hard_stop_pct <= 1),
+    updated_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS finops_alerts (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    platform          TEXT NOT NULL,
+    alert_type        TEXT NOT NULL,
+    severity          TEXT NOT NULL DEFAULT 'warning',
+    message           TEXT NOT NULL,
+    current_spend_usd REAL NOT NULL,
+    limit_usd         REAL NOT NULL,
+    pct_used          REAL NOT NULL,
+    sent_email        INTEGER NOT NULL DEFAULT 0,
+    email_to          TEXT DEFAULT '',
+    run_id            TEXT DEFAULT '',
+    acknowledged      INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_finops_alerts_ts ON finops_alerts(timestamp);
+
+CREATE TABLE IF NOT EXISTS finops_daily_rollup (
+    id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+    date                    TEXT NOT NULL,
+    platform                TEXT NOT NULL,
+    total_queries           INTEGER NOT NULL DEFAULT 0,
+    total_input_tokens      INTEGER NOT NULL DEFAULT 0,
+    total_output_tokens     INTEGER NOT NULL DEFAULT 0,
+    total_cost_usd          REAL NOT NULL DEFAULT 0.0,
+    avg_cost_per_query      REAL NOT NULL DEFAULT 0.0,
+    max_single_query_cost   REAL NOT NULL DEFAULT 0.0,
+    models_used             TEXT DEFAULT '[]',
+    UNIQUE(date, platform)
+);

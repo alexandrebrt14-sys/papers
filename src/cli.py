@@ -247,5 +247,118 @@ def intervention_add(slug: str, itype: str, desc: str, url: str) -> None:
 main.add_command(db_cmd, "db")
 
 
+# ============================================================
+# FinOps commands
+# ============================================================
+
+@main.group("finops")
+def finops_cmd() -> None:
+    """FinOps — governança de custos de APIs."""
+    pass
+
+
+@finops_cmd.command("status")
+def finops_status() -> None:
+    """Mostra status de gastos e budgets por plataforma."""
+    from src.finops.tracker import get_tracker
+
+    tracker = get_tracker()
+    statuses = tracker.get_status()
+
+    table = Table(title="FinOps — Status de Gastos")
+    table.add_column("Plataforma", style="bold")
+    table.add_column("Mensal", justify="right")
+    table.add_column("Limite", justify="right")
+    table.add_column("% Mensal", justify="right")
+    table.add_column("Diário", justify="right")
+    table.add_column("% Diário", justify="right")
+    table.add_column("Status")
+    table.add_column("Queries Hoje", justify="right")
+
+    for s in statuses:
+        pct_color = "red" if s.monthly_pct > 90 else "yellow" if s.monthly_pct > 70 else "green"
+        status_str = "[red]BLOQUEADO[/red]" if s.is_blocked else "[green]OK[/green]"
+        table.add_row(
+            s.platform,
+            f"${s.monthly_spend:.4f}",
+            f"${s.monthly_limit:.2f}",
+            f"[{pct_color}]{s.monthly_pct:.1f}%[/{pct_color}]",
+            f"${s.daily_spend:.4f}",
+            f"{s.daily_pct:.1f}%",
+            status_str,
+            str(s.queries_today),
+        )
+
+    console.print(table)
+
+
+@finops_cmd.command("set-budget")
+@click.argument("platform")
+@click.option("--monthly", type=float, help="Limite mensal em USD")
+@click.option("--daily", type=float, help="Limite diário em USD")
+def finops_set_budget(platform: str, monthly: float | None, daily: float | None) -> None:
+    """Atualiza limites de budget para uma plataforma."""
+    from src.finops.tracker import get_tracker
+
+    tracker = get_tracker()
+    tracker.set_budget(platform, monthly=monthly, daily=daily)
+    console.print(f"[green]Budget atualizado: {platform}[/green]")
+    if monthly:
+        console.print(f"  Mensal: ${monthly:.2f}")
+    if daily:
+        console.print(f"  Diário: ${daily:.2f}")
+
+
+@finops_cmd.command("alerts")
+@click.option("--limit", default=20, help="Número de alertas")
+def finops_alerts(limit: int) -> None:
+    """Lista alertas recentes."""
+    from src.finops.tracker import get_tracker
+    import sqlite3
+
+    tracker = get_tracker()
+    conn = sqlite3.connect(tracker._db_path)
+    conn.row_factory = sqlite3.Row
+    alerts = conn.execute(
+        "SELECT * FROM finops_alerts ORDER BY timestamp DESC LIMIT ?", (limit,)
+    ).fetchall()
+    conn.close()
+
+    if not alerts:
+        console.print("[dim]Nenhum alerta registrado.[/dim]")
+        return
+
+    table = Table(title="FinOps — Alertas Recentes")
+    table.add_column("Data")
+    table.add_column("Plataforma")
+    table.add_column("Tipo")
+    table.add_column("Severidade")
+    table.add_column("Mensagem", max_width=50)
+    table.add_column("Email")
+
+    for a in alerts:
+        sev_color = {"emergency": "red", "critical": "red", "warning": "yellow", "info": "blue"}.get(a["severity"], "white")
+        table.add_row(
+            a["timestamp"][:16],
+            a["platform"],
+            a["alert_type"],
+            f"[{sev_color}]{a['severity']}[/{sev_color}]",
+            a["message"][:50],
+            "Sim" if a["sent_email"] else "Nao",
+        )
+
+    console.print(table)
+
+
+@finops_cmd.command("rollup")
+def finops_rollup() -> None:
+    """Computa rollup diário para análise histórica."""
+    from src.finops.tracker import get_tracker
+
+    tracker = get_tracker()
+    tracker.rollup_daily()
+    console.print("[green]Rollup diário computado.[/green]")
+
+
 if __name__ == "__main__":
     main()

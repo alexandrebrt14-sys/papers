@@ -12,6 +12,7 @@ from typing import Any
 import httpx
 
 from src.config import LLMConfig, config
+from src.finops.tracker import FinOpsTracker, get_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -27,17 +28,37 @@ class LLMResponse:
     timestamp: str
     latency_ms: int
     token_count: int | None = None
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cost_usd: float = 0.0
     raw: dict[str, Any] | None = None
 
 
 class LLMClient:
-    """Unified client for querying multiple LLM providers."""
+    """Unified client for querying multiple LLM providers.
 
-    def __init__(self) -> None:
+    Integrated with FinOps: every query is automatically cost-tracked
+    using real token counts from API responses. Budget checks run
+    BEFORE each query; recording runs AFTER.
+    """
+
+    def __init__(self, finops: FinOpsTracker | None = None) -> None:
         self._http = httpx.Client(timeout=60.0)
+        self._finops = finops or get_tracker()
+        self._run_id = ""
 
-    def query(self, llm: LLMConfig, prompt: str) -> LLMResponse | None:
-        """Send a query to an LLM and return structured response."""
+    def set_run_id(self, run_id: str) -> None:
+        """Set run_id for cost attribution across a collection run."""
+        self._run_id = run_id
+
+    def query(self, llm: LLMConfig, prompt: str, operation: str = "llm_query") -> LLMResponse | None:
+        """Send a query to an LLM and return structured response.
+
+        Automatically:
+        1. Checks budget BEFORE calling API (can_spend)
+        2. Extracts REAL token counts from API response
+        3. Records cost in FinOps tracker
+        """
         if llm.requires_scraping:
             logger.warning(f"{llm.name} requires scraping — skipping in API mode")
             return None
@@ -45,22 +66,48 @@ class LLMClient:
             logger.warning(f"{llm.name} has no API key configured — skipping")
             return None
 
+        # Pre-flight: check budget
+        if not self._finops.can_spend(llm.provider):
+            logger.warning(f"[finops] {llm.name} BLOCKED by budget — skipping query")
+            return None
+
         start = datetime.now(timezone.utc)
+        response: LLMResponse | None = None
         try:
             if llm.provider == "openai":
-                return self._query_openai(llm, prompt, start)
+                response = self._query_openai(llm, prompt, start)
             elif llm.provider == "anthropic":
-                return self._query_anthropic(llm, prompt, start)
+                response = self._query_anthropic(llm, prompt, start)
             elif llm.provider == "google":
-                return self._query_google(llm, prompt, start)
+                response = self._query_google(llm, prompt, start)
             elif llm.provider == "perplexity":
-                return self._query_perplexity(llm, prompt, start)
+                response = self._query_perplexity(llm, prompt, start)
             else:
                 logger.error(f"Unknown provider: {llm.provider}")
                 return None
         except Exception as e:
             logger.error(f"Error querying {llm.name}: {e}")
             return None
+
+        # Post-flight: record cost with REAL tokens from API
+        if response and response.raw:
+            in_tok, out_tok = FinOpsTracker.extract_tokens(llm.provider, response.raw)
+            record = self._finops.record(
+                platform=llm.provider,
+                model=llm.model,
+                operation=operation,
+                input_tokens=in_tok,
+                output_tokens=out_tok,
+                query=prompt,
+                run_id=self._run_id,
+                raw_response=response.raw,
+            )
+            # Enrich response with cost data
+            response.input_tokens = record.input_tokens
+            response.output_tokens = record.output_tokens
+            response.cost_usd = record.cost_usd
+
+        return response
 
     def _query_openai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """Query OpenAI ChatGPT."""
