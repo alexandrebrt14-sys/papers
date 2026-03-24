@@ -386,6 +386,13 @@ def finops_monitor_cmd() -> None:
     run_monitor(verbose=True)
 
 
+@finops_cmd.command("security")
+def finops_security_cmd() -> None:
+    """Auditoria de segurança: valida chaves, scan de vazamentos, rotação."""
+    from src.finops.secrets import run_security_audit
+    run_security_audit()
+
+
 @finops_cmd.command("dashboard")
 def finops_dashboard_cmd() -> None:
     """Gera dashboard HTML com estado atual."""

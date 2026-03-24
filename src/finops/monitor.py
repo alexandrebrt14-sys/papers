@@ -427,6 +427,26 @@ def run_monitor(verbose: bool = True) -> dict[str, Any]:
     if verbose:
         print("  [6/6] Dashboard generated")
 
+    # 7. Security audit (key health + leak scan)
+    try:
+        from src.finops.secrets import check_key_rotation, scan_git_for_leaks
+        rotations = check_key_rotation(tracker._db_path)
+        if rotations:
+            for r in rotations:
+                logger.warning(f"[security] {r['message']}")
+        leaks = scan_git_for_leaks()
+        if leaks:
+            for leak in leaks:
+                logger.error(f"[security] LEAK: {leak['message']}")
+        results["security"] = {"rotations": rotations, "leaks": len(leaks)}
+        results["actions"].append("security_audit")
+        if verbose:
+            print(f"  [7/7] Security audit: {len(rotations)} rotations, {len(leaks)} leaks")
+    except Exception as e:
+        logger.warning(f"[security] Audit failed: {e}")
+        if verbose:
+            print(f"  [7/7] Security audit skipped: {e}")
+
     # Summary
     statuses = tracker.get_status()
     results["budgets"] = [
