@@ -80,6 +80,27 @@ Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Ba
 
 Cada execução gera um `run_id` para rastreabilidade. Eventos estruturados: started, query_cited, query_not_cited, query_error, completed.
 
+## FinOps — Governança de Custos
+
+Sistema integrado de controle financeiro para APIs de LLM:
+
+- **Dashboard HTML** com painel por plataforma (gasto, tokens, queries)
+- **Limites automáticos**: $10/plataforma/mês, $30 global, hard stop em 95%
+- **Alertas por email**: 70% warning, 90% critical, 100% exceeded
+- **Tracking por token**: custo calculado por modelo com tabela de preços atualizada
+
+## Documentação Evolutiva
+
+| Documento | Descrição |
+|-----------|-----------|
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Especificação formal de requisitos (RF/RNF) |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Histórico de mudanças com métricas auto-atualizadas |
+| [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Políticas de gasto, ADRs, roadmap de publicação |
+| [docs/STATUS.md](docs/STATUS.md) | Snapshot de saúde do projeto (auto-gerado) |
+| [docs/MANUAL.md](docs/MANUAL.md) | Manual operacional completo |
+
+Documentação atualizada automaticamente após cada coleta via `scripts/update-docs.py`.
+
 ## Setup
 
 ```bash
