@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-03-24T17:08:28.552891+00:00",
+  "date": "2026-03-24",
+  "coletas": [
+    {
+      "file": "coleta-raw-2026-03-24.json",
+      "records": 60,
+      "valid": 60
+    },
+    {
+      "file": "coleta-3llm-2026-03-24.json",
+      "records": 90,
+      "valid": 90
+    },
+    {
+      "file": "coleta-4llm-2026-03-24.json",
+      "records": 120,
+      "valid": 109
+    },
+    {
+      "file": "coleta-integral-2026-03-24.json",
+      "records": 120,
+      "valid": 90
+    },
+    {
+      "file": "coleta-tecnologia-2026-03-24.json",
+      "records": 72,
+      "valid": 57
+    }
+  ],
+  "total_valid_responses": 406,
+  "total_attempts": 462,
+  "costs": {
+    "openai": 0.005594,
+    "anthropic": 0.069135,
+    "google": 0.000515,
+    "perplexity": 0.725188
+  },
+  "queries": {
+    "openai": 138,
+    "anthropic": 108,
+    "google": 22,
+    "perplexity": 138
+  },
+  "tokens": {
+    "openai": 22450,
+    "anthropic": 25447,
+    "google": 2921,
+    "perplexity": 35188
+  },
+  "total_cost": 0.8004,
+  "verticals_collected": [
+    "fintech",
+    "tecnologia"
+  ]
+}
