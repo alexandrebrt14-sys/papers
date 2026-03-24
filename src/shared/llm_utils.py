@@ -245,7 +245,7 @@ def query_gemini(query: str, api_key: str) -> dict | None:
 
     def _do():
         r = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}",
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}",
             json={
                 "contents": [
                     {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nQuery: {query}"}]}
@@ -273,7 +273,7 @@ def query_gemini(query: str, api_key: str) -> dict | None:
         usage = data.get("usageMetadata", {})
         result = {
             "content": parsed.get("summary", text[:200]),
-            "model": "gemini-2.0-flash",
+            "model": "gemini-2.5-flash",
             "latency_ms": latency,
             "tokens": usage.get("totalTokenCount", 0),
             "input_tokens": usage.get("promptTokenCount", 0),

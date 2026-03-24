@@ -30,7 +30,7 @@
 4. Selecione o projeto existente ou crie "papers-fintech"
 5. Copie a key (formato: `AI...`)
 
-**Modelo usado:** `gemini-2.0-flash` (grátis: 15 RPM, 1M tokens/dia)
+**Modelo usado:** `gemini-2.5-flash` (grátis: 15 RPM, 1M tokens/dia)
 
 ## 4. Perplexity — ~$5/mês (mínimo)
 

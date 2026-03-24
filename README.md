@@ -74,7 +74,7 @@ Tivit, Totvs, Stefanini, Accenture, CI&T, Globant, Softplan, Linx, Locaweb, Movi
 |----------|--------|--------|-------|
 | OpenAI | gpt-4o | GitHub Secret | ~$3/mês |
 | Anthropic | claude-sonnet-4 | GitHub Secret | ~$2/mês |
-| Google AI | gemini-2.0-flash | GitHub Secret | Grátis |
+| Google AI | gemini-2.5-flash | GitHub Secret | Grátis |
 | Perplexity | sonar | Pendente | ~$5/mês |
 
 ## Queries: 55 padronizadas por vertical
