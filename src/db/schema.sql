@@ -1,6 +1,25 @@
 -- Papers Research Database Schema
 -- Supports both SQLite (local) and Supabase (production)
 -- All timestamps in UTC ISO 8601
+-- Multi-vertical support: fintech, varejo, saude, tecnologia
+
+-- ============================================================
+-- Verticals Registry
+-- ============================================================
+CREATE TABLE IF NOT EXISTS verticals (
+    slug        TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    cohort_json TEXT NOT NULL DEFAULT '[]',   -- JSON array of entity names
+    created_at  TEXT DEFAULT (datetime('now')),
+    updated_at  TEXT DEFAULT (datetime('now'))
+);
+
+-- Seed default verticals (INSERT OR IGNORE = idempotent)
+INSERT OR IGNORE INTO verticals (slug, name, cohort_json) VALUES
+    ('fintech', 'Fintech & Bancos Digitais', '["Nubank","PagBank","Cielo","Stone","Banco Inter","Mercado Pago","Itaú","Bradesco","C6 Bank","PicPay","Ame Digital","Neon","Original","BS2","Safra","Banco Carrefour"]'),
+    ('varejo', 'Varejo & E-commerce', '["Magazine Luiza","Casas Bahia","Ponto Frio","Americanas","Amazon Brasil","Mercado Livre","Shopee Brasil","AliExpress Brasil","Leroy Merlin","Tok&Stok","Renner","Riachuelo","C&A Brasil","Centauro","Netshoes"]'),
+    ('saude', 'Saúde & Farmacêuticas', '["Dasa","Hapvida","Unimed","Eli Lilly Brasil","Raia Drogasil","Fleury","Rede D''Or","Einstein","Sírio-Libanês","Eurofarma","Aché","EMS","Hypera Pharma","NotreDame Intermédica","SulAmérica Saúde"]'),
+    ('tecnologia', 'Tecnologia & TI', '["Tivit","Accenture Brasil","Stefanini","Totvs","Linx","Locaweb","Positivo Tecnologia","Movile","CI&T","Vivo Empresas","Embraer","WEG","Natura &Co","iFood","99"]');
 
 -- ============================================================
 -- Module 1: Multi-LLM Citation Tracker
@@ -13,6 +32,7 @@ CREATE TABLE IF NOT EXISTS citations (
     query           TEXT NOT NULL,
     query_category  TEXT NOT NULL,               -- brand, entity, concept, technical, b2a, market, academic
     query_lang      TEXT NOT NULL DEFAULT 'en',  -- en, pt
+    vertical        TEXT NOT NULL DEFAULT 'fintech',
     cited           BOOLEAN NOT NULL DEFAULT 0,
     cited_entity    BOOLEAN DEFAULT 0,
     cited_domain    BOOLEAN DEFAULT 0,
@@ -34,6 +54,7 @@ CREATE INDEX IF NOT EXISTS idx_citations_timestamp ON citations(timestamp);
 CREATE INDEX IF NOT EXISTS idx_citations_llm ON citations(llm);
 CREATE INDEX IF NOT EXISTS idx_citations_query_category ON citations(query_category);
 CREATE INDEX IF NOT EXISTS idx_citations_cited ON citations(cited);
+CREATE INDEX IF NOT EXISTS idx_citations_vertical ON citations(vertical);
 
 -- ============================================================
 -- Module 2: Competitor Benchmark Dataset
@@ -46,6 +67,7 @@ CREATE TABLE IF NOT EXISTS competitor_citations (
     query           TEXT NOT NULL,
     query_category  TEXT NOT NULL,
     query_lang      TEXT NOT NULL DEFAULT 'en',
+    vertical        TEXT NOT NULL DEFAULT 'fintech',
     entity          TEXT NOT NULL,               -- Competitor name or primary entity
     entity_type     TEXT NOT NULL,               -- 'primary' or 'competitor'
     cited           BOOLEAN NOT NULL DEFAULT 0,
@@ -56,6 +78,7 @@ CREATE TABLE IF NOT EXISTS competitor_citations (
 
 CREATE INDEX IF NOT EXISTS idx_comp_entity ON competitor_citations(entity);
 CREATE INDEX IF NOT EXISTS idx_comp_timestamp ON competitor_citations(timestamp);
+CREATE INDEX IF NOT EXISTS idx_comp_vertical ON competitor_citations(vertical);
 
 -- ============================================================
 -- Module 3: SERP vs AI Overlap Tracker
@@ -67,6 +90,7 @@ CREATE TABLE IF NOT EXISTS serp_ai_overlap (
     model           TEXT NOT NULL,
     query           TEXT NOT NULL,
     query_category  TEXT NOT NULL,
+    vertical        TEXT NOT NULL DEFAULT 'fintech',
     serp_domain_count   INTEGER,
     ai_domain_count     INTEGER,
     overlap_count       INTEGER,
@@ -82,6 +106,7 @@ CREATE TABLE IF NOT EXISTS serp_ai_overlap (
 );
 
 CREATE INDEX IF NOT EXISTS idx_overlap_timestamp ON serp_ai_overlap(timestamp);
+CREATE INDEX IF NOT EXISTS idx_overlap_vertical ON serp_ai_overlap(vertical);
 
 -- ============================================================
 -- Module 4: Content Intervention Tracker
@@ -118,14 +143,17 @@ CREATE INDEX IF NOT EXISTS idx_measurements_slug ON intervention_measurements(in
 -- ============================================================
 CREATE TABLE IF NOT EXISTS daily_snapshots (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    date        TEXT NOT NULL UNIQUE,            -- YYYY-MM-DD
+    date        TEXT NOT NULL,                    -- YYYY-MM-DD
     module      TEXT NOT NULL,
+    vertical    TEXT NOT NULL DEFAULT 'fintech',
     data_json   TEXT NOT NULL,                   -- Full snapshot as JSON
-    created_at  TEXT DEFAULT (datetime('now'))
+    created_at  TEXT DEFAULT (datetime('now')),
+    UNIQUE(date, module, vertical)
 );
 
 CREATE INDEX IF NOT EXISTS idx_snapshots_date ON daily_snapshots(date);
 CREATE INDEX IF NOT EXISTS idx_snapshots_module ON daily_snapshots(module);
+CREATE INDEX IF NOT EXISTS idx_snapshots_vertical ON daily_snapshots(vertical);
 
 -- ============================================================
 -- Module 7: Citation Context Analysis
@@ -155,12 +183,15 @@ CREATE TABLE IF NOT EXISTS collection_runs (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp   TEXT NOT NULL,
     module      TEXT NOT NULL,
+    vertical    TEXT NOT NULL DEFAULT 'fintech',
     records     INTEGER NOT NULL DEFAULT 0,
     duration_ms INTEGER,
     status      TEXT DEFAULT 'success',         -- success, error, partial
     error_msg   TEXT,
     created_at  TEXT DEFAULT (datetime('now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_collection_runs_vertical ON collection_runs(vertical);
 
 -- ============================================================
 -- FINOPS — Cost tracking, budgets, alerts, daily rollups
@@ -172,6 +203,7 @@ CREATE TABLE IF NOT EXISTS finops_usage (
     platform        TEXT NOT NULL,
     model           TEXT NOT NULL,
     operation       TEXT NOT NULL,
+    vertical        TEXT DEFAULT 'fintech',
     input_tokens    INTEGER NOT NULL DEFAULT 0 CHECK (input_tokens >= 0),
     output_tokens   INTEGER NOT NULL DEFAULT 0 CHECK (output_tokens >= 0),
     total_tokens    INTEGER NOT NULL DEFAULT 0,
@@ -182,6 +214,7 @@ CREATE TABLE IF NOT EXISTS finops_usage (
 CREATE INDEX IF NOT EXISTS idx_finops_usage_ts ON finops_usage(timestamp);
 CREATE INDEX IF NOT EXISTS idx_finops_usage_platform ON finops_usage(platform);
 CREATE INDEX IF NOT EXISTS idx_finops_usage_platform_ts ON finops_usage(platform, timestamp);
+CREATE INDEX IF NOT EXISTS idx_finops_usage_vertical ON finops_usage(vertical);
 
 CREATE TABLE IF NOT EXISTS finops_budgets (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -214,6 +247,7 @@ CREATE TABLE IF NOT EXISTS finops_daily_rollup (
     id                      INTEGER PRIMARY KEY AUTOINCREMENT,
     date                    TEXT NOT NULL,
     platform                TEXT NOT NULL,
+    vertical                TEXT DEFAULT 'fintech',
     total_queries           INTEGER NOT NULL DEFAULT 0,
     total_input_tokens      INTEGER NOT NULL DEFAULT 0,
     total_output_tokens     INTEGER NOT NULL DEFAULT 0,
@@ -221,7 +255,7 @@ CREATE TABLE IF NOT EXISTS finops_daily_rollup (
     avg_cost_per_query      REAL NOT NULL DEFAULT 0.0,
     max_single_query_cost   REAL NOT NULL DEFAULT 0.0,
     models_used             TEXT DEFAULT '[]',
-    UNIQUE(date, platform)
+    UNIQUE(date, platform, vertical)
 );
 
 -- ============================================================
@@ -239,6 +273,7 @@ CREATE TABLE IF NOT EXISTS dual_responses (
     model_version   TEXT DEFAULT '',
     query           TEXT NOT NULL,
     query_category  TEXT DEFAULT '',
+    vertical        TEXT NOT NULL DEFAULT 'fintech',
     -- JSON mode response (self-report: what the LLM says it would cite)
     json_response   TEXT DEFAULT '',
     json_cited      TEXT DEFAULT '[]',
@@ -256,6 +291,7 @@ CREATE TABLE IF NOT EXISTS dual_responses (
 CREATE INDEX IF NOT EXISTS idx_dual_ts ON dual_responses(timestamp);
 CREATE INDEX IF NOT EXISTS idx_dual_llm ON dual_responses(llm);
 CREATE INDEX IF NOT EXISTS idx_dual_type ON dual_responses(citation_type);
+CREATE INDEX IF NOT EXISTS idx_dual_vertical ON dual_responses(vertical);
 
 -- Model version tracking for temporal drift detection
 CREATE TABLE IF NOT EXISTS model_versions (

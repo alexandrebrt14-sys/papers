@@ -8,6 +8,7 @@ Optimizations applied:
 5. Local SHA-256 cache: skip identical queries within TTL window (20h default)
 6. Brave Search API: free 2K queries/mo (replaces SerpAPI $50/mo)
 7. Retry with exponential backoff: handles 429s without wasting budget
+8. Multi-vertical support: cohort and queries resolved per vertical
 """
 
 from __future__ import annotations
@@ -27,7 +28,7 @@ import httpx
 
 from src.config import (
     LLMConfig, config, SYSTEM_PROMPT, PERPLEXITY_SYSTEM,
-    CACHE_DIR,
+    CACHE_DIR, VERTICALS, get_cohort, get_queries,
 )
 
 logger = logging.getLogger(__name__)
@@ -118,11 +119,12 @@ class LLMClient:
     MAX_RETRIES = 1
     RETRY_BACKOFF = [3]  # seconds — single retry, then circuit break
 
-    def __init__(self) -> None:
+    def __init__(self, cohort: list[str] | None = None) -> None:
         self._http = httpx.Client(timeout=60.0)
         self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
         self._run_id = ""
         self._circuit_broken: set[str] = set()  # providers with 429, skip rest
+        self._cohort = cohort or config.cohort_entities
 
     def set_run_id(self, run_id: str) -> None:
         self._run_id = run_id
@@ -367,13 +369,11 @@ class LLMClient:
     def _extract_urls(text: str) -> list[str]:
         return re.findall(r'https?://[^\s\)\]>"\']+', text)
 
-    @staticmethod
-    def _extract_entity_mentions(text: str) -> list[str]:
+    def _extract_entity_mentions(self, text: str) -> list[str]:
         """Extract known entity mentions from free-text response."""
         text_lower = text.lower()
         entities = []
-        check = list(config.cohort_entities)
-        for entity in check:
+        for entity in self._cohort:
             if entity.lower() in text_lower:
                 entities.append(entity)
         return entities
@@ -432,10 +432,17 @@ class BraveSearchClient:
 # === Base Collector ===
 
 class BaseCollector(ABC):
-    """Base class for all data collection modules."""
+    """Base class for all data collection modules.
 
-    def __init__(self) -> None:
-        self.llm_client = LLMClient()
+    Accepts a vertical parameter to resolve cohort and queries
+    from the VERTICALS registry in config.py.
+    """
+
+    def __init__(self, vertical: str = "fintech") -> None:
+        self.vertical = vertical
+        self.cohort = get_cohort(vertical)
+        self.queries = get_queries(vertical, include_common=True)
+        self.llm_client = LLMClient(cohort=self.cohort)
         self.config = config
         self.logger = logging.getLogger(self.__class__.__name__)
 

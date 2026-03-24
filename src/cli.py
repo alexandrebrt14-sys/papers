@@ -11,7 +11,7 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from src.config import config
+from src.config import config, list_verticals, get_queries, get_cohort, VERTICALS
 from src.db.client import DatabaseClient
 from src.collectors.citation_tracker import CitationTracker
 from src.collectors.competitor import CompetitorBenchmark
@@ -27,6 +27,8 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 
+VERTICAL_CHOICES = list_verticals() + ["all"]
+
 
 def get_db() -> DatabaseClient:
     db = DatabaseClient()
@@ -34,53 +36,77 @@ def get_db() -> DatabaseClient:
     return db
 
 
+def resolve_verticals(ctx: click.Context) -> list[str]:
+    """Resolve which verticals to process from click context."""
+    vertical = ctx.obj.get("vertical", "fintech") if ctx.obj else "fintech"
+    if vertical == "all":
+        return list_verticals()
+    return [vertical]
+
+
 @click.group()
-def main() -> None:
+@click.option(
+    "--vertical", "-v",
+    type=click.Choice(VERTICAL_CHOICES, case_sensitive=False),
+    default="fintech",
+    envvar="VERTICAL",
+    help="Vertical de estudo: fintech, varejo, saude, tecnologia, all.",
+)
+@click.pass_context
+def main(ctx: click.Context, vertical: str) -> None:
     """Papers — Infraestrutura de pesquisa empírica em GEO."""
-    pass
+    ctx.ensure_object(dict)
+    ctx.obj["vertical"] = vertical
 
 
 # === Collect Commands ===
 
 @main.group()
-def collect() -> None:
+@click.pass_context
+def collect(ctx: click.Context) -> None:
     """Executar módulos de coleta de dados."""
     pass
 
 
 @collect.command("all")
-def collect_all() -> None:
+@click.pass_context
+def collect_all(ctx: click.Context) -> None:
     """Rodar todos os coletores disponíveis."""
     db = get_db()
-    modules = [
-        ("citation_tracker", CitationTracker, db.insert_citations),
-        ("competitor_benchmark", CompetitorBenchmark, db.insert_competitor_citations),
-        ("serp_ai_overlap", SerpAIOverlap, db.insert_serp_overlap),
-    ]
+    verticals = resolve_verticals(ctx)
 
-    for name, cls, insert_fn in modules:
-        console.print(f"\n[bold cyan]Coletando: {name}[/bold cyan]")
-        start = time.time()
-        try:
-            collector = cls()
-            results = collector.collect()
-            if results:
-                count = insert_fn(results)
+    for vert in verticals:
+        console.print(f"\n[bold magenta]--- Vertical: {VERTICALS[vert]['name']} ({vert}) ---[/bold magenta]")
+        modules = [
+            ("citation_tracker", CitationTracker, db.insert_citations),
+            ("competitor_benchmark", CompetitorBenchmark, db.insert_competitor_citations),
+            ("serp_ai_overlap", SerpAIOverlap, db.insert_serp_overlap),
+        ]
+
+        for name, cls, insert_fn in modules:
+            console.print(f"\n[bold cyan]Coletando: {name}[/bold cyan]")
+            start = time.time()
+            try:
+                collector = cls(vertical=vert)
+                results = collector.collect()
+                if results:
+                    count = insert_fn(results, vertical=vert)
+                    duration = int((time.time() - start) * 1000)
+                    db.insert_collection_run(name, count, duration, vertical=vert)
+                    console.print(f"  [green]{count} registros salvos ({duration}ms)[/green]")
+                else:
+                    console.print(f"  [yellow]Nenhum registro coletado[/yellow]")
+                collector.close()
+            except Exception as e:
                 duration = int((time.time() - start) * 1000)
-                db.insert_collection_run(name, count, duration)
-                console.print(f"  [green]{count} registros salvos ({duration}ms)[/green]")
-            else:
-                console.print(f"  [yellow]Nenhum registro coletado[/yellow]")
-            collector.close()
-        except Exception as e:
-            duration = int((time.time() - start) * 1000)
-            db.insert_collection_run(name, 0, duration, "error", str(e))
-            console.print(f"  [red]Erro: {e}[/red]")
+                db.insert_collection_run(name, 0, duration, status="error", error_msg=str(e), vertical=vert)
+                console.print(f"  [red]Erro: {e}[/red]")
 
-    # Save daily snapshot
-    ts = TimeSeriesManager(db)
-    snapshot = ts.compute_daily_citation_aggregate()
-    ts.save_daily_aggregate("citation_tracker", snapshot)
+        # Save daily snapshot per vertical
+        ts = TimeSeriesManager(db)
+        snapshot = ts.compute_daily_citation_aggregate(vertical=vert)
+        ts.save_daily_aggregate("citation_tracker", snapshot, vertical=vert)
+
     db.close()
 
     # Auto-run FinOps monitor (rollup, budget check, exports, dashboard)
@@ -91,103 +117,129 @@ def collect_all() -> None:
 
 
 @collect.command("citation")
-def collect_citation() -> None:
+@click.pass_context
+def collect_citation(ctx: click.Context) -> None:
     """Rodar apenas o Citation Tracker (Módulo 1)."""
     db = get_db()
-    start = time.time()
-    collector = CitationTracker()
-    results = collector.collect()
-    count = 0
-    if results:
-        count = db.insert_citations(results)
-        duration = int((time.time() - start) * 1000)
-        db.insert_collection_run("citation_tracker", count, duration)
-        console.print(f"[green]{count} citações coletadas ({duration}ms)[/green]")
-    collector.close()
+    verticals = resolve_verticals(ctx)
+
+    for vert in verticals:
+        console.print(f"\n[bold magenta]Vertical: {vert}[/bold magenta]")
+        start = time.time()
+        collector = CitationTracker(vertical=vert)
+        results = collector.collect()
+        count = 0
+        if results:
+            count = db.insert_citations(results, vertical=vert)
+            duration = int((time.time() - start) * 1000)
+            db.insert_collection_run("citation_tracker", count, duration, vertical=vert)
+            console.print(f"[green]{count} citações coletadas ({duration}ms)[/green]")
+        collector.close()
+
     db.close()
     # Auto FinOps
     from src.finops.hooks import post_collection_hook
-    post_collection_hook("citation_tracker", count, int((time.time() - start) * 1000))
+    post_collection_hook("citation_tracker", 0, 0)
 
 
 @collect.command("competitor")
-def collect_competitor() -> None:
+@click.pass_context
+def collect_competitor(ctx: click.Context) -> None:
     """Rodar apenas o Competitor Benchmark (Módulo 2)."""
     db = get_db()
-    start = time.time()
-    collector = CompetitorBenchmark()
-    results = collector.collect()
-    count = 0
-    if results:
-        count = db.insert_competitor_citations(results)
-        duration = int((time.time() - start) * 1000)
-        db.insert_collection_run("competitor_benchmark", count, duration)
-        console.print(f"[green]{count} registros de benchmark coletados ({duration}ms)[/green]")
-    collector.close()
+    verticals = resolve_verticals(ctx)
+
+    for vert in verticals:
+        console.print(f"\n[bold magenta]Vertical: {vert}[/bold magenta]")
+        start = time.time()
+        collector = CompetitorBenchmark(vertical=vert)
+        results = collector.collect()
+        count = 0
+        if results:
+            count = db.insert_competitor_citations(results, vertical=vert)
+            duration = int((time.time() - start) * 1000)
+            db.insert_collection_run("competitor_benchmark", count, duration, vertical=vert)
+            console.print(f"[green]{count} registros de benchmark coletados ({duration}ms)[/green]")
+        collector.close()
+
     db.close()
     from src.finops.hooks import post_collection_hook
-    post_collection_hook("competitor_benchmark", count, int((time.time() - start) * 1000))
+    post_collection_hook("competitor_benchmark", 0, 0)
 
 
 @collect.command("serp")
-def collect_serp() -> None:
+@click.pass_context
+def collect_serp(ctx: click.Context) -> None:
     """Rodar apenas o SERP vs AI Overlap (Módulo 3)."""
     db = get_db()
-    start = time.time()
-    collector = SerpAIOverlap()
-    results = collector.collect()
-    count = 0
-    if results:
-        count = db.insert_serp_overlap(results)
-        duration = int((time.time() - start) * 1000)
-        db.insert_collection_run("serp_ai_overlap", count, duration)
-        console.print(f"[green]{count} registros de overlap coletados ({duration}ms)[/green]")
-    collector.close()
+    verticals = resolve_verticals(ctx)
+
+    for vert in verticals:
+        console.print(f"\n[bold magenta]Vertical: {vert}[/bold magenta]")
+        start = time.time()
+        collector = SerpAIOverlap(vertical=vert)
+        results = collector.collect()
+        count = 0
+        if results:
+            count = db.insert_serp_overlap(results, vertical=vert)
+            duration = int((time.time() - start) * 1000)
+            db.insert_collection_run("serp_ai_overlap", count, duration, vertical=vert)
+            console.print(f"[green]{count} registros de overlap coletados ({duration}ms)[/green]")
+        collector.close()
+
     db.close()
     from src.finops.hooks import post_collection_hook
-    post_collection_hook("serp_ai_overlap", count, int((time.time() - start) * 1000))
+    post_collection_hook("serp_ai_overlap", 0, 0)
 
 
 # === Analysis Commands ===
 
 @main.group()
-def analyze() -> None:
+@click.pass_context
+def analyze(ctx: click.Context) -> None:
     """Executar análises estatísticas."""
     pass
 
 
 @analyze.command("report")
-def analyze_report() -> None:
+@click.pass_context
+def analyze_report(ctx: click.Context) -> None:
     """Gerar relatório estatístico completo."""
     db = get_db()
     import pandas as pd
     from src.analysis.statistical import StatisticalAnalyzer
 
-    rows = db._conn.execute("SELECT * FROM citations").fetchall()
-    if not rows:
-        console.print("[yellow]Sem dados de citação para análise.[/yellow]")
-        return
+    verticals = resolve_verticals(ctx)
 
-    df = pd.DataFrame([dict(r) for r in rows])
-    analyzer = StatisticalAnalyzer()
-    report = analyzer.generate_summary_report(df)
+    for vert in verticals:
+        console.print(f"\n[bold magenta]--- Relatório: {vert} ---[/bold magenta]")
+        where = "WHERE vertical = ?" if vert != "all" else ""
+        params = [vert] if vert != "all" else []
+        rows = db._conn.execute(f"SELECT * FROM citations {where}", params).fetchall()
+        if not rows:
+            console.print("[yellow]Sem dados de citação para análise.[/yellow]")
+            continue
 
-    console.print("\n[bold]Relatório Estatístico — GEO Papers[/bold]\n")
-    console.print(f"Total de observações: {report['total_observations']}")
-    console.print(f"Taxa de citação geral: {report['overall_citation_rate']:.1%}\n")
+        df = pd.DataFrame([dict(r) for r in rows])
+        analyzer = StatisticalAnalyzer()
+        report = analyzer.generate_summary_report(df)
 
-    table = Table(title="Taxa de Citação por LLM")
-    table.add_column("LLM", style="cyan")
-    table.add_column("Taxa", justify="right")
-    table.add_column("Citações", justify="right")
-    table.add_column("N", justify="right")
-    for llm, data in report["by_llm"].items():
-        table.add_row(llm, f"{data['rate']:.1%}", str(data["cited"]), str(data["n"]))
-    console.print(table)
+        console.print(f"\n[bold]Relatório Estatístico — GEO Papers ({vert})[/bold]\n")
+        console.print(f"Total de observações: {report['total_observations']}")
+        console.print(f"Taxa de citação geral: {report['overall_citation_rate']:.1%}\n")
 
-    if "anova_llms" in report:
-        anova = report["anova_llms"]
-        console.print(f"\n[bold]ANOVA entre LLMs:[/bold] {anova['interpretation']}")
+        table = Table(title=f"Taxa de Citação por LLM ({vert})")
+        table.add_column("LLM", style="cyan")
+        table.add_column("Taxa", justify="right")
+        table.add_column("Citações", justify="right")
+        table.add_column("N", justify="right")
+        for llm, data in report["by_llm"].items():
+            table.add_row(llm, f"{data['rate']:.1%}", str(data["cited"]), str(data["n"]))
+        console.print(table)
+
+        if "anova_llms" in report:
+            anova = report["anova_llms"]
+            console.print(f"\n[bold]ANOVA entre LLMs:[/bold] {anova['interpretation']}")
 
     db.close()
 
@@ -195,7 +247,8 @@ def analyze_report() -> None:
 # === Database Commands ===
 
 @main.group()
-def db_cmd() -> None:
+@click.pass_context
+def db_cmd(ctx: click.Context) -> None:
     """Gerenciar banco de dados."""
     pass
 
@@ -212,18 +265,22 @@ def db_migrate(ctx: click.Context) -> None:
 @db_cmd.command("export")
 @click.option("--format", "fmt", type=click.Choice(["csv", "json"]), default="csv")
 @click.option("--output", "-o", default="data/export")
-def db_export(fmt: str, output: str) -> None:
+@click.pass_context
+def db_export(ctx: click.Context, fmt: str, output: str) -> None:
     """Exportar dados de citação."""
     db = get_db()
-    if fmt == "csv":
-        path = f"{output}_citations.csv"
-        count = db.export_citations_csv(path)
-        console.print(f"[green]{count} registros exportados para {path}[/green]")
+    verticals = resolve_verticals(ctx)
+    for vert in verticals:
+        if fmt == "csv":
+            path = f"{output}_{vert}_citations.csv"
+            count = db.export_citations_csv(path, vertical=vert)
+            console.print(f"[green]{count} registros exportados para {path} ({vert})[/green]")
     db.close()
 
 
 @db_cmd.command("health")
-def db_health() -> None:
+@click.pass_context
+def db_health(ctx: click.Context) -> None:
     """Verificar saúde e completude dos dados."""
     db = get_db()
     ts = TimeSeriesManager(db)
@@ -235,7 +292,8 @@ def db_health() -> None:
 # === Intervention Commands ===
 
 @main.group()
-def intervention() -> None:
+@click.pass_context
+def intervention(ctx: click.Context) -> None:
     """Gerenciar intervenções de conteúdo (A/B)."""
     pass
 

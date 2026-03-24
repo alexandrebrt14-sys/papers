@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 9 * * *'  # 06:00 BRT (UTC-3)
   workflow_dispatch:
+    inputs:
+      vertical:
+        description: 'Vertical to collect (fintech|varejo|saude|tecnologia|all)'
+        required: false
+        default: 'all'
 
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -17,7 +22,12 @@ env:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        vertical: [fintech, varejo, saude, tecnologia]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,8 +40,21 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
+      # Skip if workflow_dispatch selected a specific vertical
+      - name: Check if vertical should run
+        id: check
+        run: |
+          INPUT_VERTICAL="${{ github.event.inputs.vertical || 'all' }}"
+          MATRIX_VERTICAL="${{ matrix.vertical }}"
+          if [ "$INPUT_VERTICAL" != "all" ] && [ "$INPUT_VERTICAL" != "$MATRIX_VERTICAL" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       # Step 1: Restore DB from previous run (if exists)
       - name: Download previous DB
+        if: steps.check.outputs.skip != 'true'
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
@@ -39,28 +62,68 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
-      # Step 2: Run collectors (continue on error — individual LLM failures
-      # should not block the pipeline; data from working LLMs is still valuable)
-      - name: Run Citation Tracker (Module 1)
-        run: python -m src.cli collect citation || true
+      # Step 2: Run collectors for this vertical
+      - name: Run Citation Tracker (Module 1) — ${{ matrix.vertical }}
+        if: steps.check.outputs.skip != 'true'
+        run: python -m src.cli --vertical ${{ matrix.vertical }} collect citation || true
 
-      - name: Run Competitor Benchmark (Module 2)
-        run: python -m src.cli collect competitor || true
+      - name: Run Competitor Benchmark (Module 2) — ${{ matrix.vertical }}
+        if: steps.check.outputs.skip != 'true'
+        run: python -m src.cli --vertical ${{ matrix.vertical }} collect competitor || true
 
-      # Step 3: FinOps monitor (rollup + budget check + exports + dashboard)
+      # Step 3: Export data for this vertical
+      - name: Export CSV snapshots — ${{ matrix.vertical }}
+        if: steps.check.outputs.skip != 'true'
+        run: python -m src.cli --vertical ${{ matrix.vertical }} db export --format csv --output data/daily
+        continue-on-error: true
+
+      # Step 4: Upload DB artifact
+      - name: Upload database (latest)
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: papers-db-${{ matrix.vertical }}
+          path: data/papers.db
+          retention-days: 90
+          overwrite: true
+
+  finalize:
+    runs-on: ubuntu-latest
+    needs: collect
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      # Download DB from last vertical (tecnologia runs last due to sequential)
+      - name: Download DB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: papers-db-tecnologia
+          path: data/
+        continue-on-error: true
+
+      # FinOps monitor (rollup + budget check + exports + dashboard)
       - name: FinOps monitor cycle
         run: python -m src.cli finops monitor || true
+        env:
+          PAPERS_DB_PATH: data/papers.db
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 
-      # Step 4: Update documentation with fresh data
+      # Update documentation with fresh data
       - name: Update documentation
         run: python scripts/update-docs.py
 
-      # Step 5: Export data for Git tracking
-      - name: Export CSV snapshots
-        run: python -m src.cli db export --format csv --output data/daily
-        continue-on-error: true
-
-      # Step 6: Upload DB artifact
+      # Upload final consolidated DB
       - name: Upload database (latest)
         uses: actions/upload-artifact@v4
         with:
@@ -76,7 +139,7 @@ jobs:
           path: data/papers.db
           retention-days: 90
 
-      # Step 7: Commit everything to Git
+      # Commit everything to Git
       - name: Commit data + docs + finops
         run: |
           git config user.name "github-actions[bot]"
@@ -86,5 +149,5 @@ jobs:
           git add data/finops_alerts.jsonl 2>/dev/null || true
           git add output/finops_dashboard.html 2>/dev/null || true
           git add docs/ 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "data: daily collection + finops $(date -u +%Y-%m-%d)"
+          git diff --cached --quiet || git commit -m "data: daily collection 4 verticals $(date -u +%Y-%m-%d)"
           git push

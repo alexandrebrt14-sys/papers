@@ -6,6 +6,11 @@ Optimized for cost-efficiency:
 - Structured JSON output (minimal tokens)
 - Local response cache (skip repeated queries)
 - max_tokens caps (prevent runaway costs)
+
+Multi-vertical support:
+- fintech, varejo, saude, tecnologia
+- Each vertical has its own cohort + queries
+- Common queries (GEO concepts) shared across all verticals
 """
 
 from __future__ import annotations
@@ -23,6 +28,170 @@ DATA_DIR.mkdir(exist_ok=True)
 CACHE_DIR = DATA_DIR / "cache"
 CACHE_DIR.mkdir(exist_ok=True)
 
+
+# ============================================================
+# Multi-Vertical Framework
+# ============================================================
+
+COMMON_QUERIES: list[dict[str, str]] = [
+    # GEO concept (3)
+    {"query": "What is Generative Engine Optimization GEO?", "category": "concept", "lang": "en"},
+    {"query": "How to optimize content for AI search engines?", "category": "concept", "lang": "en"},
+    {"query": "Difference between SEO and GEO", "category": "concept", "lang": "en"},
+
+    # Technical (3)
+    {"query": "How does schema markup affect AI citations?", "category": "technical", "lang": "en"},
+    {"query": "What is llms.txt and how to implement it?", "category": "technical", "lang": "en"},
+    {"query": "Best practices for entity consistency across platforms", "category": "technical", "lang": "en"},
+
+    # Academic (2)
+    {"query": "GEO research papers Aggarwal Princeton", "category": "academic", "lang": "en"},
+    {"query": "Empirical evidence for Generative Engine Optimization", "category": "academic", "lang": "en"},
+]
+
+VERTICALS: dict[str, dict] = {
+    "fintech": {
+        "name": "Fintech & Bancos Digitais",
+        "slug": "fintech",
+        "cohort": [
+            "Nubank", "PagBank", "Cielo", "Stone", "Banco Inter",
+            "Mercado Pago", "Itaú", "Bradesco", "C6 Bank", "PicPay",
+            "Ame Digital", "Neon", "Original", "BS2", "Safra",
+            "Banco Carrefour",
+        ],
+        "queries": [
+            # Brand awareness (2)
+            {"query": "Best digital banks in Brazil 2026", "category": "fintech", "lang": "en"},
+            {"query": "Melhores bancos digitais do Brasil 2026", "category": "fintech", "lang": "pt"},
+            # Comparisons (2)
+            {"query": "Compare Nubank PagBank Inter C6 Bank", "category": "fintech", "lang": "en"},
+            {"query": "Stone vs Cielo vs PagSeguro which is better?", "category": "fintech_trust", "lang": "en"},
+            # Trust (2)
+            {"query": "Is Nubank safe and reliable?", "category": "fintech_trust", "lang": "en"},
+            {"query": "Banco Inter é bom? Vale a pena?", "category": "fintech_trust", "lang": "pt"},
+            # Product (3)
+            {"query": "Best credit card no annual fee Brazil", "category": "fintech_product", "lang": "en"},
+            {"query": "Best POS machine small business Brazil", "category": "fintech_product", "lang": "en"},
+            {"query": "Best business bank account Brazil 2026", "category": "fintech_product", "lang": "en"},
+            # B2B (3)
+            {"query": "Best acquiring company for large merchants Brazil", "category": "fintech_b2b", "lang": "en"},
+            {"query": "Banking as a Service BaaS providers Brazil", "category": "fintech_b2b", "lang": "en"},
+            {"query": "Open Finance API integration Brazil banks", "category": "fintech_b2b", "lang": "en"},
+        ],
+    },
+    "varejo": {
+        "name": "Varejo & E-commerce",
+        "slug": "varejo",
+        "cohort": [
+            "Magazine Luiza", "Casas Bahia", "Ponto Frio", "Americanas",
+            "Amazon Brasil", "Mercado Livre", "Shopee Brasil", "AliExpress Brasil",
+            "Leroy Merlin", "Tok&Stok", "Renner", "Riachuelo",
+            "C&A Brasil", "Centauro", "Netshoes",
+        ],
+        "queries": [
+            # Brand awareness (2)
+            {"query": "Best online stores in Brazil 2026", "category": "varejo", "lang": "en"},
+            {"query": "Melhores lojas online do Brasil 2026", "category": "varejo", "lang": "pt"},
+            # Comparisons (2)
+            {"query": "Compare Magazine Luiza and Americanas", "category": "varejo", "lang": "en"},
+            {"query": "Mercado Livre vs Amazon Brasil vs Shopee", "category": "varejo", "lang": "en"},
+            # Trust (2)
+            {"query": "Is Shopee Brasil reliable?", "category": "varejo_trust", "lang": "en"},
+            {"query": "Americanas é confiável para comprar online?", "category": "varejo_trust", "lang": "pt"},
+            # Product (2)
+            {"query": "Best marketplace for electronics Brazil", "category": "varejo_product", "lang": "en"},
+            {"query": "Best furniture stores online Brazil 2026", "category": "varejo_product", "lang": "en"},
+            # B2B (2)
+            {"query": "Best marketplace platform for sellers Brazil", "category": "varejo_b2b", "lang": "en"},
+            {"query": "Melhores plataformas de e-commerce para lojistas no Brasil", "category": "varejo_b2b", "lang": "pt"},
+        ],
+    },
+    "saude": {
+        "name": "Saúde & Farmacêuticas",
+        "slug": "saude",
+        "cohort": [
+            "Dasa", "Hapvida", "Unimed", "Eli Lilly Brasil",
+            "Raia Drogasil", "Fleury", "Rede D'Or", "Einstein",
+            "Sírio-Libanês", "Eurofarma", "Aché", "EMS",
+            "Hypera Pharma", "NotreDame Intermédica", "SulAmérica Saúde",
+        ],
+        "queries": [
+            # Brand awareness (2)
+            {"query": "Best hospitals in Brazil 2026", "category": "saude", "lang": "en"},
+            {"query": "Melhores hospitais do Brasil 2026", "category": "saude", "lang": "pt"},
+            # Comparisons (2)
+            {"query": "Compare Dasa and Fleury labs", "category": "saude", "lang": "en"},
+            {"query": "Rede D'Or vs Einstein vs Sírio-Libanês", "category": "saude", "lang": "en"},
+            # Trust (2)
+            {"query": "Best health insurance Brazil", "category": "saude_trust", "lang": "en"},
+            {"query": "Unimed é bom? Vale a pena o plano de saúde?", "category": "saude_trust", "lang": "pt"},
+            # Product (2)
+            {"query": "Best pharmacy chains in Brazil", "category": "saude_product", "lang": "en"},
+            {"query": "Best diagnostic labs Brazil 2026", "category": "saude_product", "lang": "en"},
+            # B2B (2)
+            {"query": "Best pharmaceutical companies Brazil", "category": "saude_b2b", "lang": "en"},
+            {"query": "Melhores empresas de saúde para investir no Brasil", "category": "saude_b2b", "lang": "pt"},
+        ],
+    },
+    "tecnologia": {
+        "name": "Tecnologia & TI",
+        "slug": "tecnologia",
+        "cohort": [
+            "Tivit", "Accenture Brasil", "Stefanini", "Totvs",
+            "Linx", "Locaweb", "Positivo Tecnologia", "Movile",
+            "CI&T", "Vivo Empresas", "Embraer", "WEG",
+            "Natura &Co", "iFood", "99",
+        ],
+        "queries": [
+            # Brand awareness (2)
+            {"query": "Best IT companies in Brazil 2026", "category": "tecnologia", "lang": "en"},
+            {"query": "Melhores empresas de tecnologia do Brasil 2026", "category": "tecnologia", "lang": "pt"},
+            # Comparisons (2)
+            {"query": "Compare Totvs and Linx ERP", "category": "tecnologia", "lang": "en"},
+            {"query": "Tivit vs Stefanini vs Accenture Brasil outsourcing", "category": "tecnologia", "lang": "en"},
+            # Trust (2)
+            {"query": "Best outsourcing companies Brazil", "category": "tecnologia_trust", "lang": "en"},
+            {"query": "Locaweb é boa para hospedagem?", "category": "tecnologia_trust", "lang": "pt"},
+            # Product (2)
+            {"query": "Best ERP systems for Brazilian companies", "category": "tecnologia_product", "lang": "en"},
+            {"query": "Best cloud hosting providers Brazil 2026", "category": "tecnologia_product", "lang": "en"},
+            # B2B (2)
+            {"query": "Best IT consulting firms Brazil", "category": "tecnologia_b2b", "lang": "en"},
+            {"query": "Melhores empresas de outsourcing de TI no Brasil", "category": "tecnologia_b2b", "lang": "pt"},
+        ],
+    },
+}
+
+
+def get_vertical(slug: str) -> dict:
+    """Return vertical config by slug. Raises KeyError if not found."""
+    if slug not in VERTICALS:
+        raise KeyError(f"Vertical '{slug}' não encontrada. Opções: {list(VERTICALS.keys())}")
+    return VERTICALS[slug]
+
+
+def get_cohort(slug: str) -> list[str]:
+    """Return cohort entities for a vertical."""
+    return get_vertical(slug)["cohort"]
+
+
+def get_queries(slug: str, include_common: bool = True) -> list[dict[str, str]]:
+    """Return queries for a vertical, optionally including common queries."""
+    vertical = get_vertical(slug)
+    queries = list(vertical["queries"])
+    if include_common:
+        queries = COMMON_QUERIES + queries
+    return queries
+
+
+def list_verticals() -> list[str]:
+    """Return list of all vertical slugs."""
+    return list(VERTICALS.keys())
+
+
+# ============================================================
+# LLM Configuration
+# ============================================================
 
 @dataclass(frozen=True)
 class LLMConfig:
@@ -44,11 +213,15 @@ class LLMConfig:
 class CollectionConfig:
     """Global collection configuration."""
 
-    # Study cohort — Brazilian fintechs and banks
+    # Vertical selection (default: fintech for backward compatibility)
+    vertical: str = os.getenv("VERTICAL", "fintech")
+
+    # Study cohort — resolved from VERTICALS dict
+    # COHORT_ENTITIES env var overrides fintech cohort for backward compat
     cohort_entities: list[str] = field(default_factory=lambda: [
         e.strip() for e in os.getenv(
             "COHORT_ENTITIES",
-            "Nubank,PagBank,Cielo,Stone,Banco Inter,Mercado Pago,Itaú,Bradesco,C6 Bank,PicPay,Ame Digital,Neon,Original,BS2,Safra"
+            ",".join(VERTICALS["fintech"]["cohort"]),
         ).split(",") if e.strip()
     ])
 
@@ -131,53 +304,10 @@ Rules:
 PERPLEXITY_SYSTEM = """Answer concisely in 2-3 sentences max. Always cite your sources with URLs."""
 
 
-# === Standard queries ===
-# Deduplicated: PT queries removed where EN equivalent exists (LLMs handle both)
-# Reduced from 55 to 30 core queries — covers same signal with ~45% fewer API calls
+# === Standard queries (legacy — kept for backward compat, now derived from VERTICALS) ===
+# Use get_queries("fintech") for vertical-aware query lists
 
-STANDARD_QUERIES: list[dict[str, str]] = [
-    # GEO concept (3 — merged redundant pairs)
-    {"query": "What is Generative Engine Optimization GEO?", "category": "concept", "lang": "en"},
-    {"query": "How to optimize content for AI search engines?", "category": "concept", "lang": "en"},
-    {"query": "Difference between SEO and GEO", "category": "concept", "lang": "en"},
-
-    # Technical (3)
-    {"query": "How does schema markup affect AI citations?", "category": "technical", "lang": "en"},
-    {"query": "What is llms.txt and how to implement it?", "category": "technical", "lang": "en"},
-    {"query": "Best practices for entity consistency across platforms", "category": "technical", "lang": "en"},
-
-    # B2A + Market (4)
-    {"query": "What is Business-to-Agent B2A commerce?", "category": "b2a", "lang": "en"},
-    {"query": "Best GEO tools and platforms 2026", "category": "market", "lang": "en"},
-    {"query": "How to measure AI search visibility?", "category": "market", "lang": "en"},
-    {"query": "Consultoria GEO no Brasil", "category": "market", "lang": "pt"},
-
-    # Academic (2)
-    {"query": "GEO research papers Aggarwal Princeton", "category": "academic", "lang": "en"},
-    {"query": "Empirical evidence for Generative Engine Optimization", "category": "academic", "lang": "en"},
-
-    # Fintech — generic (4)
-    {"query": "Best digital banks in Brazil 2026", "category": "fintech", "lang": "en"},
-    {"query": "Melhores bancos digitais do Brasil 2026", "category": "fintech", "lang": "pt"},
-    {"query": "Best payment platforms in Brazil", "category": "fintech", "lang": "en"},
-    {"query": "Compare Nubank PagBank Inter C6 Bank", "category": "fintech", "lang": "en"},
-
-    # Fintech — product (3)
-    {"query": "Best credit card no annual fee Brazil", "category": "fintech_product", "lang": "en"},
-    {"query": "Best POS machine small business Brazil", "category": "fintech_product", "lang": "en"},
-    {"query": "Best business bank account Brazil 2026", "category": "fintech_product", "lang": "en"},
-
-    # Fintech — trust (3)
-    {"query": "Is Nubank safe and reliable?", "category": "fintech_trust", "lang": "en"},
-    {"query": "Stone vs Cielo vs PagSeguro which is better?", "category": "fintech_trust", "lang": "en"},
-    {"query": "Banco Inter é bom? Vale a pena?", "category": "fintech_trust", "lang": "pt"},
-
-    # Fintech — B2B (4)
-    {"query": "Best acquiring company for large merchants Brazil", "category": "fintech_b2b", "lang": "en"},
-    {"query": "Banking as a Service BaaS providers Brazil", "category": "fintech_b2b", "lang": "en"},
-    {"query": "Open Finance API integration Brazil banks", "category": "fintech_b2b", "lang": "en"},
-    {"query": "Provedores de Banking as a Service BaaS no Brasil", "category": "fintech_b2b", "lang": "pt"},
-]
+STANDARD_QUERIES: list[dict[str, str]] = get_queries("fintech", include_common=True)
 
 
 config = CollectionConfig()
