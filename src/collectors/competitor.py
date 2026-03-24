@@ -7,9 +7,11 @@ entity consistency comparison.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from src.collectors.base import BaseCollector
+from src.config import AMBIGUOUS_ENTITIES, CANONICAL_NAMES
 
 
 class CompetitorBenchmark(BaseCollector):
@@ -40,14 +42,20 @@ class CompetitorBenchmark(BaseCollector):
                 if response is None:
                     continue
 
-                text_lower = response.response_text.lower()
+                text = response.response_text
 
                 for entity in self.cohort:
-                    cited = entity.lower() in text_lower
+                    # Word boundary matching (Proposal 3)
+                    if entity in AMBIGUOUS_ENTITIES:
+                        canonical = CANONICAL_NAMES.get(entity, entity)
+                        match = re.search(r'\b' + re.escape(canonical) + r'\b', text, re.IGNORECASE)
+                    else:
+                        match = re.search(r'\b' + re.escape(entity) + r'\b', text, re.IGNORECASE)
+                    cited = match is not None
                     position = None
-                    if cited:
-                        idx = text_lower.find(entity.lower())
-                        relative = idx / max(len(text_lower), 1)
+                    if cited and match:
+                        idx = match.start()
+                        relative = idx / max(len(text), 1)
                         position = 1 if relative < 0.33 else (2 if relative < 0.66 else 3)
 
                     results.append({
@@ -62,7 +70,7 @@ class CompetitorBenchmark(BaseCollector):
                         "entity_type": "cohort",
                         "cited": cited,
                         "position": position,
-                        "response_length": len(response.response_text),
+                        "response_length": len(text),
                     })
 
         self.logger.info(f"Collected {len(results)} cohort benchmark records")

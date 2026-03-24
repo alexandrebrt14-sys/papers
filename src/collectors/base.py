@@ -29,6 +29,7 @@ import httpx
 from src.config import (
     LLMConfig, config, SYSTEM_PROMPT, PERPLEXITY_SYSTEM,
     CACHE_DIR, VERTICALS, get_cohort, get_queries,
+    AMBIGUOUS_ENTITIES, CANONICAL_NAMES,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,8 @@ class LLMResponse:
     cost_usd: float = 0.0
     from_cache: bool = False
     raw: dict[str, Any] | None = None
+    raw_text: str = ""  # Complete unprocessed LLM response before any truncation
+    engine_type: str = "parametric"  # "parametric" for ChatGPT/Claude/Gemini, "rag" for Perplexity
 
 
 # === Response Cache ===
@@ -137,7 +140,8 @@ class LLMClient:
         "mercado",       # Dados de mercado — requer fontes atualizadas
     }
 
-    def __init__(self, cohort: list[str] | None = None, vertical: str = "") -> None:
+    def __init__(self, cohort: list[str] | None = None, vertical: str = "",
+                 json_mode: bool = False) -> None:
         self._http = httpx.Client(timeout=60.0)
         self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
         self._run_id = ""
@@ -145,6 +149,7 @@ class LLMClient:
         self._cohort = cohort or config.cohort_entities
         self._vertical = vertical
         self._last_query_time: dict[str, float] = {}  # provider → timestamp
+        self._json_mode = json_mode  # If True, use SYSTEM_PROMPT forcing JSON output
 
     def set_run_id(self, run_id: str) -> None:
         self._run_id = run_id
@@ -239,17 +244,19 @@ class LLMClient:
         return fn(llm, prompt, start)
 
     def _query_openai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """OpenAI with JSON mode + max_tokens cap."""
+        """OpenAI query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        messages: list[dict[str, str]] = []
+        if self._json_mode:
+            messages.append({"role": "system", "content": SYSTEM_PROMPT})
+        messages.append({"role": "user", "content": prompt})
+
         body: dict[str, Any] = {
             "model": llm.model,
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
+            "messages": messages,
             "temperature": 0.0,
             "max_tokens": llm.max_output_tokens,
         }
-        if llm.supports_json_mode:
+        if self._json_mode and llm.supports_json_mode:
             body["response_format"] = {"type": "json_object"}
 
         resp = self._http.post(
@@ -260,18 +267,42 @@ class LLMClient:
         resp.raise_for_status()
         data = resp.json()
         text = data["choices"][0]["message"]["content"]
-        parsed = self._parse_json_response(text)
         usage = data.get("usage", {})
 
+        if self._json_mode:
+            parsed = self._parse_json_response(text)
+            return self._build_response(
+                llm, prompt, start, text, parsed,
+                input_tokens=usage.get("prompt_tokens", 0),
+                output_tokens=usage.get("completion_tokens", 0),
+                raw=data,
+            )
+        # Natural mode: post-hoc entity extraction from free-text
+        posthoc = self._analyze_response_posthoc(text)
         return self._build_response(
-            llm, prompt, start, text, parsed,
+            llm, prompt, start, text, posthoc,
             input_tokens=usage.get("prompt_tokens", 0),
             output_tokens=usage.get("completion_tokens", 0),
             raw=data,
         )
 
     def _query_anthropic(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """Anthropic with system prompt caching (90% savings on cached prefix)."""
+        """Anthropic query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        body: dict[str, Any] = {
+            "model": llm.model,
+            "max_tokens": llm.max_output_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.0,
+        }
+        if self._json_mode:
+            body["system"] = [
+                {
+                    "type": "text",
+                    "text": SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},  # Prompt caching
+                }
+            ]
+
         resp = self._http.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -279,25 +310,17 @@ class LLMClient:
                 "anthropic-version": "2023-06-01",
                 "content-type": "application/json",
             },
-            json={
-                "model": llm.model,
-                "max_tokens": llm.max_output_tokens,
-                "system": [
-                    {
-                        "type": "text",
-                        "text": SYSTEM_PROMPT,
-                        "cache_control": {"type": "ephemeral"},  # Prompt caching
-                    }
-                ],
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.0,
-            },
+            json=body,
         )
         resp.raise_for_status()
         data = resp.json()
         text = data["content"][0]["text"]
-        parsed = self._parse_json_response(text)
         usage = data.get("usage", {})
+
+        if self._json_mode:
+            parsed = self._parse_json_response(text)
+        else:
+            parsed = self._analyze_response_posthoc(text)
 
         return self._build_response(
             llm, prompt, start, text, parsed,
@@ -307,17 +330,22 @@ class LLMClient:
         )
 
     def _query_google(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
-        """Google Gemini with JSON mode (free tier)."""
+        """Google Gemini query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        if self._json_mode:
+            prompt_text = f"{SYSTEM_PROMPT}\n\nQuery: {prompt}"
+        else:
+            prompt_text = prompt
+
         body: dict[str, Any] = {
             "contents": [
-                {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nQuery: {prompt}"}]}
+                {"role": "user", "parts": [{"text": prompt_text}]}
             ],
             "generationConfig": {
                 "temperature": 0.0,
                 "maxOutputTokens": llm.max_output_tokens,
             },
         }
-        if llm.supports_json_mode:
+        if self._json_mode and llm.supports_json_mode:
             body["generationConfig"]["responseMimeType"] = "application/json"
 
         resp = self._http.post(
@@ -328,8 +356,12 @@ class LLMClient:
         resp.raise_for_status()
         data = resp.json()
         text = data["candidates"][0]["content"]["parts"][0]["text"]
-        parsed = self._parse_json_response(text)
         usage = data.get("usageMetadata", {})
+
+        if self._json_mode:
+            parsed = self._parse_json_response(text)
+        else:
+            parsed = self._analyze_response_posthoc(text)
 
         return self._build_response(
             llm, prompt, start, text, parsed,
@@ -371,6 +403,8 @@ class LLMClient:
             input_tokens=usage.get("prompt_tokens", 0),
             output_tokens=usage.get("completion_tokens", 0),
             raw=data,
+            raw_text=text,
+            engine_type="rag",
         )
 
     # === Helpers ===
@@ -380,7 +414,7 @@ class LLMClient:
         text: str, parsed: dict, input_tokens: int, output_tokens: int,
         raw: dict,
     ) -> LLMResponse:
-        """Build LLMResponse from parsed JSON output."""
+        """Build LLMResponse from parsed output (JSON or post-hoc)."""
         return LLMResponse(
             model=llm.model, provider=llm.provider, query=prompt,
             response_text=parsed.get("summary", text[:200]),
@@ -391,6 +425,8 @@ class LLMClient:
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             raw=raw,
+            raw_text=text,
+            engine_type="rag" if llm.provider == "perplexity" else "parametric",
         )
 
     @staticmethod
@@ -413,13 +449,37 @@ class LLMClient:
         return re.findall(r'https?://[^\s\)\]>"\']+', text)
 
     def _extract_entity_mentions(self, text: str) -> list[str]:
-        """Extract known entity mentions from free-text response."""
-        text_lower = text.lower()
+        """Extract known entity mentions from free-text response using word boundary matching.
+
+        Ambiguous entities (e.g., "Neon", "Inter") require their canonical name
+        (e.g., "Banco Inter") to avoid false positives from common words.
+        """
         entities = []
         for entity in self._cohort:
-            if entity.lower() in text_lower:
-                entities.append(entity)
+            if entity in AMBIGUOUS_ENTITIES:
+                # Require the full canonical name for ambiguous entities
+                canonical = CANONICAL_NAMES.get(entity, entity)
+                if re.search(r'\b' + re.escape(canonical) + r'\b', text, re.IGNORECASE):
+                    entities.append(entity)
+            else:
+                if re.search(r'\b' + re.escape(entity) + r'\b', text, re.IGNORECASE):
+                    entities.append(entity)
         return entities
+
+    def _analyze_response_posthoc(self, text: str) -> dict:
+        """Extract entities from natural free-text response via post-hoc analysis.
+
+        Used in natural (non-JSON) mode: the query goes to the LLM clean,
+        and entity extraction happens after the fact using regex word-boundary
+        matching against the cohort list.
+        """
+        cited = self._extract_entity_mentions(text)
+        sources = self._extract_urls(text)
+        return {
+            "cited": cited,
+            "sources": sources,
+            "summary": text[:200],
+        }
 
     def get_cache_stats(self) -> dict:
         return self._cache.stats()

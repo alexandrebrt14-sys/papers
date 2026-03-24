@@ -13,9 +13,11 @@ Optimizations:
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from src.collectors.base import BaseCollector, LLMResponse
+from src.config import AMBIGUOUS_ENTITIES, CANONICAL_NAMES
 
 
 class CitationTracker(BaseCollector):
@@ -61,16 +63,20 @@ class CitationTracker(BaseCollector):
     def _analyze(self, response: LLMResponse) -> dict[str, Any]:
         """Analyze citation data from structured response for cohort entities."""
         cited_lower = [e.lower() for e in response.cited_entities]
-        text_lower = response.response_text.lower()
+        text = response.response_text
 
-        # Check which cohort entities are cited
+        # Check which cohort entities are cited using word boundary matching
         cohort_cited: dict[str, bool] = {}
         for entity in self.cohort:
             entity_lower = entity.lower()
-            cohort_cited[entity] = (
-                any(entity_lower in c or c in entity_lower for c in cited_lower)
-                or entity_lower in text_lower
-            )
+            in_cited_list = any(entity_lower in c or c in entity_lower for c in cited_lower)
+            # Word boundary matching for text (Proposal 3)
+            if entity in AMBIGUOUS_ENTITIES:
+                canonical = CANONICAL_NAMES.get(entity, entity)
+                in_text = bool(re.search(r'\b' + re.escape(canonical) + r'\b', text, re.IGNORECASE))
+            else:
+                in_text = bool(re.search(r'\b' + re.escape(entity) + r'\b', text, re.IGNORECASE))
+            cohort_cited[entity] = in_cited_list or in_text
 
         cited_count = sum(1 for v in cohort_cited.values() if v)
         cited = cited_count > 0

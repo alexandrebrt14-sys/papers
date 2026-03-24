@@ -103,8 +103,8 @@ class StatisticalAnalyzer:
         else:
             stat, p = stats.ttest_ind(group_a, group_b)
 
-        # Cohen's d
-        pooled_std = np.sqrt((np.std(group_a) ** 2 + np.std(group_b) ** 2) / 2)
+        # Cohen's d with Bessel's correction (ddof=1) for unbiased sample std
+        pooled_std = np.sqrt((np.std(group_a, ddof=1) ** 2 + np.std(group_b, ddof=1) ** 2) / 2)
         d = (np.mean(group_a) - np.mean(group_b)) / max(pooled_std, 1e-10)
 
         return SignificanceResult(
@@ -283,6 +283,26 @@ class StatisticalAnalyzer:
             }
             for p in p_values
         ]
+
+    def fdr_correction(self, p_values: list[float], alpha: float = 0.05) -> list[dict[str, Any]]:
+        """Apply Benjamini-Hochberg FDR correction for multiple comparisons.
+
+        Less conservative than Bonferroni — controls false discovery rate
+        rather than family-wise error rate. Preferred when testing many
+        hypotheses simultaneously (e.g., per-entity citation significance).
+        """
+        n = len(p_values)
+        sorted_indices = sorted(range(n), key=lambda i: p_values[i])
+        results: list[dict[str, Any] | None] = [None] * n
+        for rank, idx in enumerate(sorted_indices, 1):
+            threshold = (rank / n) * alpha
+            results[idx] = {
+                "original_p": round(p_values[idx], 6),
+                "rank": rank,
+                "bh_threshold": round(threshold, 6),
+                "significant": p_values[idx] <= threshold,
+            }
+        return results  # type: ignore[return-value]
 
     def generate_summary_report(
         self, citation_data: pd.DataFrame,

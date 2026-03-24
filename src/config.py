@@ -45,6 +45,20 @@ COMMON_QUERIES: list[dict[str, str]] = [
     {"query": "Top Brazilian companies by market cap and innovation", "category": "mercado", "lang": "en"},
 ]
 
+# === Ambiguous Entity Handling (Proposal 3) ===
+# These short/common names require the full canonical form to match,
+# preventing false positives (e.g., "Inter" matching "international").
+AMBIGUOUS_ENTITIES: set[str] = {"99", "Neon", "Original", "Inter"}
+
+# Map ambiguous short names to their canonical (longer) form
+CANONICAL_NAMES: dict[str, str] = {
+    "99": "99Pay",
+    "Neon": "Banco Neon",
+    "Original": "Banco Original",
+    "Inter": "Banco Inter",
+}
+
+
 VERTICALS: dict[str, dict] = {
     "fintech": {
         "name": "Fintech & Bancos Digitais",
@@ -53,6 +67,10 @@ VERTICALS: dict[str, dict] = {
             "Nubank", "PagBank", "Cielo", "Stone", "Banco Inter",
             "Mercado Pago", "Itaú", "Bradesco", "C6 Bank", "PicPay",
             "Neon", "Safra", "BTG Pactual", "XP Investimentos",
+            # International cohort for cross-market comparison (Proposal 8)
+            "Revolut", "Monzo", "N26", "Chime", "Wise",
+            # Fictional entities for false-positive calibration (Proposal 5)
+            "Banco Floresta Digital", "FinPay Solutions",
         ],
         "queries": [
             # Descoberta de marca (3 — EN/PT balanceado)
@@ -83,6 +101,8 @@ VERTICALS: dict[str, dict] = {
             "Renner", "Riachuelo", "C&A Brasil",
             "Leroy Merlin", "Centauro", "Netshoes",
             "Via Varejo", "Grupo Pão de Açúcar",
+            # Fictional entities for false-positive calibration (Proposal 5)
+            "MegaStore Brasil", "ShopNova Digital",
         ],
         "queries": [
             # Descoberta de marca (3)
@@ -112,6 +132,8 @@ VERTICALS: dict[str, dict] = {
             "Rede D'Or", "Einstein", "Sírio-Libanês",
             "Raia Drogasil", "Eurofarma", "Aché", "EMS",
             "Hypera Pharma", "NotreDame Intermédica", "SulAmérica Saúde",
+            # Fictional entities for false-positive calibration (Proposal 5)
+            "HealthTech Brasil", "Clínica Horizonte Digital",
         ],
         "queries": [
             # Descoberta de marca (3)
@@ -141,6 +163,8 @@ VERTICALS: dict[str, dict] = {
             "Locaweb", "Linx", "Movile", "iFood",
             "Vtex", "RD Station", "Conta Azul", "Involves",
             "Accenture Brasil", "IBM Brasil",
+            # Fictional entities for false-positive calibration (Proposal 5)
+            "TechNova Solutions", "DataBridge Brasil",
         ],
         "queries": [
             # Descoberta de marca (3)
@@ -244,11 +268,11 @@ class CollectionConfig:
         LLMConfig(
             name="ChatGPT",
             provider="openai",
-            model="gpt-4o-mini",          # $0.15/$0.60 per MTok (33x cheaper than gpt-4o)
+            model="gpt-4o-mini-2024-07-18",  # Pinned version (Proposal 7) — $0.15/$0.60 per MTok
             api_key=os.getenv("OPENAI_API_KEY"),
             input_cost_per_mtok=0.15,
             output_cost_per_mtok=0.60,
-            max_output_tokens=250,
+            max_output_tokens=800,          # Increased from 250 (Proposal 4)
             supports_json_mode=True,
             supports_batch=True,
             batch_discount=0.5,
@@ -260,7 +284,7 @@ class CollectionConfig:
             api_key=os.getenv("ANTHROPIC_API_KEY"),
             input_cost_per_mtok=0.80,
             output_cost_per_mtok=4.00,
-            max_output_tokens=250,
+            max_output_tokens=800,          # Increased from 250 (Proposal 4)
             supports_json_mode=True,
             supports_batch=True,
             batch_discount=0.5,
@@ -272,7 +296,7 @@ class CollectionConfig:
             api_key=os.getenv("GOOGLE_AI_API_KEY"),
             input_cost_per_mtok=0.0,
             output_cost_per_mtok=0.0,
-            max_output_tokens=250,
+            max_output_tokens=800,          # Increased from 250 (Proposal 4)
             supports_json_mode=True,
             supports_batch=False,
         ),
@@ -283,7 +307,7 @@ class CollectionConfig:
             api_key=os.getenv("PERPLEXITY_API_KEY"),
             input_cost_per_mtok=1.00,
             output_cost_per_mtok=1.00,
-            max_output_tokens=300,          # Perplexity includes citations, needs more room
+            max_output_tokens=500,          # Kept at 500: includes citations (Proposal 4)
             supports_json_mode=False,       # Perplexity doesn't support JSON mode
             supports_batch=False,
         ),
