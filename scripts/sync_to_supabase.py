@@ -290,7 +290,7 @@ def main() -> int:
         print("[SKIP] SUPABASE_URL ou SUPABASE_KEY não configuradas. Sync ignorado.")
         return 0
 
-    print(f"=== Sync Papers → Supabase ===")
+    print(f"=== Sync Papers -> Supabase ===")
     print(f"  DB: {DB_PATH}")
     print(f"  Supabase: {SUPABASE_URL}")
     print(f"  Verticais: {', '.join(VERTICALS)}")
