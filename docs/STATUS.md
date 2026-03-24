@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-24 12:32 UTC
-**Branch:** main | **Commits:** 3
-**Último commit:** 892ec1f421ff418abc212c091d48a9860bd46647 feat: add logging system, manual, and u
+**Gerado automaticamente em:** 2026-03-24 12:42 UTC
+**Branch:** main | **Commits:** 7
+**Último commit:** a40d0a381f0b14386387541ce6863131ef3bf191 feat: robust FinOps v2 â€” deep integra
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 2,960 | OK |
+| Código (linhas Python) | 3,755 | OK |
 | Testes unitários | 19 | OK |
-| Tabelas no banco | 12 | OK |
+| Tabelas no banco | 5 | Incompleto |
 | Citações coletadas | 0 | Aguardando API keys |
-| Taxa de citação | 0.0% | — |
+| Taxa de citação | — | — |
 | Última coleta | — | Pendente |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0006 |
-| Anthropic | $0.0015 |
-| Gemini | $0.0003 |
+| OpenAI | $0.0003 |
+| Anthropic | $0.0000 |
+| Gemini | $0.0000 |
 | Perplexity | $0.0000 |
-| **Total** | **$0.0024** |
+| **Total** | **$0.0003** |
 
 ## Próximas Ações
 
