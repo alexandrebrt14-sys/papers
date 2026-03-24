@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-24 12:42 UTC
-**Branch:** main | **Commits:** 7
-**Último commit:** a40d0a381f0b14386387541ce6863131ef3bf191 feat: robust FinOps v2 â€” deep integra
+**Gerado automaticamente em:** 2026-03-24 14:22 UTC
+**Branch:** main | **Commits:** 16
+**Último commit:** f3cd5a603035f63e3399312806ccee351ed0c2c5 feat: methodology v2 â€” expert panel r
 
 ---
 
@@ -10,11 +10,11 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 3,755 | OK |
+| Código (linhas Python) | 5,698 | OK |
 | Testes unitários | 19 | OK |
-| Tabelas no banco | 5 | Incompleto |
+| Tabelas no banco | 14 | OK |
 | Citações coletadas | 0 | Aguardando API keys |
-| Taxa de citação | — | — |
+| Taxa de citação | 0.0% | — |
 | Última coleta | — | Pendente |
 
 ## FinOps — Gastos do Mês
