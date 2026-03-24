@@ -10,19 +10,25 @@ Objetivo: gerar datasets longitudinais de 6-12 meses que suportem publicação a
 
 ## Verticais e Coortes
 
-### Fintech (16 entidades)
-Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra, Banco Carrefour
+### Fintech (21 entidades)
+Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Neon, Safra, BTG Pactual, XP Investimentos
+— Internacional (cross-market): Revolut, Monzo, N26, Chime, Wise
+— Fictícias (calibração false-positive): Banco Floresta Digital, FinPay Solutions
 
-### Varejo (15 entidades)
-Magazine Luiza, Casas Bahia, Mercado Livre, Amazon Brasil, Shopee Brasil, Americanas, Carrefour, Pão de Açúcar, Renner, Riachuelo, C&A Brasil, Havan, Leroy Merlin, Netshoes, Dafiti
+### Varejo (16 entidades)
+Magazine Luiza, Casas Bahia, Americanas, Amazon Brasil, Mercado Livre, Shopee Brasil, Renner, Riachuelo, C&A Brasil, Leroy Merlin, Centauro, Netshoes, Via Varejo, Grupo Pão de Açúcar
+— Fictícias (calibração false-positive): MegaStore Brasil, ShopNova Digital
 
-### Saúde (15 entidades)
-Dasa, Hapvida, Unimed, Fleury, Rede D'Or, Einstein, Sírio-Libanês, Mater Dei, Hermes Pardini, Sabin, Amil, SulAmérica Saúde, Prevent Senior, HCor, A.C. Camargo
+### Saúde (16 entidades)
+Dasa, Hapvida, Unimed, Fleury, Rede D'Or, Einstein, Sírio-Libanês, Raia Drogasil, Eurofarma, Aché, EMS, Hypera Pharma, NotreDame Intermédica, SulAmérica Saúde
+— Fictícias (calibração false-positive): HealthTech Brasil, Clínica Horizonte Digital
 
-### Tecnologia (15 entidades)
-Tivit, Totvs, Stefanini, Accenture, CI&T, Globant, Softplan, Linx, Locaweb, Movile, iFood Tech, Vtex, RD Station, Involves, Tempest Security
+### Tecnologia (16 entidades)
+Totvs, Stefanini, Tivit, CI&T, Locaweb, Linx, Movile, iFood, Vtex, RD Station, Conta Azul, Involves, Accenture Brasil, IBM Brasil
+— Fictícias (calibração false-positive): TechNova Solutions, DataBridge Brasil
 
-**Total: 61 entidades, 4 verticais, 4 LLMs**
+**Total: 69 entidades (61 reais + 8 fictícias), 4 verticais, 4 LLMs**
+Entidades fictícias servem para calibração de falsos positivos (Proposal 5 do design doc).
 
 ## Stack
 - Python 3.11+
