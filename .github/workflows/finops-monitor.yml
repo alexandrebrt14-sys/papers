@@ -12,7 +12,7 @@ env:
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
   PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-  FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
+  FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 
 jobs:
   monitor:

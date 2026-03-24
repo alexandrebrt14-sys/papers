@@ -2,10 +2,9 @@
 
 ## 1. Visão Geral
 
-O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa empírica em **Generative Engine Optimization (GEO)**. Projetado para gerar datasets longitudinais de 6 a 12 meses que suportem publicação acadêmica peer-reviewed.
+O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa empírica sobre **como LLMs citam bancos e fintechs brasileiras**. Projetado para gerar datasets longitudinais de 6 a 12 meses que suportem publicação acadêmica peer-reviewed.
 
-**Proprietário:** Alexandre Caramaschi — CEO da Brasil GEO
-**Repositório:** github.com/alexandrebrt14-sys/papers
+**Coorte de estudo:** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
 **Licença:** MIT
 
 ---
@@ -44,16 +43,15 @@ O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa emp
 
 ### 3.1 Citation Tracker (Módulo 1)
 **Arquivo:** `src/collectors/citation_tracker.py`
-**Função:** Monitora se a entidade primária (Brasil GEO / Alexandre Caramaschi) é citada em 5 LLMs.
+**Função:** Monitora se as entidades da coorte (15 fintechs brasileiras) são citadas em 5 LLMs.
 **LLMs:** ChatGPT (OpenAI), Claude (Anthropic), Gemini (Google), Perplexity, Copilot (scraping).
 **Dados capturados por query:**
 
 | Campo | Tipo | Descrição |
 |-------|------|-----------|
 | cited | bool | LLM citou a entidade? |
-| cited_entity | bool | Citou "Brasil GEO"? |
-| cited_domain | bool | Citou brasilgeo.ai? |
-| cited_person | bool | Citou "Alexandre Caramaschi"? |
+| cited_entity | bool | Citou o nome da fintech? |
+| cited_domain | bool | Citou o domínio oficial? |
 | position | int | 1=primeiro terço, 2=meio, 3=final |
 | attribution | str | linked, named, paraphrased, none |
 | hedging_detected | bool | Linguagem hesitante? |
@@ -64,7 +62,7 @@ O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa emp
 
 ### 3.2 Competitor Benchmark (Módulo 2)
 **Arquivo:** `src/collectors/competitor.py`
-**Função:** Grupo de controle — monitora as mesmas queries para 15 concorrentes do ecossistema fintech.
+**Função:** Monitora as mesmas queries para todas as 15 entidades da coorte para comparação estatística cruzada.
 **Entidades:** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra.
 **Comando:** `python -m src.cli collect competitor`
 
@@ -91,10 +89,10 @@ O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa emp
 
 | Teste | Uso | Função |
 |-------|-----|--------|
-| Chi-squared | Comparar taxas de citação entre grupos | `chi_squared_citation_rate()` |
+| Chi-squared | Comparar taxas de citação entre fintechs | `chi_squared_citation_rate()` |
 | T-test | Comparar médias antes/depois | `t_test_means()` |
 | ANOVA | Comparar citação entre LLMs | `anova_repeated_measures()` |
-| Correlação | Entity Score x Citation Rate | `correlation()` |
+| Correlação | Market cap x Citation Rate | `correlation()` |
 | Regressão logística | Preditores de citação | `logistic_regression_predictors()` |
 | Bonferroni | Correção para comparações múltiplas | `bonferroni_correction()` |
 
@@ -102,8 +100,8 @@ O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa emp
 
 ### 3.7 Citation Context Analyzer (Módulo 7)
 **Arquivo:** `src/collectors/context_analyzer.py`
-**Função:** Analisa COMO a entidade é citada (sentimento, atribuição, precisão factual, hedging).
-**Verificações de precisão:** Nome canônico, cargo, empresa, credenciais.
+**Função:** Analisa COMO cada fintech é citada (sentimento, atribuição, precisão factual, hedging).
+**Verificações de precisão:** Nome oficial, segmento, posição de mercado.
 
 ---
 
@@ -114,7 +112,7 @@ O sistema usa 55 queries padronizadas em 8 categorias:
 | Categoria | Queries | Idiomas | Objetivo |
 |-----------|---------|---------|----------|
 | brand | 4 | EN/PT | Visibilidade da marca |
-| entity | 2 | EN/PT | Reconhecimento pessoal |
+| entity | 2 | EN/PT | Reconhecimento da entidade |
 | concept | 5 | EN/PT | GEO como conceito |
 | technical | 5 | EN/PT | Implementação técnica |
 | b2a | 2 | EN/PT | Business-to-Agent |
@@ -172,7 +170,7 @@ Cada execução de coleta gera um `CollectionLogger` com:
 ### Exemplo de log JSONL
 ```json
 {"ts":"2026-03-24T09:00:01Z","level":"INFO","logger":"papers.citation_tracker","message":"Coleta iniciada: citation_tracker","event":{"run_id":"a1b2c3d4","module":"citation_tracker","event":"started"}}
-{"ts":"2026-03-24T09:00:03Z","level":"INFO","logger":"papers.citation_tracker","message":"[ChatGPT] What is Brasil GEO?... → CITOU","event":{"run_id":"a1b2c3d4","module":"citation_tracker","event":"query_cited","llm":"ChatGPT","cited":true,"duration_ms":1234,"tokens":450}}
+{"ts":"2026-03-24T09:00:03Z","level":"INFO","logger":"papers.citation_tracker","message":"[ChatGPT] What is Nubank?... → CITOU","event":{"run_id":"a1b2c3d4","module":"citation_tracker","event":"query_cited","llm":"ChatGPT","cited":true,"duration_ms":1234,"tokens":450}}
 ```
 
 ---
@@ -232,7 +230,7 @@ python -m src.cli collect serp       # Só SERP vs AI Overlap
 python -m src.cli analyze report     # Relatório estatístico
 
 # === Intervenções ===
-python -m src.cli intervention add meu-teste --type schema_org --desc "Adicionei FAQ schema" --url "https://brasilgeo.ai/artigo"
+python -m src.cli intervention add teste-nubank --type schema_org --desc "Teste Schema.org em página Nubank" --url "https://nubank.com.br/sobre"
 
 # === Banco de Dados ===
 python -m src.cli db migrate         # Aplicar/atualizar schema
@@ -267,7 +265,3 @@ pytest tests/ -v                     # Rodar todos os testes
 | 6 | Dataset longitudinal robusto, submissão ArXiv | ~39.600 |
 | 9 | Peer review, dados cross-platform completos | ~59.400 |
 | 12 | Publicação, dataset público, replicabilidade | ~79.200 |
-
----
-
-**Brasil GEO** — brasilgeo.ai · alexandrecaramaschi.com

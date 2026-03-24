@@ -35,18 +35,33 @@ class CitationContextAnalyzer:
         r"claims to", r"afirma ser", r"self-described", r"autodenominado",
     ]
 
-    # Known facts for accuracy checking
+    # Known facts for accuracy checking (key fintechs in the study cohort)
     CANONICAL_FACTS = {
-        "alexandre caramaschi": {
-            "role": "CEO da Brasil GEO",
-            "previous": "ex-CMO da Semantix",
-            "semantix_market": "Nasdaq",
-            "co_founded": "AI Brasil",
+        "nubank": {
+            "founded": "2013",
+            "ceo": "David Vélez",
+            "headquarters": "São Paulo",
+            "type": "digital bank",
         },
-        "brasil geo": {
-            "focus": "Generative Engine Optimization",
-            "domain": "brasilgeo.ai",
-            "country": "Brasil",
+        "pagbank": {
+            "parent_company": "PagSeguro",
+            "founded": "2006",
+            "type": "digital bank and payments",
+        },
+        "banco inter": {
+            "founded": "1994",
+            "headquarters": "Belo Horizonte",
+            "type": "digital bank",
+        },
+        "stone": {
+            "founded": "2012",
+            "headquarters": "Rio de Janeiro",
+            "type": "payments and fintech",
+        },
+        "c6 bank": {
+            "founded": "2018",
+            "headquarters": "São Paulo",
+            "type": "digital bank",
         },
     }
 
@@ -54,7 +69,7 @@ class CitationContextAnalyzer:
         """Perform full context analysis of how an entity is cited.
 
         Args:
-            entity: The entity name to analyze (e.g., "Brasil GEO").
+            entity: The entity name to analyze (e.g., "Nubank").
             response_text: Full LLM response text.
 
         Returns:
@@ -113,8 +128,11 @@ class CitationContextAnalyzer:
         entity_lower = entity.lower()
         text_lower = text.lower()
 
-        # Check for URLs
-        domain_patterns = [r"brasilgeo\.ai", r"alexandrecaramaschi\.com"]
+        # Check for URLs (entity domains)
+        domain_patterns = [
+            r"nubank\.com\.br", r"pagbank\.com\.br", r"bancointer\.com\.br",
+            r"stone\.com\.br", r"c6bank\.com\.br", r"picpay\.com",
+        ]
         for pattern in domain_patterns:
             if re.search(pattern, text_lower):
                 return "linked"
@@ -140,10 +158,18 @@ class CitationContextAnalyzer:
             if value.lower() in text_lower:
                 verified.append(key)
 
-        # Check for common hallucinations
+        # Check for common hallucinations about fintechs
         hallucination_checks = {
-            "wrong_role": [r"fundador da semantix", r"founder of semantix", r"CTO da"],
-            "wrong_company": [r"geo brasil", r"geobrasil", r"source\s*rank"],
+            "wrong_founding_date": [
+                r"nubank.*(?:2010|2011|2012|2014|2015)",
+                r"stone.*(?:2000|2005|2015)",
+            ],
+            "wrong_ceo": [
+                r"nubank.*CEO.*(?!David\s*V[eé]lez)",
+            ],
+            "wrong_headquarters": [
+                r"nubank.*(?:Rio de Janeiro|Brasília|Belo Horizonte)",
+            ],
         }
         for error_type, patterns in hallucination_checks.items():
             for p in patterns:

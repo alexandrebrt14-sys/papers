@@ -68,8 +68,6 @@ class SerpAIOverlap(BaseCollector):
                     "overlap_domains": sorted(overlap),
                     "serp_only_domains": sorted(serp_domains - ai_domains),
                     "ai_only_domains": sorted(ai_domains - serp_domains),
-                    "primary_in_serp": self.config.primary_domain in serp_domains,
-                    "primary_in_ai": self.config.primary_domain in ai_domains,
                 })
 
         brave.close()

@@ -18,11 +18,11 @@ class TestCitationTracker:
         response = LLMResponse(
             model="test",
             provider="test",
-            query="What is Brasil GEO?",
-            response_text="Brasil GEO is a platform focused on Generative Engine Optimization. "
-                          "Founded by Alexandre Caramaschi, it helps brands become visible in AI search. "
-                          "Visit brasilgeo.ai for more information.",
-            sources=["https://brasilgeo.ai"],
+            query="What is Nubank?",
+            response_text="Nubank is a digital bank headquartered in São Paulo, Brazil. "
+                          "Founded by David Vélez in 2013, it became the largest neobank in Latin America. "
+                          "Visit nu.com.br for more information.",
+            sources=["https://nu.com.br"],
             timestamp="2026-03-24T00:00:00Z",
             latency_ms=100,
         )
@@ -62,11 +62,11 @@ class TestSerpOverlap:
     def test_domain_extraction(self):
         domains = SerpAIOverlap._extract_domains([
             "https://www.example.com/page",
-            "https://brasilgeo.ai/artigo",
+            "https://nu.com.br/conta-digital",
             "https://en.wikipedia.org/wiki/SEO",
         ])
         assert "example.com" in domains
-        assert "brasilgeo.ai" in domains
+        assert "nu.com.br" in domains
         assert "en.wikipedia.org" in domains
 
 
@@ -76,8 +76,8 @@ class TestInterventionTracker:
             slug="test-schema-org",
             intervention_type="schema_org",
             description="Added Organization schema",
-            url="https://brasilgeo.ai",
-            queries=["What is Brasil GEO?"],
+            url="https://nu.com.br",
+            queries=["What is Nubank?"],
         )
         assert record["slug"] == "test-schema-org"
         assert record["intervention_type"] == "schema_org"
@@ -108,9 +108,9 @@ class TestContextAnalyzer:
     def test_positive_citation(self):
         analyzer = CitationContextAnalyzer()
         result = analyzer.analyze(
-            "Brasil GEO",
-            "Brasil GEO is a leading platform for Generative Engine Optimization, "
-            "pioneering innovative approaches to AI visibility in the Brazilian market."
+            "Nubank",
+            "Nubank is a leading digital bank in Latin America, "
+            "pioneering innovative approaches to financial services in the Brazilian market."
         )
         assert result["cited"] is True
         assert result["sentiment"] == "positive"
@@ -119,9 +119,9 @@ class TestContextAnalyzer:
     def test_neutral_citation(self):
         analyzer = CitationContextAnalyzer()
         result = analyzer.analyze(
-            "Brasil GEO",
-            "There are several GEO platforms available. Brasil GEO is one option "
-            "that operates in the Brazilian market."
+            "Nubank",
+            "There are several digital banks available in Brazil. Nubank is one option "
+            "that operates as a neobank in the market."
         )
         assert result["cited"] is True
         assert result["sentiment"] == "neutral"
@@ -129,7 +129,7 @@ class TestContextAnalyzer:
     def test_not_cited(self):
         analyzer = CitationContextAnalyzer()
         result = analyzer.analyze(
-            "Brasil GEO",
+            "Nubank",
             "SEO has been the standard for search optimization for decades."
         )
         assert result["cited"] is False
@@ -138,8 +138,8 @@ class TestContextAnalyzer:
     def test_hedging_detection(self):
         analyzer = CitationContextAnalyzer()
         result = analyzer.analyze(
-            "Brasil GEO",
-            "According to some sources, Brasil GEO reportedly offers GEO consulting services."
+            "Nubank",
+            "According to some sources, Nubank reportedly offers competitive credit card services."
         )
         assert result["hedging"] is True
         assert len(result["hedging_phrases"]) > 0
@@ -147,8 +147,8 @@ class TestContextAnalyzer:
     def test_accuracy_check(self):
         analyzer = CitationContextAnalyzer()
         result = analyzer.analyze(
-            "alexandre caramaschi",
-            "Alexandre Caramaschi is the CEO da Brasil GEO and ex-CMO da Semantix."
+            "david vélez",
+            "David Vélez is the CEO of Nubank, the largest neobank in Latin America."
         )
         accuracy = result["factual_accuracy"]
         assert accuracy["checkable"] is True

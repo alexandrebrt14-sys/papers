@@ -25,7 +25,7 @@ import httpx
 
 logger = logging.getLogger("finops.secrets")
 
-ALERT_EMAIL = os.getenv("FINOPS_ALERT_EMAIL", "caramaschiai@caramaschiai.io")
+ALERT_EMAIL = os.getenv("FINOPS_ALERT_EMAIL", "")
 
 # Key patterns for leak detection
 KEY_PATTERNS = {

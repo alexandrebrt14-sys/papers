@@ -3,11 +3,9 @@
 ## REGRA #0 — IDIOMA
 Todo conteúdo em PT-BR com acentuação completa. Exceção: código, commits, docstrings técnicas.
 
-## Proprietário
-Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), cofundador da AI Brasil.
-
 ## Propósito
-Infraestrutura de coleta e análise de dados para pesquisa empírica em GEO (Generative Engine Optimization).
+Pesquisa empírica sobre como LLMs citam bancos e fintechs brasileiras em respostas generativas.
+Coorte de estudo: Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra.
 Objetivo: gerar datasets longitudinais de 6-12 meses que suportem publicação acadêmica peer-reviewed.
 
 ## Stack
@@ -67,9 +65,6 @@ python -m src.cli db export --format csv     # Exporta dados
 - `SUPABASE_URL` — Persistência
 - `SUPABASE_KEY` — Persistência
 - `PAPERS_DB_PATH` — Fallback SQLite local (default: data/papers.db)
-
-## Termos proibidos
-"Especialista #1", "GEO Brasil", "Source Rank", sourcerank.ai, geobrasil.com.br
 
 ## Convenções de código
 - Type hints em todas as funções públicas

@@ -3,9 +3,9 @@
 ## 1. OpenAI (ChatGPT) — ~$2/mês
 
 1. Acesse https://platform.openai.com/api-keys
-2. Faça login com a conta Google (caramaschiai@caramaschiai.io)
+2. Faça login com sua conta
 3. Clique em "Create new secret key"
-4. Nome: `papers-geo-research`
+4. Nome: `papers-fintech-research`
 5. Copie a key (formato: `sk-...`)
 6. Adicione crédito mínimo: $5 (Settings > Billing)
 
@@ -14,9 +14,9 @@
 ## 2. Anthropic (Claude) — ~$2/mês
 
 1. Acesse https://console.anthropic.com/settings/keys
-2. Faça login com a conta Google (caramaschiai@caramaschiai.io)
+2. Faça login com sua conta
 3. Clique em "Create Key"
-4. Nome: `papers-geo-research`
+4. Nome: `papers-fintech-research`
 5. Copie a key (formato: `sk-ant-...`)
 6. Adicione crédito mínimo: $5 (Settings > Plans & Billing)
 
@@ -25,9 +25,9 @@
 ## 3. Google AI (Gemini) — GRÁTIS
 
 1. Acesse https://aistudio.google.com/apikey
-2. Faça login com a conta Google (caramaschiai@caramaschiai.io)
+2. Faça login com sua conta Google
 3. Clique em "Create API Key"
-4. Selecione o projeto existente ou crie "papers-geo"
+4. Selecione o projeto existente ou crie "papers-fintech"
 5. Copie a key (formato: `AI...`)
 
 **Modelo usado:** `gemini-2.0-flash` (grátis: 15 RPM, 1M tokens/dia)
@@ -45,7 +45,7 @@
 ## 5. SerpAPI (opcional) — $50/mês ou grátis (100 buscas)
 
 1. Acesse https://serpapi.com/users/sign_up
-2. Registre com caramaschiai@caramaschiai.io
+2. Registre uma conta
 3. Plano gratuito: 100 buscas/mês (suficiente para começar)
 4. Copie a key em Dashboard > API Key
 

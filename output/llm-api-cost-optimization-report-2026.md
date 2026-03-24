@@ -1,13 +1,13 @@
-# Relatorio: Otimizacao de Custos com APIs de LLM para Monitoramento de Citacoes
+# Relatório: Otimização de Custos com APIs de LLM para Monitoramento de Citações de Fintechs
 
 **Data:** 2026-03-24
-**Caso de uso:** Monitoramento de entidade (Brasil GEO / Alexandre Caramaschi) -- verificar se LLMs mencionam a entidade e quais fontes citam.
+**Caso de uso:** Monitoramento de coorte de 15 fintechs brasileiras -- verificar como LLMs citam cada entidade e quais fontes referenciam.
 
 ---
 
-## 1. Tabela de Precos por Modelo (Marco 2026)
+## 1. Tabela de Preços por Modelo (Março 2026)
 
-Todos os precos em USD por 1 milhao de tokens (MTok).
+Todos os preços em USD por 1 milhão de tokens (MTok).
 
 ### OpenAI
 
@@ -18,8 +18,8 @@ Todos os precos em USD por 1 milhao de tokens (MTok).
 | GPT-4o-mini (legado) | $0.15 | $0.60 | $0.075 | $0.075 | $0.30 |
 | GPT-4o (legado) | $2.50 | $10.00 | $1.25 | $1.25 | $5.00 |
 
-**Batch API:** 50% de desconto, processamento assincrono em ate 24h, ate 50.000 requests por batch.
-**Prompt Caching:** Automatico para prompts >1.024 tokens. Cache hit = 50% de desconto (algumas fontes indicam ate 90%). Cache expira em 5-10 minutos de inatividade.
+**Batch API:** 50% de desconto, processamento assíncrono em até 24h, até 50.000 requests por batch.
+**Prompt Caching:** Automático para prompts >1.024 tokens. Cache hit = 50% de desconto (algumas fontes indicam até 90%). Cache expira em 5-10 minutos de inatividade.
 
 ### Anthropic (Claude)
 
@@ -31,9 +31,9 @@ Todos os precos em USD por 1 milhao de tokens (MTok).
 | Haiku 3.5 | $0.80 | $4.00 | $1.00 | $0.08 | $0.40 | $2.00 |
 | **Haiku 3** | **$0.25** | **$1.25** | $0.30 | $0.03 | **$0.125** | **$0.625** |
 
-**Batch API:** 50% de desconto, ate 10.000 queries por batch, processamento em ate 24h.
-**Prompt Caching:** Cache read = 10% do preco base de input. Cache write 5m = 1.25x, cache write 1h = 2x. Se paga apos 1 leitura (5m) ou 2 leituras (1h).
-**Combinacao:** Batch + Cache podem ser combinados (descontos cumulativos).
+**Batch API:** 50% de desconto, até 10.000 queries por batch, processamento em até 24h.
+**Prompt Caching:** Cache read = 10% do preço base de input. Cache write 5m = 1.25x, cache write 1h = 2x. Se paga após 1 leitura (5m) ou 2 leituras (1h).
+**Combinação:** Batch + Cache podem ser combinados (descontos cumulativos).
 
 ### Google Gemini
 
@@ -47,8 +47,8 @@ Todos os precos em USD por 1 milhao de tokens (MTok).
 | **Gemini 2.5 Flash-Lite** | **$0.10** | **$0.40** | **$0.05** | **$0.20** | -- |
 
 **Batch API:** 50% de desconto em todos os modelos pagos.
-**Free Tier:** Gemini Flash-Lite tem tier gratuito disponivel.
-**Google Grounding (Search):** $14/1.000 queries (Gemini 3.x), $35/1.000 queries (Gemini 2.x). Primeiros 1.500 queries/dia gratis no tier pago.
+**Free Tier:** Gemini Flash-Lite tem tier gratuito disponível.
+**Google Grounding (Search):** $14/1.000 queries (Gemini 3.x), $35/1.000 queries (Gemini 2.x). Primeiros 1.500 queries/dia grátis no tier pago.
 
 ### Perplexity Sonar
 
@@ -59,24 +59,24 @@ Todos os precos em USD por 1 milhao de tokens (MTok).
 | Sonar Reasoning Pro | $2.00 | $8.00 | $6/1K req | $10/1K req | $14/1K req |
 | Sonar Deep Research | $2.00 | $8.00 | -- | -- | -- |
 
-**Nota importante:** Tokens de citacao NAO sao cobrados no Sonar e Sonar Pro. Citacoes vem embutidas na resposta sem custo adicional.
+**Nota importante:** Tokens de citação NÃO são cobrados no Sonar e Sonar Pro. Citações vêm embutidas na resposta sem custo adicional.
 
 ---
 
 ## 2. Modelo Recomendado por Provedor para Monitoramento
 
-O caso de uso eh simples: enviar uma pergunta ("Quem eh Alexandre Caramaschi?" ou "O que eh Brasil GEO?"), receber resposta e verificar se a entidade foi mencionada e quais fontes foram citadas.
+O caso de uso é simples: enviar uma pergunta ("O que é Nubank?" ou "Quais são as melhores fintechs do Brasil?"), receber resposta e verificar se cada entidade da coorte foi mencionada e quais fontes foram citadas.
 
 | Provedor | Modelo Recomendado | Custo por Query Estimado | Justificativa |
 |----------|--------------------|--------------------------|---------------|
-| **OpenAI** | GPT-5 nano | ~$0.0001-0.0005 | Mais barato da OpenAI, suficiente para classificacao |
-| **Anthropic** | Haiku 3 (Batch) | ~$0.0002-0.0008 | Batch = $0.125 input. Mais barato possivel |
+| **OpenAI** | GPT-5 nano | ~$0.0001-0.0005 | Mais barato da OpenAI, suficiente para classificação |
+| **Anthropic** | Haiku 3 (Batch) | ~$0.0002-0.0008 | Batch = $0.125 input. Mais barato possível |
 | **Google** | Gemini 2.5 Flash-Lite (Batch) | ~$0.0001-0.0003 | $0.05 input em batch. Custo quase zero |
-| **Perplexity** | Sonar (Low context) | ~$0.005-0.01 | Citacoes gratis embutidas. Unico que faz busca real |
+| **Perplexity** | Sonar (Low context) | ~$0.005-0.01 | Citações grátis embutidas. Único que faz busca real |
 
-**Recomendacao final para monitoramento de citacoes:**
-- **Perplexity Sonar (Low)** para queries que precisam de busca web real + citacoes ($5/1K requests + tokens)
-- **Gemini 2.5 Flash-Lite Batch** para queries de classificacao/analise ($0.05-0.10/MTok)
+**Recomendação final para monitoramento de citações de fintechs:**
+- **Perplexity Sonar (Low)** para queries que precisam de busca web real + citações ($5/1K requests + tokens)
+- **Gemini 2.5 Flash-Lite Batch** para queries de classificação/análise ($0.05-0.10/MTok)
 
 ---
 
@@ -86,36 +86,36 @@ O caso de uso eh simples: enviar uma pergunta ("Quem eh Alexandre Caramaschi?" o
 |----------|----------|-----------------|------------------|----------|
 | OpenAI | 50% | 50.000 requests / 200 MB | 24h | POST /v1/batches |
 | Anthropic | 50% | 10.000 requests | 24h | POST /v1/messages/batches |
-| Google Gemini | 50% | Variavel | 24h | BatchGenerateContent |
+| Google Gemini | 50% | Variável | 24h | BatchGenerateContent |
 
-**Workflow padrao (OpenAI/Anthropic):**
+**Workflow padrão (OpenAI/Anthropic):**
 1. Preparar arquivo JSONL com requests
 2. Upload do arquivo via Files API
 3. Criar batch job com file_id
-4. Polling de status ate completar
+4. Polling de status até completar
 5. Download dos resultados
 
 ---
 
-## 4. Tecnicas de Reducao de Tokens com Estimativa de Economia
+## 4. Técnicas de Redução de Tokens com Estimativa de Economia
 
 ### 4.1. TOON (Token-Oriented Object Notation) -- Economia: 30-60%
 
-Substitui JSON por formato otimizado que remove pontuacao redundante. Ideal para dados tabulares/planos.
+Substitui JSON por formato otimizado que remove pontuação redundante. Ideal para dados tabulares/planos.
 
 ```
 # JSON (mais tokens):
-{"name": "Alexandre Caramaschi", "role": "CEO", "company": "Brasil GEO"}
+{"name": "Nubank", "segment": "digital bank", "market": "Brazil"}
 
 # TOON (menos tokens):
-name: Alexandre Caramaschi
-role: CEO
-company: Brasil GEO
+name: Nubank
+segment: digital bank
+market: Brazil
 ```
 
 ### 4.2. Structured Output / JSON Mode -- Economia: 40-60% vs texto livre
 
-Forcar resposta JSON minima em vez de texto verboso:
+Forçar resposta JSON mínima em vez de texto verboso:
 
 ```python
 # OpenAI - Structured Output
@@ -133,13 +133,13 @@ response = client.chat.completions.create(
             "required": ["mentioned", "sources"]
         }
     }},
-    messages=[{"role": "user", "content": "Did you mention Brasil GEO?"}]
+    messages=[{"role": "user", "content": "Did you mention Nubank in your response?"}]
 )
 ```
 
-### 4.3. Prompt Caching -- Economia: ate 90% em input tokens
+### 4.3. Prompt Caching -- Economia: até 90% em input tokens
 
-Para monitoramento repetitivo com system prompt identico:
+Para monitoramento repetitivo com system prompt idêntico:
 
 ```python
 # Anthropic - Prompt Caching
@@ -148,48 +148,48 @@ response = client.messages.create(
     max_tokens=256,
     system=[{
         "type": "text",
-        "text": "You are a citation monitor. Check if the entity...",
+        "text": "You are a citation monitor. Check if the fintech entity...",
         "cache_control": {"type": "ephemeral"}  # cache por 5 min
     }],
     messages=[{"role": "user", "content": query}]
 )
-# Primeiro request: 1.25x do preco base (cache write)
-# Requests subsequentes (5 min): 0.1x do preco base (cache read)
+# Primeiro request: 1.25x do preço base (cache write)
+# Requests subsequentes (5 min): 0.1x do preço base (cache read)
 ```
 
 ### 4.4. Minimizar Output com max_tokens -- Economia: 50-80% em output tokens
 
 ```python
-# Limitar output a 100-200 tokens para resposta sim/nao com fontes
+# Limitar output a 100-200 tokens para resposta sim/não com fontes
 response = client.chat.completions.create(
     model="gpt-5-nano",
-    max_tokens=150,  # Forca resposta curta
+    max_tokens=150,  # Força resposta curta
     messages=[...]
 )
 ```
 
 ### 4.5. LLM-as-Judge (Modelo Barato para Analisar) -- Economia: 80-95%
 
-Padrao de dois estagios:
-1. **Estagio 1 (Query):** Perplexity Sonar (Low) faz a busca e retorna texto + citacoes
-2. **Estagio 2 (Analise):** GPT-5 nano ou Gemini Flash-Lite classifica a resposta
+Padrão de dois estágios:
+1. **Estágio 1 (Query):** Perplexity Sonar (Low) faz a busca e retorna texto + citações
+2. **Estágio 2 (Análise):** GPT-5 nano ou Gemini Flash-Lite classifica a resposta
 
 ```python
-# Estagio 1: Perplexity busca (custo: ~$0.006/query)
+# Estágio 1: Perplexity busca (custo: ~$0.006/query)
 search_result = perplexity_client.chat.completions.create(
     model="sonar",
     web_search_options={"search_context_size": "low"},
-    messages=[{"role": "user", "content": "Who is Alexandre Caramaschi?"}]
+    messages=[{"role": "user", "content": "What are the best digital banks in Brazil?"}]
 )
 
-# Estagio 2: GPT-5 nano classifica (custo: ~$0.0001/query)
+# Estágio 2: GPT-5 nano classifica (custo: ~$0.0001/query)
 analysis = openai_client.chat.completions.create(
     model="gpt-5-nano",
     max_tokens=100,
     response_format={"type": "json_object"},
     messages=[{
         "role": "system",
-        "content": "Analyze if the entity was mentioned. Return JSON: {mentioned: bool, sources: [urls], sentiment: string}"
+        "content": "Analyze if the fintech entities were mentioned. Return JSON: {entities: [{name: str, mentioned: bool}], sources: [urls]}"
     }, {
         "role": "user",
         "content": search_result.choices[0].message.content
@@ -201,39 +201,39 @@ analysis = openai_client.chat.completions.create(
 
 ---
 
-## 5. Fontes Alternativas Gratuitas/Baratas para SERP e Citacoes
+## 5. Fontes Alternativas Gratuitas/Baratas para SERP e Citações
 
-| Servico | Preco | Free Tier | Melhor Para |
+| Serviço | Preço | Free Tier | Melhor Para |
 |---------|-------|-----------|-------------|
-| **SearXNG** | Gratis (self-hosted) | Ilimitado | Meta-search gratuito, sem rastreamento |
-| **Brave Search API** | $5/1K requests | $5/mes em creditos (~1K queries) | Indice proprio, grounding API |
-| **Tavily** | $0.008/credito | 1.000 creditos/mes | Busca otimizada para AI/RAG |
-| **Serper.dev** | $0.001/query | 2.500 queries/mes | Google SERP barato |
-| **SerpAPI** | $15/1K queries | 250 queries/mes | Multi-engine SERP |
-| **Google Grounding** | $14/1K queries | 1.500/dia (tier pago) | Citacoes integradas no Gemini |
-| **Perplexity Sonar** | $5-12/1K requests | -- | Busca + citacoes num so request |
+| **SearXNG** | Grátis (self-hosted) | Ilimitado | Meta-search gratuito, sem rastreamento |
+| **Brave Search API** | $5/1K requests | $5/mês em créditos (~1K queries) | Índice próprio, grounding API |
+| **Tavily** | $0.008/crédito | 1.000 créditos/mês | Busca otimizada para AI/RAG |
+| **Serper.dev** | $0.001/query | 2.500 queries/mês | Google SERP barato |
+| **SerpAPI** | $15/1K queries | 250 queries/mês | Multi-engine SERP |
+| **Google Grounding** | $14/1K queries | 1.500/dia (tier pago) | Citações integradas no Gemini |
+| **Perplexity Sonar** | $5-12/1K requests | -- | Busca + citações num só request |
 
-### Recomendacao para Monitoramento de Citacoes
+### Recomendação para Monitoramento de Citações de Fintechs
 
-**Combinacao mais barata:**
+**Combinação mais barata:**
 
-1. **SearXNG self-hosted** (custo: $0) -- Para busca SERP basica e comparacao
-2. **Perplexity Sonar Low** ($5/1K) -- Para verificar citacoes em LLMs com busca real
-3. **Gemini 2.5 Flash-Lite Batch** ($0.05/MTok input) -- Para classificacao barata
-4. **Brave Search** ($5/1K, com $5 gratis/mes) -- Como fonte adicional de SERP
+1. **SearXNG self-hosted** (custo: $0) -- Para busca SERP básica e comparação
+2. **Perplexity Sonar Low** ($5/1K) -- Para verificar citações em LLMs com busca real
+3. **Gemini 2.5 Flash-Lite Batch** ($0.05/MTok input) -- Para classificação barata
+4. **Brave Search** ($5/1K, com $5 grátis/mês) -- Como fonte adicional de SERP
 
 **Custo estimado para 100 queries de monitoramento/dia:**
-- 30 dias x 100 queries = 3.000 queries/mes
-- Perplexity Sonar Low: 3.000 x $0.006 = **$18/mes**
-- Classificacao via Gemini Flash-Lite Batch: ~**$0.50/mes**
-- SearXNG: **$0/mes**
-- **Total estimado: ~$18.50/mes**
+- 30 dias x 100 queries = 3.000 queries/mês
+- Perplexity Sonar Low: 3.000 x $0.006 = **$18/mês**
+- Classificação via Gemini Flash-Lite Batch: ~**$0.50/mês**
+- SearXNG: **$0/mês**
+- **Total estimado: ~$18.50/mês**
 
 ---
 
-## 6. Estrategias de Rate Limit e Controle de Orcamento
+## 6. Estratégias de Rate Limit e Controle de Orçamento
 
-### 6.1. Token Budget por Execucao
+### 6.1. Token Budget por Execução
 
 ```python
 class TokenBudget:
@@ -283,22 +283,22 @@ def cached_query(prompt, model, ttl_seconds=300):
     return result
 ```
 
-**Economia estimada de cache local:** 20-40% do orcamento total (prompts repetitivos como system prompts, FAQs, queries identicas).
+**Economia estimada de cache local:** 20-40% do orçamento total (prompts repetitivos como system prompts, FAQs, queries idênticas).
 
 ---
 
-## 7. Resumo: Stack Otimizado para Monitoramento de Citacoes
+## 7. Resumo: Stack Otimizado para Monitoramento de Citações de Fintechs
 
-| Camada | Ferramenta | Custo | Funcao |
+| Camada | Ferramenta | Custo | Função |
 |--------|-----------|-------|--------|
-| Busca SERP | SearXNG (self-hosted) | $0 | Comparacao de rankings |
-| Busca LLM | Perplexity Sonar (Low) | $5/1K req + tokens | Citacoes reais de LLMs |
-| Classificacao | GPT-5 nano ou Gemini 2.5 Flash-Lite | $0.05-0.10/MTok | Analisar se entidade foi mencionada |
-| Batch Processing | Anthropic Batch ou OpenAI Batch | 50% off | Queries nao-urgentes |
+| Busca SERP | SearXNG (self-hosted) | $0 | Comparação de rankings |
+| Busca LLM | Perplexity Sonar (Low) | $5/1K req + tokens | Citações reais de LLMs |
+| Classificação | GPT-5 nano ou Gemini 2.5 Flash-Lite | $0.05-0.10/MTok | Analisar se entidade fintech foi mencionada |
+| Batch Processing | Anthropic Batch ou OpenAI Batch | 50% off | Queries não-urgentes |
 | Cache | Prompt caching + cache local SHA-256 | 90% off em re-queries | Evitar chamadas repetidas |
-| Rate Control | Token budget + exponential backoff | -- | Protecao de orcamento |
+| Rate Control | Token budget + exponential backoff | -- | Proteção de orçamento |
 
-**Custo operacional estimado:** $15-25/mes para ~3.000 queries de monitoramento.
+**Custo operacional estimado:** $15-25/mês para ~3.000 queries de monitoramento.
 
 ---
 

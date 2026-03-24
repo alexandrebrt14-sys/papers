@@ -362,10 +362,7 @@ class LLMClient:
         """Extract known entity mentions from free-text response."""
         text_lower = text.lower()
         entities = []
-        check = [
-            config.primary_entity, "Alexandre Caramaschi",
-            config.primary_domain, config.secondary_domain,
-        ] + config.competitor_entities
+        check = list(config.cohort_entities)
         for entity in check:
             if entity.lower() in text_lower:
                 entities.append(entity)

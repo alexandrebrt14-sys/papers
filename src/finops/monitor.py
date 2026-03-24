@@ -348,7 +348,7 @@ table{{width:100%;border-collapse:collapse}}tr:hover{{background:rgba(255,255,25
 <h3 style="margin-bottom:10px;">Alertas Recentes</h3>
 <table><tr style="border-bottom:1px solid #374151;"><th style="text-align:left;padding:4px 6px;font-size:10px;color:#6b7280;">Data</th><th style="text-align:left;padding:4px 6px;font-size:10px;color:#6b7280;">Sev</th><th style="text-align:left;padding:4px 6px;font-size:10px;color:#6b7280;">Plat</th><th style="text-align:left;padding:4px 6px;font-size:10px;color:#6b7280;">Msg</th></tr>
 {alerts_html or '<tr><td colspan="4" style="padding:12px;text-align:center;color:#4b5563;">Nenhum alerta</td></tr>'}</table></div>
-<p style="text-align:center;color:#374151;font-size:10px;margin-top:16px;">Brasil GEO FinOps v2 — Auto-gerado por monitor.py</p>
+<p style="text-align:center;color:#374151;font-size:10px;margin-top:16px;">GEO Research FinOps — Auto-gerado por monitor.py</p>
 </body></html>"""
 
     path = OUTPUT_DIR / "finops_dashboard.html"

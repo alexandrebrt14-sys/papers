@@ -1,7 +1,6 @@
 # Governança — Papers
 
 **Última atualização:** 2026-03-24
-**Responsável:** Alexandre Caramaschi — CEO da Brasil GEO
 
 ---
 
@@ -41,9 +40,9 @@
 | Nível | Trigger | Ação |
 |-------|---------|------|
 | Info | Coleta concluída | Log estruturado (JSONL) |
-| Warning | 70% do limite | Email para caramaschiai@caramaschiai.io |
-| Critical | 90% do limite | Email urgente + log |
-| Exceeded | 100% do limite | Email + bloqueio automático de novas queries |
+| Warning | 70% do limite | Alerta no log + email |
+| Critical | 90% do limite | Alerta urgente + log |
+| Exceeded | 100% do limite | Bloqueio automático de novas queries |
 
 ### 2.3 Revisão de Limites
 - Limites revisados mensalmente com base no relatório FinOps
@@ -69,7 +68,7 @@
 - Apenas dados públicos de APIs são coletados
 - Nenhum scraping de conteúdo protegido
 - Respostas de LLMs são dados observacionais, não intervenções em sujeitos humanos
-- Concorrentes monitorados são entidades públicas com presença digital
+- Entidades monitoradas (fintechs) são empresas públicas com presença digital
 
 ---
 
@@ -78,7 +77,7 @@
 ### 4.1 Pré-requisitos para Submissão
 - [ ] Mínimo 90 dias de dados longitudinais contínuos
 - [ ] N >= 1000 observações por LLM
-- [ ] Grupo de controle (concorrentes) com mesma granularidade
+- [ ] Coorte completa (15 fintechs) com mesma granularidade
 - [ ] Testes estatísticos com p < 0.05 e effect sizes reportados
 - [ ] Datasets reprodutíveis (CSV exportável)
 
@@ -94,8 +93,8 @@
 | JASIST | Journal | Information Science | Rolling |
 
 ### 4.3 Títulos Candidatos
-1. "How LLMs Cite: A Longitudinal Study of Entity Visibility in Generative Search"
-2. "GEO vs SEO: Empirical Evidence of Source Divergence in AI-Powered Search"
+1. "How LLMs Cite Brazilian Fintechs: A Longitudinal Study of Entity Visibility in Generative Search"
+2. "GEO vs SEO: Empirical Evidence of Source Divergence in AI-Powered Search for Financial Entities"
 3. "The Invisible Excellence Paradox: When Technical Optimization Fails to Produce AI Citations"
 
 ---
@@ -117,7 +116,7 @@
 ### ADR-003: 55 queries padronizadas
 - **Data:** 2026-03-24
 - **Decisão:** Queries fixas em 8 categorias, PT-BR e EN
-- **Motivo:** Reprodutibilidade; mesmas queries para entidade primária e concorrentes
+- **Motivo:** Reprodutibilidade; mesmas queries para todas as entidades da coorte
 - **Trade-off:** Pode não capturar tendências emergentes
 
 ### ADR-004: FinOps com hard stop
@@ -133,7 +132,7 @@
 | Data | Mudança | Justificativa |
 |------|---------|---------------|
 | 2026-03-24 | Documento criado | Estabelecer governança formal para pesquisa |
-| 2026-03-24 | FinOps limites definidos | $30/mês global baseado em estimativa de 55 queries × 5 LLMs × 30 dias |
+| 2026-03-24 | FinOps limites definidos | $30/mês global baseado em estimativa de 55 queries x 5 LLMs x 30 dias |
 
 ---
 

@@ -20,7 +20,7 @@ import httpx
 
 logger = logging.getLogger("finops")
 
-ALERT_EMAIL = os.getenv("FINOPS_ALERT_EMAIL", "caramaschiai@caramaschiai.io")
+ALERT_EMAIL = os.getenv("FINOPS_ALERT_EMAIL", "")
 
 # ============================================================
 # PRICING — per 1M tokens, updated Mar 2026

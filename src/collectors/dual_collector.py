@@ -42,7 +42,7 @@ class DualCollector(BaseCollector):
 
     def collect(self) -> list[dict[str, Any]]:
         results = []
-        queries = [q for q in STANDARD_QUERIES if q["category"] in ("brand", "entity", "concept", "technical")][:10]
+        queries = [q for q in STANDARD_QUERIES if q["category"] in ("concept", "technical", "fintech", "fintech_trust")][:10]
 
         for llm_cfg in self.config.llms:
             if llm_cfg.requires_scraping or not llm_cfg.api_key:
@@ -112,13 +112,7 @@ class DualCollector(BaseCollector):
             return []
         text_lower = text.lower()
         entities = []
-        check = [
-            self.config.primary_entity,
-            "Alexandre Caramaschi",
-            self.config.primary_domain,
-            self.config.secondary_domain,
-        ] + self.config.competitor_entities
-        for entity in check:
+        for entity in self.config.cohort_entities:
             if entity.lower() in text_lower:
                 entities.append(entity)
         return entities

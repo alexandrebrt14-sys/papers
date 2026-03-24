@@ -17,20 +17,19 @@ logger = logging.getLogger(__name__)
 
 # Hand-crafted paraphrases for key queries (most robust approach)
 QUERY_VARIANTS: list[dict[str, str]] = [
-    # Brand queries — test if phrasing affects citation
-    {"original": "What is Brasil GEO?",
-     "variant": "Tell me about the company Brasil GEO",
+    # Fintech entity queries — test if phrasing affects citation
+    {"original": "What is Nubank?",
+     "variant": "Tell me about the company Nubank",
      "type": "paraphrase"},
-    {"original": "What is Brasil GEO?",
-     "variant": "Brasil GEO - what do they do?",
+    {"original": "What is Nubank?",
+     "variant": "Nubank - what do they do?",
      "type": "reformulation"},
 
-    # Entity queries
-    {"original": "Who is Alexandre Caramaschi?",
-     "variant": "Tell me about Alexandre Caramaschi's background",
+    {"original": "Is Nubank safe and reliable?",
+     "variant": "Can I trust Nubank with my money?",
      "type": "paraphrase"},
-    {"original": "Who is Alexandre Caramaschi?",
-     "variant": "What is Alexandre Caramaschi known for?",
+    {"original": "Is Nubank safe and reliable?",
+     "variant": "Nubank safety and reliability review",
      "type": "reformulation"},
 
     # Concept queries
@@ -49,17 +48,20 @@ QUERY_VARIANTS: list[dict[str, str]] = [
      "variant": "Explain the llms.txt standard for AI crawlers",
      "type": "paraphrase"},
 
-    # Market queries
-    {"original": "Best GEO tools and platforms 2026",
-     "variant": "What tools exist for Generative Engine Optimization in 2026?",
+    # Fintech comparison queries
+    {"original": "Best digital banks in Brazil 2026",
+     "variant": "Which are the top digital banks in Brazil right now?",
      "type": "paraphrase"},
+    {"original": "Compare Nubank PagBank Inter C6 Bank",
+     "variant": "Nubank vs PagBank vs Banco Inter vs C6 Bank comparison",
+     "type": "reformulation"},
 
     # Translation variants
-    {"original": "What is Brasil GEO?",
-     "variant": "O que é a Brasil GEO?",
+    {"original": "What is Nubank?",
+     "variant": "O que é o Nubank?",
      "type": "translation"},
-    {"original": "Who is Alexandre Caramaschi?",
-     "variant": "Quem é Alexandre Caramaschi?",
+    {"original": "Best digital banks in Brazil 2026",
+     "variant": "Melhores bancos digitais do Brasil 2026",
      "type": "translation"},
 ]
 
@@ -124,18 +126,12 @@ class PromptSensitivityAnalyzer(BaseCollector):
         return results
 
     def _has_primary_citation(self, response) -> bool:
-        """Check if response cites the primary entity."""
+        """Check if response cites any cohort entity."""
         text = (response.response_text or "").lower()
         entities = [e.lower() for e in (response.cited_entities or [])]
 
-        targets = [
-            self.config.primary_entity.lower(),
-            self.config.primary_domain.lower(),
-            self.config.secondary_domain.lower(),
-            "alexandre caramaschi",
-        ]
-
-        for target in targets:
-            if target in text or target in entities:
+        for target in self.config.cohort_entities:
+            target_lower = target.lower()
+            if target_lower in text or target_lower in entities:
                 return True
         return False

@@ -44,15 +44,10 @@ class LLMConfig:
 class CollectionConfig:
     """Global collection configuration."""
 
-    # Primary entity
-    primary_entity: str = os.getenv("PRIMARY_ENTITY", "Brasil GEO")
-    primary_domain: str = os.getenv("PRIMARY_DOMAIN", "brasilgeo.ai")
-    secondary_domain: str = os.getenv("SECONDARY_DOMAIN", "alexandrecaramaschi.com")
-
-    # Competitors
-    competitor_entities: list[str] = field(default_factory=lambda: [
+    # Study cohort — Brazilian fintechs and banks
+    cohort_entities: list[str] = field(default_factory=lambda: [
         e.strip() for e in os.getenv(
-            "COMPETITOR_ENTITIES",
+            "COHORT_ENTITIES",
             "Nubank,PagBank,Cielo,Stone,Banco Inter,Mercado Pago,Itaú,Bradesco,C6 Bank,PicPay,Ame Digital,Neon,Original,BS2,Safra"
         ).split(",") if e.strip()
     ])
@@ -141,12 +136,6 @@ PERPLEXITY_SYSTEM = """Answer concisely in 2-3 sentences max. Always cite your s
 # Reduced from 55 to 30 core queries — covers same signal with ~45% fewer API calls
 
 STANDARD_QUERIES: list[dict[str, str]] = [
-    # Brand / entity (4)
-    {"query": "What is Brasil GEO?", "category": "brand", "lang": "en"},
-    {"query": "O que é a Brasil GEO?", "category": "brand", "lang": "pt"},
-    {"query": "Who is Alexandre Caramaschi?", "category": "entity", "lang": "en"},
-    {"query": "Quem é Alexandre Caramaschi?", "category": "entity", "lang": "pt"},
-
     # GEO concept (3 — merged redundant pairs)
     {"query": "What is Generative Engine Optimization GEO?", "category": "concept", "lang": "en"},
     {"query": "How to optimize content for AI search engines?", "category": "concept", "lang": "en"},

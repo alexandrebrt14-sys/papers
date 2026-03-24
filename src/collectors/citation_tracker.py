@@ -60,53 +60,40 @@ class CitationTracker(BaseCollector):
         return results
 
     def _analyze(self, response: LLMResponse) -> dict[str, Any]:
-        """Analyze citation data from structured response."""
-        entity = self.config.primary_entity.lower()
-        domain = self.config.primary_domain.lower()
-        secondary = self.config.secondary_domain.lower()
-        person = "alexandre caramaschi"
-
-        # From JSON structured output
+        """Analyze citation data from structured response for cohort entities."""
         cited_lower = [e.lower() for e in response.cited_entities]
+        text_lower = response.response_text.lower()
 
-        cited_entity = any(entity in c or c in entity for c in cited_lower)
-        cited_domain = any(domain in c for c in cited_lower) or any(
-            domain in s for s in response.sources
-        )
-        cited_person = any(person in c for c in cited_lower)
-        cited_secondary = any(secondary in c for c in cited_lower) or any(
-            secondary in s for s in response.sources
-        )
-        cited = cited_entity or cited_domain or cited_person or cited_secondary
+        # Check which cohort entities are cited
+        cohort_cited: dict[str, bool] = {}
+        for entity in self.config.cohort_entities:
+            entity_lower = entity.lower()
+            cohort_cited[entity] = (
+                any(entity_lower in c or c in entity_lower for c in cited_lower)
+                or entity_lower in text_lower
+            )
 
-        # Position from cited_entities order (first = prominent)
+        cited_count = sum(1 for v in cohort_cited.values() if v)
+        cited = cited_count > 0
+
+        # Position of first cohort entity in cited_entities order
         position = None
         if cited:
             for i, c in enumerate(cited_lower):
-                if entity in c or person in c or domain in c:
-                    total = max(len(cited_lower), 1)
-                    position = 1 if i < total / 3 else (2 if i < 2 * total / 3 else 3)
+                for entity in self.config.cohort_entities:
+                    if entity.lower() in c or c in entity.lower():
+                        total = max(len(cited_lower), 1)
+                        position = 1 if i < total / 3 else (2 if i < 2 * total / 3 else 3)
+                        break
+                if position is not None:
                     break
-
-        # Attribution
-        attribution = "none"
-        if any(domain in s or secondary in s for s in response.sources):
-            attribution = "linked"
-        elif cited_entity or cited_person:
-            attribution = "named"
-
-        our_sources = [s for s in response.sources if domain in s or secondary in s]
 
         return {
             "cited": cited,
-            "cited_entity": cited_entity,
-            "cited_domain": cited_domain,
-            "cited_person": cited_person,
+            "cited_count": cited_count,
+            "cohort_cited": cohort_cited,
             "position": position,
-            "attribution": attribution,
             "source_count": len(response.sources),
-            "our_source_count": len(our_sources),
-            "our_sources": our_sources,
             "response_length": len(response.response_text),
             "response_text": response.response_text,
             "all_sources": response.sources,

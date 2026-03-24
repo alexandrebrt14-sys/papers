@@ -2,7 +2,6 @@
 
 **Versão:** 1.0
 **Data:** 2026-03-24
-**Autor:** Alexandre Caramaschi — CEO da Brasil GEO
 **Repositório:** github.com/alexandrebrt14-sys/papers
 
 ---
@@ -11,9 +10,13 @@
 
 ### 1.1 Propósito do Documento
 
-Este documento define o plano de desenvolvimento incremental da plataforma **Papers** — infraestrutura de coleta e análise de dados empíricos para pesquisa acadêmica em Generative Engine Optimization (GEO). O plano é estruturado em fases com critérios de aceitação mensuráveis.
+Este documento define o plano de desenvolvimento incremental da plataforma **Papers** — infraestrutura de coleta e análise de dados empíricos para pesquisa acadêmica sobre como LLMs citam bancos e fintechs brasileiras. O plano é estruturado em fases com critérios de aceitação mensuráveis.
 
-### 1.2 Estado Atual
+### 1.2 Coorte de Estudo
+
+**15 entidades:** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
+
+### 1.3 Estado Atual
 
 | Dimensão | Valor | Meta |
 |----------|-------|------|
@@ -26,7 +29,7 @@ Este documento define o plano de desenvolvimento incremental da plataforma **Pap
 | Dias de coleta contínua | 0 | 180+ |
 | Artigos submetidos | 0 | 2+ |
 
-### 1.3 Bloqueadores Atuais (P0)
+### 1.4 Bloqueadores Atuais (P0)
 
 1. **API keys sem créditos** — OpenAI (billing inativo), Anthropic (sem créditos), Gemini (quota 0 no workspace)
 2. **GitHub Secrets não configurados** — 5 secrets necessários para CI/CD
@@ -113,7 +116,7 @@ Este documento define o plano de desenvolvimento incremental da plataforma **Pap
 
 ### Fase 1 — Completude Funcional (Semanas 2-3)
 
-**Objetivo:** Todos os módulos integrados e funcionais.
+**Objetivo:** Todos os módulos integrados e funcionais para monitorar a coorte de fintechs.
 
 | ID | Tarefa | Tipo | Critério de Aceitação | Dependência |
 |----|--------|------|-----------------------|-------------|
@@ -180,7 +183,7 @@ Este documento define o plano de desenvolvimento incremental da plataforma **Pap
 
 ### Fase 3 — Dados e Análise (Semanas 4-12)
 
-**Objetivo:** Acumular dados suficientes para publicação.
+**Objetivo:** Acumular dados suficientes para publicação sobre padrões de citação de fintechs por LLMs.
 
 | ID | Tarefa | Tipo | Critério de Aceitação | Dependência |
 |----|--------|------|-----------------------|-------------|
@@ -200,15 +203,15 @@ Este documento define o plano de desenvolvimento incremental da plataforma **Pap
 
 ### Fase 4 — Publicação (Semanas 12-20)
 
-**Objetivo:** Submeter 2 artigos acadêmicos.
+**Objetivo:** Submeter 2 artigos acadêmicos sobre padrões de citação de fintechs brasileiras por LLMs.
 
 | ID | Tarefa | Tipo | Critério de Aceitação | Dependência |
 |----|--------|------|-----------------------|-------------|
-| F4-01 | Redigir preprint: "How LLMs Cite Entities" | Publicação | Preprint completo com abstract, metodologia, resultados | F3-06 |
+| F4-01 | Redigir preprint: "How LLMs Cite Brazilian Fintechs" | Publicação | Preprint completo com abstract, metodologia, resultados | F3-06 |
 | F4-02 | Submeter ao ArXiv | Publicação | ArXiv ID atribuído | F4-01 |
-| F4-03 | Redigir paper: "GEO vs SEO: Source Divergence" | Publicação | Paper completo com gráficos publication-quality | F3-08 |
+| F4-03 | Redigir paper: "GEO vs SEO: Source Divergence in Fintech Citations" | Publicação | Paper completo com gráficos publication-quality | F3-08 |
 | F4-04 | Submeter a conferência (SIGIR/WWW/WSDM) | Publicação | Submissão confirmada | F4-03 |
-| F4-05 | Redigir paper: "Content Interventions for AI Visibility" | Publicação | Paper com resultados dos experimentos A/B | F3-07 |
+| F4-05 | Redigir paper: "Content Interventions for AI Visibility of Financial Entities" | Publicação | Paper com resultados dos experimentos A/B | F3-07 |
 | F4-06 | Submeter a journal (Information Sciences / JASIST) | Publicação | Submissão confirmada | F4-05 |
 
 **Entrega:** 1 preprint no ArXiv + 2 submissões a venues peer-reviewed.
@@ -262,7 +265,7 @@ Este documento define o plano de desenvolvimento incremental da plataforma **Pap
 | APIs mudam formato de resposta | Média | Alto | Testes de integração semanais; extract_tokens() com fallback |
 | Créditos API acabam | Alta | Crítico | FinOps com hard stop a 95%; alertas em 70% |
 | GitHub Actions falha silenciosamente | Média | Alto | finops-monitor.yml independente a cada 6h; stale data detection |
-| Preços de API aumentam | Baixa | Médio | Budget limits configuraveis; pricing validation no monitor |
+| Preços de API aumentam | Baixa | Médio | Budget limits configuráveis; pricing validation no monitor |
 | Paper rejeitado | Alta | Médio | Submeter a 2+ venues; dataset aberto para reprodutibilidade |
 | Key vazada | Baixa | Crítico | secrets.py scan a cada 6h; keys em GitHub Secrets, nunca em código |
 
@@ -299,20 +302,17 @@ Semana 12-20 ████████████████  Fase 4: Publicaç
 
 ## 9. Dependências Externas
 
-| Dependência | Responsável | Status | Bloqueio |
-|-------------|-----------|--------|----------|
-| OpenAI billing ($5+) | Alexandre | Pendente | Fase 0 |
-| Anthropic credits ($5+) | Alexandre | Pendente | Fase 0 |
-| Gemini API (conta Gmail) | Alexandre | Pendente | Fase 0 |
-| Perplexity credits ($5+) | Alexandre | Pendente | Fase 0 |
-| SerpAPI key | Alexandre | Pendente | Fase 3 |
-| RESEND_API_KEY | Já existe (Vercel) | Copiar para Secrets | Fase 0 |
-| ArXiv account | Alexandre | Pendente | Fase 4 |
-| ORCID | Já existe (0009-0004-9150-485X) | OK | — |
+| Dependência | Status | Bloqueio |
+|-------------|--------|----------|
+| OpenAI billing ($5+) | Pendente | Fase 0 |
+| Anthropic credits ($5+) | Pendente | Fase 0 |
+| Gemini API (conta Gmail) | Pendente | Fase 0 |
+| Perplexity credits ($5+) | Pendente | Fase 0 |
+| SerpAPI key | Pendente | Fase 3 |
+| ArXiv account | Pendente | Fase 4 |
+| ORCID | OK (0009-0004-9150-485X) | — |
 
 ---
 
 *Documento gerado automaticamente e mantido em docs/DEVELOPMENT_PLAN.md.*
 *Atualizações são commitadas via `scripts/update-docs.py`.*
-
-**Brasil GEO** — [brasilgeo.ai](https://brasilgeo.ai) · [alexandrecaramaschi.com](https://alexandrecaramaschi.com)

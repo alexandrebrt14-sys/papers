@@ -1,8 +1,12 @@
-# Papers — Infraestrutura de Pesquisa Empírica em GEO
+# Papers — Pesquisa Empírica sobre Citações de LLMs a Bancos e Fintechs Brasileiras
 
-Plataforma de coleta, persistência e análise de dados para pesquisa acadêmica em **Generative Engine Optimization (GEO)**.
+Plataforma de coleta, persistência e análise de dados para pesquisa acadêmica sobre **como LLMs citam bancos e fintechs brasileiras** em respostas generativas.
 
-Desenvolvido pela [Brasil GEO](https://brasilgeo.ai) como infraestrutura de suporte para publicação de artigos científicos peer-reviewed sobre visibilidade em motores de busca generativos.
+Estudo longitudinal focado em padrões de citação, visibilidade e atribuição de fontes por motores de busca generativos (Generative Engine Optimization — GEO).
+
+## Coorte de Estudo
+
+**15 entidades monitoradas:** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
 
 ## Arquitetura
 
@@ -44,7 +48,7 @@ Desenvolvido pela [Brasil GEO](https://brasilgeo.ai) como infraestrutura de supo
 | # | Módulo | Função | Status |
 |---|--------|--------|--------|
 | 1 | Multi-LLM Citation Tracker | Citações em ChatGPT, Claude, Gemini, Perplexity | Pronto |
-| 2 | Competitor Benchmark | Grupo de controle: 15 fintechs (Nubank, Stone, Cielo...) | Pronto |
+| 2 | Competitor Benchmark | Coorte: 15 fintechs (Nubank, Stone, Cielo...) | Pronto |
 | 3 | SERP vs AI Overlap | Divergência Google SERP vs respostas IA | Pronto |
 | 4 | Intervention Tracker | A/B testing de otimizações (schema, llms.txt, citações) | Pronto |
 | 5 | Time Series Persistence | SQLite + Supabase, snapshots diários, 6-12 meses | Pronto |
@@ -59,10 +63,6 @@ Desenvolvido pela [Brasil GEO](https://brasilgeo.ai) como infraestrutura de supo
 | Anthropic | claude-sonnet-4 | GitHub Secret | ~$2/mês |
 | Google AI | gemini-2.0-flash | GitHub Secret | Grátis |
 | Perplexity | sonar | Pendente | ~$5/mês |
-
-## Concorrentes Monitorados (Ecossistema Fintech)
-
-Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
 
 ## Queries: 55 padronizadas
 
@@ -138,7 +138,3 @@ python -m src.cli db health            # Verificar completude
 ## Licença
 
 MIT
-
----
-
-**Brasil GEO** — [brasilgeo.ai](https://brasilgeo.ai) · [alexandrecaramaschi.com](https://alexandrecaramaschi.com)

@@ -13,7 +13,7 @@ env:
   SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
   PAPERS_DB_PATH: data/papers.db
-  FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
+  FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 
 jobs:
   benchmark:

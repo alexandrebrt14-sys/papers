@@ -17,6 +17,11 @@
 | Taxa de citação | 0.0% | — |
 | Última coleta | — | Pendente |
 
+## Foco da Pesquisa
+
+Estudo empírico de como LLMs citam bancos e fintechs brasileiras.
+**Coorte:** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Ame Digital, Neon, Original, BS2, Safra
+
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
@@ -39,10 +44,10 @@
 |-------|-----------|--------|
 | Dados mínimos | 1.000 citações | 0/1.000 |
 | Série temporal | 90 dias contínuos | Pendente |
-| Grupo de controle | 15 concorrentes | 0 observações |
+| Coorte completa | 15 fintechs monitoradas | 0 observações |
 | Análise estatística | p < 0.05 | Pendente |
 | Preprint | ArXiv submission | Pendente |
 
 ---
 
-*Gerado por `scripts/update-docs.py` — Brasil GEO Research*
+*Gerado por `scripts/update-docs.py`*

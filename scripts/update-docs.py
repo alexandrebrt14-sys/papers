@@ -308,7 +308,7 @@ def generate_status(stats, db_stats, git_stats):
 
 ---
 
-*Gerado por `scripts/update-docs.py` — Brasil GEO Research*
+*Gerado por `scripts/update-docs.py` — GEO Research*
 """
     (DOCS / "STATUS.md").write_text(status, encoding="utf-8")
     print(f"  [OK] STATUS.md gerado")

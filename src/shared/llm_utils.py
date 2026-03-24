@@ -1,5 +1,5 @@
 """
-llm_utils.py -- Motor compartilhado de LLM para todos os scripts do ecossistema Brasil GEO.
+llm_utils.py -- Motor compartilhado de LLM para todos os coletores do projeto Papers.
 
 Padrão obrigatório para qualquer script que use API de modelo generativo.
 Incorpora TODAS as otimizações de custo:
@@ -16,7 +16,7 @@ Custo estimado: ~$0.0003 por query (vs ~$0.007 sem otimização = 23x mais barat
 
 Uso:
     from llm_utils import query_all_llms, query_single_llm, get_available_llms
-    results = query_all_llms("What is Brasil GEO?")
+    results = query_all_llms("Best digital banks in Brazil 2026")
 """
 
 import hashlib
