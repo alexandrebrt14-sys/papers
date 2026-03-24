@@ -98,6 +98,7 @@ Sistema integrado de controle financeiro para APIs de LLM:
 | [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Políticas de gasto, ADRs, roadmap de publicação |
 | [docs/STATUS.md](docs/STATUS.md) | Snapshot de saúde do projeto (auto-gerado) |
 | [docs/MANUAL.md](docs/MANUAL.md) | Manual operacional completo |
+| [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) | Plano de desenvolvimento em 4 fases com critérios de aceitação |
 
 Documentação atualizada automaticamente após cada coleta via `scripts/update-docs.py`.
 
