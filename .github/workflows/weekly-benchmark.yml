@@ -1,9 +1,19 @@
-name: Weekly Benchmark & Analysis
+name: Weekly Benchmark + Analysis
 
 on:
   schedule:
-    - cron: '0 11 * * 0'  # Sunday 08:00 BRT (UTC-3)
+    - cron: '0 11 * * 0'  # domingo 08:00 BRT (UTC-3)
   workflow_dispatch:
+
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+  PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+  SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  PAPERS_DB_PATH: data/papers.db
+  FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
 
 jobs:
   benchmark:
@@ -21,36 +31,52 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      - name: Run SERP vs AI overlap (Module 3)
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
-          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-          PAPERS_DB_PATH: data/papers.db
+      - name: Download previous DB
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: papers-db-latest
+          path: data/
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      - name: Run SERP vs AI Overlap (Module 3)
         run: python -m src.cli collect serp
 
       - name: Run full collection
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
-          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-          PAPERS_DB_PATH: data/papers.db
         run: python -m src.cli collect all
 
       - name: Generate statistical report
-        env:
-          PAPERS_DB_PATH: data/papers.db
-        run: python -m src.cli analyze report
+        run: |
+          mkdir -p output/reports
+          python -m src.cli analyze report > output/reports/weekly_$(date -u +%Y-%m-%d).txt 2>&1 || true
 
-      - name: Upload artifacts
+      - name: FinOps monitor cycle
+        run: python -m src.cli finops monitor
+
+      - name: Update documentation
+        run: python scripts/update-docs.py
+
+      - name: Upload database
+        uses: actions/upload-artifact@v4
+        with:
+          name: papers-db-latest
+          path: data/papers.db
+          retention-days: 365
+          overwrite: true
+
+      - name: Upload reports + dashboard
         uses: actions/upload-artifact@v4
         with:
           name: weekly-report-${{ github.run_number }}
           path: |
-            data/papers.db
-            output/*.png
+            output/reports/
+            output/finops_dashboard.html
           retention-days: 365
+
+      - name: Commit data + docs + reports + finops
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ output/ docs/ 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "data: weekly benchmark + analysis $(date -u +%Y-%m-%d)"
+          git push

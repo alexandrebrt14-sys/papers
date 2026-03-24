@@ -1,0 +1,62 @@
+name: FinOps Monitor (6h)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+env:
+  PAPERS_DB_PATH: data/papers.db
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+  PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+  FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Download DB
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: papers-db-latest
+          path: data/
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      # Full FinOps monitor: rollup, budget checks, anomaly detection,
+      # stale data detection, pricing validation, exports, dashboard
+      - name: Run FinOps monitor
+        run: python -m src.cli finops monitor
+
+      - name: Upload checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: finops-checkpoint-${{ github.run_number }}
+          path: |
+            data/finops_checkpoint.json
+            data/finops_alerts.jsonl
+            output/finops_dashboard.html
+          retention-days: 30
+
+      - name: Commit FinOps state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/finops_checkpoint.json data/finops_alerts.jsonl output/finops_dashboard.html 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "finops: monitor checkpoint $(date -u +%Y-%m-%dT%H:%M)"
+          git push

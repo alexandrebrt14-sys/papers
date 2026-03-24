@@ -1,9 +1,18 @@
-name: Daily Data Collection
+name: Daily Data Collection + FinOps
 
 on:
   schedule:
     - cron: '0 9 * * *'  # 06:00 BRT (UTC-3)
   workflow_dispatch:
+
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+  PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  PAPERS_DB_PATH: data/papers.db
+  FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
 
 jobs:
   collect:
@@ -21,44 +30,62 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      - name: Run citation tracker (Module 1)
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
-          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          PAPERS_DB_PATH: data/papers.db
+      # Step 1: Restore DB from previous run (if exists)
+      - name: Download previous DB
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: papers-db-latest
+          path: data/
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      # Step 2: Run collectors (FinOps hooks auto-trigger after each)
+      - name: Run Citation Tracker (Module 1)
         run: python -m src.cli collect citation
 
-      - name: Run competitor benchmark (Module 2)
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
-          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          PAPERS_DB_PATH: data/papers.db
+      - name: Run Competitor Benchmark (Module 2)
         run: python -m src.cli collect competitor
 
-      - name: Upload database artifact
+      # Step 3: FinOps monitor (rollup + budget check + exports + dashboard)
+      # This runs automatically via post-collection hooks, but we run it
+      # explicitly here to ensure it runs even if collectors had no data
+      - name: FinOps monitor cycle
+        run: python -m src.cli finops monitor
+
+      # Step 4: Update documentation with fresh data
+      - name: Update documentation
+        run: python scripts/update-docs.py
+
+      # Step 5: Export data for Git tracking
+      - name: Export CSV snapshots
+        run: python -m src.cli db export --format csv --output data/daily
+        continue-on-error: true
+
+      # Step 6: Upload DB artifact
+      - name: Upload database (latest)
+        uses: actions/upload-artifact@v4
+        with:
+          name: papers-db-latest
+          path: data/papers.db
+          retention-days: 90
+          overwrite: true
+
+      - name: Upload database (dated)
         uses: actions/upload-artifact@v4
         with:
           name: papers-db-${{ github.run_number }}
           path: data/papers.db
           retention-days: 90
 
-      - name: Update documentation
-        env:
-          PAPERS_DB_PATH: data/papers.db
-        run: python scripts/update-docs.py
-
-      - name: Commit data + docs
+      # Step 7: Commit everything to Git
+      - name: Commit data + docs + finops
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -f data/papers.db ]; then
-            python -m src.cli db export --format csv --output data/daily
-            git add data/daily_*.csv 2>/dev/null || true
-          fi
+          git add data/daily_*.csv 2>/dev/null || true
+          git add data/finops_checkpoint.json 2>/dev/null || true
+          git add data/finops_alerts.jsonl 2>/dev/null || true
+          git add output/finops_dashboard.html 2>/dev/null || true
           git add docs/ 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "data+docs: daily collection $(date -u +%Y-%m-%d)"
+          git diff --cached --quiet || git commit -m "data: daily collection + finops $(date -u +%Y-%m-%d)"
           git push

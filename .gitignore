@@ -13,7 +13,8 @@ build/
 # Data (keep schema, ignore actual data)
 data/*.db
 data/*.csv
-data/*.json
+!data/finops_checkpoint.json
+!data/finops_alerts.jsonl
 !data/.gitkeep
 
 # IDE
@@ -31,8 +32,11 @@ logs/*.jsonl
 logs/run_*.jsonl
 !logs/.gitkeep
 
-# Output
-output/
+# Output (track finops dashboard and reports)
+output/*.png
+output/*.svg
+!output/finops_dashboard.html
+!output/reports/
 reports/
 *.png
 *.svg

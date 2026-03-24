@@ -81,8 +81,13 @@ def collect_all() -> None:
     ts = TimeSeriesManager(db)
     snapshot = ts.compute_daily_citation_aggregate()
     ts.save_daily_aggregate("citation_tracker", snapshot)
-    console.print(f"\n[bold green]Coleta concluída. Snapshot diário salvo.[/bold green]")
     db.close()
+
+    # Auto-run FinOps monitor (rollup, budget check, exports, dashboard)
+    console.print(f"\n[bold cyan]FinOps monitor...[/bold cyan]")
+    from src.finops.hooks import post_collection_hook
+    post_collection_hook("collect_all", sum(1 for _ in []), 0)
+    console.print(f"[bold green]Coleta + FinOps concluídos.[/bold green]")
 
 
 @collect.command("citation")
@@ -92,6 +97,7 @@ def collect_citation() -> None:
     start = time.time()
     collector = CitationTracker()
     results = collector.collect()
+    count = 0
     if results:
         count = db.insert_citations(results)
         duration = int((time.time() - start) * 1000)
@@ -99,6 +105,9 @@ def collect_citation() -> None:
         console.print(f"[green]{count} citações coletadas ({duration}ms)[/green]")
     collector.close()
     db.close()
+    # Auto FinOps
+    from src.finops.hooks import post_collection_hook
+    post_collection_hook("citation_tracker", count, int((time.time() - start) * 1000))
 
 
 @collect.command("competitor")
@@ -108,6 +117,7 @@ def collect_competitor() -> None:
     start = time.time()
     collector = CompetitorBenchmark()
     results = collector.collect()
+    count = 0
     if results:
         count = db.insert_competitor_citations(results)
         duration = int((time.time() - start) * 1000)
@@ -115,6 +125,8 @@ def collect_competitor() -> None:
         console.print(f"[green]{count} registros de benchmark coletados ({duration}ms)[/green]")
     collector.close()
     db.close()
+    from src.finops.hooks import post_collection_hook
+    post_collection_hook("competitor_benchmark", count, int((time.time() - start) * 1000))
 
 
 @collect.command("serp")
@@ -124,6 +136,7 @@ def collect_serp() -> None:
     start = time.time()
     collector = SerpAIOverlap()
     results = collector.collect()
+    count = 0
     if results:
         count = db.insert_serp_overlap(results)
         duration = int((time.time() - start) * 1000)
@@ -131,6 +144,8 @@ def collect_serp() -> None:
         console.print(f"[green]{count} registros de overlap coletados ({duration}ms)[/green]")
     collector.close()
     db.close()
+    from src.finops.hooks import post_collection_hook
+    post_collection_hook("serp_ai_overlap", count, int((time.time() - start) * 1000))
 
 
 # === Analysis Commands ===
@@ -358,6 +373,26 @@ def finops_rollup() -> None:
     tracker = get_tracker()
     tracker.rollup_daily()
     console.print("[green]Rollup diário computado.[/green]")
+
+
+@finops_cmd.command("monitor")
+def finops_monitor_cmd() -> None:
+    """Executa ciclo completo de monitoramento FinOps.
+
+    Roda automaticamente após cada coleta, mas pode ser chamado manualmente.
+    Inclui: rollup, budget checks, anomaly detection, exports, dashboard.
+    """
+    from src.finops.monitor import run_monitor
+    run_monitor(verbose=True)
+
+
+@finops_cmd.command("dashboard")
+def finops_dashboard_cmd() -> None:
+    """Gera dashboard HTML com estado atual."""
+    from src.finops.tracker import get_tracker
+    from src.finops.monitor import generate_dashboard
+    path = generate_dashboard(get_tracker())
+    console.print(f"[green]Dashboard gerado: {path}[/green]")
 
 
 if __name__ == "__main__":
