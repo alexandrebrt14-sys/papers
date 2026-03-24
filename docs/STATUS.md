@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-24 14:22 UTC
-**Branch:** main | **Commits:** 16
-**Último commit:** f3cd5a603035f63e3399312806ccee351ed0c2c5 feat: methodology v2 â€” expert panel r
+**Gerado automaticamente em:** 2026-03-24 15:26 UTC
+**Branch:** main | **Commits:** 1
+**Último commit:** 29497ea190ce86b21e1517ba9ecbcc0e5d5b0588 fix: make collection steps resilient to
 
 ---
 
@@ -12,34 +12,34 @@
 |-----------|-------|--------|
 | Código (linhas Python) | 5,698 | OK |
 | Testes unitários | 19 | OK |
-| Tabelas no banco | 14 | OK |
-| Citações coletadas | 0 | Aguardando API keys |
-| Taxa de citação | 0.0% | — |
-| Última coleta | — | Pendente |
+| Tabelas no banco | 19 | OK |
+| Citações coletadas | 90 | Coletando |
+| Taxa de citação | 8.9% | — |
+| Última coleta | 2026-03-24T15:24 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0003 |
+| OpenAI | $0.0000 |
 | Anthropic | $0.0000 |
 | Gemini | $0.0000 |
 | Perplexity | $0.0000 |
-| **Total** | **$0.0003** |
+| **Total** | **$0.0000** |
 
 ## Próximas Ações
 
-- Adicionar créditos às APIs (OpenAI, Anthropic, Gemini)
-- Primeira coleta pendente
-- Configurar GitHub Secrets para CI/CD
+- Coleta ativa — acumular dados
+- Continuar coleta diária (objetivo: 90+ dias)
+- CI/CD configurado
 
 ## Roadmap para Publicação
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 0/1.000 |
-| Série temporal | 90 dias contínuos | Pendente |
-| Grupo de controle | 15 concorrentes | 0 observações |
+| Dados mínimos | 1.000 citações | 90/1.000 |
+| Série temporal | 90 dias contínuos | Em progresso |
+| Grupo de controle | 15 concorrentes | 432 observações |
 | Análise estatística | p < 0.05 | Pendente |
 | Preprint | ArXiv submission | Pendente |
 
