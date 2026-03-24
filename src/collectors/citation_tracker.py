@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.config import STANDARD_QUERIES
 from src.collectors.base import BaseCollector, LLMResponse
 
 
@@ -29,9 +28,9 @@ class CitationTracker(BaseCollector):
         results: list[dict[str, Any]] = []
         cache_hits = 0
 
-        for q in STANDARD_QUERIES:
+        for q in self.queries:
             for llm_cfg in self.config.llms:
-                response = self.llm_client.query(llm_cfg, q["query"])
+                response = self.llm_client.query(llm_cfg, q["query"], category=q.get("category", ""))
                 if response is None:
                     continue
                 if response.from_cache:
@@ -66,7 +65,7 @@ class CitationTracker(BaseCollector):
 
         # Check which cohort entities are cited
         cohort_cited: dict[str, bool] = {}
-        for entity in self.config.cohort_entities:
+        for entity in self.cohort:
             entity_lower = entity.lower()
             cohort_cited[entity] = (
                 any(entity_lower in c or c in entity_lower for c in cited_lower)
@@ -80,7 +79,7 @@ class CitationTracker(BaseCollector):
         position = None
         if cited:
             for i, c in enumerate(cited_lower):
-                for entity in self.config.cohort_entities:
+                for entity in self.cohort:
                     if entity.lower() in c or c in entity.lower():
                         total = max(len(cited_lower), 1)
                         position = 1 if i < total / 3 else (2 if i < 2 * total / 3 else 3)

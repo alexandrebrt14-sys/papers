@@ -63,13 +63,13 @@ class ResponseCache:
         self._dir.mkdir(exist_ok=True)
         self._ttl = timedelta(hours=ttl_hours)
 
-    def _key(self, provider: str, model: str, query: str) -> str:
-        raw = f"{provider}:{model}:{query}"
+    def _key(self, provider: str, model: str, query: str, vertical: str = "") -> str:
+        raw = f"{provider}:{model}:{query}:{vertical}"
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
-    def get(self, provider: str, model: str, query: str) -> dict | None:
+    def get(self, provider: str, model: str, query: str, vertical: str = "") -> dict | None:
         """Return cached response if within TTL, else None."""
-        key = self._key(provider, model, query)
+        key = self._key(provider, model, query, vertical)
         path = self._dir / f"{key}.json"
         if not path.exists():
             return None
@@ -84,9 +84,9 @@ class ResponseCache:
             path.unlink(missing_ok=True)
             return None
 
-    def put(self, provider: str, model: str, query: str, response: dict) -> None:
+    def put(self, provider: str, model: str, query: str, response: dict, vertical: str = "") -> None:
         """Store response in cache."""
-        key = self._key(provider, model, query)
+        key = self._key(provider, model, query, vertical)
         path = self._dir / f"{key}.json"
         response["_cached_at"] = datetime.now(timezone.utc).isoformat()
         path.write_text(json.dumps(response, ensure_ascii=False), encoding="utf-8")
@@ -119,29 +119,62 @@ class LLMClient:
     MAX_RETRIES = 1
     RETRY_BACKOFF = [3]  # seconds — single retry, then circuit break
 
-    def __init__(self, cohort: list[str] | None = None) -> None:
+    # Per-provider rate limiting (seconds between queries)
+    # Gemini free tier = 15 RPM → 4s between queries avoids 429
+    PROVIDER_DELAY: dict[str, float] = {
+        "openai": 0.3,
+        "anthropic": 0.3,
+        "google": 4.0,      # 15 RPM limit → 60/15 = 4s spacing
+        "perplexity": 0.5,
+    }
+
+    # Perplexity query routing: only high-value categories (saves ~57% search cost)
+    # Other LLMs receive all queries. Perplexity only where web search adds value.
+    PERPLEXITY_CATEGORIES: set[str] = {
+        "brand", "entity", "concept",  # Core value: web search finds our content
+        "tecnologia", "fintech",       # Primary vertical queries
+    }
+
+    def __init__(self, cohort: list[str] | None = None, vertical: str = "") -> None:
         self._http = httpx.Client(timeout=60.0)
         self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
         self._run_id = ""
-        self._circuit_broken: set[str] = set()  # providers with 429, skip rest
+        self._circuit_broken: set[str] = set()
         self._cohort = cohort or config.cohort_entities
+        self._vertical = vertical
+        self._last_query_time: dict[str, float] = {}  # provider → timestamp
 
     def set_run_id(self, run_id: str) -> None:
         self._run_id = run_id
 
-    def query(self, llm: LLMConfig, prompt: str) -> LLMResponse | None:
+    def should_query(self, llm: LLMConfig, category: str = "") -> bool:
+        """Check if this LLM should receive this query category.
+
+        Perplexity is expensive ($0.005/search) so we route only high-value
+        queries to it. Other LLMs receive all queries.
+        Returns False if the query should be skipped for this provider.
+        """
+        if llm.provider == "perplexity" and category:
+            return category in self.PERPLEXITY_CATEGORIES
+        return True
+
+    def query(self, llm: LLMConfig, prompt: str, category: str = "") -> LLMResponse | None:
         """Query an LLM with all optimizations applied."""
         if llm.requires_scraping or not llm.api_key:
+            return None
+
+        # Perplexity query routing: skip low-value categories
+        if not self.should_query(llm, category):
             return None
 
         # Circuit breaker: if this provider already 429'd, skip immediately
         if llm.provider in self._circuit_broken:
             return None
 
-        # 1. Check cache
-        cached = self._cache.get(llm.provider, llm.model, prompt)
+        # 1. Check cache (vertical-aware to prevent cross-vertical collisions)
+        cached = self._cache.get(llm.provider, llm.model, prompt, self._vertical)
         if cached:
-            logger.debug(f"[cache-hit] {llm.name}: {prompt[:40]}...")
+            logger.debug(f"[cache-hit] {llm.name}/{self._vertical}: {prompt[:40]}...")
             return LLMResponse(
                 model=llm.model, provider=llm.provider, query=prompt,
                 response_text=cached.get("text", ""),
@@ -151,18 +184,26 @@ class LLMClient:
                 latency_ms=0, from_cache=True,
             )
 
-        # 2. Query with retries
+        # 2. Per-provider rate limiting (prevents Gemini 429)
+        delay = self.PROVIDER_DELAY.get(llm.provider, 0.3)
+        last = self._last_query_time.get(llm.provider, 0)
+        elapsed = time.time() - last
+        if elapsed < delay and last > 0:
+            time.sleep(delay - elapsed)
+        self._last_query_time[llm.provider] = time.time()
+
+        # 3. Query with retries
         start = datetime.now(timezone.utc)
         for attempt in range(self.MAX_RETRIES + 1):
             try:
                 response = self._dispatch(llm, prompt, start)
                 if response:
-                    # 3. Cache the response
+                    # 3. Cache the response (vertical-aware key)
                     self._cache.put(llm.provider, llm.model, prompt, {
                         "text": response.response_text,
                         "sources": response.sources,
                         "cited": response.cited_entities,
-                    })
+                    }, self._vertical)
                 return response
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:
@@ -438,11 +479,17 @@ class BaseCollector(ABC):
     from the VERTICALS registry in config.py.
     """
 
+    # TODO [F1-05]: Integrate CollectionLogger from src.logging.logger into collectors.
+    # Replace self.logger with CollectionLogger(self.module_name()) and use its
+    # structured log_query() / run() context manager for tracing, metrics, and
+    # per-run JSONL log files. Requires updating all subclass collect() methods
+    # to yield structured events instead of plain log calls.
+
     def __init__(self, vertical: str = "fintech") -> None:
         self.vertical = vertical
         self.cohort = get_cohort(vertical)
         self.queries = get_queries(vertical, include_common=True)
-        self.llm_client = LLMClient(cohort=self.cohort)
+        self.llm_client = LLMClient(cohort=self.cohort, vertical=vertical)
         self.config = config
         self.logger = logging.getLogger(self.__class__.__name__)
 

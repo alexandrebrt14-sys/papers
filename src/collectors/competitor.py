@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.config import STANDARD_QUERIES, config
 from src.collectors.base import BaseCollector
 
 
@@ -23,25 +22,27 @@ class CompetitorBenchmark(BaseCollector):
         """Query LLMs and check which cohort entities are cited."""
         results: list[dict[str, Any]] = []
 
-        if not self.config.cohort_entities:
+        if not self.cohort:
             self.logger.warning("No cohort entities configured — skipping")
             return results
 
-        # Use a subset of queries (market + concept + fintech) for cohort tracking
+        # Use a subset of queries relevant to this vertical
+        # Include common categories plus any vertical-specific categories
         cohort_queries = [
-            q for q in STANDARD_QUERIES
-            if q["category"] in ("concept", "market", "technical", "fintech", "fintech_product", "fintech_trust", "fintech_b2b")
+            q for q in self.queries
+            if q["category"] in ("concept", "market", "technical")
+            or q["category"].startswith(self.vertical)
         ]
 
         for q in cohort_queries:
             for llm_cfg in self.config.llms:
-                response = self.llm_client.query(llm_cfg, q["query"])
+                response = self.llm_client.query(llm_cfg, q["query"], category=q.get("category", ""))
                 if response is None:
                     continue
 
                 text_lower = response.response_text.lower()
 
-                for entity in self.config.cohort_entities:
+                for entity in self.cohort:
                     cited = entity.lower() in text_lower
                     position = None
                     if cited:
