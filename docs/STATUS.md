@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-26 22:07 UTC
+**Gerado automaticamente em:** 2026-03-26 22:15 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 4619e84ee07be1db5cd76ba0d021290f1d39d528 fix: critical DB chain bug + workflow i
+**Último commit:** 7976c23312b94fef388e1aa52cde6da347953c9b fix: sync_to_supabase entity_rankings a
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 8,553 | OK |
+| Código (linhas Python) | 8,563 | OK |
 | Testes unitários | 19 | OK |
 | Tabelas no banco | 19 | OK |
 | Citações coletadas | 186 | Coletando |
