@@ -100,26 +100,30 @@ def get_citation_rates(conn: sqlite3.Connection, vertical: str) -> list[dict]:
 
 
 def get_entity_rankings(conn: sqlite3.Connection, vertical: str, top: int = 15) -> list[dict]:
-    """Top entities by citation count within a vertical (last 30 days)."""
+    """Top entities by citation count within a vertical, from citation_context joined with citations."""
     rows = safe_fetchall(conn, """
         SELECT cc.entity,
-               SUM(CASE WHEN cc.cited THEN 1 ELSE 0 END) as citation_count,
-               COUNT(*) as total,
-               (SELECT cc2.llm FROM competitor_citations cc2
-                WHERE cc2.entity = cc.entity AND cc2.vertical = ? AND cc2.cited
-                GROUP BY cc2.llm ORDER BY COUNT(*) DESC LIMIT 1) as top_llm
-        FROM competitor_citations cc
-        WHERE cc.vertical = ? AND cc.timestamp >= datetime('now', '-30 days')
+               COUNT(*) as citation_count,
+               (SELECT COUNT(*) FROM citations c2 WHERE c2.vertical = ? AND c2.cited = 1) as total_cited,
+               (SELECT c3.model FROM citations c3
+                JOIN citation_context cc3 ON cc3.citation_id = c3.id
+                WHERE cc3.entity = cc.entity AND c3.vertical = ?
+                GROUP BY c3.model ORDER BY COUNT(*) DESC LIMIT 1) as top_llm
+        FROM citation_context cc
+        JOIN citations c ON cc.citation_id = c.id
+        WHERE c.vertical = ?
         GROUP BY cc.entity
         ORDER BY citation_count DESC
         LIMIT ?
-    """, (vertical, vertical, top))
+    """, (vertical, vertical, vertical, top))
 
+    total_cited = rows[0]["total_cited"] if rows else 1
     return [
         {
             "entity": r["entity"],
             "citation_count": r["citation_count"],
-            "citation_rate": round(r["citation_count"] / max(r["total"], 1), 4),
+            "citation_rate": round(r["citation_count"] / max(total_cited, 1), 4),
+            "total": r["citation_count"],
             "top_llm": r["top_llm"] or "N/A",
         }
         for r in rows
@@ -196,12 +200,18 @@ def get_kpis(conn: sqlite3.Connection, vertical: str) -> dict:
     total_obs = stats[0]["total"] if stats else 0
     cited_count = stats[0]["cited_count"] if stats else 0
 
-    # Distinct entities monitored
+    # Distinct entities monitored (from citation_context joined with citations)
     entities = safe_fetchall(conn, """
-        SELECT COUNT(DISTINCT entity) as n
-        FROM competitor_citations
-        WHERE vertical = ?
+        SELECT COUNT(DISTINCT cc.entity) as n
+        FROM citation_context cc
+        JOIN citations c ON cc.citation_id = c.id
+        WHERE c.vertical = ?
     """, (vertical,))
+    # Fallback: count from verticals config table
+    if not entities or entities[0]["n"] == 0:
+        entities = safe_fetchall(conn, """
+            SELECT json_array_length(cohort_json) as n FROM verticals WHERE slug = ?
+        """, (vertical,))
     entities_monitored = entities[0]["n"] if entities else 0
 
     # Days collecting
