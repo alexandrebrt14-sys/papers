@@ -5,7 +5,7 @@ Todo conteúdo em PT-BR com acentuação completa. Exceção: código, commits, 
 
 ## Propósito
 Pesquisa empírica multi-vertical sobre como LLMs citam empresas brasileiras em respostas generativas.
-Framework de 4 verticais com coortes independentes monitoradas em 4 LLMs.
+Framework de 4 verticais com coortes independentes monitoradas em 5 LLMs.
 Objetivo: gerar datasets longitudinais de 6-12 meses que suportem publicação acadêmica peer-reviewed.
 
 ## Verticais e Coortes
@@ -27,7 +27,7 @@ Dasa, Hapvida, Unimed, Fleury, Rede D'Or, Einstein, Sírio-Libanês, Raia Drogas
 Totvs, Stefanini, Tivit, CI&T, Locaweb, Linx, Movile, iFood, Vtex, RD Station, Conta Azul, Involves, Accenture Brasil, IBM Brasil
 — Fictícias (calibração false-positive): TechNova Solutions, DataBridge Brasil
 
-**Total: 69 entidades (61 reais + 8 fictícias), 4 verticais, 4 LLMs**
+**Total: 69 entidades (61 reais + 8 fictícias), 4 verticais, 5 LLMs**
 Entidades fictícias servem para calibração de falsos positivos (Proposal 5 do design doc).
 
 ## Stack
@@ -102,7 +102,8 @@ python -m src.cli db health                                  # Saúde do banco p
 - `OPENAI_API_KEY` — ChatGPT queries
 - `ANTHROPIC_API_KEY` — Claude queries
 - `GOOGLE_AI_API_KEY` — Gemini queries
-- `PERPLEXITY_API_KEY` — Perplexity queries (já tem)
+- `PERPLEXITY_API_KEY` — Perplexity queries
+- `GROQ_API_KEY` — Groq/Llama 3.3 70B queries (ultra-fast inference)
 - `SERPAPI_KEY` — Google SERP data
 - `SUPABASE_URL` — Persistência
 - `SUPABASE_KEY` — Persistência

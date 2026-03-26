@@ -245,7 +245,8 @@ def query_gemini(query: str, api_key: str) -> dict | None:
 
     def _do():
         r = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            headers={"x-goog-api-key": api_key},
             json={
                 "contents": [
                     {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nQuery: {query}"}]}
@@ -341,6 +342,58 @@ def query_perplexity(query: str, api_key: str) -> dict | None:
         return None
 
 
+def query_groq(query: str, api_key: str) -> dict | None:
+    """Groq Llama 3.3 70B — ultra-fast inference via OpenAI-compatible API."""
+    cached = _cache_get("groq", query)
+    if cached:
+        return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
+
+    def _do():
+        r = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": query},
+                ],
+                "temperature": 0.0,
+                "max_tokens": 250,
+            },
+            timeout=15,
+        )
+        r.raise_for_status()
+        return r
+
+    start = time.time()
+    try:
+        r = _retry_request(_do)
+        if r is None:
+            return None
+        data = r.json()
+        latency = int((time.time() - start) * 1000)
+        text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        parsed = _parse_json(text)
+        usage = data.get("usage", {})
+        result = {
+            "content": parsed.get("summary", text[:200]),
+            "model": "llama-3.3-70b-versatile",
+            "latency_ms": latency,
+            "tokens": usage.get("total_tokens", 0),
+            "input_tokens": usage.get("prompt_tokens", 0),
+            "output_tokens": usage.get("completion_tokens", 0),
+            "sources": parsed.get("sources", []),
+            "cited_entities": parsed.get("cited", []),
+            "from_cache": False,
+        }
+        _cache_put("groq", query, result)
+        return result
+    except Exception as e:
+        print(f"    [FAIL] Groq: {e}")
+        return None
+
+
 # === Registry ===
 
 LLM_ADAPTERS = {
@@ -348,6 +401,7 @@ LLM_ADAPTERS = {
     "anthropic": {"fn": query_anthropic, "env_key": "ANTHROPIC_API_KEY", "label": "Claude/Anthropic"},
     "gemini":    {"fn": query_gemini,    "env_key": "GEMINI_API_KEY",    "label": "Gemini/Google"},
     "perplexity":{"fn": query_perplexity,"env_key": "PERPLEXITY_API_KEY","label": "Perplexity"},
+    "groq":      {"fn": query_groq,      "env_key": "GROQ_API_KEY",     "label": "Groq/Llama"},
 }
 
 

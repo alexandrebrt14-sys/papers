@@ -54,6 +54,11 @@ PRICING: dict[str, dict[str, dict[str, float]]] = {
         "llama-3.1-sonar-small-128k-online":      {"input": 0.20,  "output": 0.20},
         "_default":                               {"input": 1.00,  "output": 1.00},
     },
+    "groq": {
+        "llama-3.3-70b-versatile":                {"input": 0.59,  "output": 0.79},
+        "llama-3.1-8b-instant":                   {"input": 0.05,  "output": 0.08},
+        "_default":                               {"input": 0.59,  "output": 0.79},
+    },
 }
 
 DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
@@ -61,7 +66,8 @@ DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
     "anthropic":  {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
     "google":     {"monthly": 5.0,  "daily": 0.50, "alert_pct": 0.80, "hard_stop_pct": 1.00},
     "perplexity": {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "global":     {"monthly": 30.0, "daily": 3.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    "groq":       {"monthly": 5.0,  "daily": 1.0,  "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    "global":     {"monthly": 35.0, "daily": 4.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
 }
 
 # Anomaly: flag if single query costs more than this
