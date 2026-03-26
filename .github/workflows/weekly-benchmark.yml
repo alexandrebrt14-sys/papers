@@ -14,7 +14,9 @@ env:
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
   PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+  BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
   PAPERS_DB_PATH: data/papers.db
   FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
@@ -43,11 +45,17 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
-      - name: Run SERP vs AI Overlap (Module 3)
-        run: python -m src.cli collect serp || true
+      - name: Run SERP vs AI Overlap (Module 3) — all verticals
+        run: |
+          for v in fintech varejo saude tecnologia; do
+            python -m src.cli --vertical $v collect serp || true
+          done
 
-      - name: Run full collection
-        run: python -m src.cli collect all || true
+      - name: Run full collection — all verticals
+        run: |
+          for v in fintech varejo saude tecnologia; do
+            python -m src.cli --vertical $v collect all || true
+          done
 
       - name: Generate statistical report
         run: |
