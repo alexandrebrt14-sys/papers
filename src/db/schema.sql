@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS citations (
     query_lang      TEXT NOT NULL DEFAULT 'en',  -- en, pt
     vertical        TEXT NOT NULL DEFAULT 'fintech',
     cited           BOOLEAN NOT NULL DEFAULT 0,
-    cited_entity    BOOLEAN DEFAULT 0,
-    cited_domain    BOOLEAN DEFAULT 0,
-    cited_person    BOOLEAN DEFAULT 0,
+    cited_entity    TEXT DEFAULT NULL,
+    cited_domain    TEXT DEFAULT NULL,
+    cited_person    TEXT DEFAULT NULL,
     position        INTEGER,                     -- 1=first third, 2=middle, 3=last third
     attribution     TEXT DEFAULT 'none',         -- linked, named, paraphrased, none
     source_count    INTEGER DEFAULT 0,

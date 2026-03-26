@@ -31,6 +31,7 @@ from src.config import (
     CACHE_DIR, VERTICALS, get_cohort, get_queries,
     AMBIGUOUS_ENTITIES, CANONICAL_NAMES,
 )
+from src.finops.tracker import get_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -188,7 +189,7 @@ class LLMClient:
                 sources=cached.get("sources", []),
                 cited_entities=cached.get("cited", []),
                 timestamp=cached.get("_cached_at", ""),
-                latency_ms=0, from_cache=True,
+                latency_ms=None, from_cache=True,
             )
 
         # 2. Per-provider rate limiting (prevents Gemini 429)
@@ -205,7 +206,23 @@ class LLMClient:
             try:
                 response = self._dispatch(llm, prompt, start)
                 if response:
-                    # 3. Cache the response (vertical-aware key)
+                    # 3a. Record cost in FinOps tracker (all providers)
+                    try:
+                        tracker = get_tracker()
+                        usage_record = tracker.record(
+                            platform=llm.provider,
+                            model=llm.model,
+                            operation="llm_query",
+                            input_tokens=response.input_tokens,
+                            output_tokens=response.output_tokens,
+                            query=prompt[:200],
+                            run_id=self._run_id,
+                            raw_response=response.raw,
+                        )
+                        response.cost_usd = usage_record.cost_usd
+                    except Exception as e:
+                        logger.warning(f"[finops] Failed to record cost for {llm.provider}: {e}")
+                    # 3b. Cache the response (vertical-aware key)
                     self._cache.put(llm.provider, llm.model, prompt, {
                         "text": response.response_text,
                         "sources": response.sources,

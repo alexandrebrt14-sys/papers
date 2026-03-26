@@ -81,6 +81,9 @@ class CitationTracker(BaseCollector):
         cited_count = sum(1 for v in cohort_cited.values() if v)
         cited = cited_count > 0
 
+        # List of all cited entities for this query
+        cited_entities_list = [e for e, v in cohort_cited.items() if v]
+
         # Position of first cohort entity in cited_entities order
         position = None
         if cited:
@@ -97,6 +100,8 @@ class CitationTracker(BaseCollector):
             "cited": cited,
             "cited_count": cited_count,
             "cohort_cited": cohort_cited,
+            "cited_entity": cited_entities_list[0] if cited_entities_list else None,
+            "cited_entities_json": cited_entities_list,
             "position": position,
             "source_count": len(response.sources),
             "response_length": len(response.response_text),

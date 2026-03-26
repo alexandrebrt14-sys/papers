@@ -1,0 +1,293 @@
+{
+  "total_queries": 397,
+  "total_cited": 165,
+  "citation_rate": 41.6,
+  "entities_monitored": 69,
+  "entities_real": 61,
+  "entities_fictitious": 8,
+  "context_analyses": 172,
+  "collection_rounds": 2,
+  "by_model": [
+    {
+      "model": "sonar",
+      "n": 113,
+      "cited": 61,
+      "rate": 54.0
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "n": 118,
+      "cited": 57,
+      "rate": 48.3
+    },
+    {
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 136,
+      "cited": 43,
+      "rate": 31.6
+    },
+    {
+      "model": "gemini-2.5-flash",
+      "n": 30,
+      "cited": 4,
+      "rate": 13.3
+    }
+  ],
+  "by_vertical": [
+    {
+      "vertical": "fintech",
+      "n": 169,
+      "cited": 79,
+      "rate": 46.7
+    },
+    {
+      "vertical": "saude",
+      "n": 102,
+      "cited": 38,
+      "rate": 37.3
+    },
+    {
+      "vertical": "tecnologia",
+      "n": 63,
+      "cited": 24,
+      "rate": 38.1
+    },
+    {
+      "vertical": "varejo",
+      "n": 63,
+      "cited": 24,
+      "rate": 38.1
+    }
+  ],
+  "cross": [
+    {
+      "vertical": "fintech",
+      "model": "sonar",
+      "n": 50,
+      "cited": 30,
+      "rate": 60.0
+    },
+    {
+      "vertical": "fintech",
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 58,
+      "cited": 26,
+      "rate": 44.8
+    },
+    {
+      "vertical": "fintech",
+      "model": "claude-haiku-4-5-20251001",
+      "n": 40,
+      "cited": 19,
+      "rate": 47.5
+    },
+    {
+      "vertical": "fintech",
+      "model": "gemini-2.5-flash",
+      "n": 21,
+      "cited": 4,
+      "rate": 19.0
+    },
+    {
+      "vertical": "saude",
+      "model": "claude-haiku-4-5-20251001",
+      "n": 38,
+      "cited": 18,
+      "rate": 47.4
+    },
+    {
+      "vertical": "saude",
+      "model": "sonar",
+      "n": 23,
+      "cited": 11,
+      "rate": 47.8
+    },
+    {
+      "vertical": "saude",
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 38,
+      "cited": 9,
+      "rate": 23.7
+    },
+    {
+      "vertical": "saude",
+      "model": "gemini-2.5-flash",
+      "n": 3,
+      "cited": 0,
+      "rate": 0.0
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "sonar",
+      "n": 20,
+      "cited": 10,
+      "rate": 50.0
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "claude-haiku-4-5-20251001",
+      "n": 20,
+      "cited": 10,
+      "rate": 50.0
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 20,
+      "cited": 4,
+      "rate": 20.0
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "gemini-2.5-flash",
+      "n": 3,
+      "cited": 0,
+      "rate": 0.0
+    },
+    {
+      "vertical": "varejo",
+      "model": "sonar",
+      "n": 20,
+      "cited": 10,
+      "rate": 50.0
+    },
+    {
+      "vertical": "varejo",
+      "model": "claude-haiku-4-5-20251001",
+      "n": 20,
+      "cited": 10,
+      "rate": 50.0
+    },
+    {
+      "vertical": "varejo",
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 20,
+      "cited": 4,
+      "rate": 20.0
+    },
+    {
+      "vertical": "varejo",
+      "model": "gemini-2.5-flash",
+      "n": 3,
+      "cited": 0,
+      "rate": 0.0
+    }
+  ],
+  "top_entities": [
+    {
+      "entity": "Nubank",
+      "count": 44
+    },
+    {
+      "entity": "Banco Inter",
+      "count": 21
+    },
+    {
+      "entity": "C6 Bank",
+      "count": 20
+    },
+    {
+      "entity": "Itaú",
+      "count": 17
+    },
+    {
+      "entity": "PagBank",
+      "count": 16
+    },
+    {
+      "entity": "Bradesco",
+      "count": 14
+    },
+    {
+      "entity": "Stone",
+      "count": 14
+    },
+    {
+      "entity": "Cielo",
+      "count": 11
+    },
+    {
+      "entity": "PicPay",
+      "count": 5
+    },
+    {
+      "entity": "Mercado Pago",
+      "count": 3
+    },
+    {
+      "entity": "Neon",
+      "count": 3
+    },
+    {
+      "entity": "BTG Pactual",
+      "count": 2
+    },
+    {
+      "entity": "Wise",
+      "count": 2
+    }
+  ],
+  "sentiment": {
+    "negative": 2,
+    "neutral": 114,
+    "positive": 56
+  },
+  "latency": {
+    "avg": 3226,
+    "min": 605,
+    "max": 16483,
+    "measured": 181,
+    "cached": 216
+  },
+  "latency_by_model": [
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "avg_ms": 1544,
+      "n": 50
+    },
+    {
+      "model": "gpt-4o-mini-2024-07-18",
+      "avg_ms": 3514,
+      "n": 68
+    },
+    {
+      "model": "sonar",
+      "avg_ms": 3712,
+      "n": 45
+    },
+    {
+      "model": "gemini-2.5-flash",
+      "avg_ms": 5593,
+      "n": 18
+    }
+  ],
+  "finops_total": 0.0002625,
+  "finops_by_platform": [
+    {
+      "platform": "openai",
+      "cost": 0.000262
+    }
+  ],
+  "response_length": {
+    "avg": 381.6,
+    "min": 7,
+    "max": 1975
+  },
+  "warnings": [
+    {
+      "vertical": "saude",
+      "model": "gemini-2.5-flash",
+      "n": 3
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "gemini-2.5-flash",
+      "n": 3
+    },
+    {
+      "vertical": "varejo",
+      "model": "gemini-2.5-flash",
+      "n": 3
+    }
+  ]
+}

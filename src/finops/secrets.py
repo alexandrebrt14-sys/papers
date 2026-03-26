@@ -163,16 +163,22 @@ def scan_git_for_leaks(repo_path: str | Path | None = None) -> list[dict[str, An
     except Exception as e:
         logger.warning(f"Git scan failed: {e}")
 
-    # Scan recent commits (last 10)
+    # Scan recent commits for sensitive files added to Git
     try:
+        # Use --name-only --diff-filter=A to list only added file paths
         log = subprocess.run(
             ["git", "log", "--oneline", "-10", "--diff-filter=A", "--name-only"],
             capture_output=True, text=True, cwd=str(repo_path),
         ).stdout
-        # Check if any .env or credential file was ever committed
         sensitive_patterns = [".env", "credentials", "secret", "apikey", "api_key"]
         for line in log.split("\n"):
             line = line.strip()
+            if not line:
+                continue
+            # Skip commit message lines (format: "hash message...")
+            # File paths never start with a hex hash followed by space
+            if re.match(r"^[0-9a-f]{7,} ", line):
+                continue
             if any(p in line.lower() for p in sensitive_patterns) and not line.startswith(("!", "#")):
                 leaks.append({
                     "file": line,
