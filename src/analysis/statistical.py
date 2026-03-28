@@ -239,7 +239,7 @@ class StatisticalAnalyzer:
             interpretation=(
                 f"Comparação entre {len(data)} grupos ({', '.join(group_names)}). "
                 f"{'Diferença significativa' if p < 0.05 else 'Sem diferença significativa'} "
-                f"({test_used}: stat={stat:.2f}, p={p:.4f}, η²={eta_sq:.3f})."
+                f"({test_used}: stat={stat:.2f}, p={p:.4f}, eta2={eta_sq:.3f})."
             ),
         )
 

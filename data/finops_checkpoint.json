@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-03-24T17:25:06.371510+00:00",
+  "generated_at": "2026-03-26T20:01:21.002957+00:00",
   "budgets": [
     {
       "platform": "openai",
       "monthly_spend": 0.0003,
       "monthly_limit": 10.0,
       "monthly_pct": 0.0,
-      "daily_spend": 0.0003,
+      "daily_spend": 0,
       "daily_limit": 1.0,
       "daily_pct": 0.0,
       "is_blocked": false,
-      "queries_today": 1,
-      "tokens_today": 550
+      "queries_today": 0,
+      "tokens_today": 0
     },
     {
       "platform": "anthropic",
@@ -72,8 +72,8 @@
     "platforms": {
       "openai": {
         "last_activity": "2026-03-24T12:41:37.616964+00:00",
-        "hours_ago": 4.7,
-        "stale": false
+        "hours_ago": 55.3,
+        "stale": true
       },
       "anthropic": {
         "last_activity": null,
