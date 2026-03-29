@@ -67,22 +67,27 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
-      # Step 2: Run collectors for this vertical
+      # Step 2: Validate Python imports before collection (fail-fast on SyntaxError)
+      - name: Validate Python imports
+        if: steps.check.outputs.skip != 'true'
+        run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
+
+      # Step 3: Run collectors for this vertical
       - name: Run Citation Tracker (Module 1) — ${{ matrix.vertical }}
         if: steps.check.outputs.skip != 'true'
-        run: python -m src.cli --vertical ${{ matrix.vertical }} collect citation || true
+        run: python -m src.cli --vertical ${{ matrix.vertical }} collect citation
 
       - name: Run Competitor Benchmark (Module 2) — ${{ matrix.vertical }}
         if: steps.check.outputs.skip != 'true'
         run: python -m src.cli --vertical ${{ matrix.vertical }} collect competitor || true
 
-      # Step 3: Export data for this vertical
+      # Step 4: Export data for this vertical
       - name: Export CSV snapshots — ${{ matrix.vertical }}
         if: steps.check.outputs.skip != 'true'
         run: python -m src.cli --vertical ${{ matrix.vertical }} db export --format csv --output data/daily
         continue-on-error: true
 
-      # Step 4: Upload DB artifact (overwrite papers-db-latest so next vertical inherits all data)
+      # Step 5: Upload DB artifact (overwrite papers-db-latest so next vertical inherits all data)
       - name: Upload database (latest — chains across verticals)
         if: steps.check.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
@@ -119,7 +124,8 @@ jobs:
 
       # FinOps monitor (rollup + budget check + exports + dashboard)
       - name: FinOps monitor cycle
-        run: python -m src.cli finops monitor || true
+        run: python -m src.cli finops monitor
+        continue-on-error: true
         env:
           PAPERS_DB_PATH: data/papers.db
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

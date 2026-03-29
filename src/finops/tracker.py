@@ -7,6 +7,7 @@ anomaly detection, and multi-level alerting.
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
 import sqlite3
@@ -610,7 +611,7 @@ class FinOpsTracker:
                 conn.execute(
                     "INSERT OR REPLACE INTO finops_daily_rollup (date, platform, total_queries, total_input_tokens, total_output_tokens, total_cost_usd, avg_cost_per_query, max_single_query_cost, models_used) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (today, platform, row[0], row[1] or 0, row[2] or 0, round(row[3] or 0, 6), round(row[4] or 0, 8), round(row[5] or 0, 6), f'["{(row[6] or "").replace(",", '","')}"]'),
+                    (today, platform, row[0], row[1] or 0, row[2] or 0, round(row[3] or 0, 6), round(row[4] or 0, 8), round(row[5] or 0, 6), json.dumps((row[6] or "").split(","))),
                 )
 
     def set_budget(self, platform: str, monthly: float | None = None, daily: float | None = None) -> None:

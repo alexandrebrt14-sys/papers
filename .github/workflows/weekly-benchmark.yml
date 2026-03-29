@@ -45,6 +45,9 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
+      - name: Validate Python imports
+        run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
+
       - name: Run SERP vs AI Overlap (Module 3) — all verticals
         run: |
           for v in fintech varejo saude tecnologia; do
@@ -54,7 +57,7 @@ jobs:
       - name: Run full collection — all verticals
         run: |
           for v in fintech varejo saude tecnologia; do
-            python -m src.cli --vertical $v collect all || true
+            python -m src.cli --vertical $v collect all
           done
 
       - name: Generate statistical report

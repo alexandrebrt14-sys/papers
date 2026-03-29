@@ -42,6 +42,9 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
+      - name: Validate Python imports
+        run: python -c "from src.finops.tracker import get_tracker; from src.finops.monitor import run_monitor; print('Import chain OK')"
+
       # Full FinOps monitor: rollup, budget checks, anomaly detection,
       # stale data detection, pricing validation, exports, dashboard
       - name: Run FinOps monitor
