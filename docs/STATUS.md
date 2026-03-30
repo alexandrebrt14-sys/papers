@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-29 17:07 UTC
-**Branch:** main | **Commits:** 56
-**Último commit:** fab39dd8754583d582f752b36ab0bfa5af6d8eb1 docs: add incident report for 4-day pip
+**Gerado automaticamente em:** 2026-03-30 10:19 UTC
+**Branch:** main | **Commits:** 1
+**Último commit:** b761fec79d593ff7e8d88572ec98c48f81155319 finops: monitor checkpoint 2026-03-30T0
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 9,432 | OK |
+| Código (linhas Python) | 8,564 | OK |
 | Testes unitários | 19 | OK |
-| Tabelas no banco | 21 | OK |
-| Citações coletadas | 653 | Coletando |
-| Taxa de citação | 49.8% | — |
-| Última coleta | 2026-03-29T17:06 | Ativo |
+| Tabelas no banco | 20 | OK |
+| Citações coletadas | 186 | Coletando |
+| Taxa de citação | 20.4% | — |
+| Última coleta | 2026-03-24T16:17 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0186 |
-| Anthropic | $0.1074 |
+| OpenAI | $0.0000 |
+| Anthropic | $0.0000 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0130 |
-| **Total** | **$0.1390** |
+| Perplexity | $0.0000 |
+| **Total** | **$0.0000** |
 
 ## Próximas Ações
 
@@ -37,9 +37,9 @@
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 653/1.000 |
+| Dados mínimos | 1.000 citações | 186/1.000 |
 | Série temporal | 90 dias contínuos | Em progresso |
-| Grupo de controle | 15 concorrentes | 0 observações |
+| Grupo de controle | 15 concorrentes | 1,722 observações |
 | Análise estatística | p < 0.05 | Disponível |
 | Preprint | ArXiv submission | Pendente |
 
