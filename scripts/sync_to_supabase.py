@@ -271,33 +271,64 @@ def _kpis(conn: sqlite3.Connection, vertical: str) -> dict:
 
 
 def _finops_data(conn: sqlite3.Connection) -> dict:
-    """Resumo FinOps: orçamento mensal, gasto e breakdown por plataforma."""
-    rows = _query(conn, """
-        SELECT platform, monthly_spend, monthly_limit, daily_spend, daily_limit,
-               queries_today, tokens_today
-        FROM finops_usage
+    """Resumo FinOps: orçamento mensal, gasto e breakdown por plataforma.
+
+    Agrega dados de finops_usage (log de transações) + finops_budgets (limites).
+    A tabela finops_usage não possui colunas agregadas — os valores mensais e
+    diários são calculados aqui via SUM(cost_usd) agrupado por período.
+    """
+    # Busca todos os budgets configurados (exclui 'global' que é budget consolidado)
+    budget_rows = _query(conn, """
+        SELECT platform, monthly_limit_usd, daily_limit_usd
+        FROM finops_budgets
+        WHERE platform != 'global'
+        ORDER BY platform
     """)
 
-    if not rows:
+    if not budget_rows:
         return {"budget_monthly": 0, "spent_monthly": 0, "pct_used": 0, "by_platform": {}}
 
-    total_budget = sum(r.get("monthly_limit") or 0 for r in rows)
-    total_spent = sum(r.get("monthly_spend") or 0 for r in rows)
+    # Calcula monthly_spend por plataforma (mês corrente)
+    monthly_spend_rows = _query(conn, """
+        SELECT platform,
+               COALESCE(SUM(cost_usd), 0.0) AS monthly_spend
+        FROM finops_usage
+        WHERE timestamp >= strftime('%Y-%m-01T00:00:00Z', 'now')
+        GROUP BY platform
+    """)
+    monthly_by_platform = {r["platform"]: r["monthly_spend"] for r in monthly_spend_rows}
+
+    # Calcula daily_spend e queries/tokens do dia por plataforma
+    daily_rows = _query(conn, """
+        SELECT platform,
+               COALESCE(SUM(cost_usd), 0.0)      AS daily_spend,
+               COUNT(*)                            AS queries_today,
+               COALESCE(SUM(total_tokens), 0)     AS tokens_today
+        FROM finops_usage
+        WHERE timestamp >= strftime('%Y-%m-%dT00:00:00Z', 'now')
+        GROUP BY platform
+    """)
+    daily_by_platform = {r["platform"]: r for r in daily_rows}
+
+    total_budget = sum(r["monthly_limit_usd"] or 0 for r in budget_rows)
+    total_spent = sum(monthly_by_platform.get(r["platform"], 0.0) for r in budget_rows)
 
     by_platform: dict = {}
-    for r in rows:
-        by_platform[r["platform"]] = {
-            "monthly_spend": r.get("monthly_spend") or 0,
-            "monthly_limit": r.get("monthly_limit") or 0,
-            "daily_spend": r.get("daily_spend") or 0,
-            "daily_limit": r.get("daily_limit") or 0,
-            "queries_today": r.get("queries_today") or 0,
-            "tokens_today": r.get("tokens_today") or 0,
+    for r in budget_rows:
+        p = r["platform"]
+        daily = daily_by_platform.get(p, {})
+        by_platform[p] = {
+            "monthly_spend": round(monthly_by_platform.get(p, 0.0), 6),
+            "monthly_limit": r["monthly_limit_usd"] or 0,
+            "daily_spend": round(daily.get("daily_spend", 0.0), 6),
+            "daily_limit": r["daily_limit_usd"] or 0,
+            "queries_today": daily.get("queries_today", 0),
+            "tokens_today": daily.get("tokens_today", 0),
         }
 
     return {
         "budget_monthly": round(total_budget, 2),
-        "spent_monthly": round(total_spent, 4),
+        "spent_monthly": round(total_spent, 6),
         "pct_used": round(total_spent / max(total_budget, 0.001) * 100, 1),
         "by_platform": by_platform,
     }
