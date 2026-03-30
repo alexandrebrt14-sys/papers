@@ -131,12 +131,13 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 
-      # Sync aggregated data to Supabase for the Next.js dashboard
+      # Sincroniza dados agregados com o Supabase para o dashboard Next.js
+      # Skip automático se as secrets não estiverem configuradas (exit code 2)
       - name: Sync to Supabase
-        if: env.SUPABASE_URL != ''
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PAPERS_DB_PATH: data/papers.db
         run: python scripts/sync_to_supabase.py
 
       # Update documentation with fresh data

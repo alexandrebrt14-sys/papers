@@ -33,6 +33,9 @@ SECRET_NAMES = [
     "GOOGLE_AI_API_KEY",
     "PERPLEXITY_API_KEY",
     "SERPAPI_KEY",
+    # Persistência Supabase — necessário para sync do dashboard
+    "SUPABASE_URL",
+    "SUPABASE_KEY",
 ]
 
 

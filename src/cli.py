@@ -605,6 +605,56 @@ def finops_dashboard_cmd() -> None:
 
 
 # ============================================================
+# Sync Supabase
+# ============================================================
+
+@main.command("sync")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Agrega e exibe dados sem enviar ao Supabase.",
+)
+@click.option(
+    "--db",
+    "db_path",
+    default=None,
+    metavar="PATH",
+    help="Caminho para o banco SQLite (padrão: PAPERS_DB_PATH ou data/papers.db).",
+)
+@click.option(
+    "--quiet", "-q",
+    is_flag=True,
+    help="Suprime output informativo (apenas erros).",
+)
+@click.pass_context
+def sync_cmd(ctx: click.Context, dry_run: bool, db_path: str | None, quiet: bool) -> None:
+    """Sincroniza dados agregados do SQLite para o Supabase.
+
+    Faz upsert das tabelas papers_dashboard_data e papers_finops
+    com dados agregados dos últimos 30/90 dias por vertical.
+
+    Exemplo:
+        python -m src.cli sync --dry-run
+        python -m src.cli --vertical fintech sync
+    """
+    from scripts.sync_to_supabase import run_sync
+
+    vertical = ctx.obj.get("vertical", "fintech") if ctx.obj else "fintech"
+    verticals_to_sync = list_verticals() if vertical == "all" else [vertical]
+
+    exit_code = run_sync(
+        db_path=db_path,
+        verticals=verticals_to_sync,
+        dry_run=dry_run,
+        verbose=not quiet,
+    )
+
+    if exit_code == 1:
+        raise SystemExit(1)
+    # exit_code == 2 significa credenciais ausentes (skip silencioso no CI)
+
+
+# ============================================================
 # API Server
 # ============================================================
 
