@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-03-30 10:19 UTC
+**Gerado automaticamente em:** 2026-03-31 10:08 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** b761fec79d593ff7e8d88572ec98c48f81155319 finops: monitor checkpoint 2026-03-30T0
+**Último commit:** 7018461b733b0f825556a44e2d2f272425b767d8 finops: monitor checkpoint 2026-03-31T0
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 8,564 | OK |
+| Código (linhas Python) | 8,820 | OK |
 | Testes unitários | 19 | OK |
 | Tabelas no banco | 20 | OK |
 | Citações coletadas | 186 | Coletando |
