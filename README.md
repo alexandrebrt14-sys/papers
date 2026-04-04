@@ -19,8 +19,11 @@ Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation 
 | LLM Models | 4 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Flash, Perplexity Sonar) |
 | Queries per vertical | 12 specific + 6 cross-vertical = 18 |
 | Daily observations | ~288 (18 queries x 4 models x 4 verticals) |
+| Observations collected | 653 citations, 172 contexts, 11 runs |
+| Code | 7,010 lines Python, 35 files, 91 commits |
+| Schema | 21 tables (citations, contexts, finops, interventions, snapshots, model_versions) |
 | Collection | Automated daily (GitHub Actions, 06:00 UTC) |
-| Persistence | SQLite (local) + Supabase (production) |
+| Persistence | SQLite WAL (canonical ledger) + Supabase (read projection) |
 | Publication target | 3 papers (ArXiv, SIGIR/WWW, Information Sciences Q1) |
 
 ---
