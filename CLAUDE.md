@@ -109,6 +109,9 @@ python -m src.cli db health                                  # Saúde do banco p
 - `SUPABASE_KEY` — Persistência
 - `PAPERS_DB_PATH` — Fallback SQLite local (default: data/papers.db)
 
+## Sem Emojis
+Proibido emojis em qualquer conteúdo ou documentação.
+
 ## Convenções de código
 - Type hints em todas as funções públicas
 - Docstrings em inglês (padrão acadêmico)
