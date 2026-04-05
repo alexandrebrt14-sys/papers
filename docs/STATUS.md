@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-04-05 09:41 UTC
+**Gerado automaticamente em:** 2026-04-05 11:26 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 42c2def74159add3fb16ae4f509a5cf10b5cd4ed finops: monitor checkpoint 2026-04-05T0
+**Último commit:** 139890151b1fbfa2092ab5d59cf1200d274a9157 data: daily collection 4 verticals 2026
 
 ---
 
@@ -12,10 +12,10 @@
 |-----------|-------|--------|
 | Código (linhas Python) | 8,820 | OK |
 | Testes unitários | 19 | OK |
-| Tabelas no banco | 20 | OK |
-| Citações coletadas | 186 | Coletando |
-| Taxa de citação | 20.4% | — |
-| Última coleta | 2026-03-24T16:17 | Ativo |
+| Tabelas no banco | 21 | OK |
+| Citações coletadas | 0 | Aguardando API keys |
+| Taxa de citação | 0.0% | — |
+| Última coleta | — | Pendente |
 
 ## FinOps — Gastos do Mês
 
@@ -29,18 +29,18 @@
 
 ## Próximas Ações
 
-- Coleta ativa — acumular dados
-- Continuar coleta diária (objetivo: 90+ dias)
-- CI/CD configurado
+- Adicionar créditos às APIs (OpenAI, Anthropic, Gemini)
+- Primeira coleta pendente
+- Configurar GitHub Secrets para CI/CD
 
 ## Roadmap para Publicação
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 186/1.000 |
-| Série temporal | 90 dias contínuos | Em progresso |
-| Grupo de controle | 15 concorrentes | 1,722 observações |
-| Análise estatística | p < 0.05 | Disponível |
+| Dados mínimos | 1.000 citações | 0/1.000 |
+| Série temporal | 90 dias contínuos | Pendente |
+| Grupo de controle | 15 concorrentes | 0 observações |
+| Análise estatística | p < 0.05 | Pendente |
 | Preprint | ArXiv submission | Pendente |
 
 ---
