@@ -148,9 +148,17 @@ def collect_all(ctx: click.Context) -> None:
 @collect.command("citation")
 @click.pass_context
 def collect_citation(ctx: click.Context) -> None:
-    """Rodar apenas o Citation Tracker (Módulo 1)."""
+    """Rodar apenas o Citation Tracker (Módulo 1).
+
+    Fail-loud: se ZERO citacoes forem coletadas em todas as verticais,
+    o comando sai com exit code 1 para que o GitHub Actions falhe.
+    Isso previne o bug silencioso onde keys 401 fazem o run aparecer
+    como "success" sem dados gravados (incidente 2026-04-07).
+    """
     db = get_db()
     verticals = resolve_verticals(ctx)
+    total_collected = 0
+    total_attempted = 0
 
     for vert in verticals:
         console.print(f"\n[bold magenta]Vertical: {vert}[/bold magenta]")
@@ -163,12 +171,26 @@ def collect_citation(ctx: click.Context) -> None:
             duration = int((time.time() - start) * 1000)
             db.insert_collection_run("citation_tracker", count, duration, vertical=vert)
             console.print(f"[green]{count} citações coletadas ({duration}ms)[/green]")
+        else:
+            console.print(f"[yellow]Nenhuma resposta valida para {vert}[/yellow]")
+        total_collected += count
+        # Tentamos ao menos a vertical (mesmo que retornem 0)
+        total_attempted += 1
         collector.close()
 
     db.close()
     # Auto FinOps
     from src.finops.hooks import post_collection_hook
     post_collection_hook("citation_tracker", 0, 0)
+
+    # FAIL-LOUD: se nenhuma vertical retornou dados, falha o comando
+    if total_attempted > 0 and total_collected == 0:
+        console.print(
+            f"\n[bold red]FAIL-LOUD: 0 citacoes em {total_attempted} verticais. "
+            f"Provavel causa: API keys invalidas/expiradas no GitHub Secrets, "
+            f"rate limiting, ou erro de configuracao. Verifique os logs acima.[/bold red]"
+        )
+        raise SystemExit(1)
 
 
 @collect.command("competitor")

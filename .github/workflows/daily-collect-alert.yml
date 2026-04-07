@@ -1,0 +1,79 @@
+name: Alert on daily-collect failure
+
+on:
+  workflow_run:
+    workflows: ["Daily Data Collection + FinOps"]
+    types:
+      - completed
+
+jobs:
+  alert:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send WhatsApp + email alert
+        env:
+          WHATSAPP_API_TOKEN: ${{ secrets.WHATSAPP_API_TOKEN }}
+          WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          python -c "
+          import os, json, urllib.request
+
+          run_url = os.environ.get('RUN_URL', '?')
+          run_id = os.environ.get('RUN_ID', '?')
+          msg = (
+              'ALERTA papers daily-collect FALHOU\n\n'
+              f'Run: {run_id}\n'
+              f'URL: {run_url}\n\n'
+              'Acao: verificar GitHub Secrets (API keys) e logs.\n'
+              'Se 401: rotacionar OPENAI_API_KEY, ANTHROPIC_API_KEY, '
+              'GOOGLE_AI_API_KEY, PERPLEXITY_API_KEY, GROQ_API_KEY '
+              'no repo papers via:\n'
+              'gh secret set <NAME> --repo alexandrebrt14-sys/papers --body <value>'
+          )
+
+          # WhatsApp
+          token = os.environ.get('WHATSAPP_API_TOKEN', '')
+          phone_id = os.environ.get('WHATSAPP_PHONE_ID', '')
+          if token and phone_id:
+              try:
+                  payload = {
+                      'messaging_product': 'whatsapp',
+                      'to': '5562998141505',
+                      'type': 'text',
+                      'text': {'body': msg[:4000]},
+                  }
+                  req = urllib.request.Request(
+                      f'https://graph.facebook.com/v18.0/{phone_id}/messages',
+                      data=json.dumps(payload).encode(),
+                      headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'},
+                  )
+                  urllib.request.urlopen(req, timeout=15)
+                  print('WhatsApp alert enviado')
+              except Exception as e:
+                  print(f'WhatsApp falhou: {e}')
+
+          # Email via Resend
+          rk = os.environ.get('RESEND_API_KEY', '')
+          if rk:
+              try:
+                  body = {
+                      'from': 'alerts@brasilgeo.ai',
+                      'to': ['caramaschiai@caramaschiai.io'],
+                      'subject': f'[papers] daily-collect FAILED - run {run_id}',
+                      'html': f'<h2>papers daily-collect FAILED</h2><p>{msg}</p><p><a href={run_url!r}>{run_url}</a></p>',
+                  }
+                  req = urllib.request.Request(
+                      'https://api.resend.com/emails',
+                      data=json.dumps(body).encode(),
+                      headers={'Authorization': f'Bearer {rk}', 'Content-Type': 'application/json'},
+                  )
+                  urllib.request.urlopen(req, timeout=15)
+                  print('Email alert enviado')
+              except Exception as e:
+                  print(f'Email falhou: {e}')
+          "

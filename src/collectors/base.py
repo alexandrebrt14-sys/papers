@@ -353,13 +353,19 @@ class LLMClient:
         else:
             prompt_text = prompt
 
+        # Gemini 2.5 Pro usa thinking mode (gasta tokens internos antes de gerar output).
+        # Se max_output_tokens for igual ao texto desejado, o thinking esgota os tokens
+        # e candidates[0].content vem sem 'parts'. Solucao: 4x para modelos *-pro.
+        is_pro = "pro" in llm.model.lower()
+        max_tokens = llm.max_output_tokens * 4 if is_pro else llm.max_output_tokens
+
         body: dict[str, Any] = {
             "contents": [
                 {"role": "user", "parts": [{"text": prompt_text}]}
             ],
             "generationConfig": {
                 "temperature": 0.0,
-                "maxOutputTokens": llm.max_output_tokens,
+                "maxOutputTokens": max_tokens,
             },
         }
         if self._json_mode and llm.supports_json_mode:
@@ -372,7 +378,20 @@ class LLMClient:
         )
         resp.raise_for_status()
         data = resp.json()
-        text = data["candidates"][0]["content"]["parts"][0]["text"]
+
+        # Gemini 2.5 Pro pode retornar candidates[0].content sem 'parts' quando o
+        # thinking budget esgota os tokens antes do output. Tratar como resposta vazia
+        # ao inves de KeyError (que parecia 'erro silencioso' nos logs).
+        candidates = data.get("candidates") or []
+        if not candidates:
+            text = ""
+        else:
+            content = candidates[0].get("content") or {}
+            parts = content.get("parts") or []
+            # filtra parts que sao thinking (sem 'text')
+            text_parts = [p.get("text", "") for p in parts if "text" in p]
+            text = "".join(text_parts)
+
         usage = data.get("usageMetadata", {})
 
         if self._json_mode:
