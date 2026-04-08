@@ -1,14 +1,16 @@
 """Module 6: Statistical Analysis Module.
 
-Significance tests, correlation, regression, and publishable visualizations
-for GEO research data.
+Significance tests, correlation, regression, bootstrap, bayesian intervals,
+inter-rater reliability and publishable visualizations for GEO research data.
+
+Reference: docs/METHODOLOGY.md (sections 5, 6 and 10).
 """
 
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, Sequence
 
 import numpy as np
 import pandas as pd
@@ -26,6 +28,29 @@ class SignificanceResult:
     significant: bool  # p < 0.05
     effect_size: float | None = None
     interpretation: str = ""
+
+
+@dataclass
+class IntervalResult:
+    """Result of an interval estimation (bootstrap or bayesian credible interval)."""
+    method: str               # "bootstrap_bca", "beta_binomial", ...
+    point_estimate: float
+    ci_lower: float
+    ci_upper: float
+    confidence: float         # e.g. 0.95
+    n: int
+    extras: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class AgreementResult:
+    """Inter-rater reliability result (Cohen / Fleiss kappa)."""
+    method: str               # "cohen_kappa", "fleiss_kappa"
+    kappa: float
+    n_raters: int
+    n_subjects: int
+    interpretation: str       # Landis-Koch label
+    extras: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -59,34 +84,57 @@ class StatisticalAnalyzer:
         self, group_a: list[bool], group_b: list[bool],
         label_a: str = "experimental", label_b: str = "control",
     ) -> SignificanceResult:
-        """Chi-squared test comparing citation rates between two groups.
+        """Chi-squared (or Fisher exact) test comparing two citation rates.
 
         Use case: is the citation rate significantly different between
         our optimized content and non-optimized content?
+
+        Pressuposto do qui-quadrado: todas as frequencias esperadas E_ij >= 5.
+        Quando esse pressuposto e violado, a aproximacao chi2 fica invalida e o
+        teste cai automaticamente para o teste exato de Fisher (scipy.stats.fisher_exact),
+        que enumera a distribuicao hipergeometrica e nao depende de aproximacoes
+        assintoticas.
         """
         table = np.array([
             [sum(group_a), len(group_a) - sum(group_a)],
             [sum(group_b), len(group_b) - sum(group_b)],
         ])
-        chi2, p, dof, expected = stats.chi2_contingency(table)
 
-        # Effect size (Cramér's V)
+        # Pre-checagem: expected counts via marginais
+        chi2, p, dof, expected = stats.chi2_contingency(table)
+        min_expected = float(np.min(expected))
+
+        used_test = "chi-squared"
+        if min_expected < 5.0:
+            # Fallback Fisher exact: valido para qualquer N, sem pressuposto assintotico.
+            try:
+                _, p_fisher = stats.fisher_exact(table, alternative="two-sided")
+                p = p_fisher
+                used_test = f"fisher-exact (E_min={min_expected:.2f} < 5)"
+                logger.info(
+                    "Chi-squared assumption violated (min_expected=%.2f<5), "
+                    "fell back to Fisher exact test.", min_expected,
+                )
+            except Exception as exc:
+                logger.warning("Fisher exact fallback failed: %s", exc)
+
+        # Effect size (Cramér's V) — vale para ambos os testes em 2x2
         n = table.sum()
-        v = np.sqrt(chi2 / (n * (min(table.shape) - 1)))
+        v = float(np.sqrt(chi2 / (n * (min(table.shape) - 1))))
 
         rate_a = sum(group_a) / max(len(group_a), 1)
         rate_b = sum(group_b) / max(len(group_b), 1)
 
         return SignificanceResult(
-            test_name="chi-squared",
-            statistic=round(chi2, 4),
-            p_value=round(p, 6),
+            test_name=used_test,
+            statistic=round(float(chi2), 4),
+            p_value=round(float(p), 6),
             significant=p < 0.05,
             effect_size=round(v, 4),
             interpretation=(
                 f"Taxa de citação {label_a}: {rate_a:.1%} vs {label_b}: {rate_b:.1%}. "
                 f"{'Diferença significativa' if p < 0.05 else 'Sem diferença significativa'} "
-                f"(χ²={chi2:.2f}, p={p:.4f}, V de Cramér={v:.3f})."
+                f"({used_test}: χ²={chi2:.2f}, p={p:.4f}, V de Cramér={v:.3f})."
             ),
         )
 
@@ -304,6 +352,381 @@ class StatisticalAnalyzer:
             }
         return results  # type: ignore[return-value]
 
+    # ------------------------------------------------------------------
+    # Interval estimation
+    # ------------------------------------------------------------------
+
+    def bootstrap_ci_bca(
+        self,
+        sample: Sequence[float],
+        statistic: str | callable = "mean",
+        n_resamples: int = 10_000,
+        confidence: float = 0.95,
+        seed: int | None = 42,
+    ) -> IntervalResult:
+        """Bias-Corrected and accelerated (BCa) bootstrap CI (Efron, 1987).
+
+        BCa corrige duas patologias do percentile bootstrap:
+          1. vies (bias correction term z0): a mediana da distribuicao bootstrap
+             pode nao coincidir com o ponto observado;
+          2. assimetria (acceleration term a): variabilidade da estatistica varia
+             ao longo da distribuicao subjacente, estimada via jackknife.
+
+        Formulacao:
+            z0 = Phi^-1( P(theta_b < theta_obs) )
+            a  = sum( (theta_bar - theta_(i))^3 ) / ( 6 * (sum(...^2))^(3/2) )
+            alpha1 = Phi( z0 + (z0 + z_{a/2}) / (1 - a*(z0 + z_{a/2})) )
+            alpha2 = Phi( z0 + (z0 + z_{1-a/2}) / (1 - a*(z0 + z_{1-a/2})) )
+            CI = [F^-1_boot(alpha1), F^-1_boot(alpha2)]
+
+        Args:
+            sample: amostra unidimensional.
+            statistic: "mean", "median", "proportion" ou callable arbitraria.
+            n_resamples: B (default 10_000 para 95% CI estavel).
+            confidence: nivel de confianca (default 0.95).
+            seed: para reprodutibilidade.
+
+        Returns:
+            IntervalResult com extras["bias_z0"] e extras["acceleration"].
+        """
+        arr = np.asarray(list(sample), dtype=float)
+        n = arr.size
+        if n < 2:
+            raise ValueError("BCa exige n >= 2")
+
+        if isinstance(statistic, str):
+            stat_funcs = {
+                "mean": np.mean,
+                "median": np.median,
+                "proportion": np.mean,  # binario {0,1}
+            }
+            if statistic not in stat_funcs:
+                raise ValueError(f"statistic '{statistic}' nao suportada")
+            stat_fn = stat_funcs[statistic]
+            stat_name = statistic
+        else:
+            stat_fn = statistic
+            stat_name = getattr(statistic, "__name__", "callable")
+
+        observed = float(stat_fn(arr))
+
+        rng = np.random.default_rng(seed)
+        boot = np.empty(n_resamples, dtype=float)
+        # vetorizado: amostra n_resamples x n indices
+        idx = rng.integers(0, n, size=(n_resamples, n))
+        for b in range(n_resamples):
+            boot[b] = stat_fn(arr[idx[b]])
+
+        # Bias correction
+        prop_below = float(np.mean(boot < observed))
+        # Clipping para evitar -inf/inf em ppf
+        prop_below = float(np.clip(prop_below, 1e-9, 1 - 1e-9))
+        z0 = stats.norm.ppf(prop_below)
+
+        # Acceleration via jackknife
+        jack = np.empty(n, dtype=float)
+        mask_full = np.ones(n, dtype=bool)
+        for i in range(n):
+            mask_full[i] = False
+            jack[i] = stat_fn(arr[mask_full])
+            mask_full[i] = True
+        jack_mean = float(np.mean(jack))
+        diffs = jack_mean - jack
+        denom = 6.0 * float(np.sum(diffs ** 2)) ** 1.5
+        accel = float(np.sum(diffs ** 3) / denom) if denom > 1e-15 else 0.0
+
+        alpha = 1.0 - confidence
+        z_lo = stats.norm.ppf(alpha / 2)
+        z_hi = stats.norm.ppf(1 - alpha / 2)
+
+        def adjust(z):
+            num = z0 + (z0 + z)
+            den = 1.0 - accel * (z0 + z)
+            if abs(den) < 1e-12:
+                den = 1e-12 if den >= 0 else -1e-12
+            return float(stats.norm.cdf(z0 + num / den))
+
+        a1 = adjust(z_lo)
+        a2 = adjust(z_hi)
+        a1 = float(np.clip(a1, 0.0, 1.0))
+        a2 = float(np.clip(a2, 0.0, 1.0))
+
+        ci_lower = float(np.quantile(boot, a1))
+        ci_upper = float(np.quantile(boot, a2))
+
+        return IntervalResult(
+            method="bootstrap_bca",
+            point_estimate=observed,
+            ci_lower=ci_lower,
+            ci_upper=ci_upper,
+            confidence=confidence,
+            n=int(n),
+            extras={
+                "statistic": stat_name,
+                "n_resamples": int(n_resamples),
+                "bias_z0": round(float(z0), 6),
+                "acceleration": round(accel, 6),
+                "alpha_lower": round(a1, 6),
+                "alpha_upper": round(a2, 6),
+            },
+        )
+
+    def beta_binomial_ci(
+        self,
+        cited: int,
+        n: int,
+        prior_alpha: float = 1.0,
+        prior_beta: float = 1.0,
+        confidence: float = 0.95,
+    ) -> IntervalResult:
+        """Bayesian credible interval for a citation rate via Beta conjugacy.
+
+        Modelo:
+            theta ~ Beta(prior_alpha, prior_beta)
+            k | theta ~ Binomial(n, theta)
+            theta | k ~ Beta(prior_alpha + k, prior_beta + n - k)
+
+        Defaults Beta(1, 1) (uniforme, equivalente a Laplace's rule of succession).
+        Beta(0.5, 0.5) (Jeffreys) tambem e razoavel e mais conservador para
+        amostras pequenas.
+
+        Vantagens versus Wald (1.96 * SE):
+          - sempre dentro de [0, 1]
+          - bem comportado para k=0 e k=n
+          - direto e interpretavel ("ha 95% de probabilidade de theta estar em ...").
+        """
+        if n < 0 or cited < 0 or cited > n:
+            raise ValueError(f"argumentos invalidos: cited={cited}, n={n}")
+        if prior_alpha <= 0 or prior_beta <= 0:
+            raise ValueError("priors devem ser > 0")
+
+        a_post = prior_alpha + cited
+        b_post = prior_beta + (n - cited)
+        alpha = 1.0 - confidence
+        ci_lower = float(stats.beta.ppf(alpha / 2, a_post, b_post))
+        ci_upper = float(stats.beta.ppf(1 - alpha / 2, a_post, b_post))
+        # Posterior mean (estimador bayesiano natural; difere da MLE k/n)
+        post_mean = float(a_post / (a_post + b_post))
+
+        return IntervalResult(
+            method="beta_binomial",
+            point_estimate=post_mean,
+            ci_lower=ci_lower,
+            ci_upper=ci_upper,
+            confidence=confidence,
+            n=int(n),
+            extras={
+                "prior_alpha": prior_alpha,
+                "prior_beta": prior_beta,
+                "posterior_alpha": float(a_post),
+                "posterior_beta": float(b_post),
+                "mle": float(cited / n) if n > 0 else 0.0,
+                "cited": int(cited),
+            },
+        )
+
+    # ------------------------------------------------------------------
+    # Inter-rater reliability
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _kappa_label(k: float) -> str:
+        """Landis & Koch (1977) labels."""
+        if k < 0:
+            return "pior que acaso"
+        if k < 0.20:
+            return "leve"
+        if k < 0.40:
+            return "razoavel"
+        if k < 0.60:
+            return "moderado"
+        if k < 0.80:
+            return "substancial"
+        return "quase perfeito"
+
+    def cohen_kappa(
+        self,
+        rater_a: Sequence[Any],
+        rater_b: Sequence[Any],
+    ) -> AgreementResult:
+        """Cohen's kappa for two raters and nominal categories.
+
+            kappa = (p_o - p_e) / (1 - p_e)
+
+        onde p_o e a concordancia observada e p_e e a esperada por sorteio
+        independente das marginais. Corrige o "agreement bruto" para o que e
+        esperado por chance — diferenca crucial em classes desbalanceadas.
+        """
+        a = np.asarray(list(rater_a))
+        b = np.asarray(list(rater_b))
+        if a.shape != b.shape or a.size == 0:
+            raise ValueError("rater_a e rater_b devem ter mesmo tamanho > 0")
+        n = a.size
+        labels = sorted(set(a.tolist()) | set(b.tolist()))
+        p_o = float(np.mean(a == b))
+        p_e = 0.0
+        for lbl in labels:
+            p_e += (np.mean(a == lbl) * np.mean(b == lbl))
+        denom = 1.0 - p_e
+        kappa = float((p_o - p_e) / denom) if denom > 1e-12 else 1.0
+
+        return AgreementResult(
+            method="cohen_kappa",
+            kappa=round(kappa, 4),
+            n_raters=2,
+            n_subjects=int(n),
+            interpretation=self._kappa_label(kappa),
+            extras={
+                "p_observed": round(p_o, 4),
+                "p_expected": round(p_e, 4),
+                "categories": list(map(str, labels)),
+            },
+        )
+
+    def fleiss_kappa(
+        self,
+        ratings: Sequence[Sequence[Any]],
+    ) -> AgreementResult:
+        """Fleiss' kappa for multiple raters and nominal categories.
+
+        Input: matriz N x R (N sujeitos, R raters por sujeito), entradas
+        sao rotulos categoricos (ex.: True/False ou strings). Os raters NAO
+        precisam ser os mesmos por linha (so o numero de avaliacoes por sujeito).
+
+        Formulacao:
+            P_i  = (1/(R(R-1))) * (sum_j n_ij^2 - R)        # acordo no sujeito i
+            P_bar = mean(P_i)                                # acordo medio
+            p_j  = sum_i n_ij / (N R)                        # marginal categoria j
+            P_e  = sum_j p_j^2                               # acordo esperado
+            kappa = (P_bar - P_e) / (1 - P_e)
+        """
+        rows = [list(r) for r in ratings]
+        if not rows:
+            raise ValueError("ratings vazio")
+        n = len(rows)
+        r = len(rows[0])
+        if r < 2:
+            raise ValueError("Fleiss exige >= 2 raters por sujeito")
+        if any(len(row) != r for row in rows):
+            raise ValueError("Numero de avaliacoes por sujeito deve ser constante")
+
+        labels = sorted({lbl for row in rows for lbl in row})
+        # Matriz de contagem N x K
+        K = len(labels)
+        idx = {lbl: i for i, lbl in enumerate(labels)}
+        counts = np.zeros((n, K), dtype=float)
+        for i, row in enumerate(rows):
+            for lbl in row:
+                counts[i, idx[lbl]] += 1
+
+        # P_i por sujeito
+        P_i = (counts ** 2).sum(axis=1) - r
+        P_i = P_i / (r * (r - 1))
+        P_bar = float(P_i.mean())
+        # Marginais por categoria
+        p_j = counts.sum(axis=0) / (n * r)
+        P_e = float((p_j ** 2).sum())
+        denom = 1.0 - P_e
+        kappa = float((P_bar - P_e) / denom) if denom > 1e-12 else 1.0
+
+        return AgreementResult(
+            method="fleiss_kappa",
+            kappa=round(kappa, 4),
+            n_raters=int(r),
+            n_subjects=int(n),
+            interpretation=self._kappa_label(kappa),
+            extras={
+                "P_observed": round(P_bar, 4),
+                "P_expected": round(P_e, 4),
+                "marginals": {lbl: round(float(p_j[idx[lbl]]), 4) for lbl in labels},
+            },
+        )
+
+    # ------------------------------------------------------------------
+    # Calibration metrics for predictive scores
+    # ------------------------------------------------------------------
+
+    def brier_score(
+        self,
+        probabilities: Sequence[float],
+        outcomes: Sequence[int],
+    ) -> dict[str, Any]:
+        """Brier score and decomposition for binary probabilistic predictions.
+
+        BS = (1/N) sum (p_i - y_i)^2  in [0, 1]; menor e melhor.
+
+        Decomposicao Murphy (1973):
+            BS = reliability - resolution + uncertainty
+              reliability  = E[(p - P(y=1|p))^2]   # quanto p mente
+              resolution   = E[(P(y=1|p) - p_bar)^2]  # quanto p discrimina
+              uncertainty  = p_bar * (1 - p_bar)   # variancia base
+
+        Util para calibracao do GEO Score Checker (probabilidade de citacao
+        prevista vs observada).
+        """
+        p = np.asarray(list(probabilities), dtype=float)
+        y = np.asarray(list(outcomes), dtype=float)
+        if p.shape != y.shape or p.size == 0:
+            raise ValueError("p e y devem ter mesmo tamanho > 0")
+        bs = float(np.mean((p - y) ** 2))
+        p_bar = float(np.mean(y))
+        # Reliability/Resolution via 10 bins
+        bins = np.linspace(0, 1, 11)
+        rel = 0.0
+        res = 0.0
+        n = p.size
+        for k in range(10):
+            mask = (p >= bins[k]) & (p < bins[k + 1] if k < 9 else p <= bins[k + 1])
+            n_k = int(mask.sum())
+            if n_k == 0:
+                continue
+            p_mean_k = float(p[mask].mean())
+            y_mean_k = float(y[mask].mean())
+            rel += (n_k / n) * (p_mean_k - y_mean_k) ** 2
+            res += (n_k / n) * (y_mean_k - p_bar) ** 2
+        unc = p_bar * (1 - p_bar)
+        return {
+            "brier_score": round(bs, 6),
+            "reliability": round(rel, 6),
+            "resolution": round(res, 6),
+            "uncertainty": round(unc, 6),
+            "n": int(n),
+        }
+
+    def reliability_diagram(
+        self,
+        probabilities: Sequence[float],
+        outcomes: Sequence[int],
+        n_bins: int = 10,
+    ) -> list[dict[str, float]]:
+        """Reliability diagram bins (Murphy & Winkler, 1977).
+
+        Para cada bin de probabilidade prevista, retorna a frequencia observada.
+        Modelo perfeitamente calibrado: linha diagonal (predicted == observed).
+        """
+        p = np.asarray(list(probabilities), dtype=float)
+        y = np.asarray(list(outcomes), dtype=float)
+        bins = np.linspace(0, 1, n_bins + 1)
+        out: list[dict[str, float]] = []
+        for k in range(n_bins):
+            lo, hi = bins[k], bins[k + 1]
+            mask = (p >= lo) & (p < hi if k < n_bins - 1 else p <= hi)
+            n_k = int(mask.sum())
+            if n_k == 0:
+                continue
+            out.append({
+                "bin_lo": float(lo),
+                "bin_hi": float(hi),
+                "predicted_mean": round(float(p[mask].mean()), 4),
+                "observed_mean": round(float(y[mask].mean()), 4),
+                "n": n_k,
+            })
+        return out
+
+    # ------------------------------------------------------------------
+    # Comprehensive summary report
+    # ------------------------------------------------------------------
+
     def generate_summary_report(
         self, citation_data: pd.DataFrame,
     ) -> dict[str, Any]:
@@ -340,5 +763,38 @@ class StatisticalAnalyzer:
         }
         if len(llm_groups) >= 2:
             report["anova_llms"] = self.anova_between_groups(llm_groups).__dict__
+
+        # Bayesian Beta-binomial credible interval por LLM (mais robusto a N pequeno)
+        bayes_by_llm: dict[str, dict[str, Any]] = {}
+        for llm, row in by_llm.iterrows():
+            ci = self.beta_binomial_ci(int(row["sum"]), int(row["count"]))
+            bayes_by_llm[str(llm)] = {
+                "rate_posterior_mean": round(ci.point_estimate, 4),
+                "ci_95": [round(ci.ci_lower, 4), round(ci.ci_upper, 4)],
+                "n": ci.n,
+                "cited": int(row["sum"]),
+            }
+        report["bayesian_by_llm"] = bayes_by_llm
+
+        # Inter-LLM agreement via Fleiss kappa, quando o painel for retangular
+        # (mesma query respondida por todos os LLMs).
+        try:
+            if "query" in citation_data.columns:
+                pivot = (
+                    citation_data
+                    .pivot_table(index="query", columns="llm", values="cited", aggfunc="max")
+                    .dropna()
+                )
+                if pivot.shape[0] >= 2 and pivot.shape[1] >= 2:
+                    ratings = pivot.astype(int).values.tolist()
+                    fk = self.fleiss_kappa(ratings)
+                    report["inter_llm_fleiss_kappa"] = {
+                        "kappa": fk.kappa,
+                        "interpretation": fk.interpretation,
+                        "n_subjects": fk.n_subjects,
+                        "n_raters": fk.n_raters,
+                    }
+        except Exception as exc:
+            logger.debug("Fleiss kappa skipped: %s", exc)
 
         return report

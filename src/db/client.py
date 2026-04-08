@@ -60,6 +60,27 @@ class DatabaseClient:
             except Exception:
                 pass  # Table doesn't exist yet, schema will create it
         self._conn.commit()
+        # Migracoes adicionais (ortogonais)
+        self._migrate_add_model_version()
+
+    def _migrate_add_model_version(self) -> None:
+        """Add model_version column to citations for non-stationarity tracking.
+
+        Modelos LLM mudam silenciosamente: 'gpt-4o-mini' em janeiro nao e o
+        mesmo de junho. Para painel longitudinal valido, precisamos rastrear
+        a versao exata do modelo no momento da coleta. NULL e aceitavel para
+        registros legacy. Novos inserts devem popular esta coluna.
+        """
+        try:
+            cols = [r[1] for r in self._conn.execute("PRAGMA table_info(citations)").fetchall()]
+            if cols and "model_version" not in cols:
+                self._conn.execute(
+                    "ALTER TABLE citations ADD COLUMN model_version TEXT DEFAULT NULL"
+                )
+                logger.info("Migracao: coluna 'model_version' adicionada a citations")
+                self._conn.commit()
+        except Exception as exc:
+            logger.debug("model_version migration skipped: %s", exc)
 
     def close(self) -> None:
         if self._conn:
@@ -76,8 +97,8 @@ class DatabaseClient:
                 vertical, cited, cited_entity, cited_domain, cited_person,
                 position, attribution, source_count, our_source_count,
                 hedging_detected, response_length, response_text,
-                sources_json, latency_ms, token_count
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                sources_json, latency_ms, token_count, model_version
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         rows = []
         for r in records:
@@ -91,6 +112,8 @@ class DatabaseClient:
                 r.get("hedging_detected"), r.get("response_length"),
                 r.get("response_text"), json.dumps(r.get("all_sources", [])),
                 r.get("latency_ms"), r.get("token_count"),
+                # model_version: rastreio de non-stationarity. Fallback = model.
+                r.get("model_version") or r.get("model"),
             ))
         self._conn.executemany(sql, rows)
         self._conn.commit()

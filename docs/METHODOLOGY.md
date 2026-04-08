@@ -368,6 +368,136 @@ Documento completo: `output/critica_estatistica_panel.md`
 
 ---
 
-*Ultima atualizacao: 26/03/2026*
+## 10. Inferencia robusta: BCa, Beta-binomial e kappa (entregue 08/04/2026)
+
+A revisao metodologica de abril 2026 fechou tres lacunas declaradas em
+secoes anteriores:
+
+### 10.1 Bootstrap BCa (Efron, 1987)
+
+`StatisticalAnalyzer.bootstrap_ci_bca(sample, statistic, n_resamples, confidence)`
+implementa o intervalo de confianca Bias-Corrected and Accelerated, hoje
+o padrao defensivel para qualquer estatistica escalar com distribuicao
+amostral assimetrica.
+
+Formulacao:
+
+```
+z0     = Phi^-1( P(theta_b < theta_obs) )       # bias correction
+a      = sum( (theta_bar - theta_(i))^3 )       # acceleration via jackknife
+         / ( 6 * (sum(...^2))^(3/2) )
+alpha1 = Phi( z0 + (z0 + z_{a/2})  / (1 - a*(z0 + z_{a/2})) )
+alpha2 = Phi( z0 + (z0 + z_{1-a/2}) / (1 - a*(z0 + z_{1-a/2})) )
+CI     = [ F^-1_boot(alpha1), F^-1_boot(alpha2) ]
+```
+
+Vantagens sobre o percentile bootstrap puro: corrige vies de localizacao
+e assimetria, segunda-ordem correto (O(1/n)), aplicavel a qualquer
+estatistica. Aceita `statistic ∈ {"mean", "median", "proportion"}` ou
+callable arbitraria. Default `n_resamples = 10_000`. Cobertura empirica
+testada em `tests/test_analysis.py::test_bootstrap_bca_*`.
+
+### 10.2 Beta-binomial bayesiano
+
+`StatisticalAnalyzer.beta_binomial_ci(cited, n, prior_alpha, prior_beta, confidence)`
+substitui o intervalo Wald (1.96 SE) — invalido para `k=0`, `k=n` ou `n` pequeno.
+
+Modelo:
+```
+theta ~ Beta(prior_alpha, prior_beta)
+k | theta ~ Binomial(n, theta)
+theta | k ~ Beta(prior_alpha + k, prior_beta + n - k)
+```
+
+Defaults Beta(1, 1) (uniforme, equivalente ao smoothing de Laplace).
+O `generate_summary_report` agora reporta o posterior mean + CI 95%
+para cada LLM em `bayesian_by_llm`.
+
+### 10.3 Cohen's e Fleiss' kappa
+
+`StatisticalAnalyzer.cohen_kappa(rater_a, rater_b)` e `fleiss_kappa(ratings)`
+substituem "agreement bruto" por concordancia corrigida por chance:
+
+```
+kappa_Cohen = (p_o - p_e) / (1 - p_e)
+kappa_Fleiss: variante para R raters por sujeito
+```
+
+Interpretacao: Landis & Koch (1977). O `generate_summary_report` agora
+reporta `inter_llm_fleiss_kappa` quando o painel for retangular,
+medindo se 4 LLMs concordam na decisao binaria "citou ou nao" para a
+mesma query alem do esperado por sorteio.
+
+### 10.4 Fisher exact fallback
+
+`chi_squared_citation_rate` agora detecta automaticamente
+`min(expected) < 5` e cai para `scipy.stats.fisher_exact`. Restaura
+validade quando o desenho fica desbalanceado (verticais com baixo N).
+
+### 10.5 Brier score e reliability diagram
+
+`brier_score(probabilities, outcomes)` retorna a decomposicao de Murphy (1973):
+```
+BS = reliability - resolution + uncertainty
+```
+e `reliability_diagram(probabilities, outcomes, n_bins)` gera os bins
+empiricos. Estas duas funcoes alimentam diretamente o pipeline de
+calibracao do GEO Score Checker (proxima secao).
+
+---
+
+## 11. Bridge Papers ↔ GEO Score Checker (entregue 08/04/2026)
+
+A tabela `score_calibration_inputs` (ver `src/db/schema.sql`) une, por
+dominio e vertical, o vetor de 8 dimensoes do Score Checker
+(`d1_retrieval_fitness` ... `d8_entity_authority`) com a taxa empirica
+de citacao observada nos paineis Papers (`k_cited / n_observations`).
+
+O script `scripts/calibrate_score.py` consome essa tabela (ou gera
+dataset sintetico via `--simulate N`) e ajusta:
+
+```
+logit(P(cited|site)) = beta_0 + sum_d beta_d * D_d(site)
+```
+
+Os pesos calibrados sao:
+
+```
+w*_d = 100 * max(0, beta_d) / sum_k max(0, beta_k)
+```
+
+substituindo os pesos cravados (15, 15, 20, 15, 10, 10, 10, 5).
+
+Diagnosticos do script:
+- coeficientes, IC 95% via Wald, p-valores, odds ratios;
+- pseudo-R2 McFadden, AIC, BIC;
+- AUROC + Brier sob 5-fold CV;
+- reliability diagram in-sample;
+- Spearman entre score atual e calibrado;
+- delta de pesos (atual -> calibrado).
+
+Demonstracao end-to-end (modo simulate, n=200):
+```
+$ python scripts/calibrate_score.py --simulate 200 --diagram
+pseudo R2 (McFadden): 0.1742
+5-fold CV AUROC: 0.8146 (+/- 0.0253)
+5-fold CV Brier: 0.0370 (+/- 0.0039)
+Spearman(score_atual, score_calibrado): 0.9495
+```
+
+A coluna `model_version` (adicionada a `citations` em 08/04) habilita
+analise longitudinal valida sob non-stationarity dos modelos LLM.
+
+### Proximos passos (roadmap atualizado)
+
+- (mai/2026) GLMM hierarquico com efeito aleatorio por dominio + vertical
+- (mai/2026) IRT 2-PL para reduzir 8 dimensoes a 3-4 fatores latentes
+- (jun/2026) BSTS / CausalImpact para a 9a dimensao "Causal Impact"
+- (jun/2026) Bootstrap BCa do score em producao (4+ replicas LLM por dim)
+- (jul/2026) Pre-registro publico no OSF
+
+---
+
+*Ultima atualizacao: 08/04/2026 (secoes 10 e 11 adicionadas)*
 *Autor: Alexandre Caramaschi — Brasil GEO*
 *Revisao: Painel simulado de 7 especialistas (Jordan, Donoho, Meng, Gelman, Wahba, Efron, Tao)*

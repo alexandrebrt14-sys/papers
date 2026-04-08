@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS citations (
     sources_json    TEXT,                        -- JSON array of source URLs
     latency_ms      INTEGER,
     token_count     INTEGER,
+    model_version   TEXT DEFAULT NULL,           -- pinned model id (rastreio non-stationarity LLM)
     created_at      TEXT DEFAULT (datetime('now'))
 );
 
@@ -55,6 +56,41 @@ CREATE INDEX IF NOT EXISTS idx_citations_llm ON citations(llm);
 CREATE INDEX IF NOT EXISTS idx_citations_query_category ON citations(query_category);
 CREATE INDEX IF NOT EXISTS idx_citations_cited ON citations(cited);
 CREATE INDEX IF NOT EXISTS idx_citations_vertical ON citations(vertical);
+CREATE INDEX IF NOT EXISTS idx_citations_model_version ON citations(model_version);
+
+-- ============================================================
+-- Score Calibration Bridge: Papers <-> GEO Score Checker
+-- Une o vetor de 8 dimensoes do GEO Score Checker (D1..D8) com a taxa de
+-- citacao empirica observada nos paineis Papers para um mesmo dominio.
+-- E a tabela de fit para a regressao logistica de calibracao dos pesos.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS score_calibration_inputs (
+    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    domain                      TEXT NOT NULL,
+    vertical                    TEXT NOT NULL,
+    n_observations              INTEGER NOT NULL,                  -- queries totais
+    k_cited                     INTEGER NOT NULL,                  -- queries onde a entidade foi citada
+    citation_rate               REAL NOT NULL,                     -- k / n
+    -- 8 dimensoes do GEO Score Checker (cada uma normalizada 0..1)
+    d1_retrieval_fitness        REAL NOT NULL CHECK (d1_retrieval_fitness BETWEEN 0 AND 1),
+    d2_reranking_fitness        REAL NOT NULL CHECK (d2_reranking_fitness BETWEEN 0 AND 1),
+    d3_generation_exposure      REAL NOT NULL CHECK (d3_generation_exposure BETWEEN 0 AND 1),
+    d4_faithful_credit          REAL NOT NULL CHECK (d4_faithful_credit BETWEEN 0 AND 1),
+    d5_answer_bubble_consensus  REAL NOT NULL CHECK (d5_answer_bubble_consensus BETWEEN 0 AND 1),
+    d6_geo_robustness           REAL NOT NULL CHECK (d6_geo_robustness BETWEEN 0 AND 1),
+    d7_static_readiness         REAL NOT NULL CHECK (d7_static_readiness BETWEEN 0 AND 1),
+    d8_entity_authority         REAL NOT NULL CHECK (d8_entity_authority BETWEEN 0 AND 1),
+    -- score atual com pesos cravados (15,15,20,15,10,10,10,5)
+    score_current_weights       REAL NOT NULL,
+    -- model_version do GEO Score Checker (incrementado quando pesos mudam)
+    score_model_version         TEXT NOT NULL,
+    collected_at                TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(domain, vertical, score_model_version, collected_at)
+);
+
+CREATE INDEX IF NOT EXISTS idx_score_calib_domain ON score_calibration_inputs(domain);
+CREATE INDEX IF NOT EXISTS idx_score_calib_vertical ON score_calibration_inputs(vertical);
+CREATE INDEX IF NOT EXISTS idx_score_calib_collected_at ON score_calibration_inputs(collected_at);
 
 -- ============================================================
 -- Module 2: Competitor Benchmark Dataset
