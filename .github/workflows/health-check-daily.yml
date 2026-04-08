@@ -29,14 +29,26 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # Restore latest papers.db artifact (gerado pelo daily-collect)
+      # Restore latest papers.db artifact (gerado pelo daily-collect).
+      # Aqui usamos dawidd6 propositalmente (workflow_conclusion: success) porque este
+      # workflow eh AGENDADO 4h apos o daily-collect e precisa baixar o artifact do
+      # ultimo run de daily-collect que terminou com sucesso. Falhamos explicito se
+      # nao houver artifact (em vez de warn) para nao mascarar problemas.
       - name: Download papers.db artifact
         uses: dawidd6/action-download-artifact@v6
         with:
+          workflow: daily-collect.yml
+          workflow_conclusion: success
           name: papers-db-latest
           path: data/
-          if_no_artifact_found: warn
-        continue-on-error: true
+          if_no_artifact_found: fail
+
+      # Garante que o schema esta migrado antes do health_check rodar suas queries.
+      - name: Aplicar migracoes do schema
+        env:
+          PAPERS_DB_PATH: data/papers.db
+        run: |
+          python -c "from src.db.client import DatabaseClient; c = DatabaseClient(); c.connect(); c.close(); print('schema migrations OK')"
 
       - name: Run health check
         env:

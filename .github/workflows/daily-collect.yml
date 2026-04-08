@@ -113,14 +113,26 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # Download DB with all 4 verticals accumulated (each vertical overwrites papers-db-latest)
-      - name: Download DB artifact
-        uses: dawidd6/action-download-artifact@v6
+      # Download DB with all 4 verticals accumulated (each vertical overwrites papers-db-latest).
+      # CRITICO: usar actions/download-artifact@v4 (default = run atual) em vez de
+      # dawidd6/action-download-artifact@v6, que por default busca o ULTIMO RUN COM SUCESSO
+      # e por isso baixava o DB do dia anterior em vez do produzido pelos jobs collect deste
+      # mesmo run — quebrava o health_check com "no such column: vertical" porque o DB
+      # legacy nao tinha a migracao aplicada. Incidente: 2026-04-08 run 24129745155.
+      - name: Download DB artifact (do run atual)
+        uses: actions/download-artifact@v4
         with:
           name: papers-db-latest
           path: data/
-          if_no_artifact_found: warn
-        continue-on-error: true
+
+      # Garantia extra: rodar a migracao do schema (adiciona coluna `vertical` se faltar)
+      # antes de qualquer consumidor (sync_to_supabase, finops, health_check). Defesa em
+      # profundidade caso o artifact baixado tenha schema legacy.
+      - name: Aplicar migracoes do schema
+        env:
+          PAPERS_DB_PATH: data/papers.db
+        run: |
+          python -c "from src.db.client import DatabaseClient; c = DatabaseClient(); c.connect(); c.close(); print('schema migrations OK')"
 
       # FinOps monitor (rollup + budget check + exports + dashboard)
       - name: FinOps monitor cycle
