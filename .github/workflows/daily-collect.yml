@@ -144,6 +144,23 @@ jobs:
       - name: Update documentation
         run: python scripts/update-docs.py
 
+      # HEALTH CHECK final — gating para garantir qualidade dos dados coletados
+      # Falha o workflow (e dispara alerta WhatsApp+email) se algum check critico falhar.
+      # Esta validacao previne o incidente de 30/Mar-06/Abr (12 dias de "success" sem dados).
+      - name: Health check (gating)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          WHATSAPP_API_TOKEN: ${{ secrets.WHATSAPP_API_TOKEN }}
+          WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          PAPERS_DB_PATH: data/papers.db
+        run: python scripts/health_check.py --min-obs-per-day 200
+
       # Upload final consolidated DB
       - name: Upload database (latest)
         uses: actions/upload-artifact@v4

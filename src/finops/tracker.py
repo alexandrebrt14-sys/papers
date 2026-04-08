@@ -37,13 +37,17 @@ PRICING: dict[str, dict[str, dict[str, float]]] = {
         "_default":       {"input": 0.15,  "output": 0.60},
     },
     "anthropic": {
-        "claude-haiku-4-5-20251001":  {"input": 0.80,  "output": 4.00},
-        "claude-sonnet-4-20250514":   {"input": 3.00,  "output": 15.00},
-        "claude-opus-4-20250514":     {"input": 15.00, "output": 75.00},
-        "_default":                   {"input": 3.00,  "output": 15.00},
+        "claude-haiku-4-5":            {"input": 0.80,  "output": 4.00},
+        "claude-haiku-4-5-20251001":   {"input": 0.80,  "output": 4.00},
+        "claude-sonnet-4-5":           {"input": 3.00,  "output": 15.00},
+        "claude-sonnet-4-20250514":    {"input": 3.00,  "output": 15.00},
+        "claude-opus-4-6":             {"input": 15.00, "output": 75.00},
+        "claude-opus-4-20250514":      {"input": 15.00, "output": 75.00},
+        "_default":                    {"input": 3.00,  "output": 15.00},
     },
     "google": {
-        "gemini-2.5-flash":      {"input": 0.15,  "output": 0.60},  # Billing ativo (R$500 credito)
+        "gemini-2.5-pro":        {"input": 1.25,  "output": 5.00},   # default (regra global)
+        "gemini-2.5-flash":      {"input": 0.15,  "output": 0.60},   # legado: aliases mantidos para historico
         "gemini-2.0-flash":      {"input": 0.10,  "output": 0.40},
         "gemini-2.0-flash-lite": {"input": 0.0,   "output": 0.0},
         "gemini-2.5-pro":        {"input": 1.25,  "output": 10.00},
@@ -63,12 +67,15 @@ PRICING: dict[str, dict[str, dict[str, float]]] = {
 }
 
 DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
-    "openai":     {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "anthropic":  {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "google":     {"monthly": 5.0,  "daily": 0.50, "alert_pct": 0.80, "hard_stop_pct": 1.00},
-    "perplexity": {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "groq":       {"monthly": 5.0,  "daily": 1.0,  "alert_pct": 0.80, "hard_stop_pct": 1.00},
-    "global":     {"monthly": 35.0, "daily": 4.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    # Atualizado 2026-04-07 — limites tighter para evitar bill shock por bug sistemico.
+    # Custo medio observado: ~$1/mes em coleta diaria 4 verticais x 4 LLMs.
+    # Margem 5x para variacoes esperadas, hard_stop em 95% por provider.
+    "openai":     {"monthly": 3.0,  "daily": 0.30, "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    "anthropic":  {"monthly": 3.0,  "daily": 0.30, "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    "google":     {"monthly": 2.0,  "daily": 0.20, "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    "perplexity": {"monthly": 3.0,  "daily": 0.30, "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    "groq":       {"monthly": 1.0,  "daily": 0.10, "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    "global":     {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
 }
 
 # Anomaly: flag if single query costs more than this

@@ -230,17 +230,37 @@ class LLMClient:
                     }, self._vertical)
                 return response
             except httpx.HTTPStatusError as e:
-                if e.response.status_code == 429:
+                code = e.response.status_code
+                # 401/403 = key invalida — circuit break imediato (incidente 30/Mar-06/Abr)
+                if code in (401, 403):
+                    self._circuit_broken.add(llm.provider)
+                    logger.error(
+                        f"[circuit-break] {llm.name} HTTP {code} (key invalida/sem permissao). "
+                        f"Rotacionar key no GitHub Secrets do papers."
+                    )
+                    return None
+                # 429 / 5xx = retry com backoff exponencial
+                if code == 429 or code >= 500:
                     if attempt < self.MAX_RETRIES:
-                        wait = self.RETRY_BACKOFF[attempt]
-                        logger.warning(f"[429] {llm.name} rate-limited, retry in {wait}s...")
+                        wait = self.RETRY_BACKOFF[attempt] if attempt < len(self.RETRY_BACKOFF) else 60
+                        logger.warning(f"[{code}] {llm.name} retry {attempt+1}/{self.MAX_RETRIES} em {wait}s...")
                         time.sleep(wait)
                         continue
-                    # Circuit break: skip all remaining queries for this provider
-                    self._circuit_broken.add(llm.provider)
-                    logger.warning(f"[circuit-break] {llm.name} 429 after retries — skipping remaining queries")
+                    if code == 429:
+                        self._circuit_broken.add(llm.provider)
+                        logger.warning(f"[circuit-break] {llm.name} 429 apos retries — pulando provider")
                     return None
-                logger.error(f"[{llm.name}] HTTP {e.response.status_code}: {e.response.text[:200]}")
+                # 4xx fatais (400, 404, 422) = log e segue
+                logger.error(f"[{llm.name}] HTTP {code}: {e.response.text[:200]}")
+                return None
+            except (httpx.ConnectError, httpx.ReadTimeout, httpx.WriteTimeout) as e:
+                # Erros de rede transientes — retry
+                if attempt < self.MAX_RETRIES:
+                    wait = self.RETRY_BACKOFF[attempt] if attempt < len(self.RETRY_BACKOFF) else 30
+                    logger.warning(f"[network] {llm.name} retry {attempt+1}/{self.MAX_RETRIES} em {wait}s: {e}")
+                    time.sleep(wait)
+                    continue
+                logger.error(f"[{llm.name}] Network error after retries: {e}")
                 return None
             except Exception as e:
                 logger.error(f"[{llm.name}] Error: {e}")

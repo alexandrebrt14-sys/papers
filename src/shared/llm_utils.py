@@ -245,7 +245,7 @@ def query_gemini(query: str, api_key: str) -> dict | None:
 
     def _do():
         r = requests.post(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
             headers={"x-goog-api-key": api_key},
             json={
                 "contents": [
@@ -274,7 +274,7 @@ def query_gemini(query: str, api_key: str) -> dict | None:
         usage = data.get("usageMetadata", {})
         result = {
             "content": parsed.get("summary", text[:200]),
-            "model": "gemini-2.5-flash",
+            "model": "gemini-2.5-pro",
             "latency_ms": latency,
             "tokens": usage.get("totalTokenCount", 0),
             "input_tokens": usage.get("promptTokenCount", 0),

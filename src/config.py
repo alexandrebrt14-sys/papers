@@ -292,7 +292,7 @@ class CollectionConfig:
         LLMConfig(
             name="Gemini",
             provider="google",
-            model="gemini-2.5-flash",      # Billing ativo (R$500 credito). 30+ RPM.
+            model="gemini-2.5-pro",      # Billing ativo (R$500 credito). 30+ RPM.
             api_key=os.getenv("GOOGLE_AI_API_KEY"),
             input_cost_per_mtok=0.15,
             output_cost_per_mtok=0.60,
