@@ -14,6 +14,9 @@ concurrency:
   group: papers-${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: write  # Para commit do dashboard_data.json no finalize step
+
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -152,9 +155,29 @@ jobs:
           PAPERS_DB_PATH: data/papers.db
         run: python scripts/sync_to_supabase.py
 
+      # Gera dashboard_data.json fresco a partir do papers.db.
+      # Este arquivo é consumido por alexandrecaramaschi.com/research via
+      # GitHub raw + ISR (revalidate 24h) para manter o dashboard sempre atualizado
+      # com os dados mais recentes da coleta diária — sem precisar de redeploy.
+      - name: Generate dashboard_data.json
+        run: python scripts/generate_dashboard_json.py
+
       # Update documentation with fresh data
       - name: Update documentation
         run: python scripts/update-docs.py
+
+      # Commit dashboard_data.json atualizado para o repo (usado pelo /research)
+      - name: Commit dashboard_data.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/dashboard_data.json
+          if git diff --cached --quiet; then
+            echo "Sem mudanças no dashboard_data.json"
+          else
+            git commit -m "data: atualiza dashboard_data.json [skip ci]"
+            git push
+          fi
 
       # HEALTH CHECK final — gating para garantir qualidade dos dados coletados
       # Falha o workflow (e dispara alerta WhatsApp+email) se algum check critico falhar.
