@@ -234,12 +234,15 @@ def _kpis(conn: sqlite3.Connection, vertical: str) -> dict:
     """KPIs agregados: total de observações, taxa geral, entidades monitoradas, dias coletando."""
     stats = _query(conn, """
         SELECT COUNT(*) AS total,
-               SUM(CASE WHEN cited THEN 1 ELSE 0 END) AS cited_count
+               COALESCE(SUM(CASE WHEN cited THEN 1 ELSE 0 END), 0) AS cited_count
         FROM citations
         WHERE vertical = ?
     """, (vertical,))
-    total_obs = stats[0]["total"] if stats else 0
-    cited_count = stats[0]["cited_count"] if stats else 0
+    # Bug fix B-017 (2026-04-09): SUM em banco vazio retorna NULL, nao 0.
+    # COALESCE garante 0. O fallback `if stats else 0` cobre lista vazia,
+    # mas o caso "lista com 1 row e cited_count=NULL" so eh resolvido com COALESCE.
+    total_obs = (stats[0]["total"] if stats else 0) or 0
+    cited_count = (stats[0]["cited_count"] if stats else 0) or 0
 
     # Entidades distintas monitoradas (via citation_context ou verticals config)
     entities = _query(conn, """

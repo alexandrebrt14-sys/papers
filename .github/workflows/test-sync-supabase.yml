@@ -1,0 +1,50 @@
+name: Test Sync Supabase
+
+# Achado B-017 da auditoria de ecossistema 2026-04-08. Roda os testes
+# de scripts/sync_to_supabase.py em PRs e pushes que tocam o script,
+# o schema ou os tests. Garante que mudancas no sync nao quebram
+# agregacao SQL ou contrato Supabase.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/sync_to_supabase.py"
+      - "scripts/supabase_schema.sql"
+      - "tests/test_sync_to_supabase.py"
+      - ".github/workflows/test-sync-supabase.yml"
+  pull_request:
+    paths:
+      - "scripts/sync_to_supabase.py"
+      - "scripts/supabase_schema.sql"
+      - "tests/test_sync_to_supabase.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install pytest python-dotenv supabase
+
+      - name: Run sync_to_supabase test suite
+        run: |
+          python -m pytest tests/test_sync_to_supabase.py -v --tb=short
+
+      - name: Smoke test dry-run (no credentials needed)
+        run: |
+          python scripts/sync_to_supabase.py --dry-run --vertical fintech
+        env:
+          PAPERS_DB_PATH: /tmp/nonexistent.db  # forca uso do banco em-memoria
