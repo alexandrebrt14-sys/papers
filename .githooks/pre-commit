@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Pre-commit hook — bloqueia commits com segredos.
+# Instalado por install.sh em cada repo. NAO edite este arquivo manualmente
+# em uma copia individual; edite o template em
+# C:/Sandyboxclaude/tools/secret_guard/pre-commit e re-execute install.sh.
+#
+# Achado F44 da auditoria de ecossistema Brasil GEO 2026-04-08.
+
+set -e
+
+# Localiza secret_guard.py — primeiro tenta o repo local (.tools/),
+# depois fallback para o monorepo central.
+GUARD=""
+if [ -f ".tools/secret_guard.py" ]; then
+    GUARD=".tools/secret_guard.py"
+elif [ -f "tools/secret_guard.py" ]; then
+    GUARD="tools/secret_guard.py"
+elif [ -f "C:/Sandyboxclaude/tools/secret_guard/secret_guard.py" ]; then
+    GUARD="C:/Sandyboxclaude/tools/secret_guard/secret_guard.py"
+else
+    echo "[secret_guard] script nao encontrado — pulando validacao" >&2
+    exit 0
+fi
+
+# Roda em modo --staged
+python "$GUARD" --staged
