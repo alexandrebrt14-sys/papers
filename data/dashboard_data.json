@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-04-10T11:09:00.273489+00:00",
-  "lastCollection": "2026-04-10 11:08:17",
+  "generatedAt": "2026-04-11T10:33:17.100866+00:00",
+  "lastCollection": "2026-04-11 10:32:35",
   "dbVersion": "papers.db (250 queries dataset)",
   "totalQueries": 250,
   "totalCited": 91,
@@ -19,28 +19,28 @@
       "queries": 36,
       "cited": 16,
       "rate": 44.4,
-      "avgLatencyMs": 15717,
+      "avgLatencyMs": 16296,
       "color": "#4285f4"
-    },
-    {
-      "name": "Claude",
-      "model": "claude-haiku-4-5-20251001",
-      "provider": "Anthropic",
-      "queries": 74,
-      "cited": 27,
-      "rate": 36.5,
-      "avgLatencyMs": 2238,
-      "color": "#d4a574"
     },
     {
       "name": "Perplexity",
       "model": "sonar",
       "provider": "Perplexity AI",
       "queries": 66,
-      "cited": 23,
-      "rate": 34.8,
-      "avgLatencyMs": 3455,
+      "cited": 24,
+      "rate": 36.4,
+      "avgLatencyMs": 3447,
       "color": "#20b2aa"
+    },
+    {
+      "name": "Claude",
+      "model": "claude-haiku-4-5-20251001",
+      "provider": "Anthropic",
+      "queries": 74,
+      "cited": 26,
+      "rate": 35.1,
+      "avgLatencyMs": 2232,
+      "color": "#d4a574"
     },
     {
       "name": "ChatGPT",
@@ -49,7 +49,7 @@
       "queries": 74,
       "cited": 25,
       "rate": 33.8,
-      "avgLatencyMs": 4577,
+      "avgLatencyMs": 2708,
       "color": "#10a37f"
     }
   ],
@@ -111,8 +111,8 @@
       "vertical": "tecnologia",
       "model": "Claude",
       "queries": 18,
-      "cited": 13,
-      "rate": 72.2
+      "cited": 12,
+      "rate": 66.7
     },
     {
       "vertical": "tecnologia",
@@ -125,8 +125,8 @@
       "vertical": "tecnologia",
       "model": "Perplexity",
       "queries": 10,
-      "cited": 7,
-      "rate": 70.0
+      "cited": 8,
+      "rate": 80.0
     }
   ],
   "verticalsFull": {
