@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-04-11T10:33:17.100866+00:00",
-  "lastCollection": "2026-04-11 10:32:35",
+  "generatedAt": "2026-04-12T10:35:46.797603+00:00",
+  "lastCollection": "2026-04-12 10:35:04",
   "dbVersion": "papers.db (250 queries dataset)",
   "totalQueries": 250,
   "totalCited": 91,
@@ -19,7 +19,7 @@
       "queries": 36,
       "cited": 16,
       "rate": 44.4,
-      "avgLatencyMs": 16296,
+      "avgLatencyMs": 16191,
       "color": "#4285f4"
     },
     {
@@ -29,7 +29,7 @@
       "queries": 66,
       "cited": 24,
       "rate": 36.4,
-      "avgLatencyMs": 3447,
+      "avgLatencyMs": 3438,
       "color": "#20b2aa"
     },
     {
@@ -39,7 +39,7 @@
       "queries": 74,
       "cited": 26,
       "rate": 35.1,
-      "avgLatencyMs": 2232,
+      "avgLatencyMs": 2254,
       "color": "#d4a574"
     },
     {
@@ -49,7 +49,7 @@
       "queries": 74,
       "cited": 25,
       "rate": 33.8,
-      "avgLatencyMs": 2708,
+      "avgLatencyMs": 2515,
       "color": "#10a37f"
     }
   ],
