@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write  # Para commit do dashboard_data.json no finalize step
+  contents: write
 
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -43,7 +43,10 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # Restore DB from previous run (incremental — preserva dados historicos)
+      # Restore DB from previous run (incremental — preserva dados historicos).
+      # dawidd6/v6 busca o ultimo run COM SUCESSO por default. Na primeira
+      # execucao ou apos muitos dias sem sucesso, if_no_artifact_found: warn
+      # garante que continuamos com um DB vazio.
       - name: Download previous DB
         uses: dawidd6/action-download-artifact@v6
         with:
@@ -52,7 +55,6 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
-      # Validate Python imports before collection (fail-fast on SyntaxError)
       - name: Validate Python imports
         run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
 
@@ -80,7 +82,6 @@ jobs:
       - name: Collect all verticals (sequential — same DB)
         run: |
           VERTICALS="${{ steps.verticals.outputs.list }}"
-          TOTAL_CITATIONS=0
           FAILED_VERTICALS=""
 
           for V in $VERTICALS; do
@@ -118,8 +119,12 @@ jobs:
             fi
           fi
 
-      # Upload DB intermediario (para recovery em caso de falha no finalize)
-      - name: Upload database (latest — all verticals accumulated)
+      # ================================================================
+      # ARTIFACT UPLOAD INTERMEDIARIO — safety net antes do finalize.
+      # Se qualquer step de finalize falhar, o DB com dados coletados
+      # ja esta salvo como artifact e sera recuperado no proximo run.
+      # ================================================================
+      - name: Upload database (intermediate safety net)
         uses: actions/upload-artifact@v4
         with:
           name: papers-db-latest
@@ -128,48 +133,101 @@ jobs:
           overwrite: true
 
       # ================================================================
-      # FINALIZE — tudo no mesmo job, sem download de artifact necessario
+      # FINALIZE — tudo no mesmo job, sem download de artifact necessario.
+      # Todos os steps de finalize usam continue-on-error para que uma
+      # falha em Supabase/docs/dashboard NAO bloqueie o artifact upload
+      # final nem o git commit.
       # ================================================================
 
-      # Garantia: rodar migracao do schema antes dos consumidores
       - name: Aplicar migracoes do schema
-        run: |
-          python -c "from src.db.client import DatabaseClient; c = DatabaseClient(); c.connect(); c.close(); print('schema migrations OK')"
+        run: python -c "from src.db.client import DatabaseClient; c = DatabaseClient(); c.connect(); c.close(); print('schema migrations OK')"
 
-      # FinOps monitor (rollup + budget check + exports + dashboard)
       - name: FinOps monitor cycle
         run: python -m src.cli finops monitor
         continue-on-error: true
 
-      # Sincroniza dados agregados com o Supabase para o dashboard Next.js
+      # CORRECAO: continue-on-error evita que exit code 2 (creds ausentes)
+      # ou falha de rede no Supabase bloqueie o pipeline inteiro.
+      # Incidente potencial identificado na auditoria 2026-04-12.
       - name: Sync to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python scripts/sync_to_supabase.py
+        continue-on-error: true
 
-      # Gera dashboard_data.json fresco a partir do papers.db
+      # CORRECAO: continue-on-error evita que DB vazio ou tabela ausente
+      # (first-ever run) bloqueie os steps seguintes.
       - name: Generate dashboard_data.json
         run: python scripts/generate_dashboard_json.py
+        continue-on-error: true
 
-      # Update documentation with fresh data
       - name: Update documentation
         run: python scripts/update-docs.py
+        continue-on-error: true
 
-      # Commit dashboard_data.json atualizado para o repo
-      - name: Commit dashboard_data.json
+      # ================================================================
+      # GIT COMMIT + PUSH UNICO — consolida tudo em um unico push.
+      # CORRECAO: antes havia 2 pushes separados (dashboard_data.json
+      # primeiro, depois CSVs/docs). Se qualquer step entre eles falhava
+      # ou outro workflow pushava no intervalo, o segundo push falhava
+      # com "non-fast-forward". Agora tudo e commitado e pushado junto.
+      # ================================================================
+      - name: Commit all data + docs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/dashboard_data.json
+
+          # Stage tudo de uma vez
+          git add data/dashboard_data.json 2>/dev/null || true
+          git add data/daily_*.csv 2>/dev/null || true
+          git add data/finops_checkpoint.json 2>/dev/null || true
+          git add data/finops_alerts.jsonl 2>/dev/null || true
+          git add output/finops_dashboard.html 2>/dev/null || true
+          git add docs/ 2>/dev/null || true
+
           if git diff --cached --quiet; then
-            echo "Sem mudancas no dashboard_data.json"
+            echo "Sem mudancas para commitar"
           else
-            git commit -m "data: atualiza dashboard_data.json [skip ci]"
+            git commit -m "data: daily collection $(date -u +%Y-%m-%d) [skip ci]"
+            # Pull --rebase antes do push para absorver commits de outros workflows
+            git pull --rebase origin main || true
             git push
           fi
 
-      # HEALTH CHECK final — gating para garantir qualidade dos dados
+      # ================================================================
+      # ARTIFACT UPLOADS FINAIS — ANTES do health check para garantir
+      # que mesmo uma falha no health check nao impede a persistencia
+      # do DB consolidado. O artifact "latest" sobrescreve o intermediario
+      # com a versao pos-finalize (inclui finops rollup etc).
+      # ================================================================
+      - name: Upload database (latest — post-finalize)
+        uses: actions/upload-artifact@v4
+        with:
+          name: papers-db-latest
+          path: data/papers.db
+          retention-days: 90
+          overwrite: true
+
+      - name: Upload database (dated backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: papers-db-${{ github.run_number }}
+          path: data/papers.db
+          retention-days: 90
+
+      # Enviar relatorio por email (antes do health check para que o
+      # relatorio saia mesmo se o check falhar)
+      - name: Enviar relatorio diario por email
+        run: python scripts/send-report.py || true
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
+
+      # ================================================================
+      # HEALTH CHECK — ultimo step. Falha dispara alertas mas NAO
+      # impede artifact upload nem git commit (ambos ja rodaram acima).
+      # ================================================================
       - name: Health check (gating)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -177,39 +235,3 @@ jobs:
           WHATSAPP_API_TOKEN: ${{ secrets.WHATSAPP_API_TOKEN }}
           WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
         run: python scripts/health_check.py --min-obs-per-day 200
-
-      # Upload final consolidated DB
-      - name: Upload database (latest)
-        uses: actions/upload-artifact@v4
-        with:
-          name: papers-db-latest
-          path: data/papers.db
-          retention-days: 90
-          overwrite: true
-
-      - name: Upload database (dated)
-        uses: actions/upload-artifact@v4
-        with:
-          name: papers-db-${{ github.run_number }}
-          path: data/papers.db
-          retention-days: 90
-
-      # Enviar relatorio por email
-      - name: Enviar relatorio diario por email
-        run: python scripts/send-report.py || true
-        env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
-
-      # Commit everything to Git
-      - name: Commit data + docs + finops
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/daily_*.csv 2>/dev/null || true
-          git add data/finops_checkpoint.json 2>/dev/null || true
-          git add data/finops_alerts.jsonl 2>/dev/null || true
-          git add output/finops_dashboard.html 2>/dev/null || true
-          git add docs/ 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "data: daily collection 4 verticals $(date -u +%Y-%m-%d)"
-          git push

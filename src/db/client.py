@@ -57,8 +57,12 @@ class DatabaseClient:
                     default = "'fintech'"
                     self._conn.execute(f"ALTER TABLE {table} ADD COLUMN vertical TEXT NOT NULL DEFAULT {default}")
                     logger.info(f"Migração: coluna 'vertical' adicionada a {table}")
-            except Exception:
-                pass  # Table doesn't exist yet, schema will create it
+            except sqlite3.OperationalError as exc:
+                if "no such table" in str(exc) or "duplicate column" in str(exc):
+                    pass  # Table doesn't exist yet (schema will create it) or column already exists
+                else:
+                    logger.warning(f"Migracao falhou para {table}: {exc}")
+                    raise
         self._conn.commit()
         # Migracoes adicionais (ortogonais)
         self._migrate_add_model_version()

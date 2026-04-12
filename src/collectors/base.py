@@ -120,8 +120,8 @@ class LLMClient:
     - New: ~$0.04/day ($1.20/mo) — mini + haiku + flash + JSON mode + cache
     """
 
-    MAX_RETRIES = 1
-    RETRY_BACKOFF = [3]  # seconds — single retry, then circuit break
+    MAX_RETRIES = 2
+    RETRY_BACKOFF = [3, 10]  # seconds — two retries with increasing backoff
 
     # Per-provider rate limiting (seconds between queries)
     # Gemini billing ativo (R$500 credito) = 30 RPM → 2s between queries
@@ -143,7 +143,7 @@ class LLMClient:
 
     def __init__(self, cohort: list[str] | None = None, vertical: str = "",
                  json_mode: bool = False) -> None:
-        self._http = httpx.Client(timeout=60.0)
+        self._http = httpx.Client(timeout=120.0)
         self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
         self._run_id = ""
         self._circuit_broken: set[str] = set()

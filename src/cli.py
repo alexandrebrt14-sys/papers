@@ -165,14 +165,19 @@ def collect_citation(ctx: click.Context) -> None:
         start = time.time()
         collector = CitationTracker(vertical=vert)
         results = collector.collect()
+        duration = int((time.time() - start) * 1000)
         count = 0
         if results:
             count = db.insert_citations(results, vertical=vert)
-            duration = int((time.time() - start) * 1000)
-            db.insert_collection_run("citation_tracker", count, duration, vertical=vert)
             console.print(f"[green]{count} citações coletadas ({duration}ms)[/green]")
         else:
             console.print(f"[yellow]Nenhuma resposta valida para {vert}[/yellow]")
+        # Registra collection_run SEMPRE (inclusive com 0 resultados) para
+        # diagnostico historico de quais verticais falharam em cada dia.
+        db.insert_collection_run(
+            "citation_tracker", count, duration,
+            vertical=vert, status="success" if count > 0 else "empty",
+        )
         total_collected += count
         # Tentamos ao menos a vertical (mesmo que retornem 0)
         total_attempted += 1
