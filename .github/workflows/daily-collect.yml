@@ -28,14 +28,9 @@ env:
   FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 
 jobs:
-  collect:
+  collect-and-finalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        vertical: [fintech, varejo, saude, tecnologia]
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v4
@@ -48,21 +43,8 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # Skip if workflow_dispatch selected a specific vertical
-      - name: Check if vertical should run
-        id: check
-        run: |
-          INPUT_VERTICAL="${{ github.event.inputs.vertical || 'all' }}"
-          MATRIX_VERTICAL="${{ matrix.vertical }}"
-          if [ "$INPUT_VERTICAL" != "all" ] && [ "$INPUT_VERTICAL" != "$MATRIX_VERTICAL" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-
-      # Step 1: Restore DB from previous run (if exists)
+      # Restore DB from previous run (incremental — preserva dados historicos)
       - name: Download previous DB
-        if: steps.check.outputs.skip != 'true'
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
@@ -70,29 +52,74 @@ jobs:
           if_no_artifact_found: warn
         continue-on-error: true
 
-      # Step 2: Validate Python imports before collection (fail-fast on SyntaxError)
+      # Validate Python imports before collection (fail-fast on SyntaxError)
       - name: Validate Python imports
-        if: steps.check.outputs.skip != 'true'
         run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
 
-      # Step 3: Run collectors for this vertical
-      - name: Run Citation Tracker (Module 1) — ${{ matrix.vertical }}
-        if: steps.check.outputs.skip != 'true'
-        run: python -m src.cli --vertical ${{ matrix.vertical }} collect citation
+      # ================================================================
+      # COLETA SEQUENCIAL — todas as verticais no MESMO job/runner
+      # ================================================================
+      # IMPORTANTE: antes, cada vertical rodava num job separado (matrix strategy)
+      # e cada um baixava o artifact do ultimo run com SUCESSO via dawidd6/v6,
+      # sobrescrevendo o artifact a cada upload. Resultado: so a ultima vertical
+      # (tecnologia) sobrevivia. Agora tudo roda no mesmo runner com o MESMO
+      # papers.db, eliminando o bug de chain de artifacts.
+      # Incidente: 2026-04-08 a 2026-04-12 (5 dias com so 1 vertical coletada).
+      # ================================================================
 
-      - name: Run Competitor Benchmark (Module 2) — ${{ matrix.vertical }}
-        if: steps.check.outputs.skip != 'true'
-        run: python -m src.cli --vertical ${{ matrix.vertical }} collect competitor || true
+      - name: Determine verticals to collect
+        id: verticals
+        run: |
+          INPUT_VERTICAL="${{ github.event.inputs.vertical || 'all' }}"
+          if [ "$INPUT_VERTICAL" = "all" ]; then
+            echo "list=fintech varejo saude tecnologia" >> $GITHUB_OUTPUT
+          else
+            echo "list=$INPUT_VERTICAL" >> $GITHUB_OUTPUT
+          fi
 
-      # Step 4: Export data for this vertical
-      - name: Export CSV snapshots — ${{ matrix.vertical }}
-        if: steps.check.outputs.skip != 'true'
-        run: python -m src.cli --vertical ${{ matrix.vertical }} db export --format csv --output data/daily
-        continue-on-error: true
+      - name: Collect all verticals (sequential — same DB)
+        run: |
+          VERTICALS="${{ steps.verticals.outputs.list }}"
+          TOTAL_CITATIONS=0
+          FAILED_VERTICALS=""
 
-      # Step 5: Upload DB artifact (overwrite papers-db-latest so next vertical inherits all data)
-      - name: Upload database (latest — chains across verticals)
-        if: steps.check.outputs.skip != 'true'
+          for V in $VERTICALS; do
+            echo ""
+            echo "========================================"
+            echo "  Coletando vertical: $V"
+            echo "========================================"
+
+            # Module 1: Citation Tracker
+            if python -m src.cli --vertical "$V" collect citation; then
+              echo "[OK] $V citation collection done"
+            else
+              echo "[FAIL] $V citation collection failed"
+              FAILED_VERTICALS="$FAILED_VERTICALS $V"
+            fi
+
+            # Module 2: Competitor Benchmark (non-blocking)
+            python -m src.cli --vertical "$V" collect competitor || true
+
+            # Export CSV snapshot
+            python -m src.cli --vertical "$V" db export --format csv --output data/daily || true
+
+            echo "[DONE] Vertical $V finalizada"
+          done
+
+          # Fail-loud se TODAS as verticais falharam
+          if [ -n "$FAILED_VERTICALS" ]; then
+            TOTAL=$(echo $VERTICALS | wc -w)
+            FAILED=$(echo $FAILED_VERTICALS | wc -w)
+            if [ "$FAILED" -eq "$TOTAL" ]; then
+              echo "CRITICO: todas as $TOTAL verticais falharam: $FAILED_VERTICALS"
+              exit 1
+            else
+              echo "AVISO: $FAILED/$TOTAL verticais falharam: $FAILED_VERTICALS (continuando com parcial)"
+            fi
+          fi
+
+      # Upload DB intermediario (para recovery em caso de falha no finalize)
+      - name: Upload database (latest — all verticals accumulated)
         uses: actions/upload-artifact@v4
         with:
           name: papers-db-latest
@@ -100,40 +127,12 @@ jobs:
           retention-days: 90
           overwrite: true
 
-  finalize:
-    runs-on: ubuntu-latest
-    needs: collect
-    timeout-minutes: 15
+      # ================================================================
+      # FINALIZE — tudo no mesmo job, sem download de artifact necessario
+      # ================================================================
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip install -e .
-
-      # Download DB with all 4 verticals accumulated (each vertical overwrites papers-db-latest).
-      # CRITICO: usar actions/download-artifact@v4 (default = run atual) em vez de
-      # dawidd6/action-download-artifact@v6, que por default busca o ULTIMO RUN COM SUCESSO
-      # e por isso baixava o DB do dia anterior em vez do produzido pelos jobs collect deste
-      # mesmo run — quebrava o health_check com "no such column: vertical" porque o DB
-      # legacy nao tinha a migracao aplicada. Incidente: 2026-04-08 run 24129745155.
-      - name: Download DB artifact (do run atual)
-        uses: actions/download-artifact@v4
-        with:
-          name: papers-db-latest
-          path: data/
-
-      # Garantia extra: rodar a migracao do schema (adiciona coluna `vertical` se faltar)
-      # antes de qualquer consumidor (sync_to_supabase, finops, health_check). Defesa em
-      # profundidade caso o artifact baixado tenha schema legacy.
+      # Garantia: rodar migracao do schema antes dos consumidores
       - name: Aplicar migracoes do schema
-        env:
-          PAPERS_DB_PATH: data/papers.db
         run: |
           python -c "from src.db.client import DatabaseClient; c = DatabaseClient(); c.connect(); c.close(); print('schema migrations OK')"
 
@@ -141,24 +140,15 @@ jobs:
       - name: FinOps monitor cycle
         run: python -m src.cli finops monitor
         continue-on-error: true
-        env:
-          PAPERS_DB_PATH: data/papers.db
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 
       # Sincroniza dados agregados com o Supabase para o dashboard Next.js
-      # Skip automático se as secrets não estiverem configuradas (exit code 2)
       - name: Sync to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          PAPERS_DB_PATH: data/papers.db
         run: python scripts/sync_to_supabase.py
 
-      # Gera dashboard_data.json fresco a partir do papers.db.
-      # Este arquivo é consumido por alexandrecaramaschi.com/research via
-      # GitHub raw + ISR (revalidate 24h) para manter o dashboard sempre atualizado
-      # com os dados mais recentes da coleta diária — sem precisar de redeploy.
+      # Gera dashboard_data.json fresco a partir do papers.db
       - name: Generate dashboard_data.json
         run: python scripts/generate_dashboard_json.py
 
@@ -166,34 +156,26 @@ jobs:
       - name: Update documentation
         run: python scripts/update-docs.py
 
-      # Commit dashboard_data.json atualizado para o repo (usado pelo /research)
+      # Commit dashboard_data.json atualizado para o repo
       - name: Commit dashboard_data.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/dashboard_data.json
           if git diff --cached --quiet; then
-            echo "Sem mudanças no dashboard_data.json"
+            echo "Sem mudancas no dashboard_data.json"
           else
             git commit -m "data: atualiza dashboard_data.json [skip ci]"
             git push
           fi
 
-      # HEALTH CHECK final — gating para garantir qualidade dos dados coletados
-      # Falha o workflow (e dispara alerta WhatsApp+email) se algum check critico falhar.
-      # Esta validacao previne o incidente de 30/Mar-06/Abr (12 dias de "success" sem dados).
+      # HEALTH CHECK final — gating para garantir qualidade dos dados
       - name: Health check (gating)
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
-          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           WHATSAPP_API_TOKEN: ${{ secrets.WHATSAPP_API_TOKEN }}
           WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          PAPERS_DB_PATH: data/papers.db
         run: python scripts/health_check.py --min-obs-per-day 200
 
       # Upload final consolidated DB
@@ -212,11 +194,10 @@ jobs:
           path: data/papers.db
           retention-days: 90
 
-      # Enviar relatório por email
-      - name: Enviar relatório diário por email
+      # Enviar relatorio por email
+      - name: Enviar relatorio diario por email
         run: python scripts/send-report.py || true
         env:
-          PAPERS_DB_PATH: data/papers.db
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           FINOPS_ALERT_EMAIL: caramaschiai@caramaschiai.io
 

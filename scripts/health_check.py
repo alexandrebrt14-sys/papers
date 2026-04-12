@@ -292,7 +292,11 @@ def check_no_consecutive_failures() -> Check:
         ).fetchall()
         days = [r[0] for r in rows]
         if len(days) < 2:
-            return c.fail(f"so {len(days)} dia(s) com dados nos ultimos 14d")
+            return c.fail(
+                f"so {len(days)} dia(s) com dados nos ultimos 14d",
+                severity="warning",
+                days_with_data=len(days),
+            )
         # Detecta gaps
         gaps = []
         for i in range(1, len(days)):
