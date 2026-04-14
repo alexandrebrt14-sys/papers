@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-13T11:28:30.893291+00:00",
-  "lastCollection": "2026-04-13 11:28:26",
-  "dbVersion": "papers.db (249 queries dataset)",
-  "totalQueries": 249,
-  "totalCited": 207,
-  "overallRate": 83.1,
+  "generatedAt": "2026-04-14T11:08:57.378912+00:00",
+  "lastCollection": "2026-04-14 11:08:53",
+  "dbVersion": "papers.db (254 queries dataset)",
+  "totalQueries": 254,
+  "totalCited": 212,
+  "overallRate": 83.5,
   "entitiesMonitored": 69,
   "entitiesReal": 61,
   "entitiesFictitious": 8,
@@ -16,10 +16,10 @@
       "name": "Gemini",
       "model": "gemini-2.5-flash",
       "provider": "Google",
-      "queries": 65,
-      "cited": 59,
-      "rate": 90.8,
-      "avgLatencyMs": 35046,
+      "queries": 70,
+      "cited": 64,
+      "rate": 91.4,
+      "avgLatencyMs": 32468,
       "color": "#4285f4"
     },
     {
@@ -27,9 +27,9 @@
       "model": "gpt-4o-mini-2024-07-18",
       "provider": "OpenAI",
       "queries": 72,
-      "cited": 61,
-      "rate": 84.7,
-      "avgLatencyMs": 8487,
+      "cited": 59,
+      "rate": 81.9,
+      "avgLatencyMs": 8073,
       "color": "#10a37f"
     },
     {
@@ -39,7 +39,7 @@
       "queries": 40,
       "cited": 32,
       "rate": 80.0,
-      "avgLatencyMs": 4425,
+      "avgLatencyMs": 4478,
       "color": "#20b2aa"
     },
     {
@@ -47,9 +47,9 @@
       "model": "claude-haiku-4-5-20251001",
       "provider": "Anthropic",
       "queries": 72,
-      "cited": 55,
-      "rate": 76.4,
-      "avgLatencyMs": 3967,
+      "cited": 57,
+      "rate": 79.2,
+      "avgLatencyMs": 3852,
       "color": "#d4a574"
     }
   ],
@@ -57,33 +57,33 @@
     {
       "slug": "fintech",
       "name": "Fintech",
-      "queries": 62,
-      "cited": 60,
-      "rate": 96.8,
+      "queries": 64,
+      "cited": 63,
+      "rate": 98.4,
       "color": "#0ea5e9"
     },
     {
       "slug": "varejo",
       "name": "Varejo",
-      "queries": 64,
-      "cited": 55,
-      "rate": 85.9,
+      "queries": 63,
+      "cited": 54,
+      "rate": 85.7,
       "color": "#ec4899"
     },
     {
       "slug": "tecnologia",
       "name": "Tecnologia",
-      "queries": 62,
+      "queries": 63,
       "cited": 52,
-      "rate": 83.9,
+      "rate": 82.5,
       "color": "#f59e0b"
     },
     {
       "slug": "saude",
       "name": "Saúde",
-      "queries": 61,
-      "cited": 40,
-      "rate": 65.6,
+      "queries": 64,
+      "cited": 43,
+      "rate": 67.2,
       "color": "#0d9488"
     }
   ],
@@ -92,22 +92,22 @@
       "vertical": "fintech",
       "model": "ChatGPT",
       "queries": 18,
-      "cited": 18,
-      "rate": 100.0
-    },
-    {
-      "vertical": "fintech",
-      "model": "Claude",
-      "queries": 18,
       "cited": 17,
       "rate": 94.4
     },
     {
       "vertical": "fintech",
+      "model": "Claude",
+      "queries": 18,
+      "cited": 18,
+      "rate": 100.0
+    },
+    {
+      "vertical": "fintech",
       "model": "Gemini",
-      "queries": 16,
-      "cited": 15,
-      "rate": 93.8
+      "queries": 18,
+      "cited": 18,
+      "rate": 100.0
     },
     {
       "vertical": "fintech",
@@ -127,15 +127,15 @@
       "vertical": "saude",
       "model": "Claude",
       "queries": 18,
-      "cited": 12,
-      "rate": 66.7
+      "cited": 13,
+      "rate": 72.2
     },
     {
       "vertical": "saude",
       "model": "Gemini",
-      "queries": 15,
-      "cited": 11,
-      "rate": 73.3
+      "queries": 18,
+      "cited": 13,
+      "rate": 72.2
     },
     {
       "vertical": "saude",
@@ -148,8 +148,8 @@
       "vertical": "tecnologia",
       "model": "ChatGPT",
       "queries": 18,
-      "cited": 17,
-      "rate": 94.4
+      "cited": 16,
+      "rate": 88.9
     },
     {
       "vertical": "tecnologia",
@@ -161,9 +161,9 @@
     {
       "vertical": "tecnologia",
       "model": "Gemini",
-      "queries": 16,
-      "cited": 15,
-      "rate": 93.8
+      "queries": 17,
+      "cited": 16,
+      "rate": 94.1
     },
     {
       "vertical": "tecnologia",
@@ -189,8 +189,8 @@
     {
       "vertical": "varejo",
       "model": "Gemini",
-      "queries": 18,
-      "cited": 18,
+      "queries": 17,
+      "cited": 17,
       "rate": 100.0
     },
     {
