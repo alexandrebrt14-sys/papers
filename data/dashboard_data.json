@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-14T11:08:57.378912+00:00",
-  "lastCollection": "2026-04-14 11:08:53",
-  "dbVersion": "papers.db (254 queries dataset)",
-  "totalQueries": 254,
-  "totalCited": 212,
-  "overallRate": 83.5,
+  "generatedAt": "2026-04-15T11:07:59.125020+00:00",
+  "lastCollection": "2026-04-15 11:07:55",
+  "dbVersion": "papers.db (253 queries dataset)",
+  "totalQueries": 253,
+  "totalCited": 214,
+  "overallRate": 84.6,
   "entitiesMonitored": 69,
   "entitiesReal": 61,
   "entitiesFictitious": 8,
@@ -13,13 +13,23 @@
   "daysCollecting": 1,
   "byLLM": [
     {
+      "name": "Perplexity",
+      "model": "sonar",
+      "provider": "Perplexity AI",
+      "queries": 40,
+      "cited": 35,
+      "rate": 87.5,
+      "avgLatencyMs": 3764,
+      "color": "#20b2aa"
+    },
+    {
       "name": "Gemini",
       "model": "gemini-2.5-flash",
       "provider": "Google",
-      "queries": 70,
-      "cited": 64,
-      "rate": 91.4,
-      "avgLatencyMs": 32468,
+      "queries": 69,
+      "cited": 60,
+      "rate": 87.0,
+      "avgLatencyMs": 31771,
       "color": "#4285f4"
     },
     {
@@ -27,29 +37,19 @@
       "model": "gpt-4o-mini-2024-07-18",
       "provider": "OpenAI",
       "queries": 72,
-      "cited": 59,
-      "rate": 81.9,
-      "avgLatencyMs": 8073,
+      "cited": 61,
+      "rate": 84.7,
+      "avgLatencyMs": 7185,
       "color": "#10a37f"
-    },
-    {
-      "name": "Perplexity",
-      "model": "sonar",
-      "provider": "Perplexity AI",
-      "queries": 40,
-      "cited": 32,
-      "rate": 80.0,
-      "avgLatencyMs": 4478,
-      "color": "#20b2aa"
     },
     {
       "name": "Claude",
       "model": "claude-haiku-4-5-20251001",
       "provider": "Anthropic",
       "queries": 72,
-      "cited": 57,
-      "rate": 79.2,
-      "avgLatencyMs": 3852,
+      "cited": 58,
+      "rate": 80.6,
+      "avgLatencyMs": 3991,
       "color": "#d4a574"
     }
   ],
@@ -57,10 +57,18 @@
     {
       "slug": "fintech",
       "name": "Fintech",
-      "queries": 64,
+      "queries": 63,
       "cited": 63,
-      "rate": 98.4,
+      "rate": 100.0,
       "color": "#0ea5e9"
+    },
+    {
+      "slug": "tecnologia",
+      "name": "Tecnologia",
+      "queries": 63,
+      "cited": 54,
+      "rate": 85.7,
+      "color": "#f59e0b"
     },
     {
       "slug": "varejo",
@@ -69,14 +77,6 @@
       "cited": 54,
       "rate": 85.7,
       "color": "#ec4899"
-    },
-    {
-      "slug": "tecnologia",
-      "name": "Tecnologia",
-      "queries": 63,
-      "cited": 52,
-      "rate": 82.5,
-      "color": "#f59e0b"
     },
     {
       "slug": "saude",
@@ -92,8 +92,8 @@
       "vertical": "fintech",
       "model": "ChatGPT",
       "queries": 18,
-      "cited": 17,
-      "rate": 94.4
+      "cited": 18,
+      "rate": 100.0
     },
     {
       "vertical": "fintech",
@@ -105,8 +105,8 @@
     {
       "vertical": "fintech",
       "model": "Gemini",
-      "queries": 18,
-      "cited": 18,
+      "queries": 17,
+      "cited": 17,
       "rate": 100.0
     },
     {
@@ -134,71 +134,71 @@
       "vertical": "saude",
       "model": "Gemini",
       "queries": 18,
-      "cited": 13,
-      "rate": 72.2
+      "cited": 12,
+      "rate": 66.7
     },
     {
       "vertical": "saude",
       "model": "Perplexity",
       "queries": 10,
-      "cited": 7,
-      "rate": 70.0
+      "cited": 8,
+      "rate": 80.0
     },
     {
       "vertical": "tecnologia",
+      "model": "ChatGPT",
+      "queries": 18,
+      "cited": 17,
+      "rate": 94.4
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "Claude",
+      "queries": 18,
+      "cited": 14,
+      "rate": 77.8
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "Gemini",
+      "queries": 17,
+      "cited": 15,
+      "rate": 88.2
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "Perplexity",
+      "queries": 10,
+      "cited": 8,
+      "rate": 80.0
+    },
+    {
+      "vertical": "varejo",
       "model": "ChatGPT",
       "queries": 18,
       "cited": 16,
       "rate": 88.9
     },
     {
-      "vertical": "tecnologia",
+      "vertical": "varejo",
       "model": "Claude",
       "queries": 18,
       "cited": 13,
       "rate": 72.2
     },
     {
-      "vertical": "tecnologia",
+      "vertical": "varejo",
       "model": "Gemini",
       "queries": 17,
       "cited": 16,
       "rate": 94.1
     },
     {
-      "vertical": "tecnologia",
-      "model": "Perplexity",
-      "queries": 10,
-      "cited": 7,
-      "rate": 70.0
-    },
-    {
-      "vertical": "varejo",
-      "model": "ChatGPT",
-      "queries": 18,
-      "cited": 16,
-      "rate": 88.9
-    },
-    {
-      "vertical": "varejo",
-      "model": "Claude",
-      "queries": 18,
-      "cited": 13,
-      "rate": 72.2
-    },
-    {
-      "vertical": "varejo",
-      "model": "Gemini",
-      "queries": 17,
-      "cited": 17,
-      "rate": 100.0
-    },
-    {
       "vertical": "varejo",
       "model": "Perplexity",
       "queries": 10,
-      "cited": 8,
-      "rate": 80.0
+      "cited": 9,
+      "rate": 90.0
     }
   ],
   "verticalsFull": {
