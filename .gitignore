@@ -13,8 +13,10 @@ build/
 # Data (keep schema, ignore actual data)
 data/*.db
 data/*.csv
+!data/papers.db           # source of truth da pesquisa — commit para reprodutibilidade
 !data/finops_checkpoint.json
 !data/finops_alerts.jsonl
+!data/dashboard_data.json
 !data/.gitkeep
 
 # IDE

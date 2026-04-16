@@ -18,7 +18,11 @@ try:
     from dotenv import dotenv_values
 except ImportError:
     print("Instalando dependências: PyNaCl httpx python-dotenv")
-    os.system(f"{sys.executable} -m pip install PyNaCl httpx python-dotenv")
+    import subprocess
+    subprocess.run(  # noqa: S603 — args via sys.executable trusted path
+        [sys.executable, "-m", "pip", "install", "PyNaCl", "httpx", "python-dotenv"],
+        check=True,
+    )
     from nacl import encoding, public
     import httpx
     from dotenv import dotenv_values

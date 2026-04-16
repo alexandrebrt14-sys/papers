@@ -294,8 +294,8 @@ class CollectionConfig:
             provider="google",
             model="gemini-2.5-pro",      # Billing ativo (R$500 credito). 30+ RPM.
             api_key=os.getenv("GOOGLE_AI_API_KEY"),
-            input_cost_per_mtok=0.15,
-            output_cost_per_mtok=0.60,
+            input_cost_per_mtok=1.25,    # Gemini 2.5 Pro oficial: $1.25/MTok <=128K context
+            output_cost_per_mtok=5.00,   # Gemini 2.5 Pro oficial: $5.00/MTok output
             max_output_tokens=800,          # Increased from 250 (Proposal 4)
             supports_json_mode=True,
             supports_batch=False,

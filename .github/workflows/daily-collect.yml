@@ -43,19 +43,18 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # Restore DB from previous run (incremental — preserva dados historicos).
-      # CRITICO: workflow_conclusion: "" faz o download do artifact mais recente
-      # INDEPENDENTE da conclusao do run (success/failure/cancelled). Sem isso,
-      # dawidd6/v6 so baixa de runs "success", e se o health check falhar
-      # (ultimo step), dados coletados naquele run sao perdidos no dia seguinte.
-      # if_no_artifact_found: warn garante que a primeira execucao continua com DB vazio.
-      - name: Download previous DB
+      # NOTA: papers.db agora e commitado no git como source-of-truth
+      # (incidente 2026-04-16: artifact papers-db-latest "not found" causava
+      # reset diario para 0 linhas; drift 255 vs 1004 na pagina publica).
+      # O checkout@v4 acima ja traz a versao mais recente do DB; artifact e
+      # mantido como safety-net secundario mas nao e mais source of truth.
+      - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
           path: data/
           workflow_conclusion: ""
-          if_no_artifact_found: warn
+          if_no_artifact_found: ignore
         continue-on-error: true
 
       - name: Validate Python imports
@@ -182,6 +181,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # Stage tudo de uma vez
+          git add data/papers.db 2>/dev/null || true   # source of truth da pesquisa (pos-incidente 16/04)
           git add data/dashboard_data.json 2>/dev/null || true
           git add data/daily_*.csv 2>/dev/null || true
           git add data/finops_checkpoint.json 2>/dev/null || true

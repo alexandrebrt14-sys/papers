@@ -18,7 +18,7 @@ LLM_META = {
     "Perplexity": {"provider": "Perplexity AI", "model": "sonar", "color": "#20b2aa"},
     "Claude": {"provider": "Anthropic", "model": "claude-haiku-4-5-20251001", "color": "#d4a574"},
     "ChatGPT": {"provider": "OpenAI", "model": "gpt-4o-mini-2024-07-18", "color": "#10a37f"},
-    "Gemini": {"provider": "Google", "model": "gemini-2.5-flash", "color": "#4285f4"},
+    "Gemini": {"provider": "Google", "model": "gemini-2.5-pro", "color": "#4285f4"},
 }
 
 VERT_META = {

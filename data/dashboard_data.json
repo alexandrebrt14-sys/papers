@@ -1,89 +1,89 @@
 {
-  "generatedAt": "2026-04-16T11:06:10.074037+00:00",
-  "lastCollection": "2026-04-16 11:06:05",
-  "dbVersion": "papers.db (255 queries dataset)",
-  "totalQueries": 255,
-  "totalCited": 212,
-  "overallRate": 83.1,
+  "generatedAt": "2026-04-16T18:24:41.343288+00:00",
+  "lastCollection": "2026-04-12 22:55:44",
+  "dbVersion": "papers.db (1004 queries dataset)",
+  "totalQueries": 1004,
+  "totalCited": 626,
+  "overallRate": 62.4,
   "entitiesMonitored": 69,
   "entitiesReal": 61,
   "entitiesFictitious": 8,
-  "contextAnalyses": 0,
-  "collectionRounds": 4,
-  "daysCollecting": 1,
+  "contextAnalyses": 172,
+  "collectionRounds": 17,
+  "daysCollecting": 5,
   "byLLM": [
-    {
-      "name": "Gemini",
-      "model": "gemini-2.5-flash",
-      "provider": "Google",
-      "queries": 71,
-      "cited": 64,
-      "rate": 90.1,
-      "avgLatencyMs": 30840,
-      "color": "#4285f4"
-    },
-    {
-      "name": "ChatGPT",
-      "model": "gpt-4o-mini-2024-07-18",
-      "provider": "OpenAI",
-      "queries": 72,
-      "cited": 61,
-      "rate": 84.7,
-      "avgLatencyMs": 6949,
-      "color": "#10a37f"
-    },
     {
       "name": "Claude",
       "model": "claude-haiku-4-5-20251001",
       "provider": "Anthropic",
-      "queries": 72,
-      "cited": 56,
-      "rate": 77.8,
-      "avgLatencyMs": 4001,
+      "queries": 280,
+      "cited": 184,
+      "rate": 65.7,
+      "avgLatencyMs": 2679,
       "color": "#d4a574"
     },
     {
       "name": "Perplexity",
       "model": "sonar",
       "provider": "Perplexity AI",
-      "queries": 40,
-      "cited": 31,
-      "rate": 77.5,
-      "avgLatencyMs": 3743,
+      "queries": 203,
+      "cited": 129,
+      "rate": 63.5,
+      "avgLatencyMs": 2632,
       "color": "#20b2aa"
+    },
+    {
+      "name": "ChatGPT",
+      "model": "gpt-4o-mini-2024-07-18",
+      "provider": "OpenAI",
+      "queries": 298,
+      "cited": 181,
+      "rate": 60.7,
+      "avgLatencyMs": 5957,
+      "color": "#10a37f"
+    },
+    {
+      "name": "Gemini",
+      "model": "gemini-2.5-pro",
+      "provider": "Google",
+      "queries": 177,
+      "cited": 86,
+      "rate": 48.6,
+      "avgLatencyMs": 15370,
+      "color": "#4285f4"
     }
   ],
   "byVertical": [
     {
       "slug": "fintech",
       "name": "Fintech",
-      "queries": 64,
-      "cited": 61,
-      "rate": 95.3,
+      "queries": 336,
+      "cited": 230,
+      "rate": 68.5,
       "color": "#0ea5e9"
-    },
-    {
-      "slug": "varejo",
-      "name": "Varejo",
-      "queries": 64,
-      "cited": 55,
-      "rate": 85.9,
-      "color": "#ec4899"
     },
     {
       "slug": "tecnologia",
       "name": "Tecnologia",
-      "queries": 63,
-      "cited": 53,
-      "rate": 84.1,
+      "queries": 252,
+      "cited": 165,
+      "rate": 65.5,
       "color": "#f59e0b"
+    },
+    {
+      "slug": "varejo",
+      "name": "Varejo",
+      "queries": 191,
+      "cited": 121,
+      "rate": 63.4,
+      "color": "#ec4899"
     },
     {
       "slug": "saude",
       "name": "Saúde",
-      "queries": 64,
-      "cited": 43,
-      "rate": 67.2,
+      "queries": 225,
+      "cited": 110,
+      "rate": 48.9,
       "color": "#0d9488"
     }
   ],
@@ -91,114 +91,114 @@
     {
       "vertical": "fintech",
       "model": "ChatGPT",
-      "queries": 18,
-      "cited": 17,
-      "rate": 94.4
+      "queries": 112,
+      "cited": 79,
+      "rate": 70.5
     },
     {
       "vertical": "fintech",
       "model": "Claude",
-      "queries": 18,
-      "cited": 17,
-      "rate": 94.4
+      "queries": 94,
+      "cited": 73,
+      "rate": 77.7
     },
     {
       "vertical": "fintech",
       "model": "Gemini",
-      "queries": 18,
-      "cited": 17,
-      "rate": 94.4
-    },
-    {
-      "vertical": "fintech",
-      "model": "Perplexity",
-      "queries": 10,
-      "cited": 10,
-      "rate": 100.0
-    },
-    {
-      "vertical": "saude",
-      "model": "ChatGPT",
-      "queries": 18,
-      "cited": 10,
-      "rate": 55.6
-    },
-    {
-      "vertical": "saude",
-      "model": "Claude",
-      "queries": 18,
-      "cited": 14,
-      "rate": 77.8
-    },
-    {
-      "vertical": "saude",
-      "model": "Gemini",
-      "queries": 18,
-      "cited": 12,
-      "rate": 66.7
-    },
-    {
-      "vertical": "saude",
-      "model": "Perplexity",
-      "queries": 10,
-      "cited": 7,
-      "rate": 70.0
-    },
-    {
-      "vertical": "tecnologia",
-      "model": "ChatGPT",
-      "queries": 18,
-      "cited": 17,
-      "rate": 94.4
-    },
-    {
-      "vertical": "tecnologia",
-      "model": "Claude",
-      "queries": 18,
-      "cited": 12,
-      "rate": 66.7
-    },
-    {
-      "vertical": "tecnologia",
-      "model": "Gemini",
-      "queries": 17,
-      "cited": 17,
-      "rate": 100.0
-    },
-    {
-      "vertical": "tecnologia",
-      "model": "Perplexity",
-      "queries": 10,
-      "cited": 7,
-      "rate": 70.0
-    },
-    {
-      "vertical": "varejo",
-      "model": "ChatGPT",
-      "queries": 18,
-      "cited": 17,
-      "rate": 94.4
-    },
-    {
-      "vertical": "varejo",
-      "model": "Claude",
-      "queries": 18,
-      "cited": 13,
-      "rate": 72.2
-    },
-    {
-      "vertical": "varejo",
-      "model": "Gemini",
-      "queries": 18,
+      "queries": 50,
       "cited": 18,
-      "rate": 100.0
+      "rate": 36.0
+    },
+    {
+      "vertical": "fintech",
+      "model": "Perplexity",
+      "queries": 80,
+      "cited": 60,
+      "rate": 75.0
+    },
+    {
+      "vertical": "saude",
+      "model": "ChatGPT",
+      "queries": 74,
+      "cited": 29,
+      "rate": 39.2
+    },
+    {
+      "vertical": "saude",
+      "model": "Claude",
+      "queries": 74,
+      "cited": 45,
+      "rate": 60.8
+    },
+    {
+      "vertical": "saude",
+      "model": "Gemini",
+      "queries": 34,
+      "cited": 12,
+      "rate": 35.3
+    },
+    {
+      "vertical": "saude",
+      "model": "Perplexity",
+      "queries": 43,
+      "cited": 24,
+      "rate": 55.8
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "ChatGPT",
+      "queries": 74,
+      "cited": 53,
+      "rate": 71.6
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "Claude",
+      "queries": 74,
+      "cited": 47,
+      "rate": 63.5
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "Gemini",
+      "queries": 54,
+      "cited": 34,
+      "rate": 63.0
+    },
+    {
+      "vertical": "tecnologia",
+      "model": "Perplexity",
+      "queries": 50,
+      "cited": 31,
+      "rate": 62.0
+    },
+    {
+      "vertical": "varejo",
+      "model": "ChatGPT",
+      "queries": 56,
+      "cited": 38,
+      "rate": 67.9
+    },
+    {
+      "vertical": "varejo",
+      "model": "Claude",
+      "queries": 56,
+      "cited": 37,
+      "rate": 66.1
+    },
+    {
+      "vertical": "varejo",
+      "model": "Gemini",
+      "queries": 39,
+      "cited": 22,
+      "rate": 56.4
     },
     {
       "vertical": "varejo",
       "model": "Perplexity",
-      "queries": 10,
-      "cited": 7,
-      "rate": 70.0
+      "queries": 40,
+      "cited": 24,
+      "rate": 60.0
     }
   ],
   "verticalsFull": {
@@ -224,9 +224,62 @@
         "Banco Carrefour"
       ],
       "rosterCount": 16,
-      "citedEntities": [],
-      "citedCount": 0,
-      "coverage": 0.0
+      "citedEntities": [
+        {
+          "entity": "Nubank",
+          "count": 44
+        },
+        {
+          "entity": "Banco Inter",
+          "count": 21
+        },
+        {
+          "entity": "C6 Bank",
+          "count": 20
+        },
+        {
+          "entity": "Itaú",
+          "count": 17
+        },
+        {
+          "entity": "PagBank",
+          "count": 16
+        },
+        {
+          "entity": "Bradesco",
+          "count": 14
+        },
+        {
+          "entity": "Stone",
+          "count": 14
+        },
+        {
+          "entity": "Cielo",
+          "count": 11
+        },
+        {
+          "entity": "PicPay",
+          "count": 5
+        },
+        {
+          "entity": "Mercado Pago",
+          "count": 3
+        },
+        {
+          "entity": "Neon",
+          "count": 3
+        },
+        {
+          "entity": "BTG Pactual",
+          "count": 2
+        },
+        {
+          "entity": "Wise",
+          "count": 2
+        }
+      ],
+      "citedCount": 13,
+      "coverage": 81.2
     },
     "varejo": {
       "slug": "varejo",
@@ -304,19 +357,72 @@
       "coverage": 0.0
     }
   },
-  "topEntities": [],
+  "topEntities": [
+    {
+      "name": "Nubank",
+      "citations": 44
+    },
+    {
+      "name": "Banco Inter",
+      "citations": 21
+    },
+    {
+      "name": "C6 Bank",
+      "citations": 20
+    },
+    {
+      "name": "Itaú",
+      "citations": 17
+    },
+    {
+      "name": "PagBank",
+      "citations": 16
+    },
+    {
+      "name": "Bradesco",
+      "citations": 14
+    },
+    {
+      "name": "Stone",
+      "citations": 14
+    },
+    {
+      "name": "Cielo",
+      "citations": 11
+    },
+    {
+      "name": "PicPay",
+      "citations": 5
+    },
+    {
+      "name": "Mercado Pago",
+      "citations": 3
+    },
+    {
+      "name": "Neon",
+      "citations": 3
+    },
+    {
+      "name": "BTG Pactual",
+      "citations": 2
+    },
+    {
+      "name": "Wise",
+      "citations": 2
+    }
+  ],
   "sentiment": {
-    "neutral": 0,
-    "positive": 0,
-    "negative": 0
+    "neutral": 114,
+    "positive": 56,
+    "negative": 2
   },
   "attribution": {
-    "named": 0,
-    "linked": 0
+    "named": 167,
+    "linked": 5
   },
   "positionInResponse": {
-    "initial": 0,
-    "middle": 0,
-    "final": 0
+    "initial": 113,
+    "middle": 33,
+    "final": 26
   }
 }
