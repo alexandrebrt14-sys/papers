@@ -67,15 +67,16 @@ PRICING: dict[str, dict[str, dict[str, float]]] = {
 }
 
 DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
-    # Atualizado 2026-04-07 — limites tighter para evitar bill shock por bug sistemico.
-    # Custo medio observado: ~$1/mes em coleta diaria 4 verticais x 4 LLMs.
-    # Margem 5x para variacoes esperadas, hard_stop em 95% por provider.
-    "openai":     {"monthly": 3.0,  "daily": 0.30, "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "anthropic":  {"monthly": 3.0,  "daily": 0.30, "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "google":     {"monthly": 2.0,  "daily": 0.20, "alert_pct": 0.80, "hard_stop_pct": 1.00},
-    "perplexity": {"monthly": 3.0,  "daily": 0.30, "alert_pct": 0.70, "hard_stop_pct": 0.95},
-    "groq":       {"monthly": 1.0,  "daily": 0.10, "alert_pct": 0.80, "hard_stop_pct": 1.00},
-    "global":     {"monthly": 10.0, "daily": 1.0,  "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    # Atualizado 2026-04-16 — budget global $100/mes para publicacao cientifica julho/2026.
+    # Pipeline com 2x/dia x 35 queries x 5 LLMs = ~1400 obs/dia.
+    # Custo esperado ~$27/mes com 4 LLMs, $30/mes adicionando Groq.
+    # Margem 3x para variacoes, anomalias e expansao futura (prompt variants, paraphrases).
+    "openai":     {"monthly": 15.0, "daily": 0.80, "alert_pct": 0.75, "hard_stop_pct": 0.95},
+    "anthropic":  {"monthly": 20.0, "daily": 1.00, "alert_pct": 0.75, "hard_stop_pct": 0.95},
+    "google":     {"monthly": 15.0, "daily": 0.80, "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    "perplexity": {"monthly": 25.0, "daily": 1.20, "alert_pct": 0.70, "hard_stop_pct": 0.95},
+    "groq":       {"monthly": 10.0, "daily": 0.50, "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    "global":     {"monthly": 100.0, "daily": 5.00, "alert_pct": 0.70, "hard_stop_pct": 0.95},
 }
 
 # Anomaly: flag if single query costs more than this

@@ -376,6 +376,17 @@ class CollectionConfig:
             supports_json_mode=False,       # Perplexity doesn't support JSON mode
             supports_batch=False,
         ),
+        LLMConfig(
+            name="Groq",
+            provider="groq",
+            model="llama-3.3-70b-versatile",  # Open-weight, ultra-fast inference, diversifica amostra
+            api_key=os.getenv("GROQ_API_KEY"),
+            input_cost_per_mtok=0.59,
+            output_cost_per_mtok=0.79,
+            max_output_tokens=800,
+            supports_json_mode=True,
+            supports_batch=False,
+        ),
     ])
 
 

@@ -1,10 +1,14 @@
 {
-  "generatedAt": "2026-04-16T18:24:41.343288+00:00",
+  "generatedAt": "2026-04-16T19:17:07.701613+00:00",
   "lastCollection": "2026-04-12 22:55:44",
   "dbVersion": "papers.db (1004 queries dataset)",
   "totalQueries": 1004,
   "totalCited": 626,
   "overallRate": 62.4,
+  "overallCI95": {
+    "low": 59.3,
+    "high": 65.3
+  },
   "entitiesMonitored": 69,
   "entitiesReal": 61,
   "entitiesFictitious": 8,
@@ -20,7 +24,9 @@
       "cited": 184,
       "rate": 65.7,
       "avgLatencyMs": 2679,
-      "color": "#d4a574"
+      "color": "#d4a574",
+      "ci95_low": 62.3,
+      "ci95_high": 72.8
     },
     {
       "name": "Perplexity",
@@ -30,7 +36,9 @@
       "cited": 129,
       "rate": 63.5,
       "avgLatencyMs": 2632,
-      "color": "#20b2aa"
+      "color": "#20b2aa",
+      "ci95_low": 58.6,
+      "ci95_high": 71.3
     },
     {
       "name": "ChatGPT",
@@ -40,7 +48,9 @@
       "cited": 181,
       "rate": 60.7,
       "avgLatencyMs": 5957,
-      "color": "#10a37f"
+      "color": "#10a37f",
+      "ci95_low": 57.5,
+      "ci95_high": 68.1
     },
     {
       "name": "Gemini",
@@ -50,7 +60,9 @@
       "cited": 86,
       "rate": 48.6,
       "avgLatencyMs": 15370,
-      "color": "#4285f4"
+      "color": "#4285f4",
+      "ci95_low": 41.3,
+      "ci95_high": 55.9
     }
   ],
   "byVertical": [
@@ -424,5 +436,298 @@
     "initial": 113,
     "middle": 33,
     "final": 26
+  },
+  "dailySeries": [
+    {
+      "date": "2026-03-24",
+      "queries": 351,
+      "cited": 134,
+      "rate": 38.2
+    },
+    {
+      "date": "2026-03-26",
+      "queries": 46,
+      "cited": 31,
+      "rate": 67.4
+    },
+    {
+      "date": "2026-03-29",
+      "queries": 256,
+      "cited": 160,
+      "rate": 62.5
+    },
+    {
+      "date": "2026-04-07",
+      "queries": 287,
+      "cited": 249,
+      "rate": 86.8
+    },
+    {
+      "date": "2026-04-12",
+      "queries": 64,
+      "cited": 52,
+      "rate": 81.2
+    }
+  ],
+  "uncitedByVertical": {
+    "fintech": [
+      "Ame Digital",
+      "Original",
+      "BS2",
+      "Safra",
+      "Banco Carrefour"
+    ],
+    "varejo": [
+      "Magazine Luiza",
+      "Casas Bahia",
+      "Ponto Frio",
+      "Americanas",
+      "Amazon Brasil",
+      "Mercado Livre",
+      "Shopee Brasil",
+      "AliExpress Brasil",
+      "Leroy Merlin",
+      "Tok&Stok",
+      "Renner",
+      "Riachuelo",
+      "C&A Brasil",
+      "Centauro",
+      "Netshoes"
+    ],
+    "saude": [
+      "Dasa",
+      "Hapvida",
+      "Unimed",
+      "Eli Lilly Brasil",
+      "Raia Drogasil",
+      "Fleury",
+      "Rede D'Or",
+      "Einstein",
+      "Sírio-Libanês",
+      "Eurofarma",
+      "Aché",
+      "EMS",
+      "Hypera Pharma",
+      "NotreDame Intermédica",
+      "SulAmérica Saúde"
+    ],
+    "tecnologia": [
+      "Tivit",
+      "Accenture Brasil",
+      "Stefanini",
+      "Totvs",
+      "Linx",
+      "Locaweb",
+      "Positivo Tecnologia",
+      "Movile",
+      "CI&T",
+      "Vivo Empresas",
+      "Embraer",
+      "WEG",
+      "Natura &Co",
+      "iFood",
+      "99"
+    ]
+  },
+  "crossVerticalEntities": [],
+  "sentimentByLLM": {
+    "ChatGPT": {
+      "neutral": 21,
+      "positive": 5,
+      "negative": 0
+    },
+    "Claude": {
+      "neutral": 38,
+      "positive": 7,
+      "negative": 0
+    },
+    "Gemini": {
+      "neutral": 2,
+      "positive": 3,
+      "negative": 0
+    },
+    "Perplexity": {
+      "neutral": 53,
+      "positive": 41,
+      "negative": 2
+    }
+  },
+  "byCategory": [
+    {
+      "category": "fintech_trust",
+      "queries": 45,
+      "cited": 45,
+      "rate": 100.0
+    },
+    {
+      "category": "comparativo",
+      "queries": 123,
+      "cited": 119,
+      "rate": 96.7
+    },
+    {
+      "category": "confianca",
+      "queries": 60,
+      "cited": 56,
+      "rate": 93.3
+    },
+    {
+      "category": "descoberta",
+      "queries": 123,
+      "cited": 101,
+      "rate": 82.1
+    },
+    {
+      "category": "produto",
+      "queries": 62,
+      "cited": 50,
+      "rate": 80.6
+    },
+    {
+      "category": "b2b",
+      "queries": 61,
+      "cited": 49,
+      "rate": 80.3
+    },
+    {
+      "category": "fintech",
+      "queries": 45,
+      "cited": 35,
+      "rate": 77.8
+    },
+    {
+      "category": "saude_b2b",
+      "queries": 4,
+      "cited": 3,
+      "rate": 75.0
+    },
+    {
+      "category": "saude_trust",
+      "queries": 4,
+      "cited": 3,
+      "rate": 75.0
+    },
+    {
+      "category": "transformacao",
+      "queries": 29,
+      "cited": 19,
+      "rate": 65.5
+    },
+    {
+      "category": "reputacao",
+      "queries": 123,
+      "cited": 65,
+      "rate": 52.8
+    },
+    {
+      "category": "experiencia",
+      "queries": 30,
+      "cited": 15,
+      "rate": 50.0
+    },
+    {
+      "category": "saude",
+      "queries": 8,
+      "cited": 4,
+      "rate": 50.0
+    },
+    {
+      "category": "fintech_b2b",
+      "queries": 45,
+      "cited": 21,
+      "rate": 46.7
+    },
+    {
+      "category": "mercado",
+      "queries": 42,
+      "cited": 18,
+      "rate": 42.9
+    },
+    {
+      "category": "fintech_product",
+      "queries": 45,
+      "cited": 15,
+      "rate": 33.3
+    },
+    {
+      "category": "saude_product",
+      "queries": 4,
+      "cited": 1,
+      "rate": 25.0
+    },
+    {
+      "category": "concept",
+      "queries": 66,
+      "cited": 6,
+      "rate": 9.1
+    },
+    {
+      "category": "technical",
+      "queries": 51,
+      "cited": 1,
+      "rate": 2.0
+    },
+    {
+      "category": "academic",
+      "queries": 34,
+      "cited": 0,
+      "rate": 0.0
+    }
+  ],
+  "byLanguage": [
+    {
+      "lang": "en",
+      "queries": 591,
+      "cited": 298,
+      "rate": 50.4
+    },
+    {
+      "lang": "pt",
+      "queries": 413,
+      "cited": 328,
+      "rate": 79.4
+    }
+  ],
+  "latencyStats": [
+    {
+      "llm": "ChatGPT",
+      "avgMs": 5957,
+      "minMs": 0,
+      "maxMs": 19288
+    },
+    {
+      "llm": "Claude",
+      "avgMs": 2679,
+      "minMs": 0,
+      "maxMs": 8825
+    },
+    {
+      "llm": "Gemini",
+      "avgMs": 15370,
+      "minMs": 0,
+      "maxMs": 39322
+    },
+    {
+      "llm": "Perplexity",
+      "avgMs": 2632,
+      "minMs": 0,
+      "maxMs": 10052
+    }
+  ],
+  "calibration": {
+    "fictitiousEntities": [
+      "Banco Floresta Digital",
+      "FinPay Solutions",
+      "MegaStore Brasil",
+      "ShopNova Digital",
+      "HealthTech Brasil",
+      "Clínica Horizonte Digital",
+      "TechNova Solutions",
+      "DataBridge Brasil"
+    ],
+    "fictitiousMentions": 0,
+    "totalResponses": 1004,
+    "falsePositiveRate": 0.0,
+    "specificity": 100.0
   }
 }

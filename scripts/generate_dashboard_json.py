@@ -19,6 +19,7 @@ LLM_META = {
     "Claude": {"provider": "Anthropic", "model": "claude-haiku-4-5-20251001", "color": "#d4a574"},
     "ChatGPT": {"provider": "OpenAI", "model": "gpt-4o-mini-2024-07-18", "color": "#10a37f"},
     "Gemini": {"provider": "Google", "model": "gemini-2.5-pro", "color": "#4285f4"},
+    "Groq": {"provider": "Groq", "model": "llama-3.3-70b-versatile", "color": "#f55036"},
 }
 
 VERT_META = {
@@ -155,6 +156,144 @@ def main():
 
     entities_real = sum(v["rosterCount"] for v in verticals_full.values())
 
+    # === ENRIQUECIMENTO ANALITICO (2026-04-16) ================================
+
+    # --- Serie temporal diaria ---
+    daily_series = []
+    for r in con.execute("""
+        SELECT date(timestamp) AS d, COUNT(*) AS q, SUM(cited) AS c
+        FROM citations GROUP BY d ORDER BY d
+    """):
+        daily_series.append({
+            "date": r["d"],
+            "queries": r["q"],
+            "cited": r["c"],
+            "rate": round((r["c"] / max(r["q"], 1)) * 100, 1),
+        })
+
+    # --- Bootstrap CI 95% da taxa global via Wilson score (sem deps externas) ---
+    def wilson_ci(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+        if n == 0: return (0.0, 0.0)
+        p = k / n
+        z2 = z * z
+        denom = 1 + z2 / n
+        center = (p + z2 / (2 * n)) / denom
+        margin = z * ((p * (1 - p) / n + z2 / (4 * n * n)) ** 0.5) / denom
+        return (round((center - margin) * 100, 1), round((center + margin) * 100, 1))
+
+    overall_lo, overall_hi = wilson_ci(total_cited, total_queries)
+    llm_ci = {}
+    for r in con.execute("SELECT llm, COUNT(*) q, SUM(cited) c FROM citations GROUP BY llm"):
+        lo, hi = wilson_ci(r["c"], r["q"])
+        llm_ci[r["llm"]] = {"ci95_low": lo, "ci95_high": hi}
+
+    # --- Entity coverage gap: marcas do roster NUNCA citadas ---
+    uncited_by_vertical = {}
+    for slug, name, roster in roster_data:
+        cited_entities_set = set()
+        for r in con.execute("""
+            SELECT DISTINCT ctx.entity
+            FROM citation_context ctx
+            JOIN citations c ON c.id = ctx.citation_id
+            WHERE c.vertical = ?
+        """, (slug,)):
+            cited_entities_set.add(r["entity"])
+        # Match por substring para lidar com "Banco Inter" vs "Inter"
+        uncited = []
+        for brand in roster:
+            # Ficticias nao devem aparecer — filtrar
+            is_fake = brand in {
+                "Banco Floresta Digital", "FinPay Solutions",
+                "MegaStore Brasil", "ShopNova Digital",
+                "HealthTech Brasil", "Clínica Horizonte Digital",
+                "TechNova Solutions", "DataBridge Brasil",
+            }
+            if is_fake:
+                continue
+            matched = any(
+                brand.lower() in c.lower() or c.lower() in brand.lower()
+                for c in cited_entities_set
+            )
+            if not matched:
+                uncited.append(brand)
+        uncited_by_vertical[slug] = uncited
+
+    # --- Cross-vertical mentions: marcas que aparecem em >1 vertical ---
+    cross_vertical_ents = []
+    for r in con.execute("""
+        SELECT ctx.entity, COUNT(DISTINCT c.vertical) AS verts, COUNT(*) AS total
+        FROM citation_context ctx JOIN citations c ON c.id = ctx.citation_id
+        GROUP BY ctx.entity HAVING verts > 1
+        ORDER BY verts DESC, total DESC LIMIT 15
+    """):
+        cross_vertical_ents.append({
+            "entity": r["entity"],
+            "verticals": r["verts"],
+            "totalMentions": r["total"],
+        })
+
+    # --- Sentiment por LLM ---
+    sentiment_by_llm = {}
+    for r in con.execute("""
+        SELECT c.llm, ctx.sentiment, COUNT(*) AS n
+        FROM citation_context ctx JOIN citations c ON c.id = ctx.citation_id
+        WHERE ctx.sentiment IS NOT NULL GROUP BY c.llm, ctx.sentiment
+    """):
+        sentiment_by_llm.setdefault(r["llm"], {"neutral": 0, "positive": 0, "negative": 0})
+        if r["sentiment"] in sentiment_by_llm[r["llm"]]:
+            sentiment_by_llm[r["llm"]][r["sentiment"]] = r["n"]
+
+    # --- Categoria x taxa de citacao (qual tipo de query mais dispara citacao?) ---
+    by_category = []
+    for r in con.execute("""
+        SELECT query_category, COUNT(*) q, SUM(cited) c
+        FROM citations GROUP BY query_category ORDER BY c * 1.0 / q DESC
+    """):
+        by_category.append({
+            "category": r["query_category"],
+            "queries": r["q"],
+            "cited": r["c"],
+            "rate": round((r["c"] / max(r["q"], 1)) * 100, 1),
+        })
+
+    # --- Idioma: PT vs EN (LLMs citam mais em qual?) ---
+    by_lang = []
+    for r in con.execute("SELECT query_lang, COUNT(*) q, SUM(cited) c FROM citations GROUP BY query_lang"):
+        by_lang.append({
+            "lang": r["query_lang"],
+            "queries": r["q"],
+            "cited": r["c"],
+            "rate": round((r["c"] / max(r["q"], 1)) * 100, 1),
+        })
+
+    # --- Latencia media por LLM (performance signal) ---
+    latency_stats = []
+    for r in con.execute("""
+        SELECT llm, ROUND(AVG(latency_ms)) avg_ms, ROUND(MIN(latency_ms)) min_ms, ROUND(MAX(latency_ms)) max_ms
+        FROM citations WHERE latency_ms IS NOT NULL GROUP BY llm
+    """):
+        latency_stats.append({
+            "llm": r["llm"],
+            "avgMs": int(r["avg_ms"] or 0),
+            "minMs": int(r["min_ms"] or 0),
+            "maxMs": int(r["max_ms"] or 0),
+        })
+
+    # --- False-positive calibration result ---
+    fictitious_entities = [
+        "Banco Floresta Digital", "FinPay Solutions",
+        "MegaStore Brasil", "ShopNova Digital",
+        "HealthTech Brasil", "Clínica Horizonte Digital",
+        "TechNova Solutions", "DataBridge Brasil",
+    ]
+    total_responses = con.execute("SELECT COUNT(*) n FROM citations WHERE response_text IS NOT NULL").fetchone()["n"]
+    fp_count = 0
+    for e in fictitious_entities:
+        r = con.execute("SELECT COUNT(*) n FROM citations WHERE response_text LIKE ?", (f"%{e}%",)).fetchone()
+        fp_count += r["n"]
+    false_positive_rate = round((fp_count / max(total_responses, 1)) * 100, 3)
+    specificity = round(100 - false_positive_rate, 3)
+
     # === Build final JSON ===
     from datetime import datetime, timezone
     data = {
@@ -164,13 +303,14 @@ def main():
         "totalQueries": total_queries,
         "totalCited": total_cited,
         "overallRate": round((total_cited / max(total_queries, 1)) * 100, 1),
+        "overallCI95": {"low": overall_lo, "high": overall_hi},
         "entitiesMonitored": entities_real + 8,  # 8 fictícias para validação
         "entitiesReal": entities_real,
         "entitiesFictitious": 8,
         "contextAnalyses": ctx_count,
         "collectionRounds": rounds,
         "daysCollecting": days_collecting,
-        "byLLM": by_llm,
+        "byLLM": [{**llm, **llm_ci.get(llm["name"], {})} for llm in by_llm],
         "byVertical": by_vertical,
         "crossMatrix": cross,
         "verticalsFull": verticals_full,
@@ -178,6 +318,21 @@ def main():
         "sentiment": sentiment,
         "attribution": attribution,
         "positionInResponse": position,
+        # Analytics enriquecidos (2026-04-16)
+        "dailySeries": daily_series,
+        "uncitedByVertical": uncited_by_vertical,
+        "crossVerticalEntities": cross_vertical_ents,
+        "sentimentByLLM": sentiment_by_llm,
+        "byCategory": by_category,
+        "byLanguage": by_lang,
+        "latencyStats": latency_stats,
+        "calibration": {
+            "fictitiousEntities": fictitious_entities,
+            "fictitiousMentions": fp_count,
+            "totalResponses": total_responses,
+            "falsePositiveRate": false_positive_rate,
+            "specificity": specificity,
+        },
     }
 
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
