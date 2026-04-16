@@ -1,8 +1,13 @@
 name: Daily Data Collection + FinOps
 
+# Duas coletas por dia (2026-04-16 boost de potencia estatistica):
+# - 06:00 BRT: captura estado matinal
+# - 18:00 BRT: captura estado do fim do dia (testa variancia temporal)
+# Dobra n/celula/dia combinado com a expansao de queries 12->35 por vertical.
 on:
   schedule:
-    - cron: '0 9 * * *'  # 06:00 BRT (UTC-3)
+    - cron: '0 9 * * *'   # 06:00 BRT (UTC-3)
+    - cron: '0 21 * * *'  # 18:00 BRT (UTC-3)
   workflow_dispatch:
     inputs:
       vertical:
@@ -12,7 +17,7 @@ on:
 
 concurrency:
   group: papers-${{ github.workflow }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -109,16 +114,16 @@ jobs:
             echo "[DONE] Vertical $V finalizada"
           done
 
-          # Fail-loud se TODAS as verticais falharam
+          # Fail-loud se QUALQUER vertical falhou — coberura parcial gera
+          # warnings estatisticos n<30 em celulas da vertical faltante e
+          # torna a serie temporal incompleta para analise longitudinal.
+          # Antes: so falhava se TODAS falhassem. Mudanca 2026-04-16.
           if [ -n "$FAILED_VERTICALS" ]; then
             TOTAL=$(echo $VERTICALS | wc -w)
             FAILED=$(echo $FAILED_VERTICALS | wc -w)
-            if [ "$FAILED" -eq "$TOTAL" ]; then
-              echo "CRITICO: todas as $TOTAL verticais falharam: $FAILED_VERTICALS"
-              exit 1
-            else
-              echo "AVISO: $FAILED/$TOTAL verticais falharam: $FAILED_VERTICALS (continuando com parcial)"
-            fi
+            echo "CRITICO: $FAILED/$TOTAL verticais falharam: $FAILED_VERTICALS"
+            echo "Coleta incompleta invalida a serie temporal. Investigar logs acima."
+            exit 1
           fi
 
       # ================================================================
@@ -219,6 +224,25 @@ jobs:
           path: data/papers.db
           retention-days: 90
 
+      # Revalidar paginas publicas na Vercel imediatamente apos o commit
+      # para que /research e /papers-roadmap reflitam os novos dados sem
+      # esperar o TTL do ISR. Silenciosamente ignora se o secret nao estiver
+      # configurado no repo.
+      - name: Revalidate Vercel pages
+        if: success()
+        run: |
+          if [ -n "${{ secrets.VERCEL_REVALIDATE_SECRET }}" ]; then
+            for P in /research /papers-roadmap /roadmap; do
+              curl -s -X POST "https://alexandrecaramaschi.com/api/revalidate" \
+                -H "Content-Type: application/json" \
+                -d "{\"secret\":\"${{ secrets.VERCEL_REVALIDATE_SECRET }}\",\"path\":\"$P\"}" \
+                || echo "revalidate $P falhou (nao bloqueia)"
+            done
+          else
+            echo "VERCEL_REVALIDATE_SECRET nao configurado — pulando revalidate"
+          fi
+        continue-on-error: true
+
       # Enviar relatorio por email (antes do health check para que o
       # relatorio saia mesmo se o check falhar)
       - name: Enviar relatorio diario por email
@@ -232,9 +256,48 @@ jobs:
       # impede artifact upload nem git commit (ambos ja rodaram acima).
       # ================================================================
       - name: Health check (gating)
+        id: health
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           WHATSAPP_API_TOKEN: ${{ secrets.WHATSAPP_API_TOKEN }}
           WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
         run: python scripts/health_check.py --min-obs-per-day 200
+        continue-on-error: true
+
+      # Alerta por email (Resend) em caso de falha de coleta ou health check.
+      # Cria issue + envia email. Objetivo: publicacao cientifica julho/2026
+      # exige pipeline 100% confiavel — zero tolerancia a falha silenciosa.
+      - name: Alert on failure (Resend + Issue)
+        if: steps.health.outcome == 'failure' || failure()
+        run: |
+          set +e
+          if [ -n "${{ secrets.RESEND_API_KEY }}" ] && [ -n "${{ secrets.FINOPS_ALERT_EMAIL }}" ]; then
+            curl -s -X POST "https://api.resend.com/emails" \
+              -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"from\": \"papers-alerts@mail.brasilgeo.ai\",
+                \"to\": \"${{ secrets.FINOPS_ALERT_EMAIL }}\",
+                \"subject\": \"[ALERTA] Papers daily-collect falhou em $(date -u +%Y-%m-%d %H:%M)\",
+                \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto na publicacao cientifica (julho/2026):</strong> gap de dados compromete serie temporal longitudinal.</p><p>Acao imediata: abrir o run, identificar vertical/LLM faltante, re-executar workflow_dispatch.</p>\"
+              }" | head -c 200
+          fi
+          # Tambem cria uma issue para rastreamento
+          gh issue create \
+            --repo alexandrebrt14-sys/papers \
+            --title "daily-collect falhou em $(date -u +%Y-%m-%d)" \
+            --body "Run #${{ github.run_number }} falhou. Link: https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}. Investigar e re-executar via workflow_dispatch." \
+            --label "pipeline-failure" \
+            || echo "issue creation failed"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      # Falha o workflow DE PROPOSITO se health check falhou, para aparecer
+      # vermelho no GitHub Actions e no badge da README.
+      - name: Fail workflow if health check failed
+        if: steps.health.outcome == 'failure'
+        run: |
+          echo "Health check falhou — workflow marcado como falho para alerta."
+          exit 1

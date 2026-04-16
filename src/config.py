@@ -34,15 +34,20 @@ CACHE_DIR.mkdir(exist_ok=True)
 # ============================================================
 
 COMMON_QUERIES: list[dict[str, str]] = [
-    # Cross-vertical: como LLMs recomendam empresas brasileiras (6 queries)
+    # Cross-vertical: como LLMs recomendam empresas brasileiras (10 queries)
     # Essas queries são genéricas o suficiente para detectar citação espontânea
     # de qualquer entidade do coorte, independente da vertical.
+    # Expansão 2026-04-16: 6→10 (boost de potência estatística n/célula).
     {"query": "Quais são as empresas mais inovadoras do Brasil?", "category": "reputacao", "lang": "pt"},
     {"query": "Most innovative companies in Brazil", "category": "reputacao", "lang": "en"},
     {"query": "Quais marcas brasileiras têm melhor reputação?", "category": "reputacao", "lang": "pt"},
     {"query": "Brazilian companies with best customer experience", "category": "experiencia", "lang": "en"},
     {"query": "Empresas brasileiras líderes em transformação digital", "category": "transformacao", "lang": "pt"},
     {"query": "Top Brazilian companies by market cap and innovation", "category": "mercado", "lang": "en"},
+    {"query": "Unicórnios brasileiros em 2026", "category": "mercado", "lang": "pt"},
+    {"query": "Most valuable Brazilian startups and scale-ups", "category": "mercado", "lang": "en"},
+    {"query": "Quais empresas brasileiras investem mais em IA?", "category": "inovacao", "lang": "pt"},
+    {"query": "Brazilian companies leading in artificial intelligence adoption", "category": "inovacao", "lang": "en"},
 ]
 
 # === Ambiguous Entity Handling (Proposal 3) ===
@@ -73,23 +78,38 @@ VERTICALS: dict[str, dict] = {
             "Banco Floresta Digital", "FinPay Solutions",
         ],
         "queries": [
-            # Descoberta de marca (3 — EN/PT balanceado)
+            # Descoberta (5)
             {"query": "Quais são os melhores bancos digitais do Brasil?", "category": "descoberta", "lang": "pt"},
             {"query": "Best digital banks in Brazil", "category": "descoberta", "lang": "en"},
             {"query": "Qual banco digital rende mais na conta corrente?", "category": "descoberta", "lang": "pt"},
-            # Comparativo direto (3)
+            {"query": "Melhores fintechs brasileiras para pessoa fisica", "category": "descoberta", "lang": "pt"},
+            {"query": "Top neobanks and fintechs in Latin America", "category": "descoberta", "lang": "en"},
+            # Comparativo (5)
             {"query": "Nubank ou Inter, qual é melhor?", "category": "comparativo", "lang": "pt"},
             {"query": "Compare Nubank PagBank Inter C6 Bank", "category": "comparativo", "lang": "en"},
             {"query": "Stone ou Cielo, qual a melhor maquininha?", "category": "comparativo", "lang": "pt"},
-            # Confiança e reputação (2)
+            {"query": "Itau vs Bradesco vs Santander — qual banco tradicional escolher?", "category": "comparativo", "lang": "pt"},
+            {"query": "Best investment brokers in Brazil: XP vs BTG vs Rico", "category": "comparativo", "lang": "en"},
+            # Confianca (4)
             {"query": "Nubank é seguro e confiável?", "category": "confianca", "lang": "pt"},
             {"query": "Banco Inter é bom? Vale a pena abrir conta?", "category": "confianca", "lang": "pt"},
-            # Produto específico (2)
+            {"query": "Reclamacoes sobre PicPay — é confiavel?", "category": "confianca", "lang": "pt"},
+            {"query": "How safe are Brazilian digital banks for large deposits?", "category": "confianca", "lang": "en"},
+            # Produto (4)
             {"query": "Melhor cartão de crédito sem anuidade no Brasil", "category": "produto", "lang": "pt"},
             {"query": "Best POS payment machine for small business in Brazil", "category": "produto", "lang": "en"},
-            # B2B e enterprise (2)
+            {"query": "Melhor conta digital com rendimento acima do CDI", "category": "produto", "lang": "pt"},
+            {"query": "Brazilian Pix payment alternatives and best providers", "category": "produto", "lang": "en"},
+            # B2B (3)
             {"query": "Melhores adquirentes para grandes varejistas no Brasil", "category": "b2b", "lang": "pt"},
             {"query": "Banking as a Service providers in Brazil", "category": "b2b", "lang": "en"},
+            {"query": "Melhores plataformas de pagamento para e-commerce B2B", "category": "b2b", "lang": "pt"},
+            # Investimento (2)
+            {"query": "Vale a pena investir em acoes de bancos brasileiros em 2026?", "category": "investimento", "lang": "pt"},
+            {"query": "Best Brazilian bank stocks for dividend investors", "category": "investimento", "lang": "en"},
+            # Alternativas (2)
+            {"query": "Alternativas ao Nubank para quem quer mais rendimento", "category": "alternativas", "lang": "pt"},
+            {"query": "Open banking alternatives to traditional Brazilian banks", "category": "alternativas", "lang": "en"},
         ],
     },
     "varejo": {
@@ -105,23 +125,38 @@ VERTICALS: dict[str, dict] = {
             "MegaStore Brasil", "ShopNova Digital",
         ],
         "queries": [
-            # Descoberta de marca (3)
+            # Descoberta (5)
             {"query": "Quais são as melhores lojas online do Brasil?", "category": "descoberta", "lang": "pt"},
             {"query": "Best e-commerce platforms in Brazil", "category": "descoberta", "lang": "en"},
             {"query": "Onde comprar eletrônicos com melhor preço no Brasil?", "category": "descoberta", "lang": "pt"},
-            # Comparativo direto (3)
+            {"query": "Melhores sites de comercio eletronico para Black Friday no Brasil", "category": "descoberta", "lang": "pt"},
+            {"query": "Top online retailers and marketplaces in Brazil", "category": "descoberta", "lang": "en"},
+            # Comparativo (5)
             {"query": "Mercado Livre ou Amazon Brasil, qual é melhor?", "category": "comparativo", "lang": "pt"},
             {"query": "Magazine Luiza vs Americanas vs Casas Bahia", "category": "comparativo", "lang": "en"},
             {"query": "Shopee Brasil é confiável para comprar?", "category": "comparativo", "lang": "pt"},
-            # Confiança e reputação (2)
+            {"query": "Renner ou Riachuelo, qual loja de moda tem melhor custo-beneficio?", "category": "comparativo", "lang": "pt"},
+            {"query": "AliExpress vs Shopee vs Amazon Brazil — which marketplace ships fastest?", "category": "comparativo", "lang": "en"},
+            # Confianca (4)
             {"query": "Americanas ainda é confiável depois da crise?", "category": "confianca", "lang": "pt"},
             {"query": "Is Mercado Livre reliable for international buyers?", "category": "confianca", "lang": "en"},
-            # Produto específico (2)
+            {"query": "Reclamacoes sobre Shopee Brasil — entregas atrasam?", "category": "confianca", "lang": "pt"},
+            {"query": "Which Brazilian e-commerce sites have best customer service reviews", "category": "confianca", "lang": "en"},
+            # Produto (4)
             {"query": "Melhor loja para comprar móveis online no Brasil", "category": "produto", "lang": "pt"},
             {"query": "Best marketplace for fashion in Brazil", "category": "produto", "lang": "en"},
-            # B2B e enterprise (2)
+            {"query": "Onde comprar celulares com garantia estendida no Brasil", "category": "produto", "lang": "pt"},
+            {"query": "Best place to buy home appliances online in Brazil", "category": "produto", "lang": "en"},
+            # B2B (3)
             {"query": "Melhores plataformas de e-commerce para lojistas no Brasil", "category": "b2b", "lang": "pt"},
             {"query": "Best marketplace platform for sellers in Brazil", "category": "b2b", "lang": "en"},
+            {"query": "Plataformas de marketplace B2B para atacado no Brasil", "category": "b2b", "lang": "pt"},
+            # Investimento (2)
+            {"query": "Acoes de varejo brasileiro valem a pena em 2026?", "category": "investimento", "lang": "pt"},
+            {"query": "Best Brazilian retail stocks for long-term investment", "category": "investimento", "lang": "en"},
+            # Alternativas (2)
+            {"query": "Alternativas ao Mercado Livre com menos taxa para vendedores", "category": "alternativas", "lang": "pt"},
+            {"query": "Smaller Brazilian e-commerce alternatives to Amazon and Shopee", "category": "alternativas", "lang": "en"},
         ],
     },
     "saude": {
@@ -136,23 +171,38 @@ VERTICALS: dict[str, dict] = {
             "HealthTech Brasil", "Clínica Horizonte Digital",
         ],
         "queries": [
-            # Descoberta de marca (3)
+            # Descoberta (5)
             {"query": "Quais são os melhores hospitais do Brasil?", "category": "descoberta", "lang": "pt"},
             {"query": "Best hospitals in Brazil", "category": "descoberta", "lang": "en"},
             {"query": "Melhores laboratórios de exames do Brasil", "category": "descoberta", "lang": "pt"},
-            # Comparativo direto (3)
+            {"query": "Principais hospitais particulares de alta complexidade no Brasil", "category": "descoberta", "lang": "pt"},
+            {"query": "Top private hospitals in Sao Paulo and Rio de Janeiro", "category": "descoberta", "lang": "en"},
+            # Comparativo (5)
             {"query": "Dasa ou Fleury, qual laboratório é melhor?", "category": "comparativo", "lang": "pt"},
             {"query": "Rede D'Or vs Einstein vs Sírio-Libanês", "category": "comparativo", "lang": "en"},
             {"query": "Hapvida ou Unimed, qual plano de saúde é melhor?", "category": "comparativo", "lang": "pt"},
-            # Confiança e reputação (2)
+            {"query": "Sulamerica ou Bradesco Saude, qual operadora cobre mais procedimentos?", "category": "comparativo", "lang": "pt"},
+            {"query": "Rede D'Or vs Hapvida — which Brazilian healthcare chain has wider coverage?", "category": "comparativo", "lang": "en"},
+            # Confianca (4)
             {"query": "Unimed é bom? Vale a pena o plano de saúde?", "category": "confianca", "lang": "pt"},
             {"query": "Best health insurance companies in Brazil", "category": "confianca", "lang": "en"},
-            # Produto específico (2)
+            {"query": "Reclamacoes sobre Hapvida — atendimento é bom?", "category": "confianca", "lang": "pt"},
+            {"query": "Which Brazilian hospitals have best patient safety ratings", "category": "confianca", "lang": "en"},
+            # Produto (4)
             {"query": "Qual a melhor rede de farmácias do Brasil?", "category": "produto", "lang": "pt"},
             {"query": "Best diagnostic lab for blood tests in São Paulo", "category": "produto", "lang": "en"},
-            # B2B e enterprise (2)
+            {"query": "Melhor plano de saude individual com cobertura nacional", "category": "produto", "lang": "pt"},
+            {"query": "Top telemedicine services in Brazil", "category": "produto", "lang": "en"},
+            # B2B (3)
             {"query": "Maiores empresas farmacêuticas brasileiras", "category": "b2b", "lang": "pt"},
             {"query": "Best healthcare companies to invest in Brazil", "category": "b2b", "lang": "en"},
+            {"query": "Principais fornecedores de equipamentos hospitalares no Brasil", "category": "b2b", "lang": "pt"},
+            # Investimento (2)
+            {"query": "Vale a pena investir em acoes de saude no Brasil?", "category": "investimento", "lang": "pt"},
+            {"query": "Best Brazilian healthcare stocks for long-term investors", "category": "investimento", "lang": "en"},
+            # Alternativas (2)
+            {"query": "Alternativas aos planos de saude tradicionais no Brasil", "category": "alternativas", "lang": "pt"},
+            {"query": "Health plan alternatives for freelancers in Brazil", "category": "alternativas", "lang": "en"},
         ],
     },
     "tecnologia": {
@@ -167,23 +217,38 @@ VERTICALS: dict[str, dict] = {
             "TechNova Solutions", "DataBridge Brasil",
         ],
         "queries": [
-            # Descoberta de marca (3)
+            # Descoberta (5)
             {"query": "Quais são as maiores empresas de tecnologia do Brasil?", "category": "descoberta", "lang": "pt"},
             {"query": "Best tech companies in Brazil", "category": "descoberta", "lang": "en"},
             {"query": "Melhores empresas de software brasileiras", "category": "descoberta", "lang": "pt"},
-            # Comparativo direto (3)
+            {"query": "Principais empresas de SaaS e cloud brasileiras", "category": "descoberta", "lang": "pt"},
+            {"query": "Top Brazilian tech unicorns and scale-ups", "category": "descoberta", "lang": "en"},
+            # Comparativo (5)
             {"query": "Totvs ou Linx, qual ERP é melhor para varejo?", "category": "comparativo", "lang": "pt"},
             {"query": "Tivit vs Stefanini vs CI&T outsourcing", "category": "comparativo", "lang": "en"},
             {"query": "Locaweb ou AWS, qual melhor para hospedar site no Brasil?", "category": "comparativo", "lang": "pt"},
-            # Confiança e reputação (2)
+            {"query": "VTEX vs Shopify vs Magento — qual plataforma de ecommerce para empresas brasileiras?", "category": "comparativo", "lang": "pt"},
+            {"query": "RD Station vs HubSpot — which marketing automation works best in Brazil?", "category": "comparativo", "lang": "en"},
+            # Confianca (4)
             {"query": "Locaweb é boa para hospedagem de sites?", "category": "confianca", "lang": "pt"},
             {"query": "Best IT outsourcing companies in Brazil", "category": "confianca", "lang": "en"},
-            # Produto específico (2)
+            {"query": "Reclamacoes sobre Totvs — vale a pena contratar?", "category": "confianca", "lang": "pt"},
+            {"query": "Which Brazilian tech consultancies have best Glassdoor reviews", "category": "confianca", "lang": "en"},
+            # Produto (4)
             {"query": "Melhor sistema ERP para empresas brasileiras", "category": "produto", "lang": "pt"},
             {"query": "Best cloud hosting providers in Brazil", "category": "produto", "lang": "en"},
-            # B2B e enterprise (2)
+            {"query": "Melhor plataforma de automacao de marketing para PMEs no Brasil", "category": "produto", "lang": "pt"},
+            {"query": "Top Brazilian API and developer platforms", "category": "produto", "lang": "en"},
+            # B2B (3)
             {"query": "Melhores consultorias de TI no Brasil", "category": "b2b", "lang": "pt"},
             {"query": "Best software development companies in Brazil", "category": "b2b", "lang": "en"},
+            {"query": "Principais integradoras de Salesforce e SAP no Brasil", "category": "b2b", "lang": "pt"},
+            # Investimento (2)
+            {"query": "Acoes de tecnologia brasileiras valem a pena em 2026?", "category": "investimento", "lang": "pt"},
+            {"query": "Best Brazilian tech stocks for long-term investors", "category": "investimento", "lang": "en"},
+            # Alternativas (2)
+            {"query": "Alternativas ao Totvs para ERP no Brasil", "category": "alternativas", "lang": "pt"},
+            {"query": "Alternative Brazilian cloud providers to AWS and Azure", "category": "alternativas", "lang": "en"},
         ],
     },
 }
