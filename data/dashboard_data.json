@@ -1,101 +1,101 @@
 {
-  "generatedAt": "2026-04-17T11:52:33.322339+00:00",
-  "lastCollection": "2026-04-17 11:52:29",
-  "dbVersion": "papers.db (2212 queries dataset)",
-  "totalQueries": 2212,
-  "totalCited": 1603,
-  "overallRate": 72.5,
+  "generatedAt": "2026-04-17T23:14:21.045386+00:00",
+  "lastCollection": "2026-04-17 23:14:17",
+  "dbVersion": "papers.db (2696 queries dataset)",
+  "totalQueries": 2696,
+  "totalCited": 1990,
+  "overallRate": 73.8,
   "overallCI95": {
-    "low": 70.6,
-    "high": 74.3
+    "low": 72.1,
+    "high": 75.4
   },
   "entitiesMonitored": 69,
   "entitiesReal": 61,
   "entitiesFictitious": 8,
   "contextAnalyses": 172,
-  "collectionRounds": 29,
+  "collectionRounds": 33,
   "daysCollecting": 7,
   "byLLM": [
     {
       "name": "Gemini",
       "model": "gemini-2.5-pro",
       "provider": "Google",
-      "queries": 513,
-      "cited": 383,
-      "rate": 74.7,
-      "avgLatencyMs": 25558,
+      "queries": 653,
+      "cited": 503,
+      "rate": 77.0,
+      "avgLatencyMs": 25732,
       "color": "#4285f4",
-      "ci95_low": 70.7,
-      "ci95_high": 78.2
+      "ci95_low": 73.7,
+      "ci95_high": 80.1
     },
     {
       "name": "Claude",
       "model": "claude-haiku-4-5-20251001",
       "provider": "Anthropic",
-      "queries": 632,
-      "cited": 456,
-      "rate": 72.2,
-      "avgLatencyMs": 3528,
+      "queries": 772,
+      "cited": 563,
+      "rate": 72.9,
+      "avgLatencyMs": 3649,
       "color": "#d4a574",
-      "ci95_low": 69.4,
-      "ci95_high": 76.2
+      "ci95_low": 70.4,
+      "ci95_high": 76.5
     },
     {
       "name": "Perplexity",
       "model": "sonar",
       "provider": "Perplexity AI",
-      "queries": 371,
-      "cited": 262,
-      "rate": 70.6,
-      "avgLatencyMs": 3043,
+      "queries": 435,
+      "cited": 313,
+      "rate": 72.0,
+      "avgLatencyMs": 3125,
       "color": "#20b2aa",
-      "ci95_low": 66.7,
-      "ci95_high": 75.7
+      "ci95_low": 68.3,
+      "ci95_high": 76.5
     },
     {
       "name": "ChatGPT",
       "model": "gpt-4o-mini-2024-07-18",
       "provider": "OpenAI",
-      "queries": 650,
-      "cited": 456,
-      "rate": 70.2,
-      "avgLatencyMs": 6599,
+      "queries": 790,
+      "cited": 565,
+      "rate": 71.5,
+      "avgLatencyMs": 6673,
       "color": "#10a37f",
-      "ci95_low": 67.4,
-      "ci95_high": 74.3
+      "ci95_low": 69.0,
+      "ci95_high": 75.1
     }
   ],
   "byVertical": [
     {
       "slug": "fintech",
       "name": "Fintech",
-      "queries": 638,
-      "cited": 516,
-      "rate": 80.9,
+      "queries": 759,
+      "cited": 630,
+      "rate": 83.0,
       "color": "#0ea5e9"
     },
     {
       "slug": "tecnologia",
       "name": "Tecnologia",
-      "queries": 557,
-      "cited": 418,
-      "rate": 75.0,
+      "queries": 678,
+      "cited": 519,
+      "rate": 76.5,
       "color": "#f59e0b"
     },
     {
       "slug": "varejo",
       "name": "Varejo",
-      "queries": 491,
-      "cited": 362,
-      "rate": 73.7,
+      "queries": 612,
+      "cited": 456,
+      "rate": 74.5,
       "color": "#ec4899"
     },
     {
       "slug": "saude",
       "name": "Saúde",
-      "queries": 526,
-      "cited": 307,
-      "rate": 58.4,
+      "queries": 647,
+      "cited": 385,
+      "rate": 59.5,
       "color": "#0d9488"
     }
   ],
@@ -103,114 +103,114 @@
     {
       "vertical": "fintech",
       "model": "ChatGPT",
-      "queries": 200,
-      "cited": 156,
-      "rate": 78.0
+      "queries": 235,
+      "cited": 186,
+      "rate": 79.1
     },
     {
       "vertical": "fintech",
       "model": "Claude",
-      "queries": 182,
-      "cited": 159,
-      "rate": 87.4
+      "queries": 217,
+      "cited": 193,
+      "rate": 88.9
     },
     {
       "vertical": "fintech",
       "model": "Gemini",
-      "queries": 134,
-      "cited": 100,
-      "rate": 74.6
+      "queries": 169,
+      "cited": 134,
+      "rate": 79.3
     },
     {
       "vertical": "fintech",
       "model": "Perplexity",
-      "queries": 122,
-      "cited": 101,
-      "rate": 82.8
+      "queries": 138,
+      "cited": 117,
+      "rate": 84.8
     },
     {
       "vertical": "saude",
       "model": "ChatGPT",
-      "queries": 162,
-      "cited": 73,
-      "rate": 45.1
+      "queries": 197,
+      "cited": 91,
+      "rate": 46.2
     },
     {
       "vertical": "saude",
       "model": "Claude",
-      "queries": 162,
-      "cited": 108,
-      "rate": 66.7
+      "queries": 197,
+      "cited": 132,
+      "rate": 67.0
     },
     {
       "vertical": "saude",
       "model": "Gemini",
-      "queries": 117,
-      "cited": 71,
-      "rate": 60.7
+      "queries": 152,
+      "cited": 95,
+      "rate": 62.5
     },
     {
       "vertical": "saude",
       "model": "Perplexity",
-      "queries": 85,
-      "cited": 55,
-      "rate": 64.7
+      "queries": 101,
+      "cited": 67,
+      "rate": 66.3
     },
     {
       "vertical": "tecnologia",
       "model": "ChatGPT",
-      "queries": 162,
-      "cited": 131,
-      "rate": 80.9
+      "queries": 197,
+      "cited": 163,
+      "rate": 82.7
     },
     {
       "vertical": "tecnologia",
       "model": "Claude",
-      "queries": 162,
-      "cited": 110,
-      "rate": 67.9
+      "queries": 197,
+      "cited": 135,
+      "rate": 68.5
     },
     {
       "vertical": "tecnologia",
       "model": "Gemini",
-      "queries": 141,
-      "cited": 115,
-      "rate": 81.6
+      "queries": 176,
+      "cited": 147,
+      "rate": 83.5
     },
     {
       "vertical": "tecnologia",
       "model": "Perplexity",
-      "queries": 92,
-      "cited": 62,
-      "rate": 67.4
+      "queries": 108,
+      "cited": 74,
+      "rate": 68.5
     },
     {
       "vertical": "varejo",
       "model": "ChatGPT",
-      "queries": 144,
-      "cited": 114,
-      "rate": 79.2
+      "queries": 179,
+      "cited": 143,
+      "rate": 79.9
     },
     {
       "vertical": "varejo",
       "model": "Claude",
-      "queries": 144,
-      "cited": 97,
-      "rate": 67.4
+      "queries": 179,
+      "cited": 121,
+      "rate": 67.6
     },
     {
       "vertical": "varejo",
       "model": "Gemini",
-      "queries": 121,
-      "cited": 97,
-      "rate": 80.2
+      "queries": 156,
+      "cited": 127,
+      "rate": 81.4
     },
     {
       "vertical": "varejo",
       "model": "Perplexity",
-      "queries": 82,
-      "cited": 54,
-      "rate": 65.9
+      "queries": 98,
+      "cited": 65,
+      "rate": 66.3
     }
   ],
   "verticalsFull": {
@@ -476,9 +476,9 @@
     },
     {
       "date": "2026-04-17",
-      "queries": 484,
-      "cited": 389,
-      "rate": 80.4
+      "queries": 968,
+      "cited": 776,
+      "rate": 80.2
     }
   ],
   "uncitedByVertical": {
@@ -573,39 +573,39 @@
     },
     {
       "category": "confianca",
-      "queries": 177,
-      "cited": 168,
-      "rate": 94.9
+      "queries": 225,
+      "cited": 214,
+      "rate": 95.1
     },
     {
       "category": "comparativo",
-      "queries": 328,
-      "cited": 311,
-      "rate": 94.8
+      "queries": 408,
+      "cited": 385,
+      "rate": 94.4
     },
     {
       "category": "descoberta",
-      "queries": 329,
-      "cited": 300,
-      "rate": 91.2
+      "queries": 409,
+      "cited": 377,
+      "rate": 92.2
     },
     {
       "category": "produto",
-      "queries": 182,
-      "cited": 162,
-      "rate": 89.0
+      "queries": 230,
+      "cited": 207,
+      "rate": 90.0
     },
     {
       "category": "alternativas",
-      "queries": 48,
-      "cited": 42,
-      "rate": 87.5
+      "queries": 72,
+      "cited": 64,
+      "rate": 88.9
     },
     {
       "category": "b2b",
-      "queries": 154,
-      "cited": 127,
-      "rate": 82.5
+      "queries": 190,
+      "cited": 155,
+      "rate": 81.6
     },
     {
       "category": "fintech",
@@ -627,33 +627,33 @@
     },
     {
       "category": "transformacao",
-      "queries": 64,
-      "cited": 44,
-      "rate": 68.8
+      "queries": 76,
+      "cited": 53,
+      "rate": 69.7
     },
     {
       "category": "investimento",
-      "queries": 48,
-      "cited": 32,
+      "queries": 72,
+      "cited": 48,
       "rate": 66.7
     },
     {
       "category": "inovacao",
-      "queries": 48,
-      "cited": 30,
+      "queries": 72,
+      "cited": 45,
       "rate": 62.5
     },
     {
-      "category": "reputacao",
-      "queries": 266,
-      "cited": 152,
-      "rate": 57.1
+      "category": "experiencia",
+      "queries": 77,
+      "cited": 45,
+      "rate": 58.4
     },
     {
-      "category": "experiencia",
-      "queries": 65,
-      "cited": 37,
-      "rate": 56.9
+      "category": "reputacao",
+      "queries": 314,
+      "cited": 180,
+      "rate": 57.3
     },
     {
       "category": "saude",
@@ -669,9 +669,9 @@
     },
     {
       "category": "mercado",
-      "queries": 152,
-      "cited": 64,
-      "rate": 42.1
+      "queries": 200,
+      "cited": 83,
+      "rate": 41.5
     },
     {
       "category": "fintech_product",
@@ -707,39 +707,39 @@
   "byLanguage": [
     {
       "lang": "en",
-      "queries": 1126,
-      "cited": 727,
-      "rate": 64.6
+      "queries": 1343,
+      "cited": 900,
+      "rate": 67.0
     },
     {
       "lang": "pt",
-      "queries": 1086,
-      "cited": 876,
-      "rate": 80.7
+      "queries": 1353,
+      "cited": 1090,
+      "rate": 80.6
     }
   ],
   "latencyStats": [
     {
       "llm": "ChatGPT",
-      "avgMs": 6599,
+      "avgMs": 6673,
       "minMs": 0,
       "maxMs": 41770
     },
     {
       "llm": "Claude",
-      "avgMs": 3528,
+      "avgMs": 3649,
       "minMs": 0,
       "maxMs": 8825
     },
     {
       "llm": "Gemini",
-      "avgMs": 25558,
+      "avgMs": 25732,
       "minMs": 0,
       "maxMs": 59649
     },
     {
       "llm": "Perplexity",
-      "avgMs": 3043,
+      "avgMs": 3125,
       "minMs": 0,
       "maxMs": 13562
     }
@@ -756,7 +756,7 @@
       "DataBridge Brasil"
     ],
     "fictitiousMentions": 0,
-    "totalResponses": 2212,
+    "totalResponses": 2696,
     "falsePositiveRate": 0.0,
     "specificity": 100.0
   }
