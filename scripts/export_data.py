@@ -17,6 +17,13 @@ Uso:
 A lógica de extração é compartilhada entre todos os formats (função
 `extract_dashboard_data`), garantindo que text/json/html/csv enxerguem
 EXATAMENTE os mesmos números.
+
+Não confundir com `scripts/generate_dashboard_json.py`, que tem propósito
+distinto: gera um JSON específico para o frontend em alexandrecaramaschi.com/
+research (com metadata de cores dos LLMs e verticais, schema fechado, consumido
+via ISR). Este export_data.py é ferramenta genérica de análise — saída
+paramétrica por --format. Use o export_data para análises ad-hoc e o
+generate_dashboard_json para a publicação web.
 """
 
 from __future__ import annotations

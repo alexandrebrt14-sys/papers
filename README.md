@@ -198,10 +198,29 @@ python -m src.cli db migrate                          # Apply schema
 python -m src.cli db export --format csv              # Export data
 python -m src.cli db health                           # Health per vertical
 
-# Migrations (one-time)
-python src/db/migrate_normalize_models.py             # Normalize GPT model strings
-python src/db/migrate_cited_entity.py                 # Backfill cited_entity
+# Migrations (one-time, idempotent)
+python -m src.db.migrate_normalize_models              # Normalize GPT model strings
+python -m src.db.migrate_cited_entity                  # Backfill cited_entity
+python -m src.db.migrate_0003_eficacia_consistencia    # query_type, composite indexes, backfills
+
+# Consolidated export (replaces data/extract_*.py — Onda 4 refactor 2026-04-19)
+python scripts/export_data.py --format text
+python scripts/export_data.py --format json --output data/dashboard.json
+python scripts/export_data.py --format csv --vertical fintech
+python scripts/export_data.py --format html
 ```
+
+---
+
+## Refactor 2026-04-19 — Quality guards
+
+- **`query_type`** (`directive` vs `exploratory`) isolates framing bias in Paper 1 ANOVA
+- **Fictional entities** (`FICTIONAL_ENTITIES` in `src/config.py`) calibrate false-positive rate — 8 entities, activatable via env `INCLUDE_FICTIONAL_ENTITIES=true`
+- **Mandatory LLMs** (env `MANDATORY_LLMS`) enforce balanced cohort — pipeline fails loud if any mandatory provider drops
+- **5 composite indexes** on `citations(vertical, cited)`, `(vertical, llm)`, `(timestamp, vertical)`, `(llm, model_version)`, `(query_type)` prevent table scans at N > 10K
+- **Backfills applied** on 940 legacy rows (model_version NULL → model)
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full flow and [docs/audits/2026-03-26/](docs/audits/2026-03-26/) for historical audit context.
 
 ---
 
@@ -209,11 +228,13 @@ python src/db/migrate_cited_entity.py                 # Backfill cited_entity
 
 | Document | Description |
 |---|---|
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Full pipeline flow, schema layers (core vs future), operational commands |
 | [docs/METHODOLOGY.md](docs/METHODOLOGY.md) | Complete statistical methodology with tests, assumptions, and limitations |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Formal specification (functional/non-functional) |
 | [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Spending policies, ADRs, roadmap |
 | [docs/MANUAL.md](docs/MANUAL.md) | Operational manual |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | Change history |
+| [docs/audits/2026-03-26/](docs/audits/2026-03-26/) | Archived statistical audit (N=397 snapshot) |
 | [output/critica_estatistica_panel.md](output/critica_estatistica_panel.md) | Critical review by panel of 7 specialists |
 
 ---

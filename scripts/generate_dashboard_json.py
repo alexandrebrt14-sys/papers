@@ -266,6 +266,26 @@ def main():
             "rate": round((r["c"] / max(r["q"], 1)) * 100, 1),
         })
 
+    # --- Query Type: directive vs exploratory (Onda 3 — 2026-04-19) ---
+    # Directive = query já força listagem ("quais os melhores X"). Exploratory
+    # = descoberta genuína ("é seguro?"). Permite isolar bias de framing nos
+    # testes estatísticos do Paper 1.
+    by_query_type = []
+    try:
+        for r in con.execute(
+            "SELECT query_type, COUNT(*) q, SUM(cited) c FROM citations "
+            "WHERE query_type IS NOT NULL GROUP BY query_type"
+        ):
+            by_query_type.append({
+                "type": r["query_type"],
+                "queries": r["q"],
+                "cited": r["c"],
+                "rate": round((r["c"] / max(r["q"], 1)) * 100, 1),
+            })
+    except sqlite3.OperationalError:
+        # DB pré-Migration 0003 ainda sem a coluna query_type
+        pass
+
     # --- Latencia media por LLM (performance signal) ---
     latency_stats = []
     for r in con.execute("""
@@ -325,6 +345,7 @@ def main():
         "sentimentByLLM": sentiment_by_llm,
         "byCategory": by_category,
         "byLanguage": by_lang,
+        "byQueryType": by_query_type,
         "latencyStats": latency_stats,
         "calibration": {
             "fictitiousEntities": fictitious_entities,
