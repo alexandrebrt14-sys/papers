@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-04-19 11:16 UTC
+**Gerado automaticamente em:** 2026-04-19 23:08 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 9141436ca3becdf8789245777041b85f9d657e75 data: daily collection 2026-04-18 [skip
+**Último commit:** 7bfe280edc06c6ac8f41eed5c4c5b7e9f40cda23 refactor: Ondas 7+8+9 — split base.py, 
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 11,740 | OK |
-| Testes unitários | 53 | OK |
+| Código (linhas Python) | 13,750 | OK |
+| Testes unitários | 90 | OK |
 | Tabelas no banco | 22 | OK |
-| Citações coletadas | 4,148 | Coletando |
-| Taxa de citação | 75.8% | — |
-| Última coleta | 2026-04-19T11:15 | Ativo |
+| Citações coletadas | 4,632 | Coletando |
+| Taxa de citação | 76.2% | — |
+| Última coleta | 2026-04-19T23:07 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.2534 |
-| Anthropic | $1.5731 |
+| OpenAI | $0.2881 |
+| Anthropic | $1.7909 |
 | Gemini | $0.0000 |
-| Perplexity | $0.1494 |
-| **Total** | **$1.9759** |
+| Perplexity | $0.1693 |
+| **Total** | **$2.2483** |
 
 ## Próximas Ações
 
@@ -37,7 +37,7 @@
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 4,148/1.000 |
+| Dados mínimos | 1.000 citações | 4,632/1.000 |
 | Série temporal | 90 dias contínuos | Em progresso |
 | Grupo de controle | 15 concorrentes | 0 observações |
 | Análise estatística | p < 0.05 | Disponível |
