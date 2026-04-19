@@ -18,11 +18,14 @@ papers/
 ├── src/
 │   ├── config.py                  # 4 verticais, 5 LLMs, queries, pricing, entidades fictícias
 │   ├── cli.py                     # Click CLI — --vertical, --module, --all
-│   ├── collectors/                # Módulos de coleta
-│   │   ├── base.py                # BaseCollector + LLMClient + ResponseCache (em refactor Onda 4)
+│   ├── collectors/                # Módulos de coleta (Onda 7: split aplicado)
+│   │   ├── base.py                # Fachada enxuta + re-exports (85 linhas após split)
+│   │   ├── llm_client.py          # LLMClient + LLMResponse (extraído Onda 7)
+│   │   ├── response_cache.py      # ResponseCache SHA-256 TTL (extraído Onda 7)
+│   │   ├── brave_search.py        # BraveSearchClient (extraído Onda 7)
 │   │   ├── citation_tracker.py    # Módulo 1: principal, gera linha em citations
 │   │   ├── competitor.py          # Módulo 2: benchmark entre verticais
-│   │   ├── serp_overlap.py        # Módulo 3: SERP vs IA (estrutura pronta, ativação pendente)
+│   │   ├── serp_overlap.py        # Módulo 3: SERP vs IA (Onda 9: toggle ENABLE_SERP_OVERLAP)
 │   │   ├── intervention.py        # Módulo 4: A/B testing (estrutura pronta)
 │   │   ├── context_analyzer.py    # Módulo 7: sentimento, atribuição, hedging
 │   │   ├── drift_detector.py      # Detector de non-stationarity

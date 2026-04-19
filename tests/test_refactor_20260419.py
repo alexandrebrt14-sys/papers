@@ -393,6 +393,97 @@ def test_cochran_mantel_haenszel_rejects_non_binary_group():
 # ── db/client auto-migration (double-check #2) ──────────────────────────────
 
 
+def test_structured_logger_lazy_on_base_collector():
+    """BaseCollector.structured_logger é lazy e expõe CollectionLogger
+    com vertical correto (Onda 8)."""
+    from src.collectors.citation_tracker import CitationTracker
+    tracker = CitationTracker(vertical="fintech")
+    # Primeira chamada carrega; segunda retorna a mesma instância
+    slog1 = tracker.structured_logger
+    slog2 = tracker.structured_logger
+    assert slog1 is slog2, "structured_logger deve ser cacheado"
+    if slog1 is not None:  # pode ser None se logs dir for read-only
+        assert slog1.module == "citation_tracker"
+        assert slog1.vertical == "fintech"
+        assert len(slog1.run_id) == 8
+
+
+def test_collection_logger_accepts_vertical():
+    """CollectionLogger aceita vertical (Onda 8)."""
+    from src.logging.logger import CollectionLogger
+    cl = CollectionLogger(module="citation_tracker", vertical="saude")
+    assert cl.vertical == "saude"
+    cl.log_query(
+        llm="ChatGPT", query="teste", category="descoberta",
+        duration_ms=123, tokens=50, cost=0.001, cited=True,
+    )
+    summary = cl.get_summary()
+    assert summary["total_queries"] == 1
+    assert summary["total_cited"] == 1
+    assert summary["vertical"] == "saude"
+    assert summary["citation_rate"] == 1.0
+
+
+def test_base_py_split_preserves_backward_compat():
+    """Todos os símbolos antigos continuam importáveis de src.collectors.base
+    após a Onda 7 (split). Sentinela anti-regressão."""
+    from src.collectors.base import (
+        BaseCollector, LLMClient, LLMResponse, ResponseCache, BraveSearchClient
+    )
+    from src.collectors.llm_client import LLMClient as LC2, LLMResponse as LR2
+    from src.collectors.response_cache import ResponseCache as RC2
+    from src.collectors.brave_search import BraveSearchClient as BS2
+    # Identidade preservada — mesmo objeto Python
+    assert LLMClient is LC2
+    assert LLMResponse is LR2
+    assert ResponseCache is RC2
+    assert BraveSearchClient is BS2
+
+
+def test_serp_overlap_skipped_when_toggle_off(monkeypatch):
+    """SERP overlap respeita ENABLE_SERP_OVERLAP=false (Onda 9).
+
+    Sem ativação explícita, retorna [] sem consumir cota Brave.
+    """
+    monkeypatch.delenv("ENABLE_SERP_OVERLAP", raising=False)
+    from src.collectors.serp_overlap import SerpAIOverlap
+    collector = SerpAIOverlap(vertical="fintech")
+    results = collector.collect()
+    collector.close()
+    assert results == []
+
+
+def test_serp_overlap_explicit_false_skips(monkeypatch):
+    monkeypatch.setenv("ENABLE_SERP_OVERLAP", "false")
+    from src.collectors.serp_overlap import SerpAIOverlap
+    collector = SerpAIOverlap(vertical="fintech")
+    results = collector.collect()
+    collector.close()
+    assert results == []
+
+
+def test_serp_overlap_without_brave_key_returns_empty(monkeypatch):
+    """Toggle ON mas BRAVE_API_KEY ausente → skip graceful, não tenta HTTP."""
+    monkeypatch.setenv("ENABLE_SERP_OVERLAP", "true")
+    monkeypatch.setenv("BRAVE_API_KEY", "")
+    # Força BraveSearchClient a ver key vazia
+    from src.collectors.serp_overlap import SerpAIOverlap
+    collector = SerpAIOverlap(vertical="fintech")
+    # Monkeypatch o atributo _key do cliente futuro para garantir
+    # o comportamento esperado sem depender de config cache
+    from src.collectors import brave_search as bs_mod
+    original_init = bs_mod.BraveSearchClient.__init__
+
+    def _empty_key_init(self, api_key: str = "") -> None:
+        original_init(self, api_key="")
+        self._key = ""
+    monkeypatch.setattr(bs_mod.BraveSearchClient, "__init__", _empty_key_init)
+
+    results = collector.collect()
+    collector.close()
+    assert results == []
+
+
 def test_db_client_auto_adds_fictional_columns(tmp_path: Path, monkeypatch):
     """DatabaseClient.apply_schema deve rodar as migrations inline (0003+0004)
     quando executado em um DB novo — garante que não é preciso rodar

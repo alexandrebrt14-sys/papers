@@ -29,17 +29,28 @@ class CitationTracker(BaseCollector):
     def collect(self) -> list[dict[str, Any]]:
         results: list[dict[str, Any]] = []
         cache_hits = 0
+        # Onda 8: structured_logger emite 1 evento por query + summary.
+        # Lazy — se o módulo de logging falhar em CI sem disco, silently
+        # passa adiante.
+        slog = self.structured_logger
 
         for q in self.queries:
             for llm_cfg in self.config.llms:
                 response = self.llm_client.query(llm_cfg, q["query"], category=q.get("category", ""))
                 if response is None:
+                    if slog is not None:
+                        slog.log_query(
+                            llm=llm_cfg.name,
+                            query=q["query"],
+                            category=q.get("category", ""),
+                            error="skipped_or_failed",
+                        )
                     continue
                 if response.from_cache:
                     cache_hits += 1
 
                 analysis = self._analyze(response, query_entry=q)
-                results.append({
+                record = {
                     "module": self.module_name(),
                     "llm": llm_cfg.name,
                     "model": response.model,
@@ -53,12 +64,31 @@ class CitationTracker(BaseCollector):
                     "output_tokens": response.output_tokens,
                     "from_cache": response.from_cache,
                     **analysis,
-                })
+                }
+                results.append(record)
+
+                if slog is not None:
+                    slog.log_query(
+                        llm=llm_cfg.name,
+                        query=q["query"],
+                        category=q.get("category", ""),
+                        duration_ms=response.latency_ms or 0,
+                        tokens=(response.input_tokens + response.output_tokens),
+                        cost=response.cost_usd or 0.0,
+                        cited=bool(record.get("cited")),
+                    )
 
         self.logger.info(
             f"Coletados {len(results)} registros "
             f"({cache_hits} do cache, {len(results)-cache_hits} da API)"
         )
+        if slog is not None:
+            summary = slog.get_summary()
+            self.logger.info(
+                f"[structured] run={summary['run_id']} queries={summary['total_queries']} "
+                f"cited={summary['total_cited']} rate={summary['citation_rate']} "
+                f"cost=${summary['total_cost_usd']} errors={summary['errors']}"
+            )
         return results
 
     def _analyze(self, response: LLMResponse, query_entry: dict[str, Any] | None = None) -> dict[str, Any]:

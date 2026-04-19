@@ -1,0 +1,486 @@
+"""Multi-provider LLM HTTP client (cost-optimized).
+
+Extraído de `src/collectors/base.py` em 2026-04-19 (Onda 7 — split de
+responsabilidades). Mantém API 100% compatível para não quebrar collectors.
+
+Responsabilidades:
+- Roteamento por provider (OpenAI, Anthropic, Google, Perplexity)
+- Circuit breaker por provider (401/403/429 retentado)
+- Rate limiting por provider
+- Cache de resposta via `ResponseCache`
+- Integração com FinOps tracker (record cost por chamada)
+- JSON mode opcional vs free-text com post-hoc extraction
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import re
+import time
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any
+
+import httpx
+
+from src.collectors.response_cache import ResponseCache
+from src.config import (
+    AMBIGUOUS_ENTITIES,
+    CANONICAL_NAMES,
+    LLMConfig,
+    PERPLEXITY_SYSTEM,
+    SYSTEM_PROMPT,
+    config,
+)
+from src.finops.tracker import get_tracker
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class LLMResponse:
+    """Structured response from an LLM query."""
+    model: str
+    provider: str
+    query: str
+    response_text: str
+    sources: list[str]
+    cited_entities: list[str]
+    timestamp: str
+    latency_ms: int
+    token_count: int | None = None
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cost_usd: float = 0.0
+    from_cache: bool = False
+    raw: dict[str, Any] | None = None
+    raw_text: str = ""  # Complete unprocessed LLM response before any truncation
+    engine_type: str = "parametric"  # "parametric" for ChatGPT/Claude/Gemini, "rag" for Perplexity
+
+
+class LLMClient:
+    """Cost-optimized multi-provider LLM client.
+
+    Per-query cost estimate (30 queries/day, 4 LLMs):
+    - Old: ~$0.80/day ($24/mo) — gpt-4o + sonnet + unlimited tokens
+    - New: ~$0.04/day ($1.20/mo) — mini + haiku + flash + JSON mode + cache
+    """
+
+    MAX_RETRIES = 2
+    RETRY_BACKOFF = [3, 10]  # seconds — two retries with increasing backoff
+
+    # Per-provider rate limiting (seconds between queries)
+    # Gemini billing ativo (R$500 credito) = 30 RPM → 2s between queries
+    PROVIDER_DELAY: dict[str, float] = {
+        "openai": 0.3,
+        "anthropic": 0.3,
+        "google": 2.0,      # 30 RPM limit → 60/30 = 2s spacing (billing ativo)
+        "perplexity": 0.5,
+    }
+
+    # Perplexity query routing: only high-value categories (saves ~50% search cost)
+    # Other LLMs receive all queries. Perplexity only where web search adds value.
+    PERPLEXITY_CATEGORIES: set[str] = {
+        "descoberta",    # Queries de descoberta de marca — alto valor de busca web
+        "comparativo",   # Comparativos diretos — Perplexity traz fontes reais
+        "reputacao",     # Cross-vertical reputação — busca web essencial
+        "mercado",       # Dados de mercado — requer fontes atualizadas
+    }
+
+    def __init__(self, cohort: list[str] | None = None, vertical: str = "",
+                 json_mode: bool = False) -> None:
+        self._http = httpx.Client(timeout=120.0)
+        self._cache = ResponseCache(ttl_hours=config.cache_ttl_hours)
+        self._run_id = ""
+        self._circuit_broken: set[str] = set()
+        self._cohort = cohort or config.cohort_entities
+        self._vertical = vertical
+        self._last_query_time: dict[str, float] = {}  # provider → timestamp
+        self._json_mode = json_mode  # If True, use SYSTEM_PROMPT forcing JSON output
+
+    def set_run_id(self, run_id: str) -> None:
+        self._run_id = run_id
+
+    def should_query(self, llm: LLMConfig, category: str = "") -> bool:
+        """Check if this LLM should receive this query category.
+
+        Perplexity is expensive ($0.005/search) so we route only high-value
+        queries to it. Other LLMs receive all queries.
+        Returns False if the query should be skipped for this provider.
+        """
+        if llm.provider == "perplexity" and category:
+            return category in self.PERPLEXITY_CATEGORIES
+        return True
+
+    def query(self, llm: LLMConfig, prompt: str, category: str = "") -> LLMResponse | None:
+        """Query an LLM with all optimizations applied."""
+        if llm.requires_scraping or not llm.api_key:
+            return None
+
+        # Perplexity query routing: skip low-value categories
+        if not self.should_query(llm, category):
+            return None
+
+        # Circuit breaker: if this provider already 429'd, skip immediately
+        if llm.provider in self._circuit_broken:
+            return None
+
+        # 1. Check cache (vertical-aware to prevent cross-vertical collisions)
+        cached = self._cache.get(llm.provider, llm.model, prompt, self._vertical)
+        if cached:
+            logger.debug(f"[cache-hit] {llm.name}/{self._vertical}: {prompt[:40]}...")
+            return LLMResponse(
+                model=llm.model, provider=llm.provider, query=prompt,
+                response_text=cached.get("text", ""),
+                sources=cached.get("sources", []),
+                cited_entities=cached.get("cited", []),
+                timestamp=cached.get("_cached_at", ""),
+                latency_ms=None, from_cache=True,
+            )
+
+        # 2. Per-provider rate limiting (prevents Gemini 429)
+        delay = self.PROVIDER_DELAY.get(llm.provider, 0.3)
+        last = self._last_query_time.get(llm.provider, 0)
+        elapsed = time.time() - last
+        if elapsed < delay and last > 0:
+            time.sleep(delay - elapsed)
+        self._last_query_time[llm.provider] = time.time()
+
+        # 3. Query with retries
+        start = datetime.now(timezone.utc)
+        for attempt in range(self.MAX_RETRIES + 1):
+            try:
+                response = self._dispatch(llm, prompt, start)
+                if response:
+                    # 3a. Record cost in FinOps tracker (all providers)
+                    try:
+                        tracker = get_tracker()
+                        usage_record = tracker.record(
+                            platform=llm.provider,
+                            model=llm.model,
+                            operation="llm_query",
+                            input_tokens=response.input_tokens,
+                            output_tokens=response.output_tokens,
+                            query=prompt[:200],
+                            run_id=self._run_id,
+                            raw_response=response.raw,
+                        )
+                        response.cost_usd = usage_record.cost_usd
+                    except Exception as e:
+                        logger.warning(f"[finops] Failed to record cost for {llm.provider}: {e}")
+                    # 3b. Cache the response (vertical-aware key)
+                    self._cache.put(llm.provider, llm.model, prompt, {
+                        "text": response.response_text,
+                        "sources": response.sources,
+                        "cited": response.cited_entities,
+                    }, self._vertical)
+                return response
+            except httpx.HTTPStatusError as e:
+                code = e.response.status_code
+                # 401/403 = key invalida — circuit break imediato (incidente 30/Mar-06/Abr)
+                if code in (401, 403):
+                    self._circuit_broken.add(llm.provider)
+                    logger.error(
+                        f"[circuit-break] {llm.name} HTTP {code} (key invalida/sem permissao). "
+                        f"Rotacionar key no GitHub Secrets do papers."
+                    )
+                    return None
+                # 429 / 5xx = retry com backoff exponencial
+                if code == 429 or code >= 500:
+                    if attempt < self.MAX_RETRIES:
+                        wait = self.RETRY_BACKOFF[attempt] if attempt < len(self.RETRY_BACKOFF) else 60
+                        logger.warning(f"[{code}] {llm.name} retry {attempt+1}/{self.MAX_RETRIES} em {wait}s...")
+                        time.sleep(wait)
+                        continue
+                    if code == 429:
+                        self._circuit_broken.add(llm.provider)
+                        logger.warning(f"[circuit-break] {llm.name} 429 apos retries — pulando provider")
+                    return None
+                # 4xx fatais (400, 404, 422) = log e segue
+                logger.error(f"[{llm.name}] HTTP {code}: {e.response.text[:200]}")
+                return None
+            except (httpx.ConnectError, httpx.ReadTimeout, httpx.WriteTimeout) as e:
+                # Erros de rede transientes — retry
+                if attempt < self.MAX_RETRIES:
+                    wait = self.RETRY_BACKOFF[attempt] if attempt < len(self.RETRY_BACKOFF) else 30
+                    logger.warning(f"[network] {llm.name} retry {attempt+1}/{self.MAX_RETRIES} em {wait}s: {e}")
+                    time.sleep(wait)
+                    continue
+                logger.error(f"[{llm.name}] Network error after retries: {e}")
+                return None
+            except Exception as e:
+                logger.error(f"[{llm.name}] Error: {e}")
+                return None
+        return None
+
+    def _dispatch(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse | None:
+        """Route to the correct provider."""
+        dispatch = {
+            "openai": self._query_openai,
+            "anthropic": self._query_anthropic,
+            "google": self._query_google,
+            "perplexity": self._query_perplexity,
+        }
+        fn = dispatch.get(llm.provider)
+        if not fn:
+            return None
+        return fn(llm, prompt, start)
+
+    # ── Providers ────────────────────────────────────────────────────────
+
+    def _query_openai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """OpenAI query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        messages: list[dict[str, str]] = []
+        if self._json_mode:
+            messages.append({"role": "system", "content": SYSTEM_PROMPT})
+        messages.append({"role": "user", "content": prompt})
+
+        body: dict[str, Any] = {
+            "model": llm.model,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": llm.max_output_tokens,
+        }
+        if self._json_mode and llm.supports_json_mode:
+            body["response_format"] = {"type": "json_object"}
+
+        resp = self._http.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {llm.api_key}"},
+            json=body,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["choices"][0]["message"]["content"]
+        usage = data.get("usage", {})
+
+        if self._json_mode:
+            parsed = self._parse_json_response(text)
+            return self._build_response(
+                llm, prompt, start, text, parsed,
+                input_tokens=usage.get("prompt_tokens", 0),
+                output_tokens=usage.get("completion_tokens", 0),
+                raw=data,
+            )
+        posthoc = self._analyze_response_posthoc(text)
+        return self._build_response(
+            llm, prompt, start, text, posthoc,
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
+            raw=data,
+        )
+
+    def _query_anthropic(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """Anthropic query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        body: dict[str, Any] = {
+            "model": llm.model,
+            "max_tokens": llm.max_output_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.0,
+        }
+        if self._json_mode:
+            body["system"] = [
+                {
+                    "type": "text",
+                    "text": SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},  # Prompt caching
+                }
+            ]
+
+        resp = self._http.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": llm.api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            },
+            json=body,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["content"][0]["text"]
+        usage = data.get("usage", {})
+
+        parsed = self._parse_json_response(text) if self._json_mode else self._analyze_response_posthoc(text)
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("input_tokens", 0),
+            output_tokens=usage.get("output_tokens", 0),
+            raw=data,
+        )
+
+    def _query_google(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """Google Gemini query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        if self._json_mode:
+            prompt_text = f"{SYSTEM_PROMPT}\n\nQuery: {prompt}"
+        else:
+            prompt_text = prompt
+
+        # Gemini 2.5 Pro usa thinking mode (gasta tokens internos antes de gerar output).
+        # Se max_output_tokens for igual ao texto desejado, o thinking esgota os tokens
+        # e candidates[0].content vem sem 'parts'. Solucao: 4x para modelos *-pro.
+        is_pro = "pro" in llm.model.lower()
+        max_tokens = llm.max_output_tokens * 4 if is_pro else llm.max_output_tokens
+
+        body: dict[str, Any] = {
+            "contents": [
+                {"role": "user", "parts": [{"text": prompt_text}]}
+            ],
+            "generationConfig": {
+                "temperature": 0.0,
+                "maxOutputTokens": max_tokens,
+            },
+        }
+        if self._json_mode and llm.supports_json_mode:
+            body["generationConfig"]["responseMimeType"] = "application/json"
+
+        resp = self._http.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{llm.model}:generateContent",
+            params={"key": llm.api_key},
+            json=body,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        # Gemini 2.5 Pro pode retornar candidates[0].content sem 'parts' quando o
+        # thinking budget esgota os tokens antes do output. Tratar como resposta vazia
+        # ao inves de KeyError (que parecia 'erro silencioso' nos logs).
+        candidates = data.get("candidates") or []
+        if not candidates:
+            text = ""
+        else:
+            content = candidates[0].get("content") or {}
+            parts = content.get("parts") or []
+            # filtra parts que sao thinking (sem 'text')
+            text_parts = [p.get("text", "") for p in parts if "text" in p]
+            text = "".join(text_parts)
+
+        usage = data.get("usageMetadata", {})
+
+        parsed = self._parse_json_response(text) if self._json_mode else self._analyze_response_posthoc(text)
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("promptTokenCount", 0),
+            output_tokens=usage.get("candidatesTokenCount", 0),
+            raw=data,
+        )
+
+    def _query_perplexity(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """Perplexity with built-in citations (no JSON mode needed)."""
+        resp = self._http.post(
+            "https://api.perplexity.ai/chat/completions",
+            headers={"Authorization": f"Bearer {llm.api_key}"},
+            json={
+                "model": llm.model,
+                "messages": [
+                    {"role": "system", "content": PERPLEXITY_SYSTEM},
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0.0,
+                "max_tokens": llm.max_output_tokens,
+            },
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["choices"][0]["message"]["content"]
+        # Perplexity returns citations in response metadata
+        citations = data.get("citations", [])
+        sources = citations if citations else self._extract_urls(text)
+        usage = data.get("usage", {})
+
+        return LLMResponse(
+            model=llm.model, provider=llm.provider, query=prompt,
+            response_text=text,
+            sources=sources,
+            cited_entities=self._extract_entity_mentions(text),
+            timestamp=start.isoformat(),
+            latency_ms=int((datetime.now(timezone.utc) - start).total_seconds() * 1000),
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
+            raw=data,
+            raw_text=text,
+            engine_type="rag",
+        )
+
+    # ── Helpers compartilhados ───────────────────────────────────────────
+
+    def _build_response(
+        self, llm: LLMConfig, prompt: str, start: datetime,
+        text: str, parsed: dict, input_tokens: int, output_tokens: int,
+        raw: dict,
+    ) -> LLMResponse:
+        """Build LLMResponse from parsed output (JSON or post-hoc)."""
+        return LLMResponse(
+            model=llm.model, provider=llm.provider, query=prompt,
+            response_text=parsed.get("summary", text[:200]),
+            sources=parsed.get("sources", self._extract_urls(text)),
+            cited_entities=parsed.get("cited", self._extract_entity_mentions(text)),
+            timestamp=start.isoformat(),
+            latency_ms=int((datetime.now(timezone.utc) - start).total_seconds() * 1000),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            raw=raw,
+            raw_text=text,
+            engine_type="rag" if llm.provider == "perplexity" else "parametric",
+        )
+
+    @staticmethod
+    def _parse_json_response(text: str) -> dict:
+        """Parse JSON from LLM response, handling edge cases."""
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # Try to extract JSON from markdown code block
+            match = re.search(r'\{[^{}]*"cited"[^{}]*\}', text, re.DOTALL)
+            if match:
+                try:
+                    return json.loads(match.group())
+                except json.JSONDecodeError:
+                    pass
+        return {"cited": [], "sources": [], "summary": text[:200]}
+
+    @staticmethod
+    def _extract_urls(text: str) -> list[str]:
+        return re.findall(r'https?://[^\s\)\]>"\']+', text)
+
+    def _extract_entity_mentions(self, text: str) -> list[str]:
+        """Extract known entity mentions from free-text response using word boundary matching.
+
+        Ambiguous entities (e.g., "Neon", "Inter") require their canonical name
+        (e.g., "Banco Inter") to avoid false positives from common words.
+        """
+        entities = []
+        for entity in self._cohort:
+            if entity in AMBIGUOUS_ENTITIES:
+                # Require the full canonical name for ambiguous entities
+                canonical = CANONICAL_NAMES.get(entity, entity)
+                if re.search(r'\b' + re.escape(canonical) + r'\b', text, re.IGNORECASE):
+                    entities.append(entity)
+            else:
+                if re.search(r'\b' + re.escape(entity) + r'\b', text, re.IGNORECASE):
+                    entities.append(entity)
+        return entities
+
+    def _analyze_response_posthoc(self, text: str) -> dict:
+        """Extract entities from natural free-text response via post-hoc analysis.
+
+        Used in natural (non-JSON) mode: the query goes to the LLM clean,
+        and entity extraction happens after the fact using regex word-boundary
+        matching against the cohort list.
+        """
+        cited = self._extract_entity_mentions(text)
+        sources = self._extract_urls(text)
+        return {
+            "cited": cited,
+            "sources": sources,
+            "summary": text[:200],
+        }
+
+    def get_cache_stats(self) -> dict:
+        return self._cache.stats()
+
+    def close(self) -> None:
+        self._http.close()

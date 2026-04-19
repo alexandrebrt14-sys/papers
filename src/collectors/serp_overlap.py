@@ -21,8 +21,32 @@ class SerpAIOverlap(BaseCollector):
         return "serp_ai_overlap"
 
     def collect(self) -> list[dict[str, Any]]:
+        """Rodar o overlap SERP vs IA.
+
+        Toggle de ativação (Onda 9 — 2026-04-19):
+        - `ENABLE_SERP_OVERLAP=true` em env: roda normalmente
+        - `ENABLE_SERP_OVERLAP` ausente/falsy: pula silently retornando []
+          (protege quota mensal do Brave; SERP só roda quando explicitamente ligado)
+        - Adicionalmente, sem `BRAVE_API_KEY`, o BraveSearchClient já
+          retorna [] internamente e o loop encerra sem INSERTs.
+        """
+        import os
+        enabled = os.getenv("ENABLE_SERP_OVERLAP", "false").lower() == "true"
+        if not enabled:
+            self.logger.info(
+                "[serp_ai_overlap] ENABLE_SERP_OVERLAP=false — módulo desligado por toggle. "
+                "Para ativar, exporte ENABLE_SERP_OVERLAP=true."
+            )
+            return []
+
         results: list[dict[str, Any]] = []
         brave = BraveSearchClient()
+        if not getattr(brave, "_key", ""):
+            self.logger.warning(
+                "[serp_ai_overlap] BRAVE_API_KEY ausente — impossível coletar SERP. "
+                "Cadastre o secret BRAVE_API_KEY e reative."
+            )
+            return []
 
         # Use EN queries for SERP
         serp_queries = [q for q in self.queries if q["lang"] == "en"]

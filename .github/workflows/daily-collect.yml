@@ -29,6 +29,11 @@ env:
   PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  # Onda 9 (2026-04-19): SERP overlap ativável via Brave Search. Sem
+  # BRAVE_API_KEY ou com ENABLE_SERP_OVERLAP=false, SerpAIOverlap é pulado
+  # silenciosamente pelo collect_all (sem custo, sem quebra).
+  BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+  ENABLE_SERP_OVERLAP: ${{ vars.ENABLE_SERP_OVERLAP || 'false' }}
   PAPERS_DB_PATH: data/papers.db
   FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
 

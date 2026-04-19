@@ -74,13 +74,19 @@ Pipeline longitudinal que observa como 5 LLMs citam empresas brasileiras em 4 ve
 | Arquivo | Papel |
 |---------|-------|
 | `src/config.py` | 4 verticais, 5 LLMs, queries com `query_type`, `FICTIONAL_ENTITIES`, `mandatory_llms()` |
-| `src/collectors/base.py` | `BaseCollector` + `LLMClient` + `ResponseCache` (split pendente Onda futura) |
-| `src/collectors/citation_tracker.py` | Módulo 1 — principal. Gera linhas em `citations`. Marca `fictional_hit` quando LLM menciona entidade fictícia |
+| `src/collectors/base.py` | Fachada enxuta (~85 linhas) + re-exports — split aplicado em Onda 7 |
+| `src/collectors/llm_client.py` | **Onda 7** — `LLMClient` + `LLMResponse` (dispatch providers, cache, finops, circuit breaker) |
+| `src/collectors/response_cache.py` | **Onda 7** — `ResponseCache` SHA-256 TTL 20h |
+| `src/collectors/brave_search.py` | **Onda 7** — `BraveSearchClient` (SERP via Brave, free tier 2k/mo) |
+| `src/collectors/citation_tracker.py` | Módulo 1 — principal. Gera linhas em `citations`. Marca `fictional_hit`; emite eventos para `structured_logger` (Onda 8) |
 | `src/collectors/competitor.py` | Módulo 2 — benchmark cross-vertical |
+| `src/collectors/serp_overlap.py` | Módulo 3 — **ativo via `ENABLE_SERP_OVERLAP=true`** (Onda 9). Sem toggle ou sem `BRAVE_API_KEY`, pula silently |
 | `src/collectors/context_analyzer.py` | Módulo 7 — sentimento, atribuição, hedging |
-| `src/db/schema.sql` | Schema SQLite + Supabase. Índices compostos pós-Migration 0003 |
-| `src/db/client.py` | Persistência; responsável por ALTER TABLE idempotente |
+| `src/logging/logger.py` | `CollectionLogger` estruturado (JSONL rotativo). Aceita `vertical`; exposto via `BaseCollector.structured_logger` lazy (Onda 8) |
+| `src/db/schema.sql` | Schema SQLite + Supabase. Índices compostos pós-Migration 0003; `fictional_hit` pós-Migration 0004 |
+| `src/db/client.py` | Persistência; ALTER TABLE idempotente inline (0003 + 0004) |
 | `src/db/migrate_0003_eficacia_consistencia.py` | Onda 2: `query_type`, 5 índices compostos, backfills |
+| `src/db/migrate_0004_fictional_persistence.py` | Double-check #2: `fictional_hit` + índice + backfill retroativo |
 | `scripts/export_data.py` | Consolidador — substitui 3 scripts duplicados |
 | `scripts/health_check.py` | Gate do pipeline — exit 1 se observações insuficientes |
 
@@ -149,10 +155,23 @@ python scripts/health_check.py
 python scripts/sync_to_supabase.py
 ```
 
-## Próximas ondas previsíveis
+## Estado das ondas de refactor (atualizado 2026-04-19)
 
-1. **Split de `base.py`** — extrair `llm_client.py`, `response_cache.py`, `finops_hook.py`, `parser.py` (auditoria Onda crítica, ~20h)
-2. **Ativar Módulo 3 (SERP overlap)** via Brave Search — habilita Paper 2
-3. **Commit shared cache** ou mover para Redis para economizar 50% API em runners paralelos
-4. **Batch API** para queries non-urgent (economiza 50% em OpenAI + Anthropic)
-5. **Integrar `CollectionLogger`** em BaseCollector (hoje logs vão só para stdout/stderr)
+| Onda | Escopo | Status |
+|------|--------|--------|
+| 1 | Limpeza (audits arquivados + gitignore + CLAUDE.md) | ✓ `b5d63a2` |
+| 2 | Migration 0003: `query_type` + 5 índices compostos + backfills | ✓ `726f087` |
+| 3 | `FICTIONAL_ENTITIES` + `mandatory_llms` + `query_type` no pipeline | ✓ `fd4d303` |
+| 4 | `export_data` consolidado + `test_collectors` reescrito | ✓ `d15b337` |
+| 5 | Double-check #1 — merge + sentinelas | ✓ `a777003` |
+| 6 | Double-check #2 — `fictional_hit` persistido (Migration 0004) + stratified analysis + auto-migration | ✓ `02a9e78` |
+| **7** | **Split `base.py`** em `llm_client` / `response_cache` / `brave_search` / `base` (fachada 85 linhas) | ✓ |
+| **8** | **`CollectionLogger` em `BaseCollector.structured_logger` lazy** + aceita vertical | ✓ |
+| **9** | **SERP overlap ativável** via `ENABLE_SERP_OVERLAP=true` + `BRAVE_API_KEY` no workflow | ✓ |
+
+## Próximas ondas previsíveis (scope out desta sessão)
+
+1. **Commit shared cache** ou migrar para Redis para economizar 50% API em runners paralelos
+2. **Batch API** para queries non-urgent (economiza 50% em OpenAI + Anthropic)
+3. **Ativar Brave API em produção** (hoje toggle off por default para proteger cota 2k/mo; basta setar `ENABLE_SERP_OVERLAP=true` como GitHub Actions variable quando quiser ligar)
+4. **CollectionLogger global run-level** — hoje integrado por collector; um único run_id atravessando todos os módulos do daily-collect facilitaria correlação de logs

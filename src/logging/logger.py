@@ -150,12 +150,19 @@ def get_logger(name: str) -> logging.Logger:
 # === Collection Logger (high-level tracing) ===
 
 class CollectionLogger:
-    """High-level logger for collection runs with tracing and metrics."""
+    """High-level logger for collection runs with tracing and metrics.
 
-    def __init__(self, module: str) -> None:
+    Integrado em BaseCollector em 2026-04-19 (Onda 8) via `structured_logger`
+    lazy. Aceita `vertical` opcional para prefixar logs quando rodando em
+    contexto multi-vertical.
+    """
+
+    def __init__(self, module: str, vertical: str = "") -> None:
         self.module = module
+        self.vertical = vertical
         self.run_id = str(uuid.uuid4())[:8]
-        self.logger = get_logger(f"papers.{module}")
+        suffix = f".{vertical}" if vertical else ""
+        self.logger = get_logger(f"papers.{module}{suffix}")
         self.start_time: float = 0
         self.events: list[CollectionEvent] = []
         self.total_tokens: int = 0
@@ -243,6 +250,7 @@ class CollectionLogger:
         return {
             "run_id": self.run_id,
             "module": self.module,
+            "vertical": self.vertical,
             "total_queries": self.total_queries,
             "total_cited": self.total_cited,
             "citation_rate": round(self.total_cited / max(self.total_queries, 1), 3),
