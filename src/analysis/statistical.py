@@ -80,6 +80,160 @@ class RegressionResult:
 class StatisticalAnalyzer:
     """Statistical analysis toolkit for GEO research."""
 
+    # ── Stratified analysis helpers (Double-check #2 2026-04-19) ────────────
+    #
+    # Auditoria identificou que `query_type` (directive/exploratory) e
+    # `query_lang` (PT/EN) são variáveis confusoras com efeito grande
+    # (PT 80.6% vs EN 54.8%, delta 26pp). Os métodos a seguir permitem
+    # desagregar qualquer análise por essas estratificações, mitigando o
+    # viés de confounding nos testes principais.
+
+    @staticmethod
+    def stratified_citation_rate(
+        df: "pd.DataFrame",
+        stratify_by: str,
+        outcome_col: str = "cited",
+    ) -> "pd.DataFrame":
+        """Calcula citation rate e IC por estrato.
+
+        Args:
+            df: DataFrame com pelo menos as colunas [stratify_by, outcome_col].
+            stratify_by: coluna de estratificação (ex: 'query_type',
+                'query_lang', 'model_version', 'vertical').
+            outcome_col: coluna booleana/0-1 do desfecho (default 'cited').
+
+        Returns:
+            DataFrame com colunas [stratum, n, k, rate, ci_low, ci_high]
+            ordenado por taxa decrescente. IC é Wilson 95%.
+        """
+        if stratify_by not in df.columns:
+            raise KeyError(f"Coluna '{stratify_by}' ausente no DataFrame")
+        if outcome_col not in df.columns:
+            raise KeyError(f"Coluna '{outcome_col}' ausente no DataFrame")
+
+        results: list[dict[str, Any]] = []
+        for stratum, group in df.groupby(stratify_by, dropna=False):
+            outcomes = group[outcome_col].astype(int)
+            n = int(len(outcomes))
+            k = int(outcomes.sum())
+            p = k / n if n else 0.0
+            # Wilson score interval (robusto para p próximo de 0/1)
+            if n > 0:
+                z = 1.959963984540054  # 95%
+                denom = 1 + z * z / n
+                centre = (p + z * z / (2 * n)) / denom
+                half = z * float(np.sqrt(p * (1 - p) / n + z * z / (4 * n * n))) / denom
+                ci_low, ci_high = max(0.0, centre - half), min(1.0, centre + half)
+            else:
+                ci_low = ci_high = 0.0
+            results.append({
+                "stratum": stratum,
+                "n": n,
+                "k": k,
+                "rate": round(p, 4),
+                "ci_low": round(ci_low, 4),
+                "ci_high": round(ci_high, 4),
+            })
+
+        out = pd.DataFrame(results).sort_values("rate", ascending=False).reset_index(drop=True)
+        out.attrs["stratify_by"] = stratify_by
+        out.attrs["outcome_col"] = outcome_col
+        return out
+
+    def cochran_mantel_haenszel(
+        self,
+        df: "pd.DataFrame",
+        group_col: str,
+        outcome_col: str,
+        stratify_by: str,
+    ) -> SignificanceResult:
+        """Cochran-Mantel-Haenszel: testa associação entre 2 grupos e 1
+        desfecho controlando por uma variável confusora (strata).
+
+        Caso canônico: comparar citation rate de directive vs exploratory
+        (`group_col='query_type'`) controlando por `query_lang` (PT vs EN)
+        ou por `vertical`.
+
+        Args:
+            df: DataFrame longo com uma linha por observação.
+            group_col: coluna binária/2-valores (ex: 'query_type').
+            outcome_col: coluna 0/1 (ex: 'cited').
+            stratify_by: variável de estratificação (ex: 'query_lang').
+
+        Returns:
+            SignificanceResult com statistic (chi² CMH), p_value, odds
+            ratio comum como effect_size.
+        """
+        groups = df[group_col].dropna().unique()
+        if len(groups) != 2:
+            raise ValueError(
+                f"{group_col} precisa ter exatamente 2 valores, tem {len(groups)}: {groups}"
+            )
+        g_a, g_b = sorted(groups)
+
+        numerator = 0.0
+        denominator = 0.0
+        mh_num = 0.0  # para odds ratio comum
+        mh_den = 0.0
+        for stratum_val, stratum_df in df.groupby(stratify_by, dropna=False):
+            a = int(((stratum_df[group_col] == g_a) & (stratum_df[outcome_col] == 1)).sum())
+            b = int(((stratum_df[group_col] == g_a) & (stratum_df[outcome_col] == 0)).sum())
+            c = int(((stratum_df[group_col] == g_b) & (stratum_df[outcome_col] == 1)).sum())
+            d = int(((stratum_df[group_col] == g_b) & (stratum_df[outcome_col] == 0)).sum())
+            n = a + b + c + d
+            if n == 0:
+                continue
+            e_a = (a + b) * (a + c) / n
+            v_a = (a + b) * (c + d) * (a + c) * (b + d) / (n * n * (n - 1)) if n > 1 else 0
+            numerator += a - e_a
+            denominator += v_a
+            if d > 0 and b > 0 and n > 0:
+                mh_num += a * d / n
+                mh_den += b * c / n
+
+        if denominator <= 0:
+            chi2 = 0.0
+            p = 1.0
+        else:
+            chi2 = (numerator ** 2) / denominator
+            p = 1.0 - stats.chi2.cdf(chi2, df=1)
+
+        odds_ratio_mh = (mh_num / mh_den) if mh_den > 0 else float("nan")
+
+        return SignificanceResult(
+            test_name=f"cochran-mantel-haenszel (stratify={stratify_by})",
+            statistic=round(float(chi2), 4),
+            p_value=round(float(p), 6),
+            significant=p < 0.05,
+            effect_size=round(float(odds_ratio_mh), 4) if not np.isnan(odds_ratio_mh) else None,
+            interpretation=(
+                f"{group_col}={g_a} vs {g_b}, controlando por {stratify_by}. "
+                f"OR_MH={odds_ratio_mh:.3f}" if not np.isnan(odds_ratio_mh) else
+                f"{group_col}={g_a} vs {g_b}, controlando por {stratify_by}. OR_MH indefinido."
+            ),
+        )
+
+    @staticmethod
+    def false_positive_rate(
+        df: "pd.DataFrame",
+        fictional_hit_col: str = "fictional_hit",
+    ) -> dict[str, float]:
+        """Calcula taxa de falso-positivo usando `fictional_hit` (Migration 0004).
+
+        Returns: dict com 'fp_rate', 'specificity', 'n_total', 'n_fictional_hits'.
+        """
+        if fictional_hit_col not in df.columns:
+            raise KeyError(f"Coluna '{fictional_hit_col}' ausente")
+        n = int(len(df))
+        hits = int(df[fictional_hit_col].astype(int).sum())
+        fp_rate = hits / n if n else 0.0
+        return {
+            "fp_rate": round(fp_rate, 6),
+            "specificity": round(1 - fp_rate, 6),
+            "n_total": n,
+            "n_fictional_hits": hits,
+        }
+
     def chi_squared_citation_rate(
         self, group_a: list[bool], group_b: list[bool],
         label_a: str = "experimental", label_b: str = "control",

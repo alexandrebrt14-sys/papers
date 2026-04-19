@@ -66,6 +66,47 @@ class DatabaseClient:
         self._conn.commit()
         # Migracoes adicionais (ortogonais)
         self._migrate_add_model_version()
+        self._migrate_add_query_type()
+        self._migrate_add_fictional_columns()
+
+    def _migrate_add_query_type(self) -> None:
+        """Adiciona citations.query_type (Migration 0003 inline).
+
+        Permite que DBs criados em máquinas que não rodaram a migration
+        standalone continuem funcionando. Idempotente.
+        """
+        try:
+            cols = [r[1] for r in self._conn.execute("PRAGMA table_info(citations)").fetchall()]
+            if cols and "query_type" not in cols:
+                self._conn.execute(
+                    "ALTER TABLE citations ADD COLUMN query_type TEXT DEFAULT 'exploratory'"
+                )
+                logger.info("Migracao: coluna 'query_type' adicionada a citations")
+                self._conn.commit()
+        except Exception as exc:
+            logger.debug("query_type migration skipped: %s", exc)
+
+    def _migrate_add_fictional_columns(self) -> None:
+        """Adiciona citations.fictional_hit + fictional_names_json (Migration 0004 inline).
+
+        Garante que DBs fora do fluxo standalone de migrations também tenham
+        as colunas de calibração de false-positive. Idempotente.
+        """
+        try:
+            cols = [r[1] for r in self._conn.execute("PRAGMA table_info(citations)").fetchall()]
+            if cols and "fictional_hit" not in cols:
+                self._conn.execute(
+                    "ALTER TABLE citations ADD COLUMN fictional_hit INTEGER NOT NULL DEFAULT 0"
+                )
+                logger.info("Migracao: coluna 'fictional_hit' adicionada a citations")
+            if cols and "fictional_names_json" not in cols:
+                self._conn.execute(
+                    "ALTER TABLE citations ADD COLUMN fictional_names_json TEXT NOT NULL DEFAULT '[]'"
+                )
+                logger.info("Migracao: coluna 'fictional_names_json' adicionada a citations")
+            self._conn.commit()
+        except Exception as exc:
+            logger.debug("fictional_* migration skipped: %s", exc)
 
     def _migrate_add_model_version(self) -> None:
         """Add model_version column to citations for non-stationarity tracking.
@@ -96,8 +137,12 @@ class DatabaseClient:
     def insert_citations(self, records: list[dict[str, Any]], vertical: str = "fintech") -> int:
         """Insert citation tracker records.
 
-        Populates ``query_type`` (directive/exploratory) added em Migration 0003.
-        Registros antigos sem essa chave recebem 'exploratory' como default seguro.
+        Populates columns added pelas migrations:
+            - Migration 0003: query_type (directive/exploratory)
+            - Migration 0004: fictional_hit + fictional_names_json (false-positive)
+
+        Registros que não tragam essas chaves recebem defaults seguros para
+        preservar compat com coletores ainda não atualizados.
         """
         sql = """
             INSERT INTO citations (
@@ -106,11 +151,13 @@ class DatabaseClient:
                 vertical, cited, cited_entity, cited_domain, cited_person,
                 position, attribution, source_count, our_source_count,
                 hedging_detected, response_length, response_text,
-                sources_json, latency_ms, token_count, model_version
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                sources_json, latency_ms, token_count, model_version,
+                fictional_hit, fictional_names_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         rows = []
         for r in records:
+            fict_names = r.get("fictional_names", []) or []
             rows.append((
                 r["timestamp"], r["llm"], r["model"], r["query"],
                 r["query_category"], r["query_lang"],
@@ -124,6 +171,9 @@ class DatabaseClient:
                 r.get("latency_ms"), r.get("token_count"),
                 # model_version: rastreio de non-stationarity. Fallback = model.
                 r.get("model_version") or r.get("model"),
+                # Migration 0004: calibração de false-positive
+                1 if r.get("fictional_hit") else 0,
+                json.dumps(fict_names, ensure_ascii=False),
             ))
         self._conn.executemany(sql, rows)
         self._conn.commit()

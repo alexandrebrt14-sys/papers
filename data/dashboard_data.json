@@ -1,454 +1,783 @@
 {
-  "extracted_at": "2026-04-19T19:38:05.032253+00:00",
-  "db_path": "C:\\Sandyboxclaude\\papers\\data\\papers.db",
-  "vertical_filter": null,
-  "verticals": [
+  "generatedAt": "2026-04-19T19:49:34.034300+00:00",
+  "lastCollection": "2026-04-19 11:16:26",
+  "dbVersion": "papers.db (4148 queries dataset)",
+  "totalQueries": 4148,
+  "totalCited": 3146,
+  "overallRate": 75.8,
+  "overallCI95": {
+    "low": 74.5,
+    "high": 77.1
+  },
+  "entitiesMonitored": 69,
+  "entitiesReal": 61,
+  "entitiesFictitious": 8,
+  "contextAnalyses": 172,
+  "collectionRounds": 45,
+  "daysCollecting": 9,
+  "byLLM": [
     {
-      "slug": "fintech",
-      "name": "Fintech & Bancos Digitais",
-      "cohort_json": "[\"Nubank\",\"PagBank\",\"Cielo\",\"Stone\",\"Banco Inter\",\"Mercado Pago\",\"Itaú\",\"Bradesco\",\"C6 Bank\",\"PicPay\",\"Ame Digital\",\"Neon\",\"Original\",\"BS2\",\"Safra\",\"Banco Carrefour\"]",
-      "created_at": "2026-03-24 17:07:48"
+      "name": "Gemini",
+      "model": "gemini-2.5-pro",
+      "provider": "Google",
+      "queries": 1073,
+      "cited": 867,
+      "rate": 80.8,
+      "avgLatencyMs": 26232,
+      "color": "#4285f4",
+      "ci95_low": 78.3,
+      "ci95_high": 83.0
     },
     {
-      "slug": "saude",
-      "name": "Saúde & Farmacêuticas",
-      "cohort_json": "[\"Dasa\",\"Hapvida\",\"Unimed\",\"Eli Lilly Brasil\",\"Raia Drogasil\",\"Fleury\",\"Rede D'Or\",\"Einstein\",\"Sírio-Libanês\",\"Eurofarma\",\"Aché\",\"EMS\",\"Hypera Pharma\",\"NotreDame Intermédica\",\"SulAmérica Saúde\"]",
-      "created_at": "2026-03-24 17:07:48"
+      "name": "ChatGPT",
+      "model": "gpt-4o-mini-2024-07-18",
+      "provider": "OpenAI",
+      "queries": 1210,
+      "cited": 892,
+      "rate": 73.7,
+      "avgLatencyMs": 6820,
+      "color": "#10a37f",
+      "ci95_low": 71.6,
+      "ci95_high": 76.5
+    },
+    {
+      "name": "Claude",
+      "model": "claude-haiku-4-5-20251001",
+      "provider": "Anthropic",
+      "queries": 1192,
+      "cited": 879,
+      "rate": 73.7,
+      "avgLatencyMs": 3826,
+      "color": "#d4a574",
+      "ci95_low": 71.6,
+      "ci95_high": 76.5
+    },
+    {
+      "name": "Perplexity",
+      "model": "sonar",
+      "provider": "Perplexity AI",
+      "queries": 627,
+      "cited": 462,
+      "rate": 73.7,
+      "avgLatencyMs": 3213,
+      "color": "#20b2aa",
+      "ci95_low": 70.6,
+      "ci95_high": 77.3
+    }
+  ],
+  "byVertical": [
+    {
+      "slug": "fintech",
+      "name": "Fintech",
+      "queries": 1122,
+      "cited": 974,
+      "rate": 86.8,
+      "color": "#0ea5e9"
     },
     {
       "slug": "tecnologia",
-      "name": "Tecnologia & TI",
-      "cohort_json": "[\"Tivit\",\"Accenture Brasil\",\"Stefanini\",\"Totvs\",\"Linx\",\"Locaweb\",\"Positivo Tecnologia\",\"Movile\",\"CI&T\",\"Vivo Empresas\",\"Embraer\",\"WEG\",\"Natura &Co\",\"iFood\",\"99\"]",
-      "created_at": "2026-03-24 17:07:48"
+      "name": "Tecnologia",
+      "queries": 1041,
+      "cited": 816,
+      "rate": 78.4,
+      "color": "#f59e0b"
     },
     {
       "slug": "varejo",
-      "name": "Varejo & E-commerce",
-      "cohort_json": "[\"Magazine Luiza\",\"Casas Bahia\",\"Ponto Frio\",\"Americanas\",\"Amazon Brasil\",\"Mercado Livre\",\"Shopee Brasil\",\"AliExpress Brasil\",\"Leroy Merlin\",\"Tok&Stok\",\"Renner\",\"Riachuelo\",\"C&A Brasil\",\"Centauro\",\"Netshoes\"]",
-      "created_at": "2026-03-24 17:07:48"
+      "name": "Varejo",
+      "queries": 975,
+      "cited": 737,
+      "rate": 75.6,
+      "color": "#ec4899"
+    },
+    {
+      "slug": "saude",
+      "name": "Saúde",
+      "queries": 1010,
+      "cited": 619,
+      "rate": 61.3,
+      "color": "#0d9488"
     }
   ],
-  "citations_summary": {
-    "total": 4148,
-    "cited": 3146,
-    "not_cited": 1002,
-    "citation_rate": 0.7584378013500482
-  },
-  "citations_by_llm_vertical": [
+  "crossMatrix": [
     {
-      "llm": "ChatGPT",
       "vertical": "fintech",
-      "total": 340,
+      "model": "ChatGPT",
+      "queries": 340,
       "cited": 279,
-      "rate": 0.8205882352941176
+      "rate": 82.1
     },
     {
-      "llm": "Claude",
       "vertical": "fintech",
-      "total": 322,
+      "model": "Claude",
+      "queries": 322,
       "cited": 294,
-      "rate": 0.9130434782608695
+      "rate": 91.3
     },
     {
-      "llm": "Gemini",
       "vertical": "fintech",
-      "total": 274,
+      "model": "Gemini",
+      "queries": 274,
       "cited": 237,
-      "rate": 0.864963503649635
+      "rate": 86.5
     },
     {
-      "llm": "Perplexity",
       "vertical": "fintech",
-      "total": 186,
+      "model": "Perplexity",
+      "queries": 186,
       "cited": 164,
-      "rate": 0.8817204301075269
+      "rate": 88.2
     },
     {
-      "llm": "ChatGPT",
       "vertical": "saude",
-      "total": 302,
+      "model": "ChatGPT",
+      "queries": 302,
       "cited": 143,
-      "rate": 0.4735099337748344
+      "rate": 47.4
     },
     {
-      "llm": "Claude",
       "vertical": "saude",
-      "total": 302,
+      "model": "Claude",
+      "queries": 302,
       "cited": 201,
-      "rate": 0.6655629139072847
+      "rate": 66.6
     },
     {
-      "llm": "Gemini",
       "vertical": "saude",
-      "total": 257,
+      "model": "Gemini",
+      "queries": 257,
       "cited": 172,
-      "rate": 0.669260700389105
+      "rate": 66.9
     },
     {
-      "llm": "Perplexity",
       "vertical": "saude",
-      "total": 149,
+      "model": "Perplexity",
+      "queries": 149,
       "cited": 103,
-      "rate": 0.6912751677852349
+      "rate": 69.1
     },
     {
-      "llm": "ChatGPT",
       "vertical": "tecnologia",
-      "total": 302,
+      "model": "ChatGPT",
+      "queries": 302,
       "cited": 258,
-      "rate": 0.8543046357615894
+      "rate": 85.4
     },
     {
-      "llm": "Claude",
       "vertical": "tecnologia",
-      "total": 302,
+      "model": "Claude",
+      "queries": 302,
       "cited": 211,
-      "rate": 0.6986754966887417
+      "rate": 69.9
     },
     {
-      "llm": "Gemini",
       "vertical": "tecnologia",
-      "total": 281,
+      "model": "Gemini",
+      "queries": 281,
       "cited": 241,
-      "rate": 0.8576512455516014
+      "rate": 85.8
     },
     {
-      "llm": "Perplexity",
       "vertical": "tecnologia",
-      "total": 156,
+      "model": "Perplexity",
+      "queries": 156,
       "cited": 106,
-      "rate": 0.6794871794871795
+      "rate": 67.9
     },
     {
-      "llm": "ChatGPT",
       "vertical": "varejo",
-      "total": 284,
+      "model": "ChatGPT",
+      "queries": 284,
       "cited": 230,
-      "rate": 0.8098591549295775
+      "rate": 81.0
     },
     {
-      "llm": "Claude",
       "vertical": "varejo",
-      "total": 284,
+      "model": "Claude",
+      "queries": 284,
       "cited": 191,
-      "rate": 0.6725352112676056
+      "rate": 67.3
     },
     {
-      "llm": "Gemini",
       "vertical": "varejo",
-      "total": 261,
+      "model": "Gemini",
+      "queries": 261,
       "cited": 217,
-      "rate": 0.8314176245210728
+      "rate": 83.1
     },
     {
-      "llm": "Perplexity",
       "vertical": "varejo",
-      "total": 146,
+      "model": "Perplexity",
+      "queries": 146,
       "cited": 99,
-      "rate": 0.678082191780822
+      "rate": 67.8
     }
   ],
-  "citations_by_model": [
+  "verticalsFull": {
+    "fintech": {
+      "slug": "fintech",
+      "name": "Fintech & Bancos Digitais",
+      "roster": [
+        "Nubank",
+        "PagBank",
+        "Cielo",
+        "Stone",
+        "Banco Inter",
+        "Mercado Pago",
+        "Itaú",
+        "Bradesco",
+        "C6 Bank",
+        "PicPay",
+        "Ame Digital",
+        "Neon",
+        "Original",
+        "BS2",
+        "Safra",
+        "Banco Carrefour"
+      ],
+      "rosterCount": 16,
+      "citedEntities": [
+        {
+          "entity": "Nubank",
+          "count": 44
+        },
+        {
+          "entity": "Banco Inter",
+          "count": 21
+        },
+        {
+          "entity": "C6 Bank",
+          "count": 20
+        },
+        {
+          "entity": "Itaú",
+          "count": 17
+        },
+        {
+          "entity": "PagBank",
+          "count": 16
+        },
+        {
+          "entity": "Bradesco",
+          "count": 14
+        },
+        {
+          "entity": "Stone",
+          "count": 14
+        },
+        {
+          "entity": "Cielo",
+          "count": 11
+        },
+        {
+          "entity": "PicPay",
+          "count": 5
+        },
+        {
+          "entity": "Mercado Pago",
+          "count": 3
+        },
+        {
+          "entity": "Neon",
+          "count": 3
+        },
+        {
+          "entity": "BTG Pactual",
+          "count": 2
+        },
+        {
+          "entity": "Wise",
+          "count": 2
+        }
+      ],
+      "citedCount": 13,
+      "coverage": 81.2
+    },
+    "varejo": {
+      "slug": "varejo",
+      "name": "Varejo & E-commerce",
+      "roster": [
+        "Magazine Luiza",
+        "Casas Bahia",
+        "Ponto Frio",
+        "Americanas",
+        "Amazon Brasil",
+        "Mercado Livre",
+        "Shopee Brasil",
+        "AliExpress Brasil",
+        "Leroy Merlin",
+        "Tok&Stok",
+        "Renner",
+        "Riachuelo",
+        "C&A Brasil",
+        "Centauro",
+        "Netshoes"
+      ],
+      "rosterCount": 15,
+      "citedEntities": [],
+      "citedCount": 0,
+      "coverage": 0.0
+    },
+    "saude": {
+      "slug": "saude",
+      "name": "Saúde & Farmacêuticas",
+      "roster": [
+        "Dasa",
+        "Hapvida",
+        "Unimed",
+        "Eli Lilly Brasil",
+        "Raia Drogasil",
+        "Fleury",
+        "Rede D'Or",
+        "Einstein",
+        "Sírio-Libanês",
+        "Eurofarma",
+        "Aché",
+        "EMS",
+        "Hypera Pharma",
+        "NotreDame Intermédica",
+        "SulAmérica Saúde"
+      ],
+      "rosterCount": 15,
+      "citedEntities": [],
+      "citedCount": 0,
+      "coverage": 0.0
+    },
+    "tecnologia": {
+      "slug": "tecnologia",
+      "name": "Tecnologia & TI",
+      "roster": [
+        "Tivit",
+        "Accenture Brasil",
+        "Stefanini",
+        "Totvs",
+        "Linx",
+        "Locaweb",
+        "Positivo Tecnologia",
+        "Movile",
+        "CI&T",
+        "Vivo Empresas",
+        "Embraer",
+        "WEG",
+        "Natura &Co",
+        "iFood",
+        "99"
+      ],
+      "rosterCount": 15,
+      "citedEntities": [],
+      "citedCount": 0,
+      "coverage": 0.0
+    }
+  },
+  "topEntities": [
     {
-      "model": "gpt-4o-mini-2024-07-18",
-      "model_version": "gpt-4o-mini-2024-07-18",
-      "total": 1228,
-      "cited": 910
+      "name": "Nubank",
+      "citations": 44
     },
     {
-      "model": "claude-haiku-4-5-20251001",
-      "model_version": "claude-haiku-4-5-20251001",
-      "total": 1210,
-      "cited": 897
+      "name": "Banco Inter",
+      "citations": 21
     },
     {
-      "model": "gemini-2.5-pro",
-      "model_version": "gemini-2.5-pro",
-      "total": 971,
-      "cited": 848
+      "name": "C6 Bank",
+      "citations": 20
     },
     {
-      "model": "sonar",
-      "model_version": "sonar",
-      "total": 637,
-      "cited": 472
+      "name": "Itaú",
+      "citations": 17
     },
     {
-      "model": "gemini-2.5-flash",
-      "model_version": "gemini-2.5-flash",
-      "total": 102,
-      "cited": 19
+      "name": "PagBank",
+      "citations": 16
+    },
+    {
+      "name": "Bradesco",
+      "citations": 14
+    },
+    {
+      "name": "Stone",
+      "citations": 14
+    },
+    {
+      "name": "Cielo",
+      "citations": 11
+    },
+    {
+      "name": "PicPay",
+      "citations": 5
+    },
+    {
+      "name": "Mercado Pago",
+      "citations": 3
+    },
+    {
+      "name": "Neon",
+      "citations": 3
+    },
+    {
+      "name": "BTG Pactual",
+      "citations": 2
+    },
+    {
+      "name": "Wise",
+      "citations": 2
     }
   ],
-  "citations_by_query_type": [
+  "sentiment": {
+    "neutral": 114,
+    "positive": 56,
+    "negative": 2
+  },
+  "attribution": {
+    "named": 167,
+    "linked": 5
+  },
+  "positionInResponse": {
+    "initial": 113,
+    "middle": 33,
+    "final": 26
+  },
+  "dailySeries": [
     {
-      "query_type": "exploratory",
-      "vertical": "fintech",
-      "total": 1122,
-      "cited": 974
+      "date": "2026-03-24",
+      "queries": 351,
+      "cited": 134,
+      "rate": 38.2
     },
-    {
-      "query_type": "exploratory",
-      "vertical": "saude",
-      "total": 1010,
-      "cited": 619
-    },
-    {
-      "query_type": "exploratory",
-      "vertical": "tecnologia",
-      "total": 1041,
-      "cited": 816
-    },
-    {
-      "query_type": "exploratory",
-      "vertical": "varejo",
-      "total": 975,
-      "cited": 737
-    }
-  ],
-  "citations_by_category": [
-    {
-      "query_category": "descoberta",
-      "total": 649,
-      "cited": 608
-    },
-    {
-      "query_category": "comparativo",
-      "total": 648,
-      "cited": 606
-    },
-    {
-      "query_category": "reputacao",
-      "total": 458,
-      "cited": 267
-    },
-    {
-      "query_category": "produto",
-      "total": 374,
-      "cited": 341
-    },
-    {
-      "query_category": "confianca",
-      "total": 369,
-      "cited": 349
-    },
-    {
-      "query_category": "mercado",
-      "total": 344,
-      "cited": 139
-    },
-    {
-      "query_category": "b2b",
-      "total": 298,
-      "cited": 240
-    },
-    {
-      "query_category": "alternativas",
-      "total": 144,
-      "cited": 129
-    },
-    {
-      "query_category": "inovacao",
-      "total": 144,
-      "cited": 90
-    },
-    {
-      "query_category": "investimento",
-      "total": 144,
-      "cited": 94
-    },
-    {
-      "query_category": "experiencia",
-      "total": 113,
-      "cited": 70
-    },
-    {
-      "query_category": "transformacao",
-      "total": 112,
-      "cited": 79
-    },
-    {
-      "query_category": "concept",
-      "total": 66,
-      "cited": 6
-    },
-    {
-      "query_category": "technical",
-      "total": 51,
-      "cited": 1
-    },
-    {
-      "query_category": "fintech",
-      "total": 45,
-      "cited": 35
-    },
-    {
-      "query_category": "fintech_b2b",
-      "total": 45,
-      "cited": 21
-    },
-    {
-      "query_category": "fintech_product",
-      "total": 45,
-      "cited": 15
-    },
-    {
-      "query_category": "fintech_trust",
-      "total": 45,
-      "cited": 45
-    },
-    {
-      "query_category": "academic",
-      "total": 34,
-      "cited": 0
-    },
-    {
-      "query_category": "saude",
-      "total": 8,
-      "cited": 4
-    },
-    {
-      "query_category": "saude_b2b",
-      "total": 4,
-      "cited": 3
-    },
-    {
-      "query_category": "saude_product",
-      "total": 4,
-      "cited": 1
-    },
-    {
-      "query_category": "saude_trust",
-      "total": 4,
-      "cited": 3
-    }
-  ],
-  "citations_by_lang": [
-    {
-      "query_lang": "en",
-      "total": 1994,
-      "cited": 1420
-    },
-    {
-      "query_lang": "pt",
-      "total": 2154,
-      "cited": 1726
-    }
-  ],
-  "finops_by_platform": [
-    {
-      "platform": "google",
-      "calls": 1043,
-      "total_cost": 14.365378549999999,
-      "total_tokens": 1448407
-    },
-    {
-      "platform": "anthropic",
-      "calls": 1092,
-      "total_cost": 1.6805256,
-      "total_tokens": 436701
-    },
-    {
-      "platform": "openai",
-      "calls": 1093,
-      "total_cost": 0.27195345,
-      "total_tokens": 466629
-    },
-    {
-      "platform": "perplexity",
-      "calls": 524,
-      "total_cost": 0.162447,
-      "total_tokens": 162447
-    }
-  ],
-  "recent_runs": [
-    {
-      "timestamp": "2026-04-19T11:16:26.656139+00:00",
-      "module": "citation_tracker",
-      "vertical": "tecnologia",
-      "records": 121,
-      "duration_ms": 1452020,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-19T10:52:13.996637+00:00",
-      "module": "citation_tracker",
-      "vertical": "saude",
-      "records": 121,
-      "duration_ms": 1356507,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-19T10:29:36.851091+00:00",
-      "module": "citation_tracker",
-      "vertical": "varejo",
-      "records": 121,
-      "duration_ms": 1354788,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-19T10:07:01.396125+00:00",
-      "module": "citation_tracker",
-      "vertical": "fintech",
-      "records": 121,
-      "duration_ms": 1408339,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-18T23:07:29.949921+00:00",
-      "module": "citation_tracker",
-      "vertical": "tecnologia",
-      "records": 121,
-      "duration_ms": 1395361,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-18T22:44:13.966570+00:00",
-      "module": "citation_tracker",
-      "vertical": "saude",
-      "records": 121,
-      "duration_ms": 1318681,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-18T22:22:14.668996+00:00",
-      "module": "citation_tracker",
-      "vertical": "varejo",
-      "records": 121,
-      "duration_ms": 1342022,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-18T21:59:52.024787+00:00",
-      "module": "citation_tracker",
-      "vertical": "fintech",
-      "records": 121,
-      "duration_ms": 1400096,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-18T11:18:45.176052+00:00",
-      "module": "citation_tracker",
-      "vertical": "tecnologia",
-      "records": 121,
-      "duration_ms": 1440431,
-      "status": "success"
-    },
-    {
-      "timestamp": "2026-04-18T10:54:44.144220+00:00",
-      "module": "citation_tracker",
-      "vertical": "saude",
-      "records": 121,
-      "duration_ms": 1456806,
-      "status": "success"
-    }
-  ],
-  "recent_snapshots": [
     {
       "date": "2026-03-26",
-      "module": "citation_tracker",
-      "vertical": "fintech",
-      "created_at": "2026-03-26 20:01:20"
+      "queries": 46,
+      "cited": 31,
+      "rate": 67.4
+    },
+    {
+      "date": "2026-03-29",
+      "queries": 256,
+      "cited": 160,
+      "rate": 62.5
+    },
+    {
+      "date": "2026-04-07",
+      "queries": 287,
+      "cited": 249,
+      "rate": 86.8
+    },
+    {
+      "date": "2026-04-12",
+      "queries": 64,
+      "cited": 52,
+      "rate": 81.2
+    },
+    {
+      "date": "2026-04-16",
+      "queries": 724,
+      "cited": 588,
+      "rate": 81.2
+    },
+    {
+      "date": "2026-04-17",
+      "queries": 968,
+      "cited": 776,
+      "rate": 80.2
+    },
+    {
+      "date": "2026-04-18",
+      "queries": 968,
+      "cited": 772,
+      "rate": 79.8
+    },
+    {
+      "date": "2026-04-19",
+      "queries": 484,
+      "cited": 384,
+      "rate": 79.3
     }
-  ]
+  ],
+  "uncitedByVertical": {
+    "fintech": [
+      "Ame Digital",
+      "Original",
+      "BS2",
+      "Safra",
+      "Banco Carrefour"
+    ],
+    "varejo": [
+      "Magazine Luiza",
+      "Casas Bahia",
+      "Ponto Frio",
+      "Americanas",
+      "Amazon Brasil",
+      "Mercado Livre",
+      "Shopee Brasil",
+      "AliExpress Brasil",
+      "Leroy Merlin",
+      "Tok&Stok",
+      "Renner",
+      "Riachuelo",
+      "C&A Brasil",
+      "Centauro",
+      "Netshoes"
+    ],
+    "saude": [
+      "Dasa",
+      "Hapvida",
+      "Unimed",
+      "Eli Lilly Brasil",
+      "Raia Drogasil",
+      "Fleury",
+      "Rede D'Or",
+      "Einstein",
+      "Sírio-Libanês",
+      "Eurofarma",
+      "Aché",
+      "EMS",
+      "Hypera Pharma",
+      "NotreDame Intermédica",
+      "SulAmérica Saúde"
+    ],
+    "tecnologia": [
+      "Tivit",
+      "Accenture Brasil",
+      "Stefanini",
+      "Totvs",
+      "Linx",
+      "Locaweb",
+      "Positivo Tecnologia",
+      "Movile",
+      "CI&T",
+      "Vivo Empresas",
+      "Embraer",
+      "WEG",
+      "Natura &Co",
+      "iFood",
+      "99"
+    ]
+  },
+  "crossVerticalEntities": [],
+  "sentimentByLLM": {
+    "ChatGPT": {
+      "neutral": 21,
+      "positive": 5,
+      "negative": 0
+    },
+    "Claude": {
+      "neutral": 38,
+      "positive": 7,
+      "negative": 0
+    },
+    "Gemini": {
+      "neutral": 2,
+      "positive": 3,
+      "negative": 0
+    },
+    "Perplexity": {
+      "neutral": 53,
+      "positive": 41,
+      "negative": 2
+    }
+  },
+  "byCategory": [
+    {
+      "category": "fintech_trust",
+      "queries": 45,
+      "cited": 45,
+      "rate": 100.0
+    },
+    {
+      "category": "confianca",
+      "queries": 369,
+      "cited": 349,
+      "rate": 94.6
+    },
+    {
+      "category": "descoberta",
+      "queries": 649,
+      "cited": 608,
+      "rate": 93.7
+    },
+    {
+      "category": "comparativo",
+      "queries": 648,
+      "cited": 606,
+      "rate": 93.5
+    },
+    {
+      "category": "produto",
+      "queries": 374,
+      "cited": 341,
+      "rate": 91.2
+    },
+    {
+      "category": "alternativas",
+      "queries": 144,
+      "cited": 129,
+      "rate": 89.6
+    },
+    {
+      "category": "b2b",
+      "queries": 298,
+      "cited": 240,
+      "rate": 80.5
+    },
+    {
+      "category": "fintech",
+      "queries": 45,
+      "cited": 35,
+      "rate": 77.8
+    },
+    {
+      "category": "saude_b2b",
+      "queries": 4,
+      "cited": 3,
+      "rate": 75.0
+    },
+    {
+      "category": "saude_trust",
+      "queries": 4,
+      "cited": 3,
+      "rate": 75.0
+    },
+    {
+      "category": "transformacao",
+      "queries": 112,
+      "cited": 79,
+      "rate": 70.5
+    },
+    {
+      "category": "investimento",
+      "queries": 144,
+      "cited": 94,
+      "rate": 65.3
+    },
+    {
+      "category": "inovacao",
+      "queries": 144,
+      "cited": 90,
+      "rate": 62.5
+    },
+    {
+      "category": "experiencia",
+      "queries": 113,
+      "cited": 70,
+      "rate": 61.9
+    },
+    {
+      "category": "reputacao",
+      "queries": 458,
+      "cited": 267,
+      "rate": 58.3
+    },
+    {
+      "category": "saude",
+      "queries": 8,
+      "cited": 4,
+      "rate": 50.0
+    },
+    {
+      "category": "fintech_b2b",
+      "queries": 45,
+      "cited": 21,
+      "rate": 46.7
+    },
+    {
+      "category": "mercado",
+      "queries": 344,
+      "cited": 139,
+      "rate": 40.4
+    },
+    {
+      "category": "fintech_product",
+      "queries": 45,
+      "cited": 15,
+      "rate": 33.3
+    },
+    {
+      "category": "saude_product",
+      "queries": 4,
+      "cited": 1,
+      "rate": 25.0
+    },
+    {
+      "category": "concept",
+      "queries": 66,
+      "cited": 6,
+      "rate": 9.1
+    },
+    {
+      "category": "technical",
+      "queries": 51,
+      "cited": 1,
+      "rate": 2.0
+    },
+    {
+      "category": "academic",
+      "queries": 34,
+      "cited": 0,
+      "rate": 0.0
+    }
+  ],
+  "byLanguage": [
+    {
+      "lang": "en",
+      "queries": 1994,
+      "cited": 1420,
+      "rate": 71.2
+    },
+    {
+      "lang": "pt",
+      "queries": 2154,
+      "cited": 1726,
+      "rate": 80.1
+    }
+  ],
+  "byQueryType": [
+    {
+      "type": "exploratory",
+      "queries": 4148,
+      "cited": 3146,
+      "rate": 75.8
+    }
+  ],
+  "latencyStats": [
+    {
+      "llm": "ChatGPT",
+      "avgMs": 6820,
+      "minMs": 0,
+      "maxMs": 41770
+    },
+    {
+      "llm": "Claude",
+      "avgMs": 3826,
+      "minMs": 0,
+      "maxMs": 12046
+    },
+    {
+      "llm": "Gemini",
+      "avgMs": 26232,
+      "minMs": 0,
+      "maxMs": 150340
+    },
+    {
+      "llm": "Perplexity",
+      "avgMs": 3213,
+      "minMs": 0,
+      "maxMs": 13562
+    }
+  ],
+  "calibration": {
+    "fictitiousEntities": [
+      "Banco Floresta Digital",
+      "FinPay Solutions",
+      "MegaStore Brasil",
+      "ShopNova Digital",
+      "HealthTech Brasil",
+      "Clínica Horizonte Digital",
+      "TechNova Solutions",
+      "DataBridge Brasil"
+    ],
+    "fictitiousMentions": 0,
+    "totalResponses": 4148,
+    "falsePositiveRate": 0.0,
+    "specificity": 100.0
+  }
 }

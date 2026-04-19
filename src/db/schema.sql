@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS citations (
     token_count     INTEGER,
     model_version   TEXT DEFAULT NULL,           -- pinned model id (rastreio non-stationarity LLM)
     query_type      TEXT DEFAULT 'exploratory',  -- 'directive' | 'exploratory' (Onda 3 — isolamento de framing)
+    fictional_hit   INTEGER NOT NULL DEFAULT 0,  -- 1 se LLM citou entidade fictícia (Migration 0004 — false-positive calibration)
+    fictional_names_json TEXT NOT NULL DEFAULT '[]',  -- JSON array com os nomes fictícios detectados
     created_at      TEXT DEFAULT (datetime('now'))
 );
 
@@ -65,6 +67,8 @@ CREATE INDEX IF NOT EXISTS idx_citations_vertical_cited ON citations(vertical, c
 CREATE INDEX IF NOT EXISTS idx_citations_vertical_llm   ON citations(vertical, llm);
 CREATE INDEX IF NOT EXISTS idx_citations_timestamp_vert ON citations(timestamp, vertical);
 CREATE INDEX IF NOT EXISTS idx_citations_llm_modelver   ON citations(llm, model_version);
+-- Migration 0004: fictional_hit para filtragem rápida de false-positives
+CREATE INDEX IF NOT EXISTS idx_citations_fictional_hit  ON citations(fictional_hit);
 
 -- ============================================================
 -- Score Calibration Bridge: Papers <-> GEO Score Checker

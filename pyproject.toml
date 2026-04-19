@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "papers"
-version = "0.1.0"
-description = "Pesquisa empírica sobre como LLMs citam bancos e fintechs brasileiras"
+version = "0.2.0"
+description = "Pesquisa empírica multi-vertical sobre como LLMs citam empresas brasileiras (fintech, varejo, saúde, tecnologia) — pipeline longitudinal 5 LLMs para publicação peer-reviewed"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"

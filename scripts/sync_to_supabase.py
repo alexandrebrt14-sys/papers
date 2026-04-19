@@ -103,7 +103,6 @@ def _citation_rates(conn: sqlite3.Connection, vertical: str) -> list[dict]:
         GROUP BY llm
         ORDER BY cited_count DESC
     """, (vertical,))
-
     return [
         {
             "llm": r["llm"],
@@ -114,6 +113,70 @@ def _citation_rates(conn: sqlite3.Connection, vertical: str) -> list[dict]:
         }
         for r in rows
     ]
+
+
+def _citation_rates_by_query_type(conn: sqlite3.Connection, vertical: str) -> list[dict]:
+    """Taxa de citação por query_type (directive/exploratory) — Migration 0003.
+
+    Útil para desambiguar bias de framing: queries que já dão a lista ("quais
+    os melhores X") vs queries de emergência ("é seguro?"). Enviado ao
+    Supabase para o frontend de analytics exibir o contraste.
+    """
+    try:
+        rows = _query(conn, """
+            SELECT query_type,
+                   COUNT(*) AS total,
+                   SUM(CASE WHEN cited THEN 1 ELSE 0 END) AS cited_count
+            FROM citations
+            WHERE timestamp >= datetime('now', '-30 days')
+              AND vertical = ?
+              AND query_type IS NOT NULL
+            GROUP BY query_type
+            ORDER BY query_type
+        """, (vertical,))
+    except sqlite3.OperationalError:
+        # DB pré-Migration 0003
+        return []
+    return [
+        {
+            "query_type": r["query_type"],
+            "total_queries": r["total"],
+            "cited_count": r["cited_count"],
+            "citation_rate": round(r["cited_count"] / max(r["total"], 1), 4),
+        }
+        for r in rows
+    ]
+
+
+def _false_positive_rate(conn: sqlite3.Connection, vertical: str) -> dict:
+    """Taxa de falso-positivo via fictional_hit (Migration 0004).
+
+    Complementa a métrica via LIKE em response_text que já existe no
+    generate_dashboard_json.py, mas aqui usa a coluna estruturada — mais
+    preciso porque evita falsos positivos de substring em texto.
+    """
+    try:
+        r = _query(conn, """
+            SELECT COUNT(*) AS n,
+                   SUM(CASE WHEN fictional_hit = 1 THEN 1 ELSE 0 END) AS hits
+            FROM citations
+            WHERE vertical = ?
+              AND timestamp >= datetime('now', '-30 days')
+        """, (vertical,))
+    except sqlite3.OperationalError:
+        return {"n_total": 0, "n_fictional_hits": 0, "fp_rate": 0.0, "specificity": 1.0}
+    if not r:
+        return {"n_total": 0, "n_fictional_hits": 0, "fp_rate": 0.0, "specificity": 1.0}
+    row = r[0]
+    n = int(row["n"] or 0)
+    hits = int(row["hits"] or 0)
+    fp = hits / n if n else 0.0
+    return {
+        "n_total": n,
+        "n_fictional_hits": hits,
+        "fp_rate": round(fp, 6),
+        "specificity": round(1 - fp, 6),
+    }
 
 
 def _entity_rankings(conn: sqlite3.Connection, vertical: str, top: int = 15) -> list[dict]:
@@ -449,14 +512,20 @@ def run_sync(
         ts = _timeseries(conn, v)
         cs = _collection_status(conn, v)
         kp = _kpis(conn, v)
+        # Double-check #2: propagação dos campos novos (query_type + fictional_hit)
+        crqt = _citation_rates_by_query_type(conn, v)
+        fpr = _false_positive_rate(conn, v)
 
         if verbose:
             obs = kp.get("total_observations", 0)
-            print(f"  LLMs: {len(cr)} | Entidades: {len(er)} | Série temporal: {len(ts)} pts | Obs: {obs}")
+            print(f"  LLMs: {len(cr)} | Entidades: {len(er)} | Série: {len(ts)} pts | "
+                  f"Obs: {obs} | QueryTypes: {len(crqt)} | FP rate: {fpr.get('fp_rate', 0):.4f}")
 
         dashboard_rows.append({
             "vertical": v,
             "citation_rates": cr,
+            "citation_rates_by_query_type": crqt,
+            "false_positive": fpr,
             "entity_rankings": er,
             "timeseries": ts,
             "collection_status": cs,

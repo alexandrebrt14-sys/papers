@@ -31,6 +31,7 @@ from src.config import (  # noqa: E402
     query_type_for,
 )
 from src.db.migrate_0003_eficacia_consistencia import migrate  # noqa: E402
+from src.db.migrate_0004_fictional_persistence import migrate as migrate_0004  # noqa: E402
 
 
 # ── query_type_for ────────────────────────────────────────────────────────
@@ -242,3 +243,169 @@ def test_migration_0003_dry_run_does_not_modify(fresh_db: Path):
     ).fetchall()}
     assert "idx_citations_query_type" not in indexes
     con.close()
+
+
+# ── Migration 0004 (double-check #2) ───────────────────────────────────────
+
+
+def test_migration_0004_adds_fictional_columns(fresh_db: Path):
+    migrate_0004(fresh_db, dry_run=False)
+    con = sqlite3.connect(fresh_db)
+    cols = [r[1] for r in con.execute("PRAGMA table_info(citations)").fetchall()]
+    assert "fictional_hit" in cols
+    assert "fictional_names_json" in cols
+    con.close()
+
+
+def test_migration_0004_creates_fictional_index(fresh_db: Path):
+    migrate_0004(fresh_db, dry_run=False)
+    con = sqlite3.connect(fresh_db)
+    idx = {r[0] for r in con.execute(
+        "SELECT name FROM sqlite_master WHERE type='index'"
+    ).fetchall()}
+    assert "idx_citations_fictional_hit" in idx
+    con.close()
+
+
+def test_migration_0004_backfill_marks_fictional_mentions(fresh_db: Path):
+    # Seed com response_text que menciona entidade fictícia
+    con = sqlite3.connect(fresh_db)
+    con.execute(
+        "ALTER TABLE citations ADD COLUMN response_text TEXT"
+    )
+    con.execute(
+        "INSERT INTO citations (timestamp, llm, model, query, query_category, "
+        "query_lang, vertical, cited, response_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ("2026-04-19T00:00:00Z", "ChatGPT", "gpt-4o-mini", "test", "descoberta",
+         "pt", "fintech", 1, "Banco Floresta Digital é uma fintech brasileira."),
+    )
+    con.execute(
+        "INSERT INTO citations (timestamp, llm, model, query, query_category, "
+        "query_lang, vertical, cited, response_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ("2026-04-19T00:00:00Z", "ChatGPT", "gpt-4o-mini", "test", "descoberta",
+         "pt", "fintech", 1, "Nubank é líder de mercado."),
+    )
+    con.commit()
+    con.close()
+
+    s = migrate_0004(fresh_db, dry_run=False)
+    assert s["rows_scanned"] == 2
+    assert s["rows_marked_fictional"] == 1
+
+    con = sqlite3.connect(fresh_db)
+    con.row_factory = sqlite3.Row
+    marked = con.execute(
+        "SELECT fictional_hit, fictional_names_json FROM citations "
+        "WHERE response_text LIKE '%Floresta%'"
+    ).fetchone()
+    assert marked["fictional_hit"] == 1
+    assert "Banco Floresta Digital" in marked["fictional_names_json"]
+
+    not_marked = con.execute(
+        "SELECT fictional_hit FROM citations WHERE response_text LIKE '%Nubank%'"
+    ).fetchone()
+    assert not_marked["fictional_hit"] == 0
+    con.close()
+
+
+def test_migration_0004_idempotent(fresh_db: Path):
+    s1 = migrate_0004(fresh_db, dry_run=False)
+    s2 = migrate_0004(fresh_db, dry_run=False)
+    assert len(s1["added_columns"]) == 2
+    assert len(s2["added_columns"]) == 0
+    assert len(s2["added_indexes"]) == 0
+
+
+# ── Statistical stratification helpers (double-check #2) ────────────────────
+
+
+def test_stratified_citation_rate_by_query_type():
+    """Helper novo em analysis/statistical.py: calcula rate+IC por strata."""
+    pd = pytest.importorskip("pandas")
+    from src.analysis.statistical import StatisticalAnalyzer
+    df = pd.DataFrame({
+        "query_type": ["directive"] * 10 + ["exploratory"] * 10,
+        "cited": [1] * 8 + [0] * 2 + [1] * 4 + [0] * 6,
+    })
+    out = StatisticalAnalyzer.stratified_citation_rate(df, "query_type", "cited")
+    # Ordenado por rate desc
+    assert out.iloc[0]["stratum"] == "directive"
+    assert out.iloc[0]["k"] == 8
+    assert out.iloc[0]["rate"] == 0.8
+    assert out.iloc[1]["stratum"] == "exploratory"
+    assert out.iloc[1]["rate"] == 0.4
+    # IC contém o ponto estimado
+    for _, row in out.iterrows():
+        assert row["ci_low"] <= row["rate"] <= row["ci_high"]
+
+
+def test_stratified_citation_rate_missing_column_raises():
+    pd = pytest.importorskip("pandas")
+    from src.analysis.statistical import StatisticalAnalyzer
+    df = pd.DataFrame({"a": [1, 2], "b": [0, 1]})
+    with pytest.raises(KeyError):
+        StatisticalAnalyzer.stratified_citation_rate(df, "inexistente")
+
+
+def test_false_positive_rate_helper():
+    pd = pytest.importorskip("pandas")
+    from src.analysis.statistical import StatisticalAnalyzer
+    df = pd.DataFrame({"fictional_hit": [0, 0, 1, 0, 1, 0, 0, 0, 0, 0]})
+    out = StatisticalAnalyzer.false_positive_rate(df)
+    assert out["n_total"] == 10
+    assert out["n_fictional_hits"] == 2
+    assert out["fp_rate"] == 0.2
+    assert out["specificity"] == 0.8
+
+
+def test_cochran_mantel_haenszel_controls_for_confounder():
+    """CMH deve neutralizar efeito de lang ao comparar directive vs exploratory."""
+    pd = pytest.importorskip("pandas")
+    from src.analysis.statistical import StatisticalAnalyzer
+    analyzer = StatisticalAnalyzer()
+    # 2x2x2 table: directive vs exploratory, stratified by lang=pt|en
+    df = pd.DataFrame({
+        "query_type": ["directive"] * 50 + ["exploratory"] * 50,
+        "cited":      [1] * 40 + [0] * 10 + [1] * 30 + [0] * 20,
+        "query_lang": ["pt"] * 25 + ["en"] * 25 + ["pt"] * 25 + ["en"] * 25,
+    })
+    result = analyzer.cochran_mantel_haenszel(
+        df, group_col="query_type", outcome_col="cited", stratify_by="query_lang",
+    )
+    assert result.test_name.startswith("cochran-mantel-haenszel")
+    assert result.p_value >= 0.0
+    assert result.statistic >= 0.0
+
+
+def test_cochran_mantel_haenszel_rejects_non_binary_group():
+    pd = pytest.importorskip("pandas")
+    from src.analysis.statistical import StatisticalAnalyzer
+    analyzer = StatisticalAnalyzer()
+    df = pd.DataFrame({
+        "query_type": ["a", "b", "c", "a"],
+        "cited": [1, 0, 1, 0],
+        "query_lang": ["pt", "en", "pt", "en"],
+    })
+    with pytest.raises(ValueError):
+        analyzer.cochran_mantel_haenszel(df, "query_type", "cited", "query_lang")
+
+
+# ── db/client auto-migration (double-check #2) ──────────────────────────────
+
+
+def test_db_client_auto_adds_fictional_columns(tmp_path: Path, monkeypatch):
+    """DatabaseClient.apply_schema deve rodar as migrations inline (0003+0004)
+    quando executado em um DB novo — garante que não é preciso rodar
+    standalone para repos em fresh install."""
+    monkeypatch.setenv("PAPERS_DB_PATH", str(tmp_path / "fresh.db"))
+    from src.db.client import DatabaseClient
+    db = DatabaseClient(db_path=tmp_path / "fresh.db")
+    db.connect()
+    try:
+        cols = [r[1] for r in db._conn.execute("PRAGMA table_info(citations)").fetchall()]
+        assert "query_type" in cols
+        assert "fictional_hit" in cols
+        assert "fictional_names_json" in cols
+        assert "model_version" in cols
+    finally:
+        db.close()
