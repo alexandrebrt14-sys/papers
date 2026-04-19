@@ -94,21 +94,27 @@ class DatabaseClient:
     # === Insert methods ===
 
     def insert_citations(self, records: list[dict[str, Any]], vertical: str = "fintech") -> int:
-        """Insert citation tracker records."""
+        """Insert citation tracker records.
+
+        Populates ``query_type`` (directive/exploratory) added em Migration 0003.
+        Registros antigos sem essa chave recebem 'exploratory' como default seguro.
+        """
         sql = """
             INSERT INTO citations (
                 timestamp, llm, model, query, query_category, query_lang,
+                query_type,
                 vertical, cited, cited_entity, cited_domain, cited_person,
                 position, attribution, source_count, our_source_count,
                 hedging_detected, response_length, response_text,
                 sources_json, latency_ms, token_count, model_version
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         rows = []
         for r in records:
             rows.append((
                 r["timestamp"], r["llm"], r["model"], r["query"],
                 r["query_category"], r["query_lang"],
+                r.get("query_type", "exploratory"),
                 r.get("vertical", vertical),
                 r["cited"], r.get("cited_entity"), r.get("cited_domain"),
                 r.get("cited_person"), r.get("position"), r.get("attribution"),

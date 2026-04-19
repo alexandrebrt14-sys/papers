@@ -48,15 +48,23 @@ CREATE TABLE IF NOT EXISTS citations (
     latency_ms      INTEGER,
     token_count     INTEGER,
     model_version   TEXT DEFAULT NULL,           -- pinned model id (rastreio non-stationarity LLM)
+    query_type      TEXT DEFAULT 'exploratory',  -- 'directive' | 'exploratory' (Onda 3 — isolamento de framing)
     created_at      TEXT DEFAULT (datetime('now'))
 );
 
-CREATE INDEX IF NOT EXISTS idx_citations_timestamp ON citations(timestamp);
-CREATE INDEX IF NOT EXISTS idx_citations_llm ON citations(llm);
+-- Índices simples
+CREATE INDEX IF NOT EXISTS idx_citations_timestamp     ON citations(timestamp);
+CREATE INDEX IF NOT EXISTS idx_citations_llm           ON citations(llm);
 CREATE INDEX IF NOT EXISTS idx_citations_query_category ON citations(query_category);
-CREATE INDEX IF NOT EXISTS idx_citations_cited ON citations(cited);
-CREATE INDEX IF NOT EXISTS idx_citations_vertical ON citations(vertical);
+CREATE INDEX IF NOT EXISTS idx_citations_cited         ON citations(cited);
+CREATE INDEX IF NOT EXISTS idx_citations_vertical      ON citations(vertical);
 CREATE INDEX IF NOT EXISTS idx_citations_model_version ON citations(model_version);
+CREATE INDEX IF NOT EXISTS idx_citations_query_type    ON citations(query_type);
+-- Índices compostos (Migration 0003): previne table scans em queries analíticas
+CREATE INDEX IF NOT EXISTS idx_citations_vertical_cited ON citations(vertical, cited);
+CREATE INDEX IF NOT EXISTS idx_citations_vertical_llm   ON citations(vertical, llm);
+CREATE INDEX IF NOT EXISTS idx_citations_timestamp_vert ON citations(timestamp, vertical);
+CREATE INDEX IF NOT EXISTS idx_citations_llm_modelver   ON citations(llm, model_version);
 
 -- ============================================================
 -- Score Calibration Bridge: Papers <-> GEO Score Checker
