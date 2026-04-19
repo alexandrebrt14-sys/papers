@@ -33,6 +33,42 @@ CACHE_DIR.mkdir(exist_ok=True)
 # Multi-Vertical Framework
 # ============================================================
 
+# Query type classification (Onda 3 — Refactor 2026-04-19)
+# - 'directive': a query já dá o slot ("quais os melhores X", "compare X e Y").
+#                Esperado: alta taxa de citação — mede ranking e bias de seleção.
+# - 'exploratory': descoberta genuína ("é seguro?", "vale a pena?", "alternativas").
+#                  Esperado: baixa taxa de citação espontânea — mede emergência.
+# Classificação automática por category via QUERY_TYPE_BY_CATEGORY; override
+# case-a-case via chave "type" dentro do dict da query.
+QUERY_TYPE_BY_CATEGORY: dict[str, str] = {
+    # Directive (query já força listagem ou comparação)
+    "descoberta":      "directive",
+    "comparativo":     "directive",
+    "b2b":             "directive",
+    "mercado":         "directive",
+    "reputacao":       "directive",
+    "experiencia":     "directive",
+    "transformacao":   "directive",
+    "inovacao":        "directive",
+    # Exploratory (abertura real à emergência)
+    "confianca":       "exploratory",
+    "produto":         "exploratory",
+    "investimento":    "exploratory",
+    "alternativas":    "exploratory",
+}
+
+
+def query_type_for(query_entry: dict) -> str:
+    """Return 'directive' or 'exploratory' for a query dict.
+
+    Respects explicit "type" override; falls back to category mapping;
+    defaults to 'exploratory' if category unknown.
+    """
+    if "type" in query_entry:
+        return query_entry["type"]
+    return QUERY_TYPE_BY_CATEGORY.get(query_entry.get("category", ""), "exploratory")
+
+
 COMMON_QUERIES: list[dict[str, str]] = [
     # Cross-vertical: como LLMs recomendam empresas brasileiras (10 queries)
     # Essas queries são genéricas o suficiente para detectar citação espontânea
@@ -49,6 +85,64 @@ COMMON_QUERIES: list[dict[str, str]] = [
     {"query": "Quais empresas brasileiras investem mais em IA?", "category": "inovacao", "lang": "pt"},
     {"query": "Brazilian companies leading in artificial intelligence adoption", "category": "inovacao", "lang": "en"},
 ]
+
+
+# ============================================================
+# Fictional Entities — calibração de false-positive (Proposal 5, ativado Onda 3)
+# ============================================================
+# Essas entidades NÃO existem. Se um LLM as cita como resposta a uma query
+# genuína, o sinal de citação é falso-positivo (modelo alucina nomes
+# plausíveis). Separadas do cohort principal para não enviesar queries que
+# listam entidades reais; ativadas via get_fictional_probe_queries() no modo
+# de calibração (INCLUDE_FICTIONAL_ENTITIES=true).
+FICTIONAL_ENTITIES: dict[str, list[str]] = {
+    "fintech":    ["Banco Floresta Digital", "FinPay Solutions"],
+    "varejo":     ["MegaStore Brasil", "ShopNova Digital"],
+    "saude":      ["HealthTech Brasil", "Clínica Horizonte Digital"],
+    "tecnologia": ["TechNova Solutions", "DataBridge Brasil"],
+}
+
+
+def is_fictional(entity: str) -> bool:
+    """True se o nome é uma das entidades fictícias do estudo."""
+    norm = entity.strip().lower()
+    for names in FICTIONAL_ENTITIES.values():
+        if any(norm == n.lower() for n in names):
+            return True
+    return False
+
+
+def get_fictional_probe_queries(slug: str) -> list[dict[str, str]]:
+    """Retorna queries que mencionam explicitamente entidades fictícias.
+
+    Uso: o LLM recebe uma query que cita o nome fictício. Se ele repetir/
+    confirmar a menção inventando contexto, é alucinação. Se ele recusar ou
+    dizer "não conheço", é comportamento correto.
+
+    Essas queries não entram no pipeline padrão — são ativadas apenas em
+    runs de calibração (env INCLUDE_FICTIONAL_ENTITIES=true) para não
+    contaminar a série longitudinal principal.
+    """
+    entities = FICTIONAL_ENTITIES.get(slug, [])
+    probes: list[dict[str, str]] = []
+    for entity in entities:
+        probes.extend([
+            {
+                "query": f"O que você sabe sobre {entity}?",
+                "category": "calibracao_fp",
+                "lang": "pt",
+                "type": "exploratory",
+                "target_fictional": entity,
+            },
+            {
+                "query": f"What do you know about {entity}?",
+                "category": "calibracao_fp",
+                "lang": "en",
+                "type": "exploratory",
+                "target_fictional": entity,
+            },
+        ])
+    return probes
 
 # === Ambiguous Entity Handling (Proposal 3) ===
 # These short/common names require the full canonical form to match,
@@ -266,18 +360,53 @@ def get_cohort(slug: str) -> list[str]:
     return get_vertical(slug)["cohort"]
 
 
-def get_queries(slug: str, include_common: bool = True) -> list[dict[str, str]]:
-    """Return queries for a vertical, optionally including common queries."""
+def get_queries(
+    slug: str,
+    include_common: bool = True,
+    include_fictional: bool | None = None,
+) -> list[dict[str, str]]:
+    """Return queries for a vertical.
+
+    Args:
+        slug: vertical slug (fintech, varejo, ...).
+        include_common: when True, prepend COMMON_QUERIES.
+        include_fictional: when True, append fictional-entity probe queries
+            for false-positive calibration. Defaults to env var
+            INCLUDE_FICTIONAL_ENTITIES (true/false), or False if unset.
+    """
+    if include_fictional is None:
+        include_fictional = os.getenv("INCLUDE_FICTIONAL_ENTITIES", "false").lower() == "true"
+
     vertical = get_vertical(slug)
     queries = list(vertical["queries"])
     if include_common:
         queries = COMMON_QUERIES + queries
+    if include_fictional:
+        queries = queries + get_fictional_probe_queries(slug)
     return queries
 
 
 def list_verticals() -> list[str]:
     """Return list of all vertical slugs."""
     return list(VERTICALS.keys())
+
+
+# ============================================================
+# Mandatory LLMs (Onda 3 — protege contra cohort desbalanceado)
+# ============================================================
+
+def mandatory_llms() -> set[str]:
+    """Nomes de LLMs obrigatórios na coleta.
+
+    Lidos de env `MANDATORY_LLMS` (vírgula-separados). Default: todos os 5.
+    Se algum desses falhar durante a coleta, o pipeline deve fail-loud
+    (exit 1) para proteger o balanceamento de N por célula.
+
+    Override em dev:
+        MANDATORY_LLMS=ChatGPT,Claude  (só esses dois obrigatórios)
+    """
+    raw = os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Groq")
+    return {n.strip() for n in raw.split(",") if n.strip()}
 
 
 # ============================================================

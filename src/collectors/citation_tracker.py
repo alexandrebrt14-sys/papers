@@ -17,7 +17,7 @@ import re
 from typing import Any
 
 from src.collectors.base import BaseCollector, LLMResponse
-from src.config import AMBIGUOUS_ENTITIES, CANONICAL_NAMES
+from src.config import AMBIGUOUS_ENTITIES, CANONICAL_NAMES, is_fictional, query_type_for
 
 
 class CitationTracker(BaseCollector):
@@ -38,7 +38,7 @@ class CitationTracker(BaseCollector):
                 if response.from_cache:
                     cache_hits += 1
 
-                analysis = self._analyze(response)
+                analysis = self._analyze(response, query_entry=q)
                 results.append({
                     "module": self.module_name(),
                     "llm": llm_cfg.name,
@@ -46,6 +46,7 @@ class CitationTracker(BaseCollector):
                     "query": q["query"],
                     "query_category": q["category"],
                     "query_lang": q["lang"],
+                    "query_type": query_type_for(q),
                     "timestamp": response.timestamp,
                     "latency_ms": response.latency_ms,
                     "input_tokens": response.input_tokens,
@@ -60,8 +61,13 @@ class CitationTracker(BaseCollector):
         )
         return results
 
-    def _analyze(self, response: LLMResponse) -> dict[str, Any]:
-        """Analyze citation data from structured response for cohort entities."""
+    def _analyze(self, response: LLMResponse, query_entry: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Analyze citation data from structured response for cohort entities.
+
+        Args:
+            response: LLMResponse from provider.
+            query_entry: the query dict (used to flag fictional-entity probes).
+        """
         cited_lower = [e.lower() for e in response.cited_entities]
         text = response.response_text
 
@@ -83,6 +89,22 @@ class CitationTracker(BaseCollector):
 
         # List of all cited entities for this query
         cited_entities_list = [e for e, v in cohort_cited.items() if v]
+
+        # False-positive calibration (Onda 3): flag quando a resposta menciona
+        # uma entidade fictícia (Proposal 5). target_fictional=True em probe
+        # queries E entidade fictícia aparece no texto → sinal de alucinação.
+        fictional_hit = False
+        fictional_names: list[str] = []
+        for name in response.cited_entities:
+            if is_fictional(name):
+                fictional_hit = True
+                fictional_names.append(name)
+        # Também checa texto livre (LLMs podem alucinar sem listar em `cited`)
+        target_fictional = (query_entry or {}).get("target_fictional")
+        if target_fictional and target_fictional.lower() in text.lower():
+            fictional_hit = True
+            if target_fictional not in fictional_names:
+                fictional_names.append(target_fictional)
 
         # Position of first cohort entity in cited_entities order
         position = None
@@ -108,4 +130,7 @@ class CitationTracker(BaseCollector):
             "response_text": response.response_text,
             "all_sources": response.sources,
             "all_cited_entities": response.cited_entities,
+            # False-positive calibration (Onda 3)
+            "fictional_hit": fictional_hit,
+            "fictional_names": fictional_names,
         }
