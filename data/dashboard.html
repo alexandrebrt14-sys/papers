@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Papers — Brasil GEO</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #0f1419; color: #e0e0e0; margin: 0; line-height: 1.5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+        h1 { font-size: 28px; margin: 0 0 4px; color: #fff; }
+        .meta { color: #9aa4ad; font-size: 13px; margin-bottom: 24px; }
+        .card { background: #1a2028; border: 1px solid #2a3139; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+        h2 { font-size: 18px; margin: 0 0 12px; color: #9cdcfe; }
+        .kpi { display: flex; gap: 24px; flex-wrap: wrap; }
+        .kpi div { flex: 1 1 150px; }
+        .kpi strong { display: block; font-size: 32px; color: #ffd580; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid #2a3139; text-align: left; }
+        th { font-weight: 600; color: #9aa4ad; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+        .num { text-align: right; font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard Papers — Brasil GEO</h1>
+        <div class="meta">
+            Extraído em 2026-04-19T19:32:07.248119+00:00
+            
+        </div>
+
+        <div class="card kpi">
+            <div><strong>1244</strong>total de observações</div>
+            <div><strong>824</strong>com citação</div>
+            <div><strong>66.2%</strong>taxa de citação</div>
+            <div><strong>4</strong>verticais ativas</div>
+        </div>
+
+        <div class="card">
+            <h2>Citações por LLM × Vertical</h2>
+            <table>
+                <tr><th>Vertical</th><th>LLM</th><th class="num">Total</th><th class="num">Citadas</th><th class="num">Taxa</th></tr>
+                <tr><td>fintech</td><td>ChatGPT</td><td class='num'>130</td><td class='num'>96</td><td class='num'>73.8%</td></tr><tr><td>fintech</td><td>Claude</td><td class='num'>112</td><td class='num'>91</td><td class='num'>81.2%</td></tr><tr><td>fintech</td><td>Gemini</td><td class='num'>64</td><td class='num'>32</td><td class='num'>50.0%</td></tr><tr><td>fintech</td><td>Perplexity</td><td class='num'>90</td><td class='num'>70</td><td class='num'>77.8%</td></tr><tr><td>saude</td><td>ChatGPT</td><td class='num'>92</td><td class='num'>39</td><td class='num'>42.4%</td></tr><tr><td>saude</td><td>Claude</td><td class='num'>92</td><td class='num'>58</td><td class='num'>63.0%</td></tr><tr><td>saude</td><td>Gemini</td><td class='num'>47</td><td class='num'>21</td><td class='num'>44.7%</td></tr><tr><td>saude</td><td>Perplexity</td><td class='num'>53</td><td class='num'>31</td><td class='num'>58.5%</td></tr><tr><td>tecnologia</td><td>ChatGPT</td><td class='num'>92</td><td class='num'>69</td><td class='num'>75.0%</td></tr><tr><td>tecnologia</td><td>Claude</td><td class='num'>92</td><td class='num'>60</td><td class='num'>65.2%</td></tr><tr><td>tecnologia</td><td>Gemini</td><td class='num'>71</td><td class='num'>50</td><td class='num'>70.4%</td></tr><tr><td>tecnologia</td><td>Perplexity</td><td class='num'>60</td><td class='num'>38</td><td class='num'>63.3%</td></tr><tr><td>varejo</td><td>ChatGPT</td><td class='num'>74</td><td class='num'>55</td><td class='num'>74.3%</td></tr><tr><td>varejo</td><td>Claude</td><td class='num'>74</td><td class='num'>49</td><td class='num'>66.2%</td></tr><tr><td>varejo</td><td>Gemini</td><td class='num'>51</td><td class='num'>33</td><td class='num'>64.7%</td></tr><tr><td>varejo</td><td>Perplexity</td><td class='num'>50</td><td class='num'>32</td><td class='num'>64.0%</td></tr>
+            </table>
+        </div>
+
+        <div class="card"><h2>Citações por Query Type (directive vs exploratory)</h2><table><tr><th>Vertical</th><th>Tipo</th><th class="num">Total</th><th class="num">Citadas</th><th class="num">Taxa</th></tr><tr><td>fintech</td><td>exploratory</td><td class='num'>396</td><td class='num'>289</td><td class='num'>73.0%</td></tr><tr><td>saude</td><td>exploratory</td><td class='num'>284</td><td class='num'>149</td><td class='num'>52.5%</td></tr><tr><td>tecnologia</td><td>exploratory</td><td class='num'>315</td><td class='num'>217</td><td class='num'>68.9%</td></tr><tr><td>varejo</td><td>exploratory</td><td class='num'>249</td><td class='num'>169</td><td class='num'>67.9%</td></tr></table></div>
+
+        <div class="card">
+            <h2>FinOps por plataforma</h2>
+            <table>
+                <tr><th>Platform</th><th class="num">Calls</th><th class="num">Cost (USD)</th><th class="num">Tokens</th></tr>
+                <tr><td>google</td><td class='num'>203</td><td class='num'>$1.9238</td><td class='num'>196339</td></tr><tr><td>anthropic</td><td class='num'>252</td><td class='num'>$0.3782</td><td class='num'>98248</td></tr><tr><td>openai</td><td class='num'>253</td><td class='num'>$0.0646</td><td class='num'>110684</td></tr><tr><td>perplexity</td><td class='num'>140</td><td class='num'>$0.0447</td><td class='num'>44677</td></tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
