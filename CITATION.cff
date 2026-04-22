@@ -1,0 +1,63 @@
+cff-version: 1.2.0
+message: "If you use this software or the associated research data, please cite it as below."
+type: software
+title: "GEO Multi-Vertical Citation Tracker"
+abstract: >-
+  Longitudinal empirical study pipeline tracking citation patterns of 69
+  Brazilian entities (61 real + 8 fictional controls) across 4 verticals
+  (fintech, retail, healthcare, technology) by 5 LLMs (GPT-4o-mini,
+  Claude Haiku 4.5, Gemini 2.5 Pro, Perplexity Sonar, Groq Llama 3.3 70B).
+  Target 90-day observation window · ~25,920 observations. Companion to
+  the practitioner paper "Algorithmic Authority" (SSRN DOI
+  10.2139/ssrn.6460680 · Zenodo DOI 10.5281/zenodo.19687866).
+authors:
+  - family-names: Caramaschi
+    given-names: Alexandre
+    orcid: "https://orcid.org/0009-0004-9150-485X"
+    affiliation: "Independent AI Researcher; Brasil GEO"
+    email: caramaschiai@caramaschiai.io
+    website: "https://alexandrecaramaschi.com"
+identifiers:
+  - type: doi
+    value: "10.2139/ssrn.6460680"
+    description: "Companion paper (SSRN primary)"
+  - type: doi
+    value: "10.5281/zenodo.19687866"
+    description: "Companion paper (Zenodo archival)"
+  - type: other
+    value: "https://www.wikidata.org/wiki/Q138755507"
+    description: "Author Wikidata item"
+keywords:
+  - Generative Engine Optimization
+  - GEO
+  - Large Language Models
+  - LLM citation analysis
+  - Entity Consistency Score
+  - Algorithmic Citability
+  - Knowledge Graphs
+  - Schema.org
+  - Action Research
+  - Information Retrieval
+license: MIT
+license-url: "https://github.com/alexandrebrt14-sys/papers/blob/main/LICENSE"
+repository-code: "https://github.com/alexandrebrt14-sys/papers"
+url: "https://github.com/alexandrebrt14-sys/papers"
+version: "0.1.0"
+date-released: "2026-04-22"
+preferred-citation:
+  type: article
+  title: >-
+    Algorithmic Authority: A Practitioner Framework for Generative Engine
+    Optimization Based on a 7-Day Implementation Sprint
+  authors:
+    - family-names: Caramaschi
+      given-names: Alexandre
+      orcid: "https://orcid.org/0009-0004-9150-485X"
+  year: 2026
+  month: 4
+  journal: "SSRN Electronic Journal"
+  doi: "10.2139/ssrn.6460680"
+  url: "https://ssrn.com/abstract=6460680"
+  publisher:
+    name: "Elsevier SSRN"
+    website: "https://ssrn.com"
