@@ -1,10 +1,12 @@
 # Paper 4 — Null-Triad (outline canônico)
 
-**Status**: v1 draft completo em `papers/drafts/null-triad-v1.md` (~6.300 palavras).
+**Status**: v2 draft em `papers/drafts/null-triad-v1.md` (8.156 palavras, 36 seções) — integração 2026 agentic-commerce literature (Liu, Cao, Mao) completada 23/04.
 
 ## Thesis
 
 Três teses dominantes do mercado GEO brasileiro falham em ser rejeitadas com *n*=7.052 em 12 dias — mas **por três mecanismos independentes**: underpower (H1 RAG), design falho (H2 hallucination probe desligado), instrumentação assimétrica (H3 sources_json). O *Null-Triad* é a contribuição organizadora.
+
+**Elevação de stakes (v2)**: cada null mapeia para uma classe de decisão em agentic commerce 2026 — backing-model selection (AgenticPay, Liu et al 2026), adversarial-robustness certification (SoK, Mao et al 2026), cross-agent comparability audit (Solicit-Then-Suggest, Cao & Hu 2026). Citações de LLM deixam de ser metadado e viram decisão econômica.
 
 ## Título
 
