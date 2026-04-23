@@ -137,6 +137,14 @@ jobs:
             exit 1
           fi
 
+      # Fail-loud per-LLM POS-LOOP (fix 2026-04-23 Onda 2):
+      # Valida que TODOS os providers em MANDATORY_LLMS produziram rows no
+      # run agregado (cross-vertical). Antes, rodava dentro de `collect citation`
+      # por-vertical e mataria o bash loop antes de 2a/3a/4a vertical rodar.
+      # Incidente coberto: Groq silencioso 10-22/04.
+      - name: Validate run — all mandatory LLMs produced rows
+        run: python -m src.cli collect validate-run --since-minutes 120
+
       # ================================================================
       # ARTIFACT UPLOAD INTERMEDIARIO — safety net antes do finalize.
       # Se qualquer step de finalize falhar, o DB com dados coletados

@@ -189,7 +189,7 @@ def collect_citation(ctx: click.Context) -> None:
     from src.finops.hooks import post_collection_hook
     post_collection_hook("citation_tracker", 0, 0)
 
-    # FAIL-LOUD: se nenhuma vertical retornou dados, falha o comando
+    # FAIL-LOUD global: se nenhuma vertical retornou dados, falha o comando
     if total_attempted > 0 and total_collected == 0:
         console.print(
             f"\n[bold red]FAIL-LOUD: 0 citacoes em {total_attempted} verticais. "
@@ -198,27 +198,64 @@ def collect_citation(ctx: click.Context) -> None:
         )
         raise SystemExit(1)
 
-    # FAIL-LOUD per-LLM: garante que cada provider em MANDATORY_LLMS
-    # produziu linhas nesta execução. Detecta bugs silenciosos (ex: Groq
-    # sem roteamento no _dispatch, incidente 2026-04-07→2026-04-22) que
-    # o fail-loud global não pega quando outros providers compensam.
+    # NOTA (2026-04-23): fail-loud per-LLM foi movido para novo comando
+    # `collect validate-run` (invocado pelo workflow após TODAS as verticais).
+    # Motivo: `collect citation` roda per-vertical via daily-collect.yml loop,
+    # então um exit 2 aqui mata o bash loop antes das outras verticais,
+    # gerando cascade de failures. Separar garante 4 verticais completas antes
+    # de validar cohort LLM completo.
+
+
+@collect.command("validate-run")
+@click.option("--since-minutes", type=int, default=60, show_default=True,
+              help="Janela (minutos) a trás para considerar o run atual")
+@click.pass_context
+def collect_validate_run(ctx: click.Context, since_minutes: int) -> None:
+    """Valida que TODOS os LLMs em MANDATORY_LLMS produziram rows no run.
+
+    Invocar APÓS o loop completo de verticais no workflow daily-collect.yml.
+    Caso contrário, um exit 2 em fail-loud per-LLM durante a 1ª vertical
+    mataria o loop bash antes das outras verticais rodarem.
+
+    Incidente coberto: Groq com _dispatch sem routing (10-22 abril), onde os
+    outros 4 LLMs compensavam o total e o fail-loud global (total==0) nunca
+    disparava.
+
+    Exit codes:
+      0 = todos os mandatory_llms produziram rows
+      2 = provider(s) obrigatório(s) sem rows — bug silencioso
+    """
+    from datetime import datetime, timedelta, timezone
     from src.config import mandatory_llms
+
     required = mandatory_llms()
-    db2 = get_db()
-    seen_rows = db2._conn.execute(
-        "SELECT DISTINCT llm FROM citations WHERE timestamp >= ?",
-        (run_start_ts,),
+    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=since_minutes)).isoformat()
+
+    db = get_db()
+    rows = db._conn.execute(
+        "SELECT llm, COUNT(*) FROM citations WHERE timestamp >= ? GROUP BY llm",
+        (cutoff,),
     ).fetchall()
-    db2.close()
-    seen = {r[0] for r in seen_rows}
-    missing = required - seen
+    db.close()
+
+    seen = {r[0]: r[1] for r in rows}
+    missing = required - set(seen.keys())
+
+    console.print(f"\n[bold cyan]Validação do run (últimos {since_minutes}min):[/bold cyan]")
+    for llm in sorted(required):
+        count = seen.get(llm, 0)
+        status = "[green]OK[/green]" if count > 0 else "[red]MISSING[/red]"
+        console.print(f"  {llm:15s} {count:>5} rows  {status}")
+
     if missing:
         console.print(
             f"\n[bold red]FAIL-LOUD LLM: providers obrigatorios sem dados neste run: "
-            f"{sorted(missing)}. Verifique API keys, roteamento em llm_client._dispatch, "
-            f"e circuit breaker. MANDATORY_LLMS={sorted(required)}.[/bold red]"
+            f"{sorted(missing)}. Verifique API keys (gh secret list), roteamento em "
+            f"llm_client._dispatch, e circuit breaker. MANDATORY_LLMS={sorted(required)}.[/bold red]"
         )
         raise SystemExit(2)
+
+    console.print("\n[bold green]Todos os providers obrigatorios produziram rows.[/bold green]")
 
 
 @collect.command("competitor")
