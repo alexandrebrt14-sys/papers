@@ -3,10 +3,33 @@
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Status: Collecting](https://img.shields.io/badge/Status-Collecting-yellow)
+![Tests](https://img.shields.io/badge/tests-78%2F78%20passing-brightgreen)
+![Version](https://img.shields.io/badge/version-v2.0.0--reboot-blue)
 
 Platform for collection, persistence, and statistical analysis of **how LLMs cite Brazilian companies** across 4 economic sectors.
 
 Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation patterns, visibility, and source attribution by generative search engines (Generative Engine Optimization — GEO).
+
+---
+
+## v2.0.0-reboot (2026-04-23)
+
+Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 128-entity cohort, a 192-query balanced battery, and a pre-registered decision rule. **78/78 tests passing.**
+
+Canonical pillars:
+
+1. **NER v2** — NFC+NFKD dual-pass, word-boundary matching, alias and stop-context tables. Dry-run on 2,000 rows: -45% false positives. [`src/analysis/entity_extraction.py`](src/analysis/entity_extraction.py) (24 tests)
+2. **Cluster-robust CR1** — sandwich estimator with cross-group covariance. [`src/analysis/cluster_robust.py`](src/analysis/cluster_robust.py) (6 tests)
+3. **Null simulation (Monte Carlo)** — empirical null distribution replaces the arbitrary Jaccard 0.30 threshold. [`src/analysis/null_simulation.py`](src/analysis/null_simulation.py) (8 tests)
+4. **Power analysis** — Rule-of-3 inverse, Cohen's h, design effect, `reboot_roadmap()`. [`src/analysis/power_analysis.py`](src/analysis/power_analysis.py) (10 tests)
+5. **Mixed-effects GLMM** — `BinomialBayesMixedGLM` with random intercepts per entity and per query. [`src/analysis/mixed_effects.py`](src/analysis/mixed_effects.py)
+6. **Cohort v2** — 80 Brazilian entities + 32 international anchors + 16 fictional decoys (128 total). [`src/config_v2.py`](src/config_v2.py) (16 tests)
+7. **Query battery v2** — 192 balanced queries across verticals, framings, and directives.
+8. **Hypothesis engine** — BH-FDR correction with a pre-registered decision rule. [`src/analysis/hypothesis_engine.py`](src/analysis/hypothesis_engine.py) (14 tests)
+9. **Forward-only migrations** — `0005` NER v2 columns, `0006` SHA-256 response hashes, `0007` fictitious-probe flag.
+10. **Reproducibility** — [`Dockerfile`](Dockerfile), [`requirements-lock.txt`](requirements-lock.txt), [`scripts/reproduce.sh`](scripts/reproduce.sh).
+11. **Pipeline** — `collect validate-run --since-minutes N` standalone, fail-loud per mandatory LLM, `routed_out` vs `api_failure` distinction, updated `daily-collect.yml`.
+12. **Canonical docs** — [`docs/METHODOLOGY_V2.md`](docs/METHODOLOGY_V2.md) (source of truth) and [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
@@ -72,6 +95,9 @@ Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation 
 
 ## Statistical Methodology
 
+> **Source of truth:** [`docs/METHODOLOGY_V2.md`](docs/METHODOLOGY_V2.md) (v2.0.0-reboot, 2026-04-23).
+> The legacy [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) is preserved as historical reference for v1 and Paper 4's failure analysis.
+
 ### Test Framework
 
 | Test | Use | Implementation |
@@ -115,13 +141,15 @@ Each detected citation undergoes analysis of:
 
 ---
 
-## Planned Papers
+## Papers
 
-| # | Title | Venue | Main Methodology |
-|---|---|---|---|
-| 1 | How LLMs Cite Entities Across Industry Verticals | ArXiv | Multi-vertical tracking, ANOVA/KW across models, time series |
-| 2 | GEO vs SEO: Source Divergence | SIGIR/WWW | Weekly Jaccard index (top-10 Google vs LLM sources), 12+ weeks |
-| 3 | Industry-Specific Patterns in AI Citation | Information Sciences (Q1) | Fisher exact test, odds ratios, 95% CI, 2 A/B experiments |
+| # | Title | Venue | Status | Main Methodology |
+|---|---|---|---|---|
+| 1 | How LLMs Cite Entities Across Industry Verticals | ArXiv | planned | Multi-vertical tracking, ANOVA/KW across models, time series |
+| 2 | GEO vs SEO: Source Divergence | SIGIR/WWW | planned | Weekly Jaccard index (top-10 Google vs LLM sources), 12+ weeks |
+| 3 | Industry-Specific Patterns in AI Citation | Information Sciences (Q1) | planned | Fisher exact test, odds ratios, 95% CI, 2 A/B experiments |
+| 4 | Three Ways to Fail to Conclude: A Null-Triad Post-Mortem | SSRN / arXiv / SIGIR 2027 | **submitted** ([10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)) | Null-triad decomposition: H1 underpower, H2 design-null, H3 instrumentation asymmetry |
+| 5 | (in preparation) | Elsevier (target) | **in preparation** — v2 infrastructure operational, 90-day collection window pending OSF preregistration v2 | Balanced 128-entity cohort, 192-query battery, cluster-robust CR1, Monte Carlo null, GLMM, BH-FDR |
 
 ---
 
@@ -224,16 +252,40 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full flow and [docs/aud
 
 ---
 
+## Reproducibility
+
+The v2.0.0-reboot ships a fully pinned, container-reproducible environment:
+
+```bash
+# One-shot container build + test suite + sample analysis
+./scripts/reproduce.sh
+
+# Or, manual Docker workflow
+docker build -t papers-v2 .
+docker run --rm -v "$PWD":/workspace papers-v2 pytest -q
+```
+
+| Artifact | Purpose |
+|---|---|
+| [`Dockerfile`](Dockerfile) | Python 3.11 image with system deps and pinned requirements |
+| [`requirements-lock.txt`](requirements-lock.txt) | Fully pinned dependency set (hashes) used by CI and Docker |
+| [`scripts/reproduce.sh`](scripts/reproduce.sh) | End-to-end: build, migrate, run 78-test suite, emit analysis sample |
+| [`CHANGELOG.md`](CHANGELOG.md) | Version history from v1 through v2.0.0-reboot |
+
+---
+
 ## Documentation
 
 | Document | Description |
 |---|---|
+| [docs/METHODOLOGY_V2.md](docs/METHODOLOGY_V2.md) | **Current** statistical methodology (v2.0.0-reboot) — source of truth |
+| [CHANGELOG.md](CHANGELOG.md) | Top-level version history (v1 through v2.0.0-reboot) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Full pipeline flow, schema layers (core vs future), operational commands |
-| [docs/METHODOLOGY.md](docs/METHODOLOGY.md) | Complete statistical methodology with tests, assumptions, and limitations |
+| [docs/METHODOLOGY.md](docs/METHODOLOGY.md) | Historical methodology (v1, pre-reboot) — kept for Paper 4 context |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Formal specification (functional/non-functional) |
 | [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Spending policies, ADRs, roadmap |
 | [docs/MANUAL.md](docs/MANUAL.md) | Operational manual |
-| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Change history |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Legacy per-docs change log |
 | [docs/audits/2026-03-26/](docs/audits/2026-03-26/) | Archived statistical audit (N=397 snapshot) |
 | [output/critica_estatistica_panel.md](output/critica_estatistica_panel.md) | Critical review by panel of 7 specialists |
 
