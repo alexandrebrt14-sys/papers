@@ -315,11 +315,23 @@ def main():
     specificity = round(100 - false_positive_rate, 3)
 
     # === Build final JSON ===
-    from datetime import datetime, timezone
+    from datetime import datetime, timezone, date, timedelta
+    # Window v2: dia 1 = 23/04/2026, dia 90 = 21/07/2026
+    WINDOW_START = date(2026, 4, 23)
+    WINDOW_END = WINDOW_START + timedelta(days=89)
+    today_utc = datetime.now(timezone.utc).date()
+    day_number = max(1, (today_utc - WINDOW_START).days + 1)
+    day_number = min(day_number, 90)  # cap em 90
     data = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "lastCollection": last_coll,
         "dbVersion": f"papers.db ({total_queries} queries dataset)",
+        # Window de coleta v2 (Onda 10 — 2026-04-23)
+        "windowStart": WINDOW_START.isoformat(),
+        "windowEnd": WINDOW_END.isoformat(),
+        "dayNumber": day_number,
+        "windowTotalDays": 90,
+        "methodologyVersion": "v2",
         "totalQueries": total_queries,
         "totalCited": total_cited,
         "overallRate": round((total_cited / max(total_queries, 1)) * 100, 1),

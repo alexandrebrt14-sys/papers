@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-04-23T19:40:43.995263+00:00",
+  "generatedAt": "2026-04-23T20:34:41.603162+00:00",
   "lastCollection": null,
   "dbVersion": "papers.db (0 queries dataset)",
+  "windowStart": "2026-04-23",
+  "windowEnd": "2026-07-21",
+  "dayNumber": 1,
+  "windowTotalDays": 90,
+  "methodologyVersion": "v2",
   "totalQueries": 0,
   "totalCited": 0,
   "overallRate": 0.0,
