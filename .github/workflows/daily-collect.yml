@@ -149,6 +149,15 @@ jobs:
       - name: Validate run — all mandatory LLMs produced rows
         run: python -m src.cli collect validate-run --since-minutes 120
 
+      # Onda 14 (2026-04-23): validator v2 end-to-end em 6 dimensões
+      # (cobertura per-LLM e per-vertical, colunas v2 populadas, fictitious
+      # hit rate, model_versions drift tracking, citation rate por LLM).
+      # Exit 2 = failure crítico · exit 1 = warning · exit 0 = pass.
+      # continue-on-error para não bloquear commit de dados em warnings.
+      - name: Validate v2 collection (schema + coverage + drift)
+        run: python scripts/validate_v2_collection.py --since-minutes 120 --verbose
+        continue-on-error: true
+
       # ================================================================
       # ARTIFACT UPLOAD INTERMEDIARIO — safety net antes do finalize.
       # Se qualquer step de finalize falhar, o DB com dados coletados
