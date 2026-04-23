@@ -24,7 +24,7 @@ target_length: "6300 words body"
 
 **Methods.** We collected 7,052 LLM responses over 12 consecutive days (2026-03-24 to 2026-04-22) probing 69 entities (61 real Brazilian brands and 8 fictitious decoy entities designed for false-positive calibration) across 4 verticals (fintech, retail, health, technology) against 4 production LLMs (OpenAI `gpt-4o-mini-2024-07-18`, Anthropic `claude-haiku-4-5-20251001`, Google `gemini-2.5-pro`, Perplexity `sonar`). Groq `llama-3.3-70b-versatile` was onboarded mid-collection and excluded from confirmatory analysis. We formulate three hypotheses popularly asserted in the Brazilian GEO market and analyse them under Benjamini–Hochberg false discovery rate correction, BCa bootstrap confidence intervals (10,000 resamples), and cluster-robust standard errors by collection day.
 
-**Results.** The aggregate citation rate is 77.62 % (95 % BCa CI [76.68 %, 78.62 %]). For all three focal hypotheses we fail to reject the null — but by *independent mechanisms*. H1 (RAG advantage) fails through statistical underpower (difference −2.58 pp, 95 % CI crosses zero, p=0.067 naive → p≈0.48 cluster-robust; Cohen's *h*=−0.061). H2 (hallucination robustness) fails through methodological design (the fictitious probe was never activated during production collection, so a Clopper–Pearson upper bound of 0.05 % reflects absence of spontaneous hallucination on legitimate queries, not adversarial resistance). H3 (disjoint cross-LLM citation universes) fails through instrumentation (three of the four LLMs emit effectively no structured source data, rendering Jaccard comparison a measure of instrumentation rather than agreement). Vertical heterogeneity (Cramér's *V*=0.23, *p*<10⁻⁸²) and Portuguese–English divergence (*h*=0.136, *p*<10⁻⁸) *do* survive correction and subsampling.
+**Results.** The aggregate citation rate is 77.62 % (95 % BCa CI [76.62 %, 78.57 %]). For all three focal hypotheses we fail to reject the null — but by *independent mechanisms*. H1 (RAG advantage) fails through statistical underpower (difference −2.58 pp, 95 % CI crosses zero, p=0.067 naive → p≈0.48 cluster-robust; Cohen's *h*=−0.061). H2 (hallucination robustness) fails through methodological design (the fictitious probe was never activated during production collection, so a Rule-of-Three upper bound of 0.043 % reflects absence of spontaneous hallucination on legitimate queries, not adversarial resistance). H3 (disjoint cross-LLM citation universes) fails through instrumentation (three of the four LLMs emit effectively no structured source data, rendering Jaccard comparison a measure of instrumentation rather than agreement). Vertical heterogeneity (Cramér's *V*=0.23, *p*<10⁻⁸²) and Portuguese–English divergence (*h*=0.136, *p*<10⁻⁸) *do* survive correction and subsampling.
 
 **Conclusion.** We present this as a null-report with diagnostic value: the same dataset simultaneously licenses descriptive claims about linguistic and vertical surface heterogeneity while refusing three architectural claims that commercially matter to the GEO market. We release preregistration, code and data for adversarial replication.
 
@@ -32,7 +32,7 @@ target_length: "6300 words body"
 
 **Keywords.** Generative Engine Optimization · null-result · preregistration · large language model · citation · information retrieval · agentic commerce · Brazilian Portuguese · false discovery rate · BCa bootstrap · reproducibility
 
-**JEL.** M31 · L86 · C12 · C55 · D44 (auction/negotiation theory).
+**JEL.** C12 · C55 · D44 · L86 · M31.
 
 ---
 
@@ -42,9 +42,9 @@ Few technical markets in Brazil have grown as fast as Generative Engine Optimiza
 
 Rigorously, we do not know whether any of them is true.
 
-Ioannidis (2005) argued, now two decades ago, that most published positive findings in underpowered, incentive-laden fields are false [Ioannidis2005]. Simmons, Nelson and Simonsohn (2011) showed that undeclared researcher degrees of freedom inflate false-positive rates to arbitrary levels even without malice [Simmons2011]. Armstrong, Moffat, Webber and Zobel (2009), writing inside information retrieval, documented how weak baselines produce an endemic pattern of "improvements that don't add up" [Armstrong2009]. Ferro and Silvello (2016) extended this diagnosis into a reproducibility framework for IR evaluation [Ferro2016]. A field younger and more commercially pressured than ad-hoc retrieval — such as GEO in Brazilian Portuguese — ought, therefore, to expect the same pathology.
+Ioannidis (2005) argued, now two decades ago, that most published positive findings in underpowered, incentive-laden fields are false [Ioannidis2005]. Simmons, Nelson and Simonsohn (2011) showed that undeclared researcher degrees of freedom inflate false-positive rates to arbitrary levels even without malice [Simmons2011]. Armstrong, Moffat, Webber and Zobel (2009), writing inside information retrieval, documented how weak baselines produce an endemic pattern of "improvements that don't add up" [Armstrong2009]. Ferro and Silvello (2017) extended this diagnosis into a reproducibility framework for IR evaluation [Ferro2017]. A field younger and more commercially pressured than ad-hoc retrieval — such as GEO in Brazilian Portuguese — ought, therefore, to expect the same pathology.
 
-The stakes of this question have changed in 2026. Until recently, an LLM that cited a brand was mostly an inconvenience for a brand manager; the transaction still happened through human intermediation. With the consolidation of agentic commerce, the inconvenience is becoming an economic selection signal. Liu, Gu and Song's *AgenticPay* (2026) formalises multi-agent LLM negotiation between buyers and sellers and documents that, across 110 negotiation tasks, the choice of underlying model materially shapes feasibility, efficiency and welfare outcomes [Liu2026AgenticPay]. Cao and Hu's *Solicit-Then-Suggest* (2026) derives an economic model of agentic purchasing in which the agent refines a principal's preferences across *m* conversational rounds and then recommends a *k*-product assortment; the authors prove that solicitation depth and assortment breadth are economic substitutes under Gaussian priors [Cao2026Solicit]. Mao et al.'s *SoK* (2026) catalogues twelve cross-layer attack vectors against autonomous LLM agents in commerce, explicitly including market manipulation and regulatory compliance failures as first-class threats [Mao2026SoK]. In all three regimes, a citation ceases to be metadatum and becomes a transaction. The question of which brands an LLM cites, and why, is therefore no longer only a question about discoverability — it is a question about downstream economic routing.
+The stakes of this question have changed in 2026. Until recently, an LLM that cited a brand was mostly an inconvenience for a brand manager; the transaction still happened through human intermediation. With the consolidation of agentic commerce, the inconvenience is becoming an economic selection signal. Liu, Gu and Song's *AgenticPay* (2026) formalises multi-agent LLM negotiation between buyers and sellers and documents that, across 110 negotiation tasks, the choice of underlying model materially shapes feasibility, efficiency and welfare outcomes [Liu2026AgenticPay]. Cao and Hu's *Solicit-Then-Suggest* (2026) derives an economic model of agentic purchasing in which the agent refines a principal's preferences across *m* conversational rounds and then recommends a *k*-product assortment; the authors prove that solicitation depth and assortment breadth are economic substitutes under Gaussian priors [Cao2026Solicit]. Mao et al.'s *SoK* (2026) catalogues twelve cross-layer attack vectors against autonomous LLM agents in commerce, explicitly including market manipulation and regulatory compliance failures as first-class threats [Mao2026SoK]. The question of which brands an LLM cites, and why, is therefore no longer only a question about discoverability — it becomes a question about downstream economic routing that a builder cannot defer to taste.
 
 This paper makes three contributions. First, we report the largest multi-LLM citation dataset collected to date in Brazilian Portuguese (*N* = 7,052 observations, 12 collection days, 4 verticals, 4 production LLMs). Second, we show that this dataset — contrary to what practitioners might hope — fails to reject the three dominant market claims listed above, but does so by *three mutually distinct mechanisms*: statistical underpower, methodological design, and instrumentation bias. We call this structure the **Null-Triad** and argue it is the organising contribution of the paper. Third, we release the pipeline (MIT), the frozen dataset (Zenodo CC-BY 4.0) and the deferred OSF preregistration as a public baseline against which adversarial replication — including our own — can proceed.
 
@@ -58,11 +58,11 @@ The paper sits at the intersection of three literatures. The first is the nascen
 
 The second literature is LLM faithfulness, citation and hallucination. Lewis et al. (2020) formalised retrieval-augmented generation and established the architectural distinction between parametric and retrieval modalities that hypothesis H1 depends on [Lewis2020]. Liu, Zhang and Liang (2023) quantified verifiability failures in commercial generative search engines at EMNLP [Liu2023]. Gao, Yen, Yu and Chen (2023) proposed citation-capable LLM architectures (ALCE) at EMNLP [Gao2023]. Hallucination behaviour was surveyed by Zhang et al. (2023) in the *Siren's Song* article and characterised mechanistically by Shi et al. (2023) at ICML [Zhang2023, Shi2023]. Brown et al. (2020), Vaswani et al. (2017) and Kaplan et al. (2020) are the architectural and scaling background [Brown2020, Vaswani2017, Kaplan2020]. Mitchell et al. (2019) established the Model Cards norm for model-level transparency that Section 4.1 follows [Mitchell2019].
 
-The third and, for this paper, the most important literature is the tradition of null-results in computer science. Armstrong, Moffat, Webber and Zobel's "Improvements that don't add up" (CIKM 2009) remains the founding document of that tradition in IR, showing that cumulative reported gains in ad-hoc retrieval since TREC-8 did not yield a measurably stronger state of the art once baselines were examined [Armstrong2009]. Ferro and Silvello (2016) proposed an IR reproducibility framework with specific commitments that we adapt here [Ferro2016]. Nosek et al. (2018) formalised the preregistration revolution [Nosek2018]; the OSF Secondary Data Analysis template we use is an artefact of that tradition. The Open Science Collaboration (2015) replication project made the cost of underpowered enthusiasm vivid for psychology [OSC2015]; Munafò et al. (2017) wrote the manifesto for reproducible science that our Methods section consciously follows [Munafo2017]. Wasserstein and Lazar (2016) and Amrhein, Greenland and McShane (2019) argued against the mechanical use of *p* < 0.05, which is why we report effect sizes with BCa confidence intervals rather than asterisks [Wasserstein2016, Amrhein2019]. Kass and Raftery (1995) supply the Bayes-factor vocabulary [Kass1995]; Benjamini and Hochberg (1995) the FDR procedure; Efron (1987) the BCa bootstrap [Benjamini1995, Efron1987]. Gelman and Loken's "garden of forking paths" (2014) is the object of the preregistration discipline [Gelman2014].
+The third and, for this paper, the most important literature is the tradition of null-results in computer science. Armstrong, Moffat, Webber and Zobel's "Improvements that don't add up" (CIKM 2009) remains the founding document of that tradition in IR, showing that cumulative reported gains in ad-hoc retrieval since TREC-8 did not yield a measurably stronger state of the art once baselines were examined [Armstrong2009]. Ferro and Silvello (2017) proposed an IR reproducibility framework with specific commitments that we adapt here [Ferro2017]. Nosek et al. (2018) formalised the preregistration revolution [Nosek2018]; the OSF Secondary Data Analysis template we use is an artefact of that tradition. The Open Science Collaboration (2015) replication project made the cost of underpowered enthusiasm vivid for psychology [OSC2015]; Munafò et al. (2017) wrote the manifesto for reproducible science that our Methods section consciously follows [Munafo2017]. Wasserstein and Lazar (2016) and Amrhein, Greenland and McShane (2019) argued against the mechanical use of *p* < 0.05, which is why we report effect sizes with BCa confidence intervals rather than asterisks [Wasserstein2016, Amrhein2019]. Kass and Raftery (1995) supply the Bayes-factor vocabulary [Kass1995]; Benjamini and Hochberg (1995) the FDR procedure; Efron (1987) the BCa bootstrap [Benjamini1995, Efron1987]. Gelman and Loken's "garden of forking paths" (2014) is the object of the preregistration discipline [Gelman2014].
 
 A fourth literature emerged in 2026 and reframes why the first three matter: agentic commerce. Liu, Gu and Song's *AgenticPay* (2026) introduces a multi-agent LLM negotiation benchmark in which buyers and sellers hold private constraints and product-dependent valuations and must reach agreement through multi-round natural-language bargaining rather than algorithmic bidding alone [Liu2026AgenticPay]. Their benchmark of 110 tasks across bilateral, many-to-one and many-to-many settings reveals sizeable performance gaps between proprietary and open-weight models on long-horizon strategic reasoning; critically, which seller an agent *mentions* early in a negotiation is not a cosmetic detail but a prior over which counter-party the negotiation continues with. Cao and Hu's *Solicit-Then-Suggest* (2026) formalises the other side of the same economy: an AI purchasing agent that refines its belief about a principal's preference vector across *m* conversational rounds and then recommends a *k*-product assortment [Cao2026Solicit]. Under Gaussian priors, they prove an uncertainty decomposition in which solicitation depth and assortment breadth substitute for each other, with expected loss decreasing at order 1/*m* for conversation depth but only at *k*^(−2/*d*) for catalogue breadth — a sharp argument that the *conversational* surface where brands are named is where selection efficiency is concentrated. Mao, Wang, Liu, Zhu, Ma and Yan's *SoK: Security of Autonomous LLM Agents in Agentic Commerce* (2026) catalogues twelve cross-layer attack vectors against such agents, organised along five threat dimensions — agent integrity, transaction authorisation, inter-agent trust, market manipulation and regulatory compliance — and warns that failures in the reasoning and tooling layers propagate into custody, settlement and compliance exposure [Mao2026SoK]. Two of the five dimensions (market manipulation and regulatory compliance) are direct function calls of citation accuracy. An agent that can be induced to cite a fictitious counter-party is an agent that can be socially engineered into a fraudulent transaction.
 
-This fourth literature changes the interpretation of the first three. In a pre-agentic world, a citation in an LLM response was information. In an agentic world, a citation is a *decision*. The three hypotheses we examine all describe the conditions under which those decisions would be predictable. Our paper's failure to confirm them is therefore not neutral: it is a claim about what agentic commerce systems cannot yet be calibrated against.
+This fourth literature changes the interpretation of the first three. In a pre-agentic world, a citation in an LLM response was information consumed by a human reader. In an agentic world, the same citation becomes an input to a downstream procurement or negotiation loop executed by a software principal on behalf of an economic principal. The three hypotheses we examine all describe conditions under which those machine decisions would be predictable or auditable. Our paper's failure to confirm them is therefore not neutral: it is a claim about what agentic commerce systems cannot yet be calibrated against.
 
 We are unaware of any peer-reviewed null-result in the Brazilian GEO literature at the time of writing. Filling that absence is the paper's external contribution.
 
@@ -90,11 +90,29 @@ The collection pipeline is a Python 3.11 code base (MIT) that orchestrates daily
 
 ## 4.2 Cohort
 
-The cohort comprises 69 entities: 61 real Brazilian brands stratified across four verticals (fintech 16, retail 15, health 15, technology 15) and 8 fictitious decoys designed to calibrate the false-positive rate (two per vertical — e.g. "Banco Floresta Digital", "TechNova Solutions", "MegaStore Brasil", "Clínica Horizonte Digital"). Fictitious entities are documented in Appendix B. Sampling across real brands is purposive by notoriety tier (head / torso / long tail) rather than probabilistic, a limitation discussed in Section 7. The query battery (Appendix C) contains 112 canonical prompts grouped into 24 semantic categories (comparative, trust, discovery, alternatives, B2B, sector-map, investment, among others) and is bilingual; all prompts are stored verbatim and linked to results by foreign key. The fictitious probe depends on the environment variable `INCLUDE_FICTITIOUS_ENTITIES`; during the entire collection window analysed here it was set to `false`, with direct consequences for H2 (Section 6.2).
+The cohort comprises 69 entities: 61 real brands stratified across four verticals (fintech 19, comprising 14 Brazilian firms plus 5 international reference firms — Revolut, Monzo, N26, Chime and Wise — used as cross-market anchors; retail 14; health 14; technology 14), and 8 fictitious decoys designed to calibrate the false-positive rate (two per vertical — e.g. "Banco Floresta Digital", "TechNova Solutions", "MegaStore Brasil", "Clínica Horizonte Digital"). Fictitious entities are documented in Appendix B. Sampling across real brands is purposive by notoriety tier (head / torso / long tail) rather than probabilistic, a limitation discussed in Section 7. The query battery (Appendix C) contains 112 canonical prompts grouped into 23 semantic categories (comparative, trust, discovery, alternatives, B2B, sector-map, investment, among others) and is bilingual; all prompts are stored verbatim and linked to results by foreign key. The fictitious probe depends on the environment variable `INCLUDE_FICTITIOUS_ENTITIES`; during the entire collection window analysed here it was set to `false`, with direct consequences for H2 (Section 6.2).
 
 ## 4.3 Dataset statistics
 
-Table 1 summarises the dataset as frozen at tag `paper-4-dataset-closed`. Twelve days are active out of 30 elapsed; the remaining days correspond to pipeline incidents whose root causes are listed in Appendix D. The 12 active days yielded 7,052 observations, distributed unevenly across LLMs (ChatGPT 2,068; Claude 2,050; Gemini 1,913; Perplexity 1,021) and evenly across verticals (fintech 1,848; technology 1,767; retail 1,701; health 1,736). Portuguese and English queries are near-balanced (pt 3,756; en 3,296). The aggregate citation rate is 77.62 % (BCa 95 % CI [76.68 %, 78.62 %], 10,000 resamples, seed 42). Context analyses — a secondary module that extracts sentiment, attribution and response position from each cited mention — cover 4,716 rows after a post-hoc backfill that corrected a bug under which only fintech rows had been processed between 2026-03-24 and 2026-04-22; the bug and its correction are disclosed in Section 7.
+Table 1 summarises the dataset as frozen at tag `paper-4-dataset-closed`. Twelve days are active out of 30 elapsed; the remaining days correspond to pipeline incidents whose root causes are listed in Appendix D. The 12 active days yielded 7,052 observations, distributed unevenly across LLMs and evenly across verticals. Portuguese and English queries are near-balanced. The aggregate citation rate is 77.62 % (BCa 95 % CI [76.62 %, 78.57 %], 10,000 resamples, seed 42). Context analyses — a secondary module that extracts sentiment, attribution and response position from each cited mention — cover 4,716 rows after a post-hoc backfill that corrected a bug under which only fintech rows had been processed between 2026-03-24 and 2026-04-22; the bug and its correction are disclosed in Section 7.
+
+**Table 1.** Dataset statistics at tag `paper-4-dataset-closed`.
+
+| Variable | Value |
+|---|---:|
+| N total observations | 7,052 |
+| Collection period | 2026-03-24 → 2026-04-22 |
+| Collection days active | 12 |
+| Verticals | 4 (fintech, health, technology, retail) |
+| Real entities | 61 (19 fintech incl. 5 international anchors; 14 each retail, health, technology) |
+| Fictitious entities (design, not activated during window) | 8 (2 per vertical) |
+| Production LLMs | 4 (Groq onboarded mid-collection, excluded) |
+| Rows per LLM | ChatGPT 2,068 · Claude 2,050 · Gemini 1,913 · Perplexity 1,021 |
+| Rows per vertical | fintech 1,848 · health 1,736 · technology 1,767 · retail 1,701 |
+| Rows per language | PT 3,756 · EN 3,296 |
+| Overall citation rate | 77.62 % (BCa 95 % CI [76.62 %, 78.57 %]) |
+| Context analyses (secondary) | 4,716 |
+| Query categories | 23 |
 
 ---
 
@@ -128,11 +146,49 @@ No human subjects were involved. The data comes from public LLM APIs queried und
 
 Table 2 summarises the confirmatory and supplementary tests. We discuss each in turn.
 
+**Table 2.** Hypothesis test results. Seed=42; bootstrap resamples = 10,000; cluster-robust SE by collection day (12 clusters).
+
+| Hypothesis | Test | Statistic | *p* (raw) | *p* (BH-FDR) | *p* (cluster-robust) | Effect size | 95 % CI | Verdict |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| H1 RAG vs parametric | 2-prop z | z=−1.830 | 0.0673 | 0.0673 | **0.4841** | Cohen's h=−0.061 | [−0.127, 0.005] | fail to reject |
+| H2 Hallucination (spontaneous) | Rule-of-3 upper 95 % | k=0 / N=7,052 | — | — | — | upper = 0.000425 | [0, 0.000425] | supported (conditional on design, see §6.2) |
+| H3 Jaccard top-30 cross-LLM (49 common queries) | Mean pairwise J | — | — | — | — | J̄ = 0.139 | [0.040, 0.337] | see §6.3 |
+| Vertical heterogeneity | χ² (df = 3) | χ² = 384.06 | < 10⁻⁸² | < 10⁻⁸² | — | Cramér's V = 0.233 | — | reject H0 |
+| PT vs EN | 2-prop z | z = 5.696 | < 10⁻⁸ | < 10⁻⁸ | 0.2146 | Cohen's h = 0.136 | [0.089, 0.183] | reject H0 (sensitive to clustering) |
+| Time trend | OLS / Mann–Kendall | slope = 0.0232 / day; τ = 0.212 | 0.0279 / 0.3734 | 0.0373 | — | slope = 0.0232 | [0.0055, 0.0410] | reject H0 under OLS, fail under MK |
+
+
 ## 6.1 H1 — Underpower null
 
-The RAG model (Perplexity `sonar`) cites in 75.42 % of its queries against 78.00 % aggregated over the three parametric models. The raw difference is −2.58 pp (Perplexity lower), with a naive two-proportion *z* of −1.830 (*p* = 0.067). Cohen's *h* is −0.061, which is below the commonly used "small" threshold of 0.20 [Cohen1988]. The BCa 95 % CI for the difference is [−5.42 pp, +0.26 pp] — it straddles zero. Under Benjamini–Hochberg correction on the family of three focal tests, the adjusted *p* remains 0.067. Under cluster-robust standard errors inflated by a factor of 2.55 relative to the iid estimator (Section 6's Table 5), the effective *p* rises to approximately 0.48; 80 % subsampling across 20 replicates produces a median *p* of 0.059, with replicate *p* values ranging from 0.004 to 0.66, and only 50 % of replicates falling below 0.05.
+The RAG model (Perplexity `sonar`) cites in 75.42 % of its queries against 78.00 % aggregated over the three parametric models. The raw difference is −2.58 pp (Perplexity lower), with a naive two-proportion *z* of −1.830 (*p* = 0.067). Cohen's *h* is −0.061, which is below the commonly used "small" threshold of 0.20 [Cohen1988]. The BCa 95 % CI for the difference is [−5.42 pp, +0.26 pp] — it straddles zero. Under Benjamini–Hochberg correction on the family of three focal tests, the adjusted *p* remains 0.067. Under cluster-robust standard errors inflated by a factor of 2.55 relative to the iid estimator (Table 5), the effective *p* rises to approximately 0.48; 80 % subsampling across 20 replicates produces a median *p* of 0.059, with replicate *p* values ranging from 0.004 to 0.66, and only 50 % of replicates falling below 0.05.
+
+**Table 5.** Cluster-robust standard-error inflation by collection day (12 clusters).
+
+| Statistic | SE (iid) | SE (cluster-robust) | Inflation factor | CI (iid) | CI (cluster-robust) |
+|---|---:|---:|---:|---|---|
+| Overall citation rate | 0.00496 | 0.02336 | **4.71×** | [76.65 %, 78.60 %] | [73.04 %, 82.20 %] |
+| H1 rate difference (RAG − parametric) | 0.01449 | 0.03689 | **2.55×** | [−5.42 %, +0.26 %] | [−9.81 %, +4.65 %] |
+
 
 Inverse power analysis (Table 3) indicates that detecting a Cohen's *h* of 0.061 with 80 % power under the observed class proportions would require approximately 4,211 Perplexity queries per group against the 1,021 available. The shortfall is of the order of four-fold.
+
+**Table 3.** Inverse power analysis (α = 0.05, power = 0.80).
+
+| Test | Observed effect | *n* current | *n* required | Ratio (*n*_current / *n*_required) |
+|---|---|---:|---:|---:|
+| H1 RAG vs parametric | diff = −0.0258 (h=−0.061) | n₁ = 1,021; n₂ = 6,031 | ≈ 4,211 per group | 0.24× / 1.43× |
+| H2 hallucination (spontaneous) | k = 0 / 7,052 (upper = 0.000425) | 7,052 | ≥ 300 to fix upper ≤ 1 % | 23.5× |
+| PT vs EN | diff = +0.0567 (h = 0.136) | 3,756 / 3,296 | ≈ 854 per group | 4.40× / 3.86× |
+| Time trend | slope = 0.0232 / day | 12 days | 13 days | 0.92× |
+
+**Table 4.** Robustness: stability of focal tests under 80 % random subsampling (B = 20 replicates, seed = 42).
+
+| Test | Median *p* | Min *p* | Max *p* | % reps with *p* < 0.05 |
+|---|---:|---:|---:|---:|
+| H1 RAG vs parametric | 0.059 | 0.004 | 0.665 | 50 % |
+| Vertical heterogeneity | < 10⁻⁶⁵ | < 10⁻⁶⁷ | < 10⁻⁵⁰ | 100 % |
+| PT vs EN | < 10⁻⁶ | < 10⁻⁸ | < 10⁻⁴ | 100 % |
+
 
 The H1 null is, therefore, a null of *underpower*. The available data are compatible with a true rate difference ranging from a modest parametric advantage (−5.42 pp) through zero to a weak RAG advantage (+0.26 pp). We report this carefully: the confidence interval does not rule out that Perplexity slightly under-cites Brazilian brands relative to parametric models. What the dataset establishes is that a Perplexity-specific RAG advantage *of the magnitude implicitly assumed by the market* does not survive a straightforward confirmatory test at this *n*, and that reaching the power to settle the question requires either a longer collection window or a collection pipeline that over-samples the RAG model.
 
@@ -140,7 +196,7 @@ We also note that H1's bold form — which is what practitioners actually assert
 
 ## 6.2 H2 — Design null
 
-The fictitious-hit rate is 0 / 7,052 in the full dataset and 0 / 2,068, 0 / 2,050, 0 / 1,913 and 0 / 1,021 across the four LLMs individually. The Wilson 95 % CI under *k* = 0 has 0 as its lower bound by construction; the Clopper–Pearson 95 % upper bound at the full-dataset level is 0.0425 %, and the Rule-of-Three approximation gives 0.0425 % as well [Jarvelin2002]. Per-LLM upper bounds are tighter for the higher-*n* models (ChatGPT and Claude) and looser for Perplexity (0.29 %). None of these facts constitutes evidence of non-zero hallucination.
+The fictitious-hit rate is 0 / 7,052 in the full dataset and 0 / 2,068, 0 / 2,050, 0 / 1,913 and 0 / 1,021 across the four LLMs individually. The Wilson 95 % CI under *k* = 0 has 0 as its lower bound by construction; the Rule-of-Three approximation (3/*n*), which is the standard one-sided 95 % upper bound for a zero-event binomial [Hanley1983, Eypasch1995], gives 0.043 % at the full-dataset level. Per-LLM Rule-of-Three upper bounds are tighter for the higher-*n* models (ChatGPT 0.145 %, Claude 0.146 %, Gemini 0.157 %) and looser for Perplexity (0.294 %). None of these facts constitutes evidence of non-zero hallucination.
 
 The H2 null is a null of *design*. During the entire collection window, the environment variable `INCLUDE_FICTITIOUS_ENTITIES` was set to `false`. Concretely, this means the 112-query battery did not plant any of the eight designed decoy probes — *the models were never asked questions whose subject was a fictitious brand*. What our 0-over-7,052 therefore measures is the absence of *spontaneous* hallucination of fictitious Brazilian brands on legitimate, non-probe queries. This is evidentially different from — and strictly weaker than — an adversarial probe such as TruthfulQA [Liu2023] or HaluEval [Zhang2023], which deliberately place the model under conditions designed to elicit confabulation.
 
@@ -150,15 +206,25 @@ Concretely, H2 cannot be rejected with the dataset as collected not because the 
 
 The six pairwise Jaccard similarities between top-30 cited entities are close to zero; in the most austere reading they are all zero, and in the version that normalises for string casing and diacritics they reach an average Jaccard of 0.14. This is far below the preregistered threshold of 0.30. Taken at face value, H3 would be strongly confirmed — LLMs would cite almost disjoint universes of Brazilian brands.
 
-We resist this reading. Table 6 shows the distribution of non-empty `sources_json` rows across the four LLMs: Perplexity emits structured sources in 100 % of its rows with a median of 137 source tokens per response; Gemini emits them in 3.03 % with a median of 51 tokens; Claude in 2.98 % with a median of 28 tokens; and ChatGPT in 0.05 % with a single response carrying 36 tokens. The measurement instrument for "cited entity" in the schema used here leans on `sources_json` as a primary channel, with free-text named-entity recognition as a fall-back. Three of the four LLMs simply do not emit the structured sources that the instrument reads best. What H3's low Jaccard therefore captures is not architectural divergence in citation behaviour but asymmetry in *source structure emission*: a pipeline artefact rather than a semantic finding.
+We resist this reading. Table 6 shows the distribution of non-empty `sources_json` rows across the four LLMs: Perplexity emits structured sources in 100 % of its rows with a median of 137 source tokens per response; Gemini emits them in 3.03 % with a median of 51 tokens; Claude in 2.98 % with a median of 28 tokens; and ChatGPT in 0.05 % with a single response carrying 36 tokens.
 
-The H3 null is a null of *instrumentation*. Its corrective design is not larger *n* or an adversarial probe; it is a normalised extraction pipeline whose `cited_entities` column is populated from the body of the response (via canonical regex against the cohort) in exactly the same way for all four LLMs, regardless of whether the model emits structured sources. A preliminary implementation of this normalisation suggests four-way top-30 Jaccard is higher than 0.50 — but reporting a confirmed result there requires the full corrective design to be preregistered and rerun, which we mark as future work.
+**Table 6.** Distribution of non-empty `sources_json` across the four production LLMs (instrumentation evidence for H3).
+
+| LLM | Rows | With sources | % non-empty | Mean tokens | Median tokens | P95 tokens |
+|---|---:|---:|---:|---:|---:|---:|
+| ChatGPT | 2,068 | 1 | 0.05 % | 36.0 | 36.0 | 36.0 |
+| Claude | 2,050 | 61 | 2.98 % | 26.2 | 28.0 | 51.0 |
+| Gemini | 1,913 | 58 | 3.03 % | 49.2 | 51.0 | 103.3 |
+| Perplexity | 1,021 | 1,021 | 100.00 % | 132.3 | 137.2 | 181.2 |
+ The measurement instrument for "cited entity" in the schema used here leans on `sources_json` as a primary channel, with free-text named-entity recognition as a fall-back. Three of the four LLMs simply do not emit the structured sources that the instrument reads best. What H3's low Jaccard therefore captures is not architectural divergence in citation behaviour but asymmetry in *source structure emission*: a pipeline artefact rather than a semantic finding.
+
+The H3 null is a null of *instrumentation*. Its corrective design is not larger *n* or an adversarial probe; it is a normalised extraction pipeline whose `cited_entities` column is populated from the body of the response (via canonical regex against the cohort) in exactly the same way for all four LLMs, regardless of whether the model emits structured sources. A preliminary implementation of this normalisation, restricted to the 49 queries for which all four LLMs returned non-empty responses, yields a pairwise Jaccard mean of 0.14 (95 % BCa CI, 10,000 resamples, spanning [0.04, 0.34]) against the preregistered threshold of 0.30; this exploratory range is consistent with the possibility of either confirming or rejecting H3 once the corrective design is fully implemented. Reporting a confirmed result requires the full design to be preregistered and rerun, which we mark as future work.
 
 ## 6.4 What the data do support
 
 Three patterns survive correction, cluster adjustment and 80 % subsampling with full robustness. Vertical heterogeneity is the strongest: fintech cites at 90.0 %, technology at 79.7 %, retail at 76.9 %, and health at 63.0 %. The 4 × 2 chi-square is 384.06 (df = 3, *p* ≈ 6.3 × 10⁻⁸³), Cramér's *V* is 0.23, and 100 % of 80 % subsample replicates retain *p* < 0.05. The six post-hoc pairwise comparisons all survive Bonferroni correction. Linguistic heterogeneity follows: Portuguese cites at 80.27 %, English at 74.61 %, a difference of 5.67 pp (Cohen's *h* = 0.136, *p* ≈ 1.2 × 10⁻⁸), with 100 % subsample stability. We do observe, however, that the PT–EN effect is sensitive to cluster-robust adjustment — the cluster-robust *p* rises to roughly 0.21 — suggesting that part of the linguistic gap correlates with which specific days delivered more Portuguese than English queries.
 
-Two further descriptive patterns are noteworthy but not central to the null-triad. Gemini has the highest rate among LLMs (83.5 %), about eight percentage points above the other three (which cluster tightly at 75.1–75.4 %). A naive OLS slope of daily rate on day index is positive and significant (+2.32 pp per day, *p* = 0.028) but the non-parametric Mann–Kendall trend test returns *p* = 0.37; the slope is being driven by two low-*n* early days (2026-03-24 with *n* = 351 and rate 38.2 %, and 2026-03-26 with *n* = 46 and rate 67.4 %). We therefore regard the time trend as an artefact of the pipeline's warm-up phase rather than evidence of a systematic shift over 12 days.
+Two further descriptive patterns are noteworthy but not central to the null-triad. Gemini has the highest rate among LLMs (83.5 %), about eight percentage points above the other three (which cluster tightly at 75.37 %–75.48 %). A naive OLS slope of daily rate on day index is positive and significant (+2.32 pp per day, *p* = 0.028) but the non-parametric Mann–Kendall trend test returns *p* = 0.37; the slope is being driven by two low-*n* early days (2026-03-24 with *n* = 351 and rate 38.2 %, and 2026-03-26 with *n* = 46 and rate 67.4 %). We therefore regard the time trend as an artefact of the pipeline's warm-up phase rather than evidence of a systematic shift over 12 days.
 
 ---
 
@@ -180,17 +246,17 @@ We enumerate eleven limitations, in descending order of impact on interpretation
 
 (L3) Three of the four LLMs emit effectively no structured source data. H3's corrective pipeline has not yet been preregistered and rerun; the current result is an instrumentation artefact.
 
-(L4) No prompt-variation study was run. Bengio's criticism that prompt sensitivity is under-reported in LLM evaluation work therefore applies to this paper as well [Amrhein2019]. A future replication should include at least eleven paraphrase variants per canonical query.
+(L4) No prompt-variation study was run. Recent work has documented that published LLM evaluations are highly sensitive to small variations in prompt formatting and paraphrasing [Sclar2024]; that critique therefore applies to this paper as well. A future replication should include at least eleven paraphrase variants per canonical query.
 
 (L5) Sampling across the 61 real brands is purposive by notoriety tier rather than probabilistic; this limits generalisation to the population of "Brazilian brands" as a whole.
 
 (L6) European Portuguese is excluded from the language cohort. "Portuguese" in this paper refers exclusively to Brazilian Portuguese.
 
-(L7) The `sentiment` and `attribution` annotations in `citation_context` rely on a rule-based classifier; no human inter-rater reliability (Cohen's κ) has been computed. A blinded double-annotation of 200 rows per LLM is scheduled for v2 of this paper.
+(L7) The `sentiment` and `attribution` annotations in `citation_context` rely on a rule-based classifier; no human inter-rater reliability has been computed. A blinded double-annotation of 200 rows per LLM, scored under Fleiss's and Cohen's kappa [Fleiss1971], is scheduled for v2 of this paper.
 
 (L8) Groq `llama-3.3-70b-versatile` is excluded from confirmatory analysis due to mid-collection onboarding. The preregistration fixes the cohort; any Groq-inclusive analysis in a future version will be reported as an extension rather than a modification of confirmatory claims.
 
-(L9) All four LLMs in the cohort are small or mid-tier model families (mini / haiku / flash-pro / sonar). Kaplan et al. (2020) scaling laws would predict qualitatively different citation behaviour at GPT-4o full / Claude Sonnet / Opus scales [Kaplan2020]. Our results should not be read as a claim about state-of-the-art LLMs at any price point.
+(L9) All four LLMs in the cohort are small or mid-tier commercial model families (`gpt-4o-mini`, `claude-haiku-4-5`, `gemini-2.5-pro` — the Pro tier is mid-tier within the Gemini family — and `sonar` — the non-reasoning tier within the Perplexity Sonar family). Kaplan et al. (2020) scaling laws would predict qualitatively different citation behaviour at GPT-4o full / Claude Sonnet / Opus scales [Kaplan2020]. Our results should not be read as a claim about state-of-the-art LLMs at any price point.
 
 (L10) The parametric-vs-RAG distinction used for H1 is imperfect. Gemini 2.5 Pro is arguably hybrid under some definitions, and Claude Haiku may have limited retrieval adjuncts in specific routing scenarios. We operationalise the distinction strictly on whether the API returns `citations` / `sources_json` natively, which isolates Perplexity. A more sophisticated taxonomy would be welcome.
 
@@ -210,7 +276,7 @@ H1 would require the collection pipeline to reach *n* ≈ 4,211 Perplexity queri
 
 H2 would require activation of the fictitious probe under a design that plants decoy queries at a rate of roughly one per vertical per day per LLM. The expected detection power against a 0.1 % hallucination rate at 80 % power is reached at approximately *n* = 3,000 per LLM per vertical — roughly 48,000 total decoy rows, again on the order of seven collection weeks under a 100-decoy-per-day rate. Because this decoy load would compete with the primary load for provider rate limits, operationalisation requires either a separate day or a dedicated provider quota.
 
-H3 would require a normalised `cited_entities` extraction that ignores `sources_json` structural differences across LLMs and extracts cohort mentions exclusively from the response body using a single canonical regex set. Under this extraction, preliminary exploratory numbers suggest a four-way Jaccard above 0.50 — but the confirmatory result requires preregistration and rerun against the locked cohort, which is scheduled for v2.
+H3 would require a normalised `cited_entities` extraction that ignores `sources_json` structural differences across LLMs and extracts cohort mentions exclusively from the response body using a single canonical regex set. Under this extraction, preliminary exploratory numbers (Section 6.3) place the mean pairwise Jaccard around 0.14 with a 95 % BCa CI spanning [0.04, 0.34]; this is not yet confirmatory evidence in either direction and the preregistered rerun against the locked cohort is scheduled for v2.
 
 We emphasise that these are *engineering* recipes rather than scientific breakthroughs. The paper's claim is precisely that the gap between the current evidentiary state and a confirming study is a set of tractable engineering fixes, not a fundamental mystery.
 
@@ -275,39 +341,37 @@ Full BibTeX is distributed with the source package. A compact listing with DOIs 
 - Aggarwal et al. (2024). *GEO: Generative Engine Optimization*. KDD '24. DOI 10.1145/3637528.3671900.
 - Amrhein, Greenland & McShane (2019). *Retire statistical significance*. Nature 567:305–307. DOI 10.1038/d41586-019-00857-9.
 - Armstrong, Moffat, Webber & Zobel (2009). *Improvements that don't add up: ad-hoc retrieval results since 1998*. CIKM '09. DOI 10.1145/1645953.1646031.
-- Baeza-Yates & Ribeiro-Neto (2011). *Modern Information Retrieval*, 2nd ed. Addison-Wesley.
 - Benjamini & Hochberg (1995). *Controlling the false discovery rate*. JRSS B 57:289–300. DOI 10.1111/j.2517-6161.1995.tb02031.x.
 - Brown et al. (2020). *Language Models are Few-Shot Learners*. NeurIPS 33. arXiv:2005.14165.
 - Cao & Hu (2026). *A Solicit-Then-Suggest Model of Agentic Purchasing*. arXiv:2603.20972. [Cao2026Solicit]
 - Caramaschi (2026). *Algorithmic Authority*. SSRN. DOI 10.2139/ssrn.6460680.
 - Cohen (1988). *Statistical Power Analysis for the Behavioral Sciences*, 2nd ed. Lawrence Erlbaum Associates.
-- Craswell et al. (2021). *Overview of the TREC 2020 Deep Learning Track*. NIST SP 1266. arXiv:2102.07662.
 - Dong et al. (2014). *Knowledge Vault: A Web-Scale Approach to Probabilistic Knowledge Fusion*. KDD '14. DOI 10.1145/2623330.2623623.
 - Efron (1987). *Better Bootstrap Confidence Intervals*. JASA 82:171–185. DOI 10.1080/01621459.1987.10478410.
+- Eypasch, Lefering, Kum & Troidl (1995). *Probability of adverse events that have not yet occurred: a statistical reminder*. British Medical Journal 311(7005):619–620. DOI 10.1136/bmj.311.7005.619.
 - Ferro & Silvello (2017). *Toward a Reproducibility Framework for IR Evaluation*. ACM JDIQ 8(2):8:1–8:4. DOI 10.1145/3020206.
-- Fleiss (1971). *Measuring nominal scale agreement among many raters*. Psychological Bulletin 76(5):378–382.
+- Fleiss (1971). *Measuring nominal scale agreement among many raters*. Psychological Bulletin 76(5):378–382. DOI 10.1037/h0031619.
 - Gao, Yen, Yu & Chen (2023). *Enabling Large Language Models to Generate Text with Citations*. EMNLP '23. DOI 10.18653/v1/2023.emnlp-main.398.
-- Gelman & Loken (2014). *The Statistical Crisis in Science*. American Scientist 102(6):460–465.
+- Gelman & Loken (2014). *The Statistical Crisis in Science*. American Scientist 102(6):460–465. DOI 10.1511/2014.111.460.
 - Gienapp et al. (2024). *Evaluating Generative Ad Hoc Information Retrieval*. SIGIR '24. DOI 10.1145/3626772.3657849.
 - Guha, Brickley & Macbeth (2016). *Schema.org: Evolution of Structured Data on the Web*. CACM 59(2):44–51. DOI 10.1145/2844544.
+- Hanley & Lippman-Hand (1983). *If nothing goes wrong, is everything all right? Interpreting zero numerators*. JAMA 249(13):1743–1745. DOI 10.1001/jama.1983.03330370053031.
 - Ioannidis (2005). *Why Most Published Research Findings Are False*. PLoS Medicine 2(8):e124. DOI 10.1371/journal.pmed.0020124.
-- Järvelin & Kekäläinen (2002). *Cumulated gain-based evaluation of IR techniques*. ACM TOIS 20(4):422–446.
 - Kaplan et al. (2020). *Scaling Laws for Neural Language Models*. arXiv:2001.08361.
-- Kass & Raftery (1995). *Bayes Factors*. JASA 90(430):773–795.
+- Kass & Raftery (1995). *Bayes Factors*. JASA 90(430):773–795. DOI 10.1080/01621459.1995.10476572.
 - Lewis et al. (2020). *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks*. NeurIPS 33. arXiv:2005.11401.
-- Lin, Nogueira & Yates (2021). *Pretrained Transformers for Text Ranking*. Morgan & Claypool. DOI 10.2200/S01123ED1V01Y202108HLT053.
 - Liu, Gu & Song (2026). *AgenticPay: A Multi-Agent LLM Negotiation System for Buyer-Seller Transactions*. arXiv:2602.06008. [Liu2026AgenticPay]
 - Liu, Zhang & Liang (2023). *Evaluating Verifiability in Generative Search Engines*. Findings EMNLP '23. DOI 10.18653/v1/2023.findings-emnlp.467.
 - Mao, Wang, Liu, Zhu, Ma & Yan (2026). *SoK: Security of Autonomous LLM Agents in Agentic Commerce*. arXiv:2604.15367. [Mao2026SoK]
 - Mitchell et al. (2019). *Model Cards for Model Reporting*. FAT* '19. DOI 10.1145/3287560.3287596.
-- Munafò et al. (2017). *A Manifesto for Reproducible Science*. Nature Human Behaviour 1:0021.
-- Nosek et al. (2018). *The preregistration revolution*. PNAS 115(11):2600–2606.
-- Open Science Collaboration (2015). *Estimating the reproducibility of psychological science*. Science 349:aac4716.
+- Munafò et al. (2017). *A Manifesto for Reproducible Science*. Nature Human Behaviour 1:0021. DOI 10.1038/s41562-016-0021.
+- Nosek et al. (2018). *The preregistration revolution*. PNAS 115(11):2600–2606. DOI 10.1073/pnas.1708274114.
+- Open Science Collaboration (2015). *Estimating the reproducibility of psychological science*. Science 349:aac4716. DOI 10.1126/science.aac4716.
+- Sclar, Choi, Tsvetkov & Suhr (2024). *Quantifying Language Models' Sensitivity to Spurious Features in Prompt Design*. ICLR 2024. arXiv:2310.11324.
 - Shi et al. (2023). *Large Language Models Can Be Easily Distracted by Irrelevant Context*. ICML '23. arXiv:2302.00093.
-- Simmons, Nelson & Simonsohn (2011). *False-Positive Psychology*. Psychological Science 22:1359–1366.
-- Thakur et al. (2021). *BEIR: A Heterogeneous Benchmark for Zero-shot Evaluation of IR Models*. NeurIPS Datasets & Benchmarks '21. arXiv:2104.08663.
-- Vaswani et al. (2017). *Attention Is All You Need*. NIPS. arXiv:1706.03762.
-- Wasserstein & Lazar (2016). *The ASA Statement on p-Values*. The American Statistician 70(2):129–133.
+- Simmons, Nelson & Simonsohn (2011). *False-Positive Psychology*. Psychological Science 22:1359–1366. DOI 10.1177/0956797611417632.
+- Vaswani et al. (2017). *Attention Is All You Need*. NeurIPS 30. arXiv:1706.03762.
+- Wasserstein & Lazar (2016). *The ASA Statement on p-Values*. The American Statistician 70(2):129–133. DOI 10.1080/00031305.2016.1154108.
 - Zhang et al. (2023). *Siren's Song in the AI Ocean: A Survey on Hallucination in Large Language Models*. arXiv:2309.01219.
 
 ---
