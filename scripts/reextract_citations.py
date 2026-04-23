@@ -42,7 +42,9 @@ from src.analysis.entity_extraction import (
 from src.config import (
     AMBIGUOUS_ENTITIES,
     CANONICAL_NAMES,
-    get_cohort,
+    ENTITY_ALIASES,
+    ENTITY_STOP_CONTEXTS,
+    get_real_cohort,
     list_verticals,
 )
 from src.db.migrate_0005_ner_v2 import apply as apply_migration_0005
@@ -54,48 +56,29 @@ logging.basicConfig(
 log = logging.getLogger("reextract")
 
 
-# ---------------------------------------------------------------------------
-# ALIASES — gap G6 do Agent C audit. Expandir conforme necessário.
-# Mapeia entidade canônica do cohort → lista de formas alternativas no texto.
-# ---------------------------------------------------------------------------
-ALIASES: dict[str, list[str]] = {
-    "BTG Pactual": ["BTG", "BTGP"],
-    "XP Investimentos": ["XP"],
-    "C6 Bank": ["C6"],
-    "Banco Inter": ["Inter Bank", "Inter S.A.", "Inter SA"],
-    "Rede D'Or": ["Rede D'Or São Luiz", "Rede D'Or Sao Luiz"],
-    "Pão de Açúcar": ["Grupo Pão de Açúcar", "GPA"],
-    "Amazon Brasil": ["Amazon BR", "Amazon.com.br"],
-    "Mercado Livre": ["MercadoLivre", "ML Brasil", "Mercado Libre"],
-    "Mercado Pago": ["MercadoPago", "ML Pago"],
-    "Magazine Luiza": ["Magalu", "Magazine Luíza"],
-    "NotreDame Intermédica": ["NotreDame", "Intermedica"],
-    "SulAmérica Saúde": ["SulAmerica Saude", "Sul America Saúde"],
-    "Eli Lilly Brasil": ["Eli Lilly", "Lilly Brasil"],
-    "EMS": ["EMS Pharma"],
-    "Hypera Pharma": ["Hypera"],
-    "Natura &Co": ["Natura", "Natura & Co"],
-    "Vivo Empresas": ["Vivo B2B", "Vivo Business"],
-    "Accenture Brasil": ["Accenture BR", "Accenture Brazil"],
-    "IBM Brasil": ["IBM BR", "IBM Brazil"],
-}
+# Consolidação 2026-04-23: ALIASES e STOP_CONTEXTS foram migrados para
+# src/config.py (ENTITY_ALIASES, ENTITY_STOP_CONTEXTS) como single source
+# of truth. Este script apenas consome — evitando drift entre NER online
+# e re-extração offline.
 
-# Stop-contexts — gap G7. Descarta matches quando padrão casa no entorno.
-STOP_CONTEXTS: dict[str, list[str]] = {
-    "99": [r"99%", r"\b99\s*%"],           # "99%" não é a empresa
-    "EMS": [r"\bemergency medical", r"EMS\s*=\s*Emergency"],
-}
+# Aliases backward-compat para imports externos (tests, notebooks):
+ALIASES = ENTITY_ALIASES
+STOP_CONTEXTS = ENTITY_STOP_CONTEXTS
 
 
 def build_extractor(vertical: str) -> EntityExtractor:
-    """Constrói EntityExtractor para uma vertical com todos os gaps corrigidos."""
-    cohort = get_cohort(vertical)
+    """Constrói EntityExtractor com cohort REAL (exclui fictícias).
+
+    Fictícias são processadas separadamente via `build_probe_extractor`
+    em scripts de análise de hallucination (probe_type='decoy').
+    """
+    cohort = get_real_cohort(vertical)
     return EntityExtractor(
         cohort=cohort,
-        aliases=ALIASES,
+        aliases=ENTITY_ALIASES,
         ambiguous=set(AMBIGUOUS_ENTITIES),
         canonical_names=CANONICAL_NAMES,
-        stop_contexts=STOP_CONTEXTS,
+        stop_contexts=ENTITY_STOP_CONTEXTS,
     )
 
 
@@ -175,8 +158,8 @@ def main() -> int:
 
     for vert in verticals:
         extractor = build_extractor(vert)
-        log.info("Processing vertical %s (cohort size: %d)", vert,
-                 len(get_cohort(vert)))
+        log.info("Processing vertical %s (real cohort size: %d)", vert,
+                 len(get_real_cohort(vert)))
 
         where = "WHERE vertical = ? AND response_text IS NOT NULL"
         params: list[Any] = [vert]

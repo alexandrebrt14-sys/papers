@@ -147,7 +147,16 @@ def get_fictional_probe_queries(slug: str) -> list[dict[str, str]]:
 # === Ambiguous Entity Handling (Proposal 3) ===
 # These short/common names require the full canonical form to match,
 # preventing false positives (e.g., "Inter" matching "international").
-AMBIGUOUS_ENTITIES: set[str] = {"99", "Neon", "Original", "Inter"}
+# Expandido pela auditoria 2026-04-23 Agent C G12: "Stone" (stablecoin US$),
+# "Ache" (fuzzy acne/achar), "EMS" (Emergency Medical Services), "Linx"
+# (LinkedIn stub), "Amazon" sem qualificador (floresta/river em EN descoberta).
+AMBIGUOUS_ENTITIES: set[str] = {
+    "99", "Neon", "Original", "Inter",
+    # Adicionadas Onda 2 — ambiguidade semântica comprovada em responses
+    "Stone", "Aché", "EMS", "Linx", "Amazon",
+    "Amil",  # farma BR vs "amilase" fuzzy
+    "C&A",   # sigla comum em resposta genérica
+}
 
 # Map ambiguous short names to their canonical (longer) form
 CANONICAL_NAMES: dict[str, str] = {
@@ -155,6 +164,52 @@ CANONICAL_NAMES: dict[str, str] = {
     "Neon": "Banco Neon",
     "Original": "Banco Original",
     "Inter": "Banco Inter",
+    # Novos canônicos pós-audit (gap C12)
+    "Stone": "Stone Co",
+    "Aché": "Aché Laboratórios",
+    "EMS": "EMS Pharma",
+    "Linx": "Linx S.A.",
+    "Amazon": "Amazon Brasil",
+    "Amil": "Amil Assistência Médica",
+    "C&A": "C&A Brasil",
+}
+
+# ALIASES: mapeia nome canônico do cohort → lista de formas alternativas
+# que podem aparecer no response text. Adicionado Onda 2 (gap C7+C11 Agent C).
+# Preserva `entity` canônica em `cited_entities` enquanto aceita matches
+# em acrônimos, ordem invertida (EN), ou variações ortográficas.
+ENTITY_ALIASES: dict[str, list[str]] = {
+    "BTG Pactual": ["BTG", "BTGP"],
+    "XP Investimentos": ["XP"],
+    "C6 Bank": ["C6"],
+    "Banco Inter": ["Inter Bank", "Inter S.A.", "Inter SA"],
+    "Rede D'Or": ["Rede D'Or São Luiz", "Rede D'Or Sao Luiz"],
+    "Pão de Açúcar": ["Grupo Pão de Açúcar", "GPA"],
+    "Amazon Brasil": ["Amazon BR", "Amazon.com.br"],
+    "Mercado Livre": ["MercadoLivre", "ML Brasil", "Mercado Libre"],
+    "Mercado Pago": ["MercadoPago", "ML Pago"],
+    "Magazine Luiza": ["Magalu", "Magazine Luíza"],
+    "NotreDame Intermédica": ["NotreDame", "Intermedica"],
+    "SulAmérica Saúde": ["SulAmerica Saude", "Sul America Saúde"],
+    "Eli Lilly Brasil": ["Eli Lilly", "Lilly Brasil"],
+    "EMS Pharma": ["EMS"],
+    "Hypera Pharma": ["Hypera"],
+    "Natura &Co": ["Natura", "Natura & Co"],
+    "Vivo Empresas": ["Vivo B2B", "Vivo Business"],
+    "Accenture Brasil": ["Accenture BR", "Accenture Brazil"],
+    "IBM Brasil": ["IBM BR", "IBM Brazil"],
+    "Sírio-Libanês": ["Hospital Sírio-Libanês"],
+    "Einstein": ["Hospital Einstein", "Hospital Israelita Albert Einstein"],
+}
+
+# STOP_CONTEXTS: regex que descarta match quando padrão casa ±30 chars
+# (Onda 2 gap C7/C8 Agent C — evita falsos positivos contextuais)
+ENTITY_STOP_CONTEXTS: dict[str, list[str]] = {
+    "99": [r"99%", r"99\s*%", r"noventa e nove"],
+    "Amazon": [r"floresta\s+amaz[oô]nica", r"rio\s+amazonas", r"amazon\s+rainforest"],
+    "EMS": [r"emergency\s+medical", r"electromagnetic"],
+    "Inter": [r"international", r"internet", r"interval"],
+    "Aché": [r"\bachar\b", r"\bache[ris]\b"],   # verbo achar em PT
 }
 
 
@@ -356,8 +411,36 @@ def get_vertical(slug: str) -> dict:
 
 
 def get_cohort(slug: str) -> list[str]:
-    """Return cohort entities for a vertical."""
+    """Return FULL cohort entities for a vertical (inclui fictícias).
+
+    DEPRECATED para análise científica: use `get_real_cohort` ou
+    `get_fictitious_cohort` conforme intenção. Mantido para compat com
+    código legado (citation_tracker.py v1).
+    """
     return get_vertical(slug)["cohort"]
+
+
+def get_real_cohort(slug: str) -> list[str]:
+    """Retorna APENAS entidades reais da vertical (exclui fictícias).
+
+    Uso canônico da análise científica paper v2: reporta rates e cited
+    entities apenas sobre cohort real. Fictícias vão pra `probe_type='decoy'`
+    separadas em análise dedicada.
+
+    Adicionado Onda 2 (gap C5 Agent C audit 2026-04-23).
+    """
+    full = get_vertical(slug)["cohort"]
+    fictitious = set(FICTIONAL_ENTITIES.get(slug, []))
+    return [e for e in full if e not in fictitious]
+
+
+def get_fictitious_cohort(slug: str) -> list[str]:
+    """Retorna APENAS entidades fictícias (decoys) da vertical.
+
+    Usado pelo probe factorial quando `INCLUDE_FICTITIOUS_ENTITIES=true`.
+    Rows geradas recebem `is_probe=1, probe_type='decoy'` no schema v0007.
+    """
+    return list(FICTIONAL_ENTITIES.get(slug, []))
 
 
 def get_queries(

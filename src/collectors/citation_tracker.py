@@ -36,6 +36,24 @@ class CitationTracker(BaseCollector):
 
         for q in self.queries:
             for llm_cfg in self.config.llms:
+                # Distingue "routed_out" (deliberadamente pulado por
+                # PERPLEXITY_CATEGORIES filter) de "failed" (erro real de API,
+                # circuit-break, timeout). Gap B5 Agent B audit 2026-04-23:
+                # logar ambos como "skipped_or_failed" gerava falsos-alarmes
+                # de fail-loud porque Perplexity recebe apenas 4/N categorias
+                # por design — mas em logs era indistinguível de falha real.
+                should_process = self.llm_client.should_query(
+                    llm_cfg, q.get("category", "")
+                )
+                if not should_process:
+                    if slog is not None:
+                        slog.log_query(
+                            llm=llm_cfg.name,
+                            query=q["query"],
+                            category=q.get("category", ""),
+                            error="routed_out",  # não é failure — design decision
+                        )
+                    continue
                 response = self.llm_client.query(llm_cfg, q["query"], category=q.get("category", ""))
                 if response is None:
                     if slog is not None:
@@ -43,7 +61,7 @@ class CitationTracker(BaseCollector):
                             llm=llm_cfg.name,
                             query=q["query"],
                             category=q.get("category", ""),
-                            error="skipped_or_failed",
+                            error="api_failure",  # falha real — API, timeout, circuit
                         )
                     continue
                 if response.from_cache:
