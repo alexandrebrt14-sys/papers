@@ -40,7 +40,11 @@ env:
 jobs:
   collect-and-finalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # Onda 13 (2026-04-23): ampliado de 120 para 180min para dar margem
+    # extra nos primeiros dias da janela v2 (rate limits variam entre
+    # provedores; 5 LLMs × 4 verticais × 48 queries × 2 retries pode
+    # exceder 90min quando Gemini 2.0s/query + redes mais lentas).
+    timeout-minutes: 180
 
     steps:
       - uses: actions/checkout@v5
