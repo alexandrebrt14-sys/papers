@@ -397,3 +397,84 @@ def _validate_query_battery():
     for v in ["fintech", "retail", "health", "technology"]:
         v_count = sum(1 for q in qs if q["vertical"] == v)
         assert v_count == 48
+
+
+# ---------------------------------------------------------------------------
+# Public helpers para o hot path de coleta (Onda 7)
+# ---------------------------------------------------------------------------
+# Slug mapping: config.py usa pt-br (varejo/saude/tecnologia); config_v2
+# internamente usa en (retail/health/technology). BaseCollector passa slug
+# pt-br, então os helpers traduzem.
+
+_VERTICAL_SLUG_MAP_PT_EN: dict[str, str] = {
+    "fintech": "fintech",
+    "varejo": "retail",
+    "saude": "health",
+    "tecnologia": "technology",
+    # also accept en passthroughs
+    "retail": "retail",
+    "health": "health",
+    "technology": "technology",
+}
+
+_REAL_COHORT_BY_SLUG: dict[str, list] = {
+    "fintech": COHORT_FINTECH_REAL,
+    "retail": COHORT_RETAIL_REAL,
+    "health": COHORT_HEALTH_REAL,
+    "technology": COHORT_TECHNOLOGY_REAL,
+}
+
+_ANCHORS_COHORT_BY_SLUG: dict[str, list] = {
+    "fintech": COHORT_FINTECH_ANCHORS,
+    "retail": COHORT_RETAIL_ANCHORS,
+    "health": COHORT_HEALTH_ANCHORS,
+    "technology": COHORT_TECHNOLOGY_ANCHORS,
+}
+
+
+def _normalize_slug(slug: str) -> str:
+    """Accept both pt-br (varejo/saude/tecnologia) and en (retail/health/technology)."""
+    return _VERTICAL_SLUG_MAP_PT_EN.get(slug.lower(), slug.lower())
+
+
+def get_v2_real_entities(slug: str) -> list[str]:
+    """Nomes das entidades BR reais v2 para uma vertical."""
+    v = _normalize_slug(slug)
+    return [e.name for e in _REAL_COHORT_BY_SLUG[v]]
+
+
+def get_v2_anchors(slug: str) -> list[str]:
+    """Nomes dos anchors internacionais v2 para uma vertical."""
+    v = _normalize_slug(slug)
+    return [e.name for e in _ANCHORS_COHORT_BY_SLUG[v]]
+
+
+def get_v2_decoys(slug: str) -> list[str]:
+    """Nomes dos decoys fictícios v2 para uma vertical."""
+    v = _normalize_slug(slug)
+    return list(FICTITIOUS_DECOYS_V2.get(v, []))
+
+
+def get_v2_cohort(slug: str, include_anchors: bool = True,
+                  include_decoys: bool = True) -> list[str]:
+    """União determinística: real + anchors + decoys.
+
+    Ordem:
+      1. BR reais (19-20)
+      2. Anchors internacionais (8) — para cross-vertical comparison
+      3. Decoys fictícios (4) — para false-positive calibration
+
+    Total típico por vertical: 31-32 entidades.
+    """
+    out = list(get_v2_real_entities(slug))
+    if include_anchors:
+        out.extend(get_v2_anchors(slug))
+    if include_decoys:
+        out.extend(get_v2_decoys(slug))
+    return out
+
+
+def get_v2_queries(slug: str) -> list[dict[str, str]]:
+    """Retorna as 48 queries canonical battery v2 para uma vertical."""
+    v = _normalize_slug(slug)
+    return [q for q in build_canonical_battery() if q["vertical"] == v]

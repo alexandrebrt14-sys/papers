@@ -140,9 +140,13 @@ class DatabaseClient:
         Populates columns added pelas migrations:
             - Migration 0003: query_type (directive/exploratory)
             - Migration 0004: fictional_hit + fictional_names_json (false-positive)
+            - Migration 0005: cited_v2, cited_entities_v2_json, position_v2, ... (NER v2)
+            - Migration 0006: response_hash (drift detection)
+            - Migration 0007: is_probe, probe_type, adversarial_framing,
+              fictitious_target, is_calibration (probe design)
 
         Registros que não tragam essas chaves recebem defaults seguros para
-        preservar compat com coletores ainda não atualizados.
+        preservar compat com coletores ainda não atualizados (v1 legacy).
         """
         sql = """
             INSERT INTO citations (
@@ -152,8 +156,22 @@ class DatabaseClient:
                 position, attribution, source_count, our_source_count,
                 hedging_detected, response_length, response_text,
                 sources_json, latency_ms, token_count, model_version,
-                fictional_hit, fictional_names_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                fictional_hit, fictional_names_json,
+                -- Migration 0005 (NER v2)
+                cited_v2, cited_count_v2, cited_entities_v2_json,
+                first_entity_v2, first_entity_offset_v2, position_v2,
+                via_alias_count_v2, via_fold_count_v2,
+                response_length_chars_v2, extraction_version, extracted_at_v2,
+                -- Migration 0006 (drift)
+                response_hash,
+                -- Migration 0007 (probe design)
+                is_probe, probe_type, adversarial_framing,
+                fictitious_target, is_calibration
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                      ?, ?,
+                      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                      ?,
+                      ?, ?, ?, ?, ?)
         """
         rows = []
         for r in records:
@@ -174,6 +192,26 @@ class DatabaseClient:
                 # Migration 0004: calibração de false-positive
                 1 if r.get("fictional_hit") else 0,
                 json.dumps(fict_names, ensure_ascii=False),
+                # Migration 0005: NER v2 columns
+                r.get("cited_v2"),
+                r.get("cited_count_v2"),
+                r.get("cited_entities_v2_json"),
+                r.get("first_entity_v2"),
+                r.get("first_entity_offset_v2"),
+                r.get("position_v2"),
+                r.get("via_alias_count_v2", 0),
+                r.get("via_fold_count_v2", 0),
+                r.get("response_length_chars_v2"),
+                r.get("extraction_version", "v1"),
+                r.get("extracted_at_v2"),
+                # Migration 0006: drift detection
+                r.get("response_hash"),
+                # Migration 0007: probe design
+                r.get("is_probe", 0) or 0,
+                r.get("probe_type"),
+                r.get("adversarial_framing", 0) or 0,
+                r.get("fictitious_target"),
+                r.get("is_calibration", 0) or 0,
             ))
         self._conn.executemany(sql, rows)
         self._conn.commit()
