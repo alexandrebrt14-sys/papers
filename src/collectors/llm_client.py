@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from dataclasses import dataclass
@@ -99,6 +100,11 @@ class LLMClient:
         self._vertical = vertical
         self._last_query_time: dict[str, float] = {}  # provider → timestamp
         self._json_mode = json_mode  # If True, use SYSTEM_PROMPT forcing JSON output
+        # Drift detection: opt-in via DRIFT_DETECTION_ENABLED (default on from Onda 6a).
+        # Records model version string + response hash into model_versions table after
+        # every successful API call. Disable via env=0 if DB contention becomes an issue.
+        self._drift_enabled = os.getenv("DRIFT_DETECTION_ENABLED", "1") == "1"
+        self._drift_detector: Any = None  # lazily instantiated
 
     def set_run_id(self, run_id: str) -> None:
         self._run_id = run_id
@@ -176,6 +182,9 @@ class LLMClient:
                         "sources": response.sources,
                         "cited": response.cited_entities,
                     }, self._vertical)
+                    # 3c. Drift detection (Onda 6a): record model version + response hash
+                    if self._drift_enabled:
+                        self._log_drift(response)
                 return response
             except httpx.HTTPStatusError as e:
                 code = e.response.status_code
@@ -515,6 +524,20 @@ class LLMClient:
             "sources": sources,
             "summary": text[:200],
         }
+
+    def _log_drift(self, response: LLMResponse) -> None:
+        """Record model version + response hash for drift detection.
+
+        Lazily instantiates DriftDetector on first use. Never raises — drift
+        is observability, not a coleta dependency. Failures are logged.
+        """
+        try:
+            if self._drift_detector is None:
+                from src.collectors.drift_detector import DriftDetector
+                self._drift_detector = DriftDetector(db_path=config.db_path)
+            self._drift_detector.record_version(response)
+        except Exception as exc:
+            logger.debug(f"[drift] record_version skipped: {exc}")
 
     def get_cache_stats(self) -> dict:
         return self._cache.stats()

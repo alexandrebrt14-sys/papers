@@ -4,6 +4,30 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [v2.1.0-observability] — 2026-04-23 (Onda 6 — observabilidade + Actions v5)
+
+Onda 6 fecha gaps de observability e dívida técnica de CI identificados durante o reboot.
+
+### Added
+- **DriftDetector wire** (`src/collectors/llm_client.py` + `src/collectors/drift_detector.py`): lazy-instanciado, grava `model_versions` row a cada resposta LLM via `_log_drift`. Opt-in via `DRIFT_DETECTION_ENABLED=1` (default). Fix: `detected_change` flag agora é gravado corretamente no INSERT (antes ficava sempre 0). 5 testes novos.
+- **CollectionLogger auto-persist** (`src/logging/logger.py`): context manager `run()` agora persiste JSONL automaticamente em `.logs/structured/` via `finally` block. Path aparece como artifact `structured-logs-{run_number}` no workflow daily-collect (retention 30d). Opt-out via `PAPERS_STRUCTURED_LOG_PERSIST=0`. 4 testes novos.
+- **Triple-LLM kappa validator** (`src/analysis/kappa_validator.py`): framework interim de inter-annotator agreement. Calcula Cohen's κ par-a-par entre regex NER v2 + 3 LLMs (ChatGPT/Claude/Gemini) + consensus majority-vote. Dependency injection dos extractors para testes sem rede. Landis & Koch interpretation bands. 15 testes novos.
+
+### Changed
+- **GitHub Actions** bump em 7 workflows: `checkout@v4→v5`, `setup-python@v5→v6`, `upload-artifact@v4→v5` (Node 20 deprecation cleared).
+- **`.gitignore`**: `.logs/` adicionado com `.gitkeep` preservado.
+
+### Fixed
+- **`model_versions` drift flag**: `INSERT OR IGNORE` sem coluna `detected_change` fazia com que `get_drift_events()` sempre retornasse lista vazia mesmo em drift real. Agora grava `1 if detected_change else 0`.
+
+### Testing
+- **102/102 testes passing** (24 novos na Onda 6 sobre os 78 da Onda 2-5):
+  - `test_drift_detector.py` (5)
+  - `test_collection_logger_persist.py` (4)
+  - `test_kappa_validator.py` (15)
+
+---
+
 ## [v2.0.0-reboot] — 2026-04-23 (Onda 2-5 do reboot algorítmico)
 
 Reboot metodológico pós-Paper 4 (Null-Triad SSRN + Zenodo `10.5281/zenodo.19712217` published). Auditoria em 5 agents paralelos identificou 95+ gaps; este release implementa os P0+P1.

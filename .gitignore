@@ -37,6 +37,8 @@ logs/*.log
 logs/*.jsonl
 logs/run_*.jsonl
 !logs/.gitkeep
+.logs/
+!.logs/.gitkeep
 
 # Output (track finops dashboard and reports)
 output/*.png

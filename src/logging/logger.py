@@ -30,6 +30,11 @@ from rich.logging import RichHandler
 LOG_DIR = Path(os.getenv("PAPERS_LOG_DIR", "logs"))
 LOG_DIR.mkdir(exist_ok=True)
 
+# Structured JSONL runs are persisted to .logs/structured/ for artifact upload
+# by the daily-collect workflow (gap Onda 6b — observability handoff to CI).
+STRUCTURED_DIR = Path(os.getenv("PAPERS_STRUCTURED_LOG_DIR", ".logs/structured"))
+STRUCTURED_DIR.mkdir(parents=True, exist_ok=True)
+
 
 # === Structured Log Record ===
 
@@ -173,7 +178,11 @@ class CollectionLogger:
 
     @contextmanager
     def run(self) -> Generator[CollectionLogger, None, None]:
-        """Context manager for a complete collection run."""
+        """Context manager for a complete collection run.
+
+        On exit (success or failure), persists the full event stream as a JSONL
+        file under STRUCTURED_DIR. Disable via PAPERS_STRUCTURED_LOG_PERSIST=0.
+        """
         self.start_time = time.time()
         self._log_event("started", f"Coleta iniciada: {self.module}")
         try:
@@ -190,6 +199,12 @@ class CollectionLogger:
             duration = int((time.time() - self.start_time) * 1000)
             self._log_event("fatal", f"Coleta falhou: {e}", error=str(e), duration_ms=duration)
             raise
+        finally:
+            if os.getenv("PAPERS_STRUCTURED_LOG_PERSIST", "1") == "1":
+                try:
+                    self.save_run_log()
+                except Exception as exc:
+                    self.logger.debug(f"save_run_log failed: {exc}")
 
     def log_query(
         self, llm: str, query: str, category: str,
@@ -262,10 +277,15 @@ class CollectionLogger:
         }
 
     def save_run_log(self, path: Path | None = None) -> str:
-        """Save the complete run log as JSONL file."""
+        """Save the complete run log as JSONL file.
+
+        Default target: STRUCTURED_DIR/{module}_{vertical}_{ts}_{run_id}.jsonl.
+        This path is what the GitHub Actions workflow uploads as artifact.
+        """
         if path is None:
             ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-            path = LOG_DIR / f"run_{self.module}_{ts}_{self.run_id}.jsonl"
+            vert_suffix = f"_{self.vertical}" if self.vertical else ""
+            path = STRUCTURED_DIR / f"{self.module}{vert_suffix}_{ts}_{self.run_id}.jsonl"
 
         with open(path, "w", encoding="utf-8") as f:
             # Header: summary

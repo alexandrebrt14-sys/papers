@@ -72,14 +72,15 @@ class DriftDetector:
         try:
             conn.execute(
                 "INSERT OR IGNORE INTO model_versions "
-                "(timestamp, provider, model_alias, model_version, response_hash) "
-                "VALUES (?, ?, ?, ?, ?)",
+                "(timestamp, provider, model_alias, model_version, response_hash, detected_change) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
                 (datetime.now(timezone.utc).isoformat(), response.provider,
-                 response.model, actual_version, response_hash),
+                 response.model, actual_version, response_hash,
+                 1 if detected_change else 0),
             )
             conn.commit()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(f"[drift] failed to persist model_versions row: {exc}")
         conn.close()
 
         return {

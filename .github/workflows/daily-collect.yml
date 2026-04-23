@@ -43,9 +43,9 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -151,7 +151,7 @@ jobs:
       # ja esta salvo como artifact e sera recuperado no proximo run.
       # ================================================================
       - name: Upload database (intermediate safety net)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: papers-db-latest
           path: data/papers.db
@@ -229,7 +229,7 @@ jobs:
       # com a versao pos-finalize (inclui finops rollup etc).
       # ================================================================
       - name: Upload database (latest — post-finalize)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: papers-db-latest
           path: data/papers.db
@@ -237,11 +237,23 @@ jobs:
           overwrite: true
 
       - name: Upload database (dated backup)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: papers-db-${{ github.run_number }}
           path: data/papers.db
           retention-days: 90
+
+      # Onda 6b (2026-04-23): structured JSONL logs uploaded como artifact
+      # para auditoria pós-run. CollectionLogger persiste .logs/structured/*.jsonl
+      # automaticamente via context manager. Retenção 30 dias.
+      - name: Upload structured collection logs
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: structured-logs-${{ github.run_number }}
+          path: .logs/structured/
+          retention-days: 30
+          if-no-files-found: ignore
 
       # Revalidar paginas publicas na Vercel imediatamente apos o commit
       # para que /research e /papers-roadmap reflitam os novos dados sem
