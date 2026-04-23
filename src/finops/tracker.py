@@ -385,6 +385,19 @@ class FinOpsTracker:
                 (ts, platform, model, operation, input_tokens, output_tokens, total, cost, query[:200], run_id),
             )
 
+        # Espelha no geo-finops calls.db unificado (fire-and-forget).
+        # Wire 2026-04-23: adapter existia mas nunca era invocado.
+        try:
+            from src.finops import unified_adapter
+            unified_adapter.record(
+                platform=platform, model=model,
+                tokens_in=input_tokens, tokens_out=output_tokens,
+                cost_usd=cost, operation=operation, run_id=run_id,
+                timestamp=ts,
+            )
+        except Exception as e:
+            logger.debug(f"[finops] unified_adapter noop: {e}")
+
         # Post-hoc checks (non-blocking)
         self._check_anomaly(platform, cost, query)
         self._check_budgets(platform)
@@ -437,13 +450,21 @@ class FinOpsTracker:
         self, conn: sqlite3.Connection, platform: str, period: str,
         pct: float, current: float, limit: float, alert_pct: float,
     ) -> None:
-        """Evaluate spend against thresholds and emit alerts."""
+        """Evaluate spend against thresholds and emit alerts.
+
+        Schema convention: alert_type uses `budget_*` for monthly windows
+        (finops_alerts CHECK constraint only permits `budget_*` and `daily_*`).
+        Maps internal `period='monthly'` to external `budget_*` alert_type to
+        avoid sqlite3.IntegrityError (incident 2026-04-17 through 2026-04-22:
+        FinOps Monitor failing 6 days with 'CHECK constraint failed').
+        """
+        prefix = "budget" if period == "monthly" else period
         if pct >= 1.0:
-            self._emit_alert(conn, platform, f"{period}_exceeded", "emergency", current, limit, pct)
+            self._emit_alert(conn, platform, f"{prefix}_exceeded", "emergency", current, limit, pct)
         elif pct >= 0.90:
-            self._emit_alert(conn, platform, f"{period}_critical", "critical", current, limit, pct)
+            self._emit_alert(conn, platform, f"{prefix}_critical", "critical", current, limit, pct)
         elif pct >= alert_pct:
-            self._emit_alert(conn, platform, f"{period}_warning", "warning", current, limit, pct)
+            self._emit_alert(conn, platform, f"{prefix}_warning", "warning", current, limit, pct)
 
     # --- Anomaly detection ---
 

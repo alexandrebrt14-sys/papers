@@ -1,0 +1,64 @@
+name: Weekly Fictional Calibration
+
+# Roda 1x por semana com INCLUDE_FICTIONAL_ENTITIES=true para calibrar
+# o false-positive rate (specificity) do detector. Sem isso, todas as
+# 6.568 rows históricas têm fictional_hit=0 e 100% specificity reportado
+# sem replicação metodológica — crítico para revisor do Paper 1.
+#
+# Frequência: domingo 10h BRT (13:00 UTC), não colide com daily (9h/21h UTC).
+# Custo estimado: +~30 queries × 5 LLMs × 4 verticais = 600 calls extras/semana.
+
+on:
+  schedule:
+    - cron: '0 13 * * 0'   # Domingo 10:00 BRT
+  workflow_dispatch: {}
+
+concurrency:
+  group: papers-calibration
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+  PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  INCLUDE_FICTIONAL_ENTITIES: "true"     # ativa coorte fictícia no cohort
+  PAPERS_DB_PATH: data/papers.db
+  FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run calibration across verticals
+        run: |
+          for V in fintech varejo saude tecnologia; do
+            echo ""
+            echo "=== Calibration ($V) — INCLUDE_FICTIONAL_ENTITIES=true ==="
+            python -m src.cli --vertical "$V" collect citation || true
+          done
+
+      - name: Commit calibration results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/papers.db
+          git diff --cached --quiet || git commit -m "calibration: weekly fictional entities [skip ci]"
+          git push || true

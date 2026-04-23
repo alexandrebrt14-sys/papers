@@ -113,6 +113,12 @@ jobs:
             # Module 2: Competitor Benchmark (non-blocking)
             python -m src.cli --vertical "$V" collect competitor || true
 
+            # Module 7: Context Analyzer (non-blocking)
+            # Wire 2026-04-23: antes só `collect all` rodava analyzer, mas
+            # workflow usa `collect citation` — citation_context ficava vazio
+            # em varejo/saude/tecnologia. Processa até 500 citations pendentes.
+            python -m src.cli --vertical "$V" collect context --limit 500 || true
+
             # Export CSV snapshot
             python -m src.cli --vertical "$V" db export --format csv --output data/daily || true
 

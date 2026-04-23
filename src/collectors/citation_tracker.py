@@ -50,6 +50,11 @@ class CitationTracker(BaseCollector):
                     cache_hits += 1
 
                 analysis = self._analyze(response, query_entry=q)
+                # token_count = input + output (fix 2026-04-23: campo estava
+                # 100% NULL em 6.568 rows porque o record só expunha
+                # input_tokens/output_tokens separados, mas client.py lê
+                # r.get("token_count") na insert, que caía em None).
+                total_tokens = (response.input_tokens or 0) + (response.output_tokens or 0)
                 record = {
                     "module": self.module_name(),
                     "llm": llm_cfg.name,
@@ -60,6 +65,7 @@ class CitationTracker(BaseCollector):
                     "query_type": query_type_for(q),
                     "timestamp": response.timestamp,
                     "latency_ms": response.latency_ms,
+                    "token_count": total_tokens or None,
                     "input_tokens": response.input_tokens,
                     "output_tokens": response.output_tokens,
                     "from_cache": response.from_cache,

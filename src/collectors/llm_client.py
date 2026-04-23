@@ -77,6 +77,7 @@ class LLMClient:
         "anthropic": 0.3,
         "google": 2.0,      # 30 RPM limit → 60/30 = 2s spacing (billing ativo)
         "perplexity": 0.5,
+        "groq": 0.5,        # Free tier 30 RPM — 2s seria seguro, 0.5s ok em paid
     }
 
     # Perplexity query routing: only high-value categories (saves ~50% search cost)
@@ -221,6 +222,7 @@ class LLMClient:
             "anthropic": self._query_anthropic,
             "google": self._query_google,
             "perplexity": self._query_perplexity,
+            "groq": self._query_groq,
         }
         fn = dispatch.get(llm.provider)
         if not fn:
@@ -365,6 +367,41 @@ class LLMClient:
             llm, prompt, start, text, parsed,
             input_tokens=usage.get("promptTokenCount", 0),
             output_tokens=usage.get("candidatesTokenCount", 0),
+            raw=data,
+        )
+
+    def _query_groq(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """Groq query (OpenAI-compatible endpoint). Fast inference, open-weight models."""
+        messages: list[dict[str, str]] = []
+        if self._json_mode:
+            messages.append({"role": "system", "content": SYSTEM_PROMPT})
+        messages.append({"role": "user", "content": prompt})
+
+        body: dict[str, Any] = {
+            "model": llm.model,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": llm.max_output_tokens,
+        }
+        if self._json_mode and llm.supports_json_mode:
+            body["response_format"] = {"type": "json_object"}
+
+        resp = self._http.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {llm.api_key}"},
+            json=body,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["choices"][0]["message"]["content"]
+        usage = data.get("usage", {})
+
+        parsed = self._parse_json_response(text) if self._json_mode else self._analyze_response_posthoc(text)
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
             raw=data,
         )
 

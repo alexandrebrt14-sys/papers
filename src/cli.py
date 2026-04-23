@@ -159,6 +159,7 @@ def collect_citation(ctx: click.Context) -> None:
     verticals = resolve_verticals(ctx)
     total_collected = 0
     total_attempted = 0
+    run_start_ts = datetime.now(timezone.utc).isoformat()
 
     for vert in verticals:
         console.print(f"\n[bold magenta]Vertical: {vert}[/bold magenta]")
@@ -197,6 +198,28 @@ def collect_citation(ctx: click.Context) -> None:
         )
         raise SystemExit(1)
 
+    # FAIL-LOUD per-LLM: garante que cada provider em MANDATORY_LLMS
+    # produziu linhas nesta execução. Detecta bugs silenciosos (ex: Groq
+    # sem roteamento no _dispatch, incidente 2026-04-07→2026-04-22) que
+    # o fail-loud global não pega quando outros providers compensam.
+    from src.config import mandatory_llms
+    required = mandatory_llms()
+    db2 = get_db()
+    seen_rows = db2._conn.execute(
+        "SELECT DISTINCT llm FROM citations WHERE timestamp >= ?",
+        (run_start_ts,),
+    ).fetchall()
+    db2.close()
+    seen = {r[0] for r in seen_rows}
+    missing = required - seen
+    if missing:
+        console.print(
+            f"\n[bold red]FAIL-LOUD LLM: providers obrigatorios sem dados neste run: "
+            f"{sorted(missing)}. Verifique API keys, roteamento em llm_client._dispatch, "
+            f"e circuit breaker. MANDATORY_LLMS={sorted(required)}.[/bold red]"
+        )
+        raise SystemExit(2)
+
 
 @collect.command("competitor")
 @click.pass_context
@@ -221,6 +244,50 @@ def collect_competitor(ctx: click.Context) -> None:
     db.close()
     from src.finops.hooks import post_collection_hook
     post_collection_hook("competitor_benchmark", 0, 0)
+
+
+@collect.command("context")
+@click.option("--limit", type=int, default=500, show_default=True,
+              help="Máx. citações sem contexto a processar por vertical")
+@click.pass_context
+def collect_context(ctx: click.Context, limit: int) -> None:
+    """Rodar Context Analyzer (Módulo 7) em citations sem contexto.
+
+    Bug fix 2026-04-23: antes só o comando `collect all` chamava o analyzer,
+    mas o workflow diário usa `collect citation` + `collect competitor`. Isso
+    deixou citation_context vazio em varejo/saude/tecnologia desde início de
+    abril (bug reportado em PAPERS-DEEP-ANALYTICS-2026-04-16 §2.5).
+
+    Este comando standalone processa TODAS as verticais, respeitando --limit.
+    """
+    db = get_db()
+    verticals = resolve_verticals(ctx)
+    analyzer = CitationContextAnalyzer()
+    total = 0
+
+    for vert in verticals:
+        console.print(f"\n[bold magenta]Vertical: {vert}[/bold magenta]")
+        rows = db._conn.execute(
+            "SELECT c.id, c.query, c.response_text FROM citations c "
+            "LEFT JOIN citation_context cc ON cc.citation_id = c.id "
+            "WHERE c.vertical = ? AND c.response_text IS NOT NULL "
+            "AND c.cited = 1 AND cc.citation_id IS NULL "
+            "ORDER BY c.id DESC LIMIT ?",
+            (vert, limit),
+        ).fetchall()
+        cohort = get_cohort(vert)
+        vert_count = 0
+        for row in rows:
+            for entity in cohort:
+                result = analyzer.analyze(entity, row["response_text"])
+                if result["cited"]:
+                    db.insert_citation_context(row["id"], result)
+                    vert_count += 1
+        total += vert_count
+        console.print(f"  [green]{vert_count} contextos gravados (de {len(rows)} citations pendentes)[/green]")
+
+    db.close()
+    console.print(f"\n[bold green]Context Analyzer: {total} registros em {len(verticals)} verticais.[/bold green]")
 
 
 @collect.command("serp")

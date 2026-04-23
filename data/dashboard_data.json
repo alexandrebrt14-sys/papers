@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-22T23:26:30.827738+00:00",
+  "generatedAt": "2026-04-23T11:11:27.177258+00:00",
   "lastCollection": "2026-04-22 23:26:26",
   "dbVersion": "papers.db (7052 queries dataset)",
   "totalQueries": 7052,
@@ -12,7 +12,7 @@
   "entitiesMonitored": 69,
   "entitiesReal": 61,
   "entitiesFictitious": 8,
-  "contextAnalyses": 172,
+  "contextAnalyses": 4716,
   "collectionRounds": 69,
   "daysCollecting": 12,
   "byLLM": [
@@ -239,59 +239,67 @@
       "citedEntities": [
         {
           "entity": "Nubank",
-          "count": 44
-        },
-        {
-          "entity": "Banco Inter",
-          "count": 21
+          "count": 541
         },
         {
           "entity": "C6 Bank",
-          "count": 20
+          "count": 185
         },
         {
           "entity": "Itaú",
-          "count": 17
+          "count": 171
+        },
+        {
+          "entity": "Banco Inter",
+          "count": 140
         },
         {
           "entity": "PagBank",
-          "count": 16
-        },
-        {
-          "entity": "Bradesco",
-          "count": 14
-        },
-        {
-          "entity": "Stone",
-          "count": 14
-        },
-        {
-          "entity": "Cielo",
-          "count": 11
+          "count": 119
         },
         {
           "entity": "PicPay",
-          "count": 5
+          "count": 112
         },
         {
-          "entity": "Mercado Pago",
-          "count": 3
+          "entity": "Bradesco",
+          "count": 104
+        },
+        {
+          "entity": "Cielo",
+          "count": 95
+        },
+        {
+          "entity": "Stone",
+          "count": 77
         },
         {
           "entity": "Neon",
-          "count": 3
+          "count": 65
         },
         {
           "entity": "BTG Pactual",
-          "count": 2
+          "count": 43
+        },
+        {
+          "entity": "Mercado Pago",
+          "count": 30
+        },
+        {
+          "entity": "Revolut",
+          "count": 8
         },
         {
           "entity": "Wise",
-          "count": 2
+          "count": 6
+        },
+        {
+          "entity": "XP Investimentos",
+          "count": 6
         }
       ],
-      "citedCount": 13,
-      "coverage": 81.2
+      "citedCount": 15,
+      "coverage": 93.8
     },
     "varejo": {
       "slug": "varejo",
@@ -314,9 +322,54 @@
         "Netshoes"
       ],
       "rosterCount": 15,
-      "citedEntities": [],
-      "citedCount": 0,
-      "coverage": 0.0
+      "citedEntities": [
+        {
+          "entity": "Mercado Livre",
+          "count": 352
+        },
+        {
+          "entity": "Magazine Luiza",
+          "count": 213
+        },
+        {
+          "entity": "Americanas",
+          "count": 168
+        },
+        {
+          "entity": "Amazon Brasil",
+          "count": 110
+        },
+        {
+          "entity": "Casas Bahia",
+          "count": 100
+        },
+        {
+          "entity": "Shopee Brasil",
+          "count": 85
+        },
+        {
+          "entity": "Renner",
+          "count": 42
+        },
+        {
+          "entity": "Riachuelo",
+          "count": 36
+        },
+        {
+          "entity": "Netshoes",
+          "count": 12
+        },
+        {
+          "entity": "Leroy Merlin",
+          "count": 6
+        },
+        {
+          "entity": "Via Varejo",
+          "count": 5
+        }
+      ],
+      "citedCount": 11,
+      "coverage": 73.3
     },
     "saude": {
       "slug": "saude",
@@ -339,9 +392,62 @@
         "SulAmérica Saúde"
       ],
       "rosterCount": 15,
-      "citedEntities": [],
-      "citedCount": 0,
-      "coverage": 0.0
+      "citedEntities": [
+        {
+          "entity": "Einstein",
+          "count": 180
+        },
+        {
+          "entity": "Sírio-Libanês",
+          "count": 176
+        },
+        {
+          "entity": "Unimed",
+          "count": 136
+        },
+        {
+          "entity": "Hapvida",
+          "count": 128
+        },
+        {
+          "entity": "Rede D'Or",
+          "count": 117
+        },
+        {
+          "entity": "Fleury",
+          "count": 106
+        },
+        {
+          "entity": "Dasa",
+          "count": 63
+        },
+        {
+          "entity": "EMS",
+          "count": 24
+        },
+        {
+          "entity": "Hypera Pharma",
+          "count": 16
+        },
+        {
+          "entity": "NotreDame Intermédica",
+          "count": 10
+        },
+        {
+          "entity": "Raia Drogasil",
+          "count": 4
+        },
+        {
+          "entity": "Eurofarma",
+          "count": 2
+        },
+        {
+          "entity": "Aché",
+          "count": 1
+        }
+      ],
+      "citedCount": 13,
+      "coverage": 86.7
     },
     "tecnologia": {
       "slug": "tecnologia",
@@ -364,78 +470,195 @@
         "99"
       ],
       "rosterCount": 15,
-      "citedEntities": [],
-      "citedCount": 0,
-      "coverage": 0.0
+      "citedEntities": [
+        {
+          "entity": "Totvs",
+          "count": 242
+        },
+        {
+          "entity": "Locaweb",
+          "count": 158
+        },
+        {
+          "entity": "Stefanini",
+          "count": 79
+        },
+        {
+          "entity": "CI&T",
+          "count": 77
+        },
+        {
+          "entity": "iFood",
+          "count": 72
+        },
+        {
+          "entity": "Linx",
+          "count": 67
+        },
+        {
+          "entity": "Tivit",
+          "count": 57
+        },
+        {
+          "entity": "Vtex",
+          "count": 57
+        },
+        {
+          "entity": "RD Station",
+          "count": 52
+        },
+        {
+          "entity": "Movile",
+          "count": 39
+        },
+        {
+          "entity": "Involves",
+          "count": 17
+        },
+        {
+          "entity": "IBM Brasil",
+          "count": 5
+        }
+      ],
+      "citedCount": 12,
+      "coverage": 80.0
     }
   },
   "topEntities": [
     {
       "name": "Nubank",
-      "citations": 44
+      "citations": 541
     },
     {
-      "name": "Banco Inter",
-      "citations": 21
+      "name": "Mercado Livre",
+      "citations": 352
+    },
+    {
+      "name": "Totvs",
+      "citations": 242
+    },
+    {
+      "name": "Magazine Luiza",
+      "citations": 213
     },
     {
       "name": "C6 Bank",
-      "citations": 20
+      "citations": 185
+    },
+    {
+      "name": "Einstein",
+      "citations": 180
+    },
+    {
+      "name": "Sírio-Libanês",
+      "citations": 176
     },
     {
       "name": "Itaú",
-      "citations": 17
+      "citations": 171
+    },
+    {
+      "name": "Americanas",
+      "citations": 168
+    },
+    {
+      "name": "Locaweb",
+      "citations": 158
+    },
+    {
+      "name": "Banco Inter",
+      "citations": 140
+    },
+    {
+      "name": "Unimed",
+      "citations": 136
+    },
+    {
+      "name": "Hapvida",
+      "citations": 128
     },
     {
       "name": "PagBank",
-      "citations": 16
+      "citations": 119
     },
     {
-      "name": "Bradesco",
-      "citations": 14
-    },
-    {
-      "name": "Stone",
-      "citations": 14
-    },
-    {
-      "name": "Cielo",
-      "citations": 11
+      "name": "Rede D'Or",
+      "citations": 117
     },
     {
       "name": "PicPay",
-      "citations": 5
+      "citations": 112
     },
     {
-      "name": "Mercado Pago",
-      "citations": 3
+      "name": "Amazon Brasil",
+      "citations": 110
+    },
+    {
+      "name": "Fleury",
+      "citations": 106
+    },
+    {
+      "name": "Bradesco",
+      "citations": 104
+    },
+    {
+      "name": "Casas Bahia",
+      "citations": 100
+    },
+    {
+      "name": "Cielo",
+      "citations": 95
+    },
+    {
+      "name": "Shopee Brasil",
+      "citations": 85
+    },
+    {
+      "name": "Stefanini",
+      "citations": 79
+    },
+    {
+      "name": "CI&T",
+      "citations": 77
+    },
+    {
+      "name": "Stone",
+      "citations": 77
+    },
+    {
+      "name": "iFood",
+      "citations": 72
+    },
+    {
+      "name": "Linx",
+      "citations": 67
     },
     {
       "name": "Neon",
-      "citations": 3
+      "citations": 65
     },
     {
-      "name": "BTG Pactual",
-      "citations": 2
+      "name": "Dasa",
+      "citations": 63
     },
     {
-      "name": "Wise",
-      "citations": 2
+      "name": "Tivit",
+      "citations": 57
     }
   ],
   "sentiment": {
-    "neutral": 114,
-    "positive": 56,
-    "negative": 2
+    "neutral": 2899,
+    "positive": 1803,
+    "negative": 14
   },
   "attribution": {
-    "named": 167,
-    "linked": 5
+    "named": 4694,
+    "linked": 22
   },
   "positionInResponse": {
-    "initial": 113,
-    "middle": 33,
-    "final": 26
+    "initial": 3092,
+    "middle": 943,
+    "final": 681
   },
   "dailySeries": [
     {
@@ -520,78 +743,47 @@
       "Banco Carrefour"
     ],
     "varejo": [
-      "Magazine Luiza",
-      "Casas Bahia",
       "Ponto Frio",
-      "Americanas",
-      "Amazon Brasil",
-      "Mercado Livre",
-      "Shopee Brasil",
       "AliExpress Brasil",
-      "Leroy Merlin",
       "Tok&Stok",
-      "Renner",
-      "Riachuelo",
       "C&A Brasil",
-      "Centauro",
-      "Netshoes"
+      "Centauro"
     ],
     "saude": [
-      "Dasa",
-      "Hapvida",
-      "Unimed",
       "Eli Lilly Brasil",
-      "Raia Drogasil",
-      "Fleury",
-      "Rede D'Or",
-      "Einstein",
-      "Sírio-Libanês",
-      "Eurofarma",
-      "Aché",
-      "EMS",
-      "Hypera Pharma",
-      "NotreDame Intermédica",
       "SulAmérica Saúde"
     ],
     "tecnologia": [
-      "Tivit",
       "Accenture Brasil",
-      "Stefanini",
-      "Totvs",
-      "Linx",
-      "Locaweb",
       "Positivo Tecnologia",
-      "Movile",
-      "CI&T",
       "Vivo Empresas",
       "Embraer",
       "WEG",
       "Natura &Co",
-      "iFood",
       "99"
     ]
   },
   "crossVerticalEntities": [],
   "sentimentByLLM": {
     "ChatGPT": {
-      "neutral": 21,
-      "positive": 5,
+      "neutral": 732,
+      "positive": 230,
       "negative": 0
     },
     "Claude": {
-      "neutral": 38,
-      "positive": 7,
+      "neutral": 739,
+      "positive": 645,
       "negative": 0
     },
     "Gemini": {
-      "neutral": 2,
-      "positive": 3,
-      "negative": 0
+      "neutral": 400,
+      "positive": 92,
+      "negative": 6
     },
     "Perplexity": {
-      "neutral": 53,
-      "positive": 41,
-      "negative": 2
+      "neutral": 1028,
+      "positive": 836,
+      "negative": 8
     }
   },
   "byCategory": [
