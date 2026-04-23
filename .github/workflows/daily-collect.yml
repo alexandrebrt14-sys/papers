@@ -16,7 +16,10 @@ on:
         default: 'all'
 
 concurrency:
-  group: papers-${{ github.workflow }}
+  # Onda 15 (2026-04-23): group por event_name para prevenir que workflow_dispatch
+  # manual e schedule cron compartilhem slot. Incidente run 24856932674 cancelada
+  # após 101min quando cron das 18:00 BRT foi despachado durante overlap.
+  group: papers-${{ github.workflow }}-${{ github.event_name }}
   cancel-in-progress: false
 
 permissions:
