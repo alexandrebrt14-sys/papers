@@ -22,6 +22,7 @@ data/*.csv
 !data/finops_alerts.jsonl
 !data/dashboard_data.json
 !data/.gitkeep
+data/backups/             # backups físicos (usar git tags para reprodutibilidade)
 
 # IDE
 .vscode/
