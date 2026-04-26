@@ -78,6 +78,16 @@ jobs:
         run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
 
       # ================================================================
+      # PRE-FLIGHT LLM CHECK (2026-04-26): valida que todas as 5 APIs
+      # respondem ANTES de iniciar o loop de verticais. Bloqueante.
+      # Motivacao: incidente 24/04 — Anthropic credit balance esgotado
+      # rodou 30min de fintech sem Claude (gap seletivo no dataset v2).
+      # Custo: ~5 calls de 1 token (<US$0.0001).
+      # ================================================================
+      - name: Preflight LLM connectivity + auth check
+        run: python scripts/preflight_llm_check.py
+
+      # ================================================================
       # COLETA SEQUENCIAL — todas as verticais no MESMO job/runner
       # ================================================================
       # IMPORTANTE: antes, cada vertical rodava num job separado (matrix strategy)
