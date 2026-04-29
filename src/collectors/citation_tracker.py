@@ -198,7 +198,9 @@ class CitationTracker(BaseCollector):
 
         if target_fictional:
             is_probe = 1
-            probe_type = "decoy"
+            # Preserva probe_type explícito da query (ex.: "adversarial");
+            # default "decoy" para retro-compat com probes passivos.
+            probe_type = qe.get("probe_type") or "decoy"
             is_calibration = 1
             adversarial_framing = int(bool(
                 qe.get("adversarial") or qe.get("adversarial_framing")

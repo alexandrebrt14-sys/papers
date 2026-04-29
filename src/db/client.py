@@ -68,6 +68,7 @@ class DatabaseClient:
         self._migrate_add_model_version()
         self._migrate_add_query_type()
         self._migrate_add_fictional_columns()
+        self._migrate_snapshot_composite_unique()
 
     def _migrate_add_query_type(self) -> None:
         """Adiciona citations.query_type (Migration 0003 inline).
@@ -85,6 +86,31 @@ class DatabaseClient:
                 self._conn.commit()
         except Exception as exc:
             logger.debug("query_type migration skipped: %s", exc)
+
+    def _migrate_snapshot_composite_unique(self) -> None:
+        """daily_snapshots: UNIQUE(date) → UNIQUE(date, module, vertical).
+
+        Bug histórico (2026-04-29 health-check):
+            schema antigo tinha `UNIQUE(date)`. Cada INSERT OR REPLACE com a
+            mesma date sobrescrevia a anterior, deixando só 1 row/dia (a
+            última vertical do loop). Snapshots por vertical não persistiam.
+        Idempotente: detecta UNIQUE composto antes de aplicar.
+        """
+        try:
+            sql = self._conn.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' AND name='daily_snapshots'"
+            ).fetchone()
+            schema = (sql[0] if sql else "") or ""
+            if (
+                "UNIQUE(date, module, vertical)" in schema
+                or "UNIQUE (date, module, vertical)" in schema
+            ):
+                return
+            from src.db import migrate_0008_snapshot_composite_unique
+            migrate_0008_snapshot_composite_unique.apply(self._conn)
+            logger.info("Migracao 0008 aplicada: daily_snapshots UNIQUE composto")
+        except Exception as exc:
+            logger.debug("snapshot composite migration skipped: %s", exc)
 
     def _migrate_add_fictional_columns(self) -> None:
         """Adiciona citations.fictional_hit + fictional_names_json (Migration 0004 inline).

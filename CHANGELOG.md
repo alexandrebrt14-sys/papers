@@ -4,6 +4,54 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [v2.2.0-onda16] — 2026-04-29 (Onda 16 — health-check profundo + 4 fixes estruturais)
+
+Auditoria completa da janela v2 (dias 1-7) identificou 4 bugs estruturais que comprometiam pilares metodológicos do paper sem paralisar a coleta. Todos corrigidos sem perda de dados; janela v2 segue válida com calibração H2 a partir de 2026-04-30.
+
+Documento canônico: `docs/audits/2026-04-29/HEALTH-CHECK-DEEP.md`.
+
+### Fixed
+
+- **BUG-1 query_type 85/15 (CRÍTICO)**: `config.py::query_type_for()` lia apenas `q["type"]` como override; battery v2 usa `q["query_type"]` → caía no map por categoria onde 5/6 categorias v2 viram directive. Real era 7299 directive vs 1272 exploratory. Fix: precedência `query_type` → `type` → map. Re-anotação retroativa via `scripts/reannotate_query_type_retroactive.py` corrigiu 4284 rows; janela agora 4287/4284 (50,02% / 49,98%). Coluna `query_type_v1_legacy` preserva valor original.
+
+- **BUG-2 probes adversariais inativos (CRÍTICO)**: `config_v2.build_adversarial_queries()` retornava `[]` (placeholder). 100% das 8571 rows tinham `is_probe=0`, `fictional_hit=0`. Fix: implementação completa com 64 queries (4 verticais × 4 decoys × 2 langs × 2 templates) carregando `is_probe=1`, `adversarial_framing=1`, `target_fictional`. `BaseCollector.__init__` concatena via env `PAPERS_INCLUDE_ADVERSARIAL_PROBES` (default ativo). `_analyze` preserva `probe_type` explícito. Custo +~US$0,08/dia.
+
+- **BUG-3 daily_snapshots perdendo 75% (MÉDIO)**: schema tinha `UNIQUE(date)` simples — INSERT OR REPLACE sobrescrevia entre verticais. Backfill resultava em 7 rows (last vertical) em vez de 28. Workflow rodava `collect citation`, mas `save_daily_aggregate` só estava em `collect_all`. Fix triplo: (1) `migrate_0008_snapshot_composite_unique.py` cria nova tabela com `UNIQUE(date, module, vertical)`, idempotente, wired em `DatabaseClient._migrate_snapshot_composite_unique`; (2) `cli.py::collect_citation` chama `save_daily_aggregate` por vertical; (3) `scripts/backfill_daily_snapshots.py` reconstrói retroativo. Resultado: 24 snapshots persistidos.
+
+- **BUG-4 backup off-site ausente (MÉDIO)**: papers.db existia apenas em git + artifact 90d. Fix: novo step "Off-site backup to Cloudflare R2" em `daily-collect.yml` envia `papers/db/{timestamp}-{sha8}.db` + `latest.db` com metadata SHA-256. Skip silencioso sem secrets. Pendente operacional: criar bucket + secrets.
+
+### Added
+
+- `scripts/reannotate_query_type_retroactive.py` — fix retroativo determinístico do BUG-1.
+- `scripts/backfill_daily_snapshots.py` — reconstrói daily_snapshots a partir de citations.
+- `src/db/migrate_0008_snapshot_composite_unique.py` — UNIQUE composto.
+- `src/config_v2.get_v2_adversarial_queries(slug)` — public helper.
+- `tests/test_v2_hot_path.py::test_v2_tracker_includes_adversarial_probes_by_default` — guard contra regressão BUG-2.
+- `data/backups/health-check-2026-04-29/papers.db.bak` (sha256 b7d2ae22f776a0…) — snapshot pré-fix preservado.
+
+### Changed
+
+- `config.py::query_type_for()` precedência atualizada (BUG-1).
+- `config_v2.build_adversarial_queries()` agora retorna 64 probes reais (BUG-2).
+- `collectors/base.py::BaseCollector.__init__` concatena adversarial queries por default (BUG-2).
+- `collectors/citation_tracker.py::_analyze` preserva `probe_type` explícito (BUG-2).
+- `cli.py::collect_citation` persiste daily snapshot por vertical (BUG-3).
+- `db/client.py` chama `_migrate_snapshot_composite_unique` em todo connect.
+- Test `test_v2_tracker_loads_cohort_and_battery` agora desliga probes via `monkeypatch` para isolar battery canonical (48 vs 64 com probes).
+
+### Testing
+
+- 204/204 passing (203 antes + 1 novo: probe inclusion default).
+
+### Implicações para o paper
+
+- Janela 23-29/abr declarada **warm-up window** (sem probes).
+- **Janela calibrada H2 inicia 2026-04-30**, fechando em 2026-07-22 (~83 dias). Suficiente para Rule-of-Three e Cohen's h projetados.
+- SIGIR 2026 (Melbourne, Jul) **infeasível** — deadline fev/2026 já fechou. Re-target para SIGIR 2027 (deadline ~fev/2027), com 6+ meses de janela.
+- Information Sciences (Elsevier, IF 8.1, rolling) **realista** para outubro 2026.
+
+---
+
 ## [v2.1.0-observability] — 2026-04-23 (Onda 6 — observabilidade + Actions v5)
 
 Onda 6 fecha gaps de observability e dívida técnica de CI identificados durante o reboot.

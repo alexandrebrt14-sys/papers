@@ -61,10 +61,18 @@ QUERY_TYPE_BY_CATEGORY: dict[str, str] = {
 def query_type_for(query_entry: dict) -> str:
     """Return 'directive' or 'exploratory' for a query dict.
 
-    Respects explicit "type" override; falls back to category mapping;
-    defaults to 'exploratory' if category unknown.
+    Order of precedence (fix 2026-04-29 — bug que enviesou 85/15 directive na
+    janela v2 porque a battery v2 usa a chave "query_type" e cai no map de
+    categoria, perdendo o balanceamento 50/50 desenhado em build_canonical_battery):
+
+      1. query_entry["query_type"] — chave canônica usada por config_v2
+      2. query_entry["type"]       — chave legada (config v1 + probes)
+      3. QUERY_TYPE_BY_CATEGORY[category]
+      4. "exploratory" se categoria desconhecida
     """
-    if "type" in query_entry:
+    if "query_type" in query_entry and query_entry["query_type"]:
+        return query_entry["query_type"]
+    if "type" in query_entry and query_entry["type"]:
         return query_entry["type"]
     return QUERY_TYPE_BY_CATEGORY.get(query_entry.get("category", ""), "exploratory")
 

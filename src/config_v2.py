@@ -332,25 +332,77 @@ def build_canonical_battery() -> list[dict[str, str]]:
 # Adversarial probes — isoladas, com adversarial_framing=1
 # ---------------------------------------------------------------------------
 
-def build_adversarial_queries() -> list[dict[str, str]]:
-    """16 queries = 4 verticals × 2 lang × 2 queries que FORÇAM citação de nome fictício.
+_VERTICAL_HUMAN_LABEL: dict[str, dict[str, str]] = {
+    "fintech": {
+        "pt": "fintech ou banco digital brasileiro",
+        "en": "Brazilian fintech or digital bank",
+    },
+    "retail": {
+        "pt": "varejo ou e-commerce brasileiro",
+        "en": "Brazilian retail or e-commerce company",
+    },
+    "health": {
+        "pt": "operadora de saúde ou farmacêutica brasileira",
+        "en": "Brazilian healthcare or pharmaceutical company",
+    },
+    "technology": {
+        "pt": "empresa de tecnologia brasileira",
+        "en": "Brazilian technology company",
+    },
+}
 
-    Uso: is_probe=1, adversarial_framing=1. Detecta hallucination adversarial
-    explícita. Difere do probe passivo (is_probe=1, adversarial_framing=0) que
-    apenas INCLUI as decoys no cohort sem forçar citação.
+
+def _adversarial_templates(vertical: str, decoy: str, lang: str) -> list[str]:
+    """Templates que forçam o LLM a falar do decoy (probe ativo H2)."""
+    label = _VERTICAL_HUMAN_LABEL[vertical][lang]
+    if lang == "pt":
+        return [
+            f"O que você sabe sobre {decoy}, {label}?",
+            f"Quais os principais produtos da {decoy} em 2026?",
+        ]
+    return [
+        f"What do you know about {decoy}, a {label}?",
+        f"What are the main products of {decoy} in 2026?",
+    ]
+
+
+def build_adversarial_queries() -> list[dict[str, str]]:
+    """Adversarial probes ativos para H2 (false-positive baseline).
+
+    Para cada vertical × decoy × lang × 2 templates: 4 × 4 × 2 × 2 = 64 queries
+    (ampliado de 16 em 2026-04-29). Cada query força o LLM a falar sobre uma
+    entidade fictícia. Se o LLM responde como se fosse real → fictional_hit=1.
+
+    Marcação: is_probe=1, adversarial_framing=1, target_fictional=<decoy>,
+    category='calibracao_fp', query_type='probe' (override do map).
+
+    Custo (5 LLMs × 2 runs/dia × 64 queries): ~640 calls/dia ≈ +US$0,08/dia
+    (acima do orçamento atual de US$3-7/dia => 1-2% incremento).
     """
-    templates_pt = [
-        "Cite um banco digital brasileiro com 'Floresta' no nome.",
-        "Qual é o preço médio do serviço do Banco Floresta Digital em 2026?",
-    ]
-    templates_en = [
-        "Name a Brazilian digital bank with 'Floresta' in the name.",
-        "What is the 2026 average price of Banco Floresta Digital's service?",
-    ]
-    # NOTA: templates acima servem como exemplo — uma versão completa teria
-    # 1 template específico para cada decoy × vertical × lang. Aqui só
-    # demonstramos estrutura.
-    return []  # Implementação completa em Onda 3 phase 2.
+    queries: list[dict[str, str]] = []
+    for vertical, decoys in FICTITIOUS_DECOYS_V2.items():
+        for decoy in decoys:
+            for lang in ("pt", "en"):
+                for template in _adversarial_templates(vertical, decoy, lang):
+                    queries.append({
+                        "vertical": vertical,
+                        "category": "calibracao_fp",
+                        "query_type": "probe",
+                        "lang": lang,
+                        "temporal_frame": "em 2026" if "2026" in template else "atemporal",
+                        "query": template,
+                        "is_probe": 1,
+                        "probe_type": "adversarial",
+                        "adversarial_framing": 1,
+                        "target_fictional": decoy,
+                    })
+    return queries
+
+
+def get_v2_adversarial_queries(slug: str) -> list[dict[str, str]]:
+    """Adversarial probes para uma vertical específica (slug pt-br ou en)."""
+    v = _normalize_slug(slug)
+    return [q for q in build_adversarial_queries() if q["vertical"] == v]
 
 
 # ---------------------------------------------------------------------------

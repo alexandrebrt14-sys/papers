@@ -66,9 +66,23 @@ class BaseCollector(ABC):
         )
 
         if self.methodology_version == "v2":
-            from src.config_v2 import get_v2_cohort, get_v2_queries, get_v2_decoys
+            from src.config_v2 import (
+                get_v2_cohort, get_v2_queries, get_v2_decoys,
+                get_v2_adversarial_queries,
+            )
             self.cohort = get_v2_cohort(vertical, include_anchors=True, include_decoys=True)
-            self.queries = get_v2_queries(vertical)
+            base_queries = get_v2_queries(vertical)
+            # Adversarial probes (Onda 16 — wire 2026-04-29):
+            # H2 (false-positive baseline) precisa de queries que FORCEM o LLM
+            # a falar de decoys. Sem isso, fictional_hit=0 em 100% das rows
+            # (gap identificado no health-check 2026-04-29 sobre janela v2).
+            # Opt-out via PAPERS_INCLUDE_ADVERSARIAL_PROBES=0 (ex.: rodar
+            # apenas re-extração ou debugging).
+            include_probes = os.getenv("PAPERS_INCLUDE_ADVERSARIAL_PROBES", "1") != "0"
+            if include_probes:
+                self.queries = base_queries + get_v2_adversarial_queries(vertical)
+            else:
+                self.queries = base_queries
             self._v2_decoys: set[str] = {d.lower() for d in get_v2_decoys(vertical)}
         else:
             self.cohort = get_cohort(vertical)

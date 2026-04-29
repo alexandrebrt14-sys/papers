@@ -79,8 +79,13 @@ def _build_record(tracker, response: LLMResponse, query_entry: dict) -> dict:
 
 # ---------- methodology flag + cohort/queries v2 ----------
 
-def test_v2_tracker_loads_cohort_and_battery(v2_db: str) -> None:
-    """CitationTracker v2 carrega 31-32 entidades + 48 queries por vertical."""
+def test_v2_tracker_loads_cohort_and_battery(v2_db: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    """CitationTracker v2 carrega 31-32 entidades + 48 queries canonical
+    (+ 16 adversarial probes ativos por default, Onda 16/2026-04-29).
+
+    Para isolar a battery canonical, opta-se por desligar probes via env.
+    """
+    monkeypatch.setenv("PAPERS_INCLUDE_ADVERSARIAL_PROBES", "0")
     from src.collectors.citation_tracker import CitationTracker
     for slug, expected_cohort, expected_queries in [
         ("fintech", 31, 48),
@@ -94,6 +99,24 @@ def test_v2_tracker_loads_cohort_and_battery(v2_db: str) -> None:
             f"{slug}: {len(ct.cohort)} != {expected_cohort}"
         )
         assert len(ct.queries) == expected_queries
+
+
+def test_v2_tracker_includes_adversarial_probes_by_default(v2_db: str) -> None:
+    """Default (PAPERS_INCLUDE_ADVERSARIAL_PROBES unset): 48 + 16 = 64 queries.
+
+    Wire 2026-04-29 (Onda 16): adversarial probes essenciais para H2
+    (false-positive baseline). Bug histórico: 100% das 8.571 rows na
+    janela v2 inicial (23-29/abril) tinham is_probe=0 porque
+    build_adversarial_queries() retornava []. Após fix, BaseCollector
+    inclui as 16 probes/vertical em self.queries por default.
+    """
+    from src.collectors.citation_tracker import CitationTracker
+    ct = CitationTracker(vertical="fintech")
+    assert len(ct.queries) == 48 + 16
+    probes = [q for q in ct.queries if q.get("is_probe")]
+    assert len(probes) == 16
+    assert all(p.get("target_fictional") for p in probes)
+    assert all(p.get("adversarial_framing") == 1 for p in probes)
 
 
 def test_v1_fallback_when_env_set(v2_db: str, monkeypatch: pytest.MonkeyPatch) -> None:

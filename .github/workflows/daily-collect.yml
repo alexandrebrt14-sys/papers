@@ -269,6 +269,56 @@ jobs:
           path: data/papers.db
           retention-days: 90
 
+      # ================================================================
+      # OFF-SITE BACKUP (Onda 16, 2026-04-29 health-check):
+      # Mitigação para perda catastrófica de papers.db (artifact retention
+      # 90d + GitHub-only é single point of failure). Envia para Cloudflare
+      # R2 se secrets configurados; silenciosamente skip se não houver.
+      # ================================================================
+      - name: Off-site backup to Cloudflare R2
+        if: success()
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$R2_ENDPOINT" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ]; then
+            echo "R2 secrets ausentes — pulando backup off-site (skip silencioso)"
+            exit 0
+          fi
+          pip install -q boto3
+          python - <<'PY'
+          import os, hashlib, datetime, boto3
+          from botocore.config import Config
+
+          path = "data/papers.db"
+          h = hashlib.sha256()
+          with open(path, "rb") as f:
+              for chunk in iter(lambda: f.read(1 << 20), b""):
+                  h.update(chunk)
+          digest = h.hexdigest()
+          stamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%SZ")
+          key_dated = f"papers/db/{stamp}-{digest[:8]}.db"
+          key_latest = "papers/db/latest.db"
+
+          s3 = boto3.client(
+              "s3",
+              endpoint_url=os.environ["R2_ENDPOINT"],
+              aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
+              aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+              config=Config(signature_version="s3v4"),
+          )
+          bucket = os.environ["R2_BUCKET"]
+          for key in (key_dated, key_latest):
+              s3.upload_file(
+                  path, bucket, key,
+                  ExtraArgs={"Metadata": {"sha256": digest, "uploaded_at": stamp}},
+              )
+              print(f"R2 upload OK -> s3://{bucket}/{key}")
+          PY
+        continue-on-error: true
+
       # Onda 6b (2026-04-23): structured JSONL logs uploaded como artifact
       # para auditoria pós-run. CollectionLogger persiste .logs/structured/*.jsonl
       # automaticamente via context manager. Retenção 30 dias.

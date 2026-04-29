@@ -179,6 +179,17 @@ def collect_citation(ctx: click.Context) -> None:
             "citation_tracker", count, duration,
             vertical=vert, status="success" if count > 0 else "empty",
         )
+        # Daily snapshot per vertical (Onda 16 — fix 2026-04-29 health-check):
+        # antes só `collect all` chamava save_daily_aggregate, mas o workflow
+        # usa `collect citation` → daily_snapshots ficou com 0 rows na janela
+        # v2 inteira. Agora persiste a cada vertical, idempotente (INSERT OR
+        # REPLACE por (date, module, vertical) em db.client).
+        try:
+            ts = TimeSeriesManager(db)
+            snapshot = ts.compute_daily_citation_aggregate(vertical=vert)
+            ts.save_daily_aggregate("citation_tracker", snapshot, vertical=vert)
+        except Exception as exc:
+            console.print(f"  [yellow]snapshot {vert}: {exc}[/yellow]")
         total_collected += count
         # Tentamos ao menos a vertical (mesmo que retornem 0)
         total_attempted += 1
