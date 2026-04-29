@@ -213,7 +213,10 @@ def test_insert_citations_populates_all_v2_cols(v2_db: str) -> None:
     }
     record = _build_record(ct, response, query)
 
-    db = DatabaseClient()
+    # FIX 2026-04-29: passar db_path explícito; sem isso, DatabaseClient() lê
+    # config.db_path cacheado no import (anterior ao monkeypatch.setenv) e
+    # contamina o DB de produção com 4 rows do mock (query='test e2e').
+    db = DatabaseClient(db_path=v2_db)
     db.connect()
     n = db.insert_citations([record], vertical="fintech")
     assert n == 1
