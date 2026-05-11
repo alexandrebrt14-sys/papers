@@ -24,6 +24,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
