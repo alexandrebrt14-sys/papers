@@ -228,26 +228,56 @@ jobs:
       # ================================================================
       - name: Commit all data + docs
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage tudo de uma vez
-          git add data/papers.db 2>/dev/null || true   # source of truth da pesquisa (pos-incidente 16/04)
-          git add data/dashboard_data.json 2>/dev/null || true
-          git add data/daily_*.csv 2>/dev/null || true
-          git add data/finops_checkpoint.json 2>/dev/null || true
-          git add data/finops_alerts.jsonl 2>/dev/null || true
-          git add output/finops_dashboard.html 2>/dev/null || true
-          git add docs/ 2>/dev/null || true
+          # Estratégia (fix 2026-05-12 — incidente run 25700155296):
+          # 1) Snapshot dos arquivos gerados nesta run (fora do git).
+          # 2) Reset hard para origin/main (descarta o que outro workflow
+          #    possa ter empurrado durante a coleta).
+          # 3) Restaurar arquivos como overlay.
+          # 4) Commit + push, com retry se push for rejeitado.
+          # Motivação: papers.db é binário; rebase em conflito é intratável.
+          # Antes: `git pull --rebase || true` deixava o repo em detached
+          # HEAD com conflitos não resolvidos, push falhava com exit 128.
 
-          if git diff --cached --quiet; then
-            echo "Sem mudancas para commitar"
-          else
+          TMPDIR=$(mktemp -d)
+          for p in data/papers.db data/dashboard_data.json \
+                   data/finops_checkpoint.json data/finops_alerts.jsonl \
+                   output/finops_dashboard.html docs data/daily_*.csv; do
+            [ -e "$p" ] || continue
+            mkdir -p "$TMPDIR/$(dirname "$p")"
+            cp -r "$p" "$TMPDIR/$(dirname "$p")/"
+          done
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            cp -r "$TMPDIR"/. .
+
+            git add data/papers.db data/dashboard_data.json \
+                    data/finops_checkpoint.json data/finops_alerts.jsonl \
+                    output/finops_dashboard.html docs/ 2>/dev/null || true
+            git add data/daily_*.csv 2>/dev/null || true
+
+            if git diff --cached --quiet; then
+              echo "Sem mudancas para commitar apos sync com origin (tentativa $attempt)"
+              exit 0
+            fi
+
             git commit -m "data: daily collection $(date -u +%Y-%m-%d) [skip ci]"
-            # Pull --rebase antes do push para absorver commits de outros workflows
-            git pull --rebase origin main || true
-            git push
-          fi
+            if git push origin main; then
+              echo "Push OK na tentativa $attempt"
+              exit 0
+            fi
+            echo "Push tentativa $attempt rejeitado — re-sync com remoto"
+            sleep $((attempt * 3))
+          done
+
+          echo "FALHA: push rejeitado apos 5 tentativas"
+          exit 1
 
       # ================================================================
       # ARTIFACT UPLOADS FINAIS — ANTES do health check para garantir
@@ -387,7 +417,7 @@ jobs:
               -d "{
                 \"from\": \"papers-alerts@mail.brasilgeo.ai\",
                 \"to\": \"${{ secrets.FINOPS_ALERT_EMAIL }}\",
-                \"subject\": \"[ALERTA] Papers daily-collect falhou em $(date -u +%Y-%m-%d %H:%M)\",
+                \"subject\": \"[ALERTA] Papers daily-collect falhou em $(date -u '+%Y-%m-%d %H:%M')\",
                 \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto na publicacao cientifica (julho/2026):</strong> gap de dados compromete serie temporal longitudinal.</p><p>Acao imediata: abrir o run, identificar vertical/LLM faltante, re-executar workflow_dispatch.</p>\"
               }" | head -c 200
           fi
