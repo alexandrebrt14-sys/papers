@@ -1,56 +1,76 @@
 {
-  "generated_at": "2026-05-11T14:58:24.783610+00:00",
+  "generated_at": "2026-05-12T00:26:47.311952+00:00",
   "budgets": [
     {
       "platform": "openai",
-      "monthly_spend": 0.1125,
+      "monthly_spend": 0.162,
       "monthly_limit": 30.0,
-      "monthly_pct": 0.4,
-      "daily_spend": 0,
+      "monthly_pct": 0.5,
+      "daily_spend": 0.0075,
       "daily_limit": 2.0,
-      "daily_pct": 0.0,
+      "daily_pct": 0.4,
       "is_blocked": false,
-      "queries_today": 0,
-      "tokens_today": 0
+      "queries_today": 43,
+      "tokens_today": 13181
     },
     {
       "platform": "anthropic",
-      "monthly_spend": 0.7418,
+      "monthly_spend": 1.0663,
       "monthly_limit": 40.0,
-      "monthly_pct": 1.9,
-      "daily_spend": 0,
+      "monthly_pct": 2.7,
+      "daily_spend": 0.0491,
       "daily_limit": 3.0,
-      "daily_pct": 0.0,
+      "daily_pct": 1.6,
       "is_blocked": false,
-      "queries_today": 0,
-      "tokens_today": 0
+      "queries_today": 43,
+      "tokens_today": 13064
     },
     {
       "platform": "google",
-      "monthly_spend": 8.0151,
+      "monthly_spend": 11.4974,
       "monthly_limit": 50.0,
-      "monthly_pct": 16.0,
-      "daily_spend": 0,
+      "monthly_pct": 23.0,
+      "daily_spend": 0.5763,
       "daily_limit": 3.0,
-      "daily_pct": 0.0,
+      "daily_pct": 19.2,
       "is_blocked": false,
-      "queries_today": 0,
-      "tokens_today": 0
+      "queries_today": 44,
+      "tokens_today": 58240
     },
     {
       "platform": "perplexity",
-      "monthly_spend": 0.0664,
+      "monthly_spend": 0.0935,
       "monthly_limit": 30.0,
-      "monthly_pct": 0.2,
-      "daily_spend": 0,
+      "monthly_pct": 0.3,
+      "daily_spend": 0.002,
       "daily_limit": 2.0,
-      "daily_pct": 0.0,
+      "daily_pct": 0.1,
       "is_blocked": false,
-      "queries_today": 0,
-      "tokens_today": 0
+      "queries_today": 8,
+      "tokens_today": 2041
     }
   ],
   "alerts_recent": [
+    {
+      "timestamp": "2026-05-11T23:50:29.709160+00:00",
+      "platform": "google",
+      "alert_type": "daily_critical",
+      "severity": "critical",
+      "message": "google daily_critical: $2.7122/$3.00 (90.4%)",
+      "current_spend_usd": 2.7122275,
+      "pct_used": 90.4,
+      "sent_email": 0
+    },
+    {
+      "timestamp": "2026-05-11T23:36:36.170786+00:00",
+      "platform": "google",
+      "alert_type": "daily_warning",
+      "severity": "warning",
+      "message": "google daily_warning: $2.4116/$3.00 (80.4%)",
+      "current_spend_usd": 2.411625,
+      "pct_used": 80.4,
+      "sent_email": 0
+    },
     {
       "timestamp": "2026-05-05T12:21:51.274054+00:00",
       "platform": "google",
@@ -333,6 +353,136 @@
     }
   ],
   "daily_rollups": [
+    {
+      "id": 704,
+      "date": "2026-05-12",
+      "platform": "perplexity",
+      "total_queries": 8,
+      "total_input_tokens": 274,
+      "total_output_tokens": 1767,
+      "total_cost_usd": 0.002041,
+      "avg_cost_per_query": 0.00025512,
+      "max_single_query_cost": 0.000377,
+      "models_used": "[\"sonar\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 703,
+      "date": "2026-05-12",
+      "platform": "anthropic",
+      "total_queries": 43,
+      "total_input_tokens": 992,
+      "total_output_tokens": 12072,
+      "total_cost_usd": 0.049082,
+      "avg_cost_per_query": 0.00114143,
+      "max_single_query_cost": 0.001757,
+      "models_used": "[\"claude-haiku-4-5-20251001\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 702,
+      "date": "2026-05-12",
+      "platform": "openai",
+      "total_queries": 43,
+      "total_input_tokens": 895,
+      "total_output_tokens": 12286,
+      "total_cost_usd": 0.007506,
+      "avg_cost_per_query": 0.00017455,
+      "max_single_query_cost": 0.000442,
+      "models_used": "[\"gpt-4o-mini-2024-07-18\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 701,
+      "date": "2026-05-12",
+      "platform": "groq",
+      "total_queries": 44,
+      "total_input_tokens": 2190,
+      "total_output_tokens": 21805,
+      "total_cost_usd": 0.018518,
+      "avg_cost_per_query": 0.00042086,
+      "max_single_query_cost": 0.000664,
+      "models_used": "[\"llama-3.3-70b-versatile\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 700,
+      "date": "2026-05-12",
+      "platform": "google",
+      "total_queries": 44,
+      "total_input_tokens": 696,
+      "total_output_tokens": 57544,
+      "total_cost_usd": 0.57631,
+      "avg_cost_per_query": 0.01309795,
+      "max_single_query_cost": 0.017528,
+      "models_used": "[\"gemini-2.5-pro\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 689,
+      "date": "2026-05-11",
+      "platform": "groq",
+      "total_queries": 192,
+      "total_input_tokens": 9966,
+      "total_output_tokens": 99643,
+      "total_cost_usd": 0.084598,
+      "avg_cost_per_query": 0.00044061,
+      "max_single_query_cost": 0.000667,
+      "models_used": "[\"llama-3.3-70b-versatile\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 688,
+      "date": "2026-05-11",
+      "platform": "perplexity",
+      "total_queries": 72,
+      "total_input_tokens": 2616,
+      "total_output_tokens": 18577,
+      "total_cost_usd": 0.021193,
+      "avg_cost_per_query": 0.00029435,
+      "max_single_query_cost": 0.000524,
+      "models_used": "[\"sonar\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 687,
+      "date": "2026-05-11",
+      "platform": "google",
+      "total_queries": 192,
+      "total_input_tokens": 3360,
+      "total_output_tokens": 261986,
+      "total_cost_usd": 2.62406,
+      "avg_cost_per_query": 0.01366698,
+      "max_single_query_cost": 0.018292,
+      "models_used": "[\"gemini-2.5-pro\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 686,
+      "date": "2026-05-11",
+      "platform": "anthropic",
+      "total_queries": 192,
+      "total_input_tokens": 4892,
+      "total_output_tokens": 61243,
+      "total_cost_usd": 0.248886,
+      "avg_cost_per_query": 0.00129628,
+      "max_single_query_cost": 0.003226,
+      "models_used": "[\"claude-haiku-4-5-20251001\"]",
+      "vertical": "fintech"
+    },
+    {
+      "id": 685,
+      "date": "2026-05-11",
+      "platform": "openai",
+      "total_queries": 192,
+      "total_input_tokens": 4242,
+      "total_output_tokens": 60492,
+      "total_cost_usd": 0.036931,
+      "avg_cost_per_query": 0.00019235,
+      "max_single_query_cost": 0.000454,
+      "models_used": "[\"gpt-4o-mini-2024-07-18\"]",
+      "vertical": "fintech"
+    },
     {
       "id": 659,
       "date": "2026-05-05",
@@ -1050,28 +1200,28 @@
     }
   ],
   "stale_check": {
-    "stale": true,
+    "stale": false,
     "hours_since_last": 0,
     "platforms": {
       "openai": {
-        "last_activity": "2026-05-05T13:40:40.495023+00:00",
-        "hours_ago": 145.3,
-        "stale": true
+        "last_activity": "2026-05-12T00:26:12.993468+00:00",
+        "hours_ago": 0.0,
+        "stale": false
       },
       "anthropic": {
-        "last_activity": "2026-05-05T13:40:42.512298+00:00",
-        "hours_ago": 145.3,
-        "stale": true
+        "last_activity": "2026-05-12T00:26:14.980840+00:00",
+        "hours_ago": 0.0,
+        "stale": false
       },
       "google": {
-        "last_activity": "2026-05-05T13:41:13.603337+00:00",
-        "hours_ago": 145.3,
-        "stale": true
+        "last_activity": "2026-05-12T00:26:42.584942+00:00",
+        "hours_ago": 0.0,
+        "stale": false
       },
       "perplexity": {
-        "last_activity": "2026-05-05T13:26:55.611549+00:00",
-        "hours_ago": 145.5,
-        "stale": true
+        "last_activity": "2026-05-12T00:14:06.694684+00:00",
+        "hours_ago": 0.2,
+        "stale": false
       }
     }
   },
