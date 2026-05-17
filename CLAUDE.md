@@ -19,6 +19,19 @@ Em **toda** decisão metodológica (escolha de dataset, framing de paper, defini
 
 Citar `§X.Y` do KB/OS/INCREMENT ao tomar decisões. Atualizar trimestralmente (ciclo de submissão).
 
+## REGRA #2 — Taxonomia canônica de 50 conceitos GEO/SEO 2026 (classificação obrigatória)
+
+[`docs/GEO_50_CONCEITOS_CANONICAL.md`](docs/GEO_50_CONCEITOS_CANONICAL.md) é o **dicionário obrigatório de classificação** ao catalogar paper acadêmico, análise de fonte, ou produção de research neste repo. 14 eixos, 50 conceitos numerados, anti-padrões proibidos (pseudo-GEO, schema inflado, llms.txt como talismã).
+
+**Mapeamento obrigatório:**
+
+- **Ao resumir um paper** (entrada em `docs/research/` ou ingestão arXiv): tagueá-lo contra os Conceitos **11** (Answer capsules), **13** (Schema.org), **15** (Clareza de entidade), **21** (Referências externas), **22** (Autoria), **24** (Citabilidade GEO), **25** (Recuperabilidade generativa), **30** (llms.txt). Anotar quais o paper cobre, quais ignora, e quais ele desafia.
+- **Em pesquisa nova com Perplexity sonar-deep-research**: usar os 50 conceitos como template de checklist da query — incorporar conceitos pertinentes ao tópico para evitar lacunas estruturais comuns em reviews ad hoc.
+- **Em prompt portfolio de validação**: garantir que cobertura por vertical toca os 14 eixos (não só os de citação direta).
+- **Em pré-registro OSF**: declarar quais conceitos a hipótese testa explicitamente.
+
+Citar `Conceito N — Nome` ao referenciar (ex.: "Conceito 24 — Citabilidade GEO"). Documento revisado trimestralmente em sincronia com KB/OS.
+
 ## Propósito
 
 Pesquisa empírica multi-vertical sobre como LLMs citam empresas brasileiras em respostas generativas. Framework de 4 verticais com coortes independentes monitoradas em 5 LLMs. Dataset longitudinal alvo: 6-12 meses para sustentar 3 papers peer-reviewed.
