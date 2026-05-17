@@ -11,7 +11,13 @@ Em **toda** decisão metodológica (escolha de dataset, framing de paper, defini
 - **OS (~24 KB)** é o playbook operacional alinhado a calendário de submissões: cadência diária (coleta + cache), semanal (review estatístico), mensal (preprint draft), trimestral (submission window). KPIs estatísticos (n por vertical, intervalo de confiança, pré-registro OSF). Prompt portfolio para validar replicabilidade do dataset.
 - **Pesquisa bruta** em [`docs/research/geo-knowledge-2026/`](docs/research/geo-knowledge-2026/) (Perplexity sonar-pro com citações reais).
 
-Citar `§X.Y` do KB/OS ao tomar decisões. Atualizar trimestralmente (ciclo de submissão).
+**Incremento Q2 2026 (17-05-2026)** — adiciona ao KB/OS sem substituir:
+- [`docs/research/geo-q2-2026/GEO_KNOWLEDGE_2026_Q2_INCREMENT.md`](docs/research/geo-q2-2026/GEO_KNOWLEDGE_2026_Q2_INCREMENT.md) — doc canônico específico deste repo de pesquisa (sumário executivo, mudanças metodológicas Q1-Q2 2026, novos papers a integrar no pipeline arXiv, novos critérios de scoring, preregistration, 7 artefatos a produzir). Gerado por Claude Opus 4.7 sobre síntese Gemini 2.5 Pro de 5 Perplexity sonar-pro + 5 sonar-deep-research + 1 GPT-4o web_search.
+- [`docs/research/geo-q2-2026/SYNTHESIS_STATE_OF_ART_2026.md`](docs/research/geo-q2-2026/SYNTHESIS_STATE_OF_ART_2026.md) — síntese geral (estado da arte, 8 seções, papers AgenticGEO/AdaptOrch/MoA/DAAO/CASTER, frameworks evaluation BiGGen-Bench/GEO-Bench/Arena-Hard, métricas GEO 2026).
+- [`docs/research/geo-q2-2026/CITATIONS_POOL.md`](docs/research/geo-q2-2026/CITATIONS_POOL.md) — **325 URLs verificáveis** (arXiv IDs prioritários para ingestão).
+- [`docs/research/geo-q2-2026/raw/`](docs/research/geo-q2-2026/raw/) — 10 JSONs originais das waves.
+
+Citar `§X.Y` do KB/OS/INCREMENT ao tomar decisões. Atualizar trimestralmente (ciclo de submissão).
 
 ## Propósito
 

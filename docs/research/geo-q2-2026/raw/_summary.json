@@ -1,0 +1,48 @@
+{
+  "total_elapsed": 300.7816495895386,
+  "waves": [
+    {
+      "id": "wave-1-papers-frameworks-kpis",
+      "model": "sonar-deep-research",
+      "elapsed": 104.90126061439514,
+      "ok": true,
+      "content_chars": 0
+    },
+    {
+      "id": "wave-2-semantic-vector-embeddings",
+      "model": "sonar-deep-research",
+      "elapsed": 111.92503952980042,
+      "ok": true,
+      "content_chars": 0
+    },
+    {
+      "id": "wave-3-seo-geo-vendors",
+      "model": null,
+      "elapsed": 300.1142716407776,
+      "ok": false,
+      "content_chars": 0,
+      "error": ""
+    },
+    {
+      "id": "wave-4-llm-releases-q1q2-2026",
+      "model": "sonar-deep-research",
+      "elapsed": 115.96881461143494,
+      "ok": true,
+      "content_chars": 0
+    },
+    {
+      "id": "wave-5-measurement-reports-2026",
+      "model": "sonar-deep-research",
+      "elapsed": 124.46125054359436,
+      "ok": true,
+      "content_chars": 0
+    },
+    {
+      "id": "wave-6-gpt4o-news",
+      "model": "gpt-4o + web_search_preview",
+      "elapsed": 15.74737548828125,
+      "ok": true,
+      "content_chars": 5377
+    }
+  ]
+}
