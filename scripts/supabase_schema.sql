@@ -8,6 +8,8 @@
 CREATE TABLE IF NOT EXISTS papers_dashboard_data (
     vertical       TEXT PRIMARY KEY,
     citation_rates JSONB DEFAULT '[]'::jsonb,
+    citation_rates_by_query_type JSONB DEFAULT '[]'::jsonb,
+    false_positive JSONB DEFAULT '{}'::jsonb,
     entity_rankings JSONB DEFAULT '[]'::jsonb,
     timeseries     JSONB DEFAULT '[]'::jsonb,
     collection_status JSONB DEFAULT '{}'::jsonb,
@@ -15,8 +17,16 @@ CREATE TABLE IF NOT EXISTS papers_dashboard_data (
     updated_at     TIMESTAMPTZ DEFAULT now()
 );
 
+-- Migracoes incrementais (idempotentes — seguro re-executar):
+ALTER TABLE papers_dashboard_data
+    ADD COLUMN IF NOT EXISTS citation_rates_by_query_type JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE papers_dashboard_data
+    ADD COLUMN IF NOT EXISTS false_positive JSONB DEFAULT '{}'::jsonb;
+
 COMMENT ON TABLE papers_dashboard_data IS 'Dados agregados de citação por vertical, sincronizados do SQLite local via GitHub Actions';
 COMMENT ON COLUMN papers_dashboard_data.citation_rates IS 'Array de {llm, total_queries, cited_count, citation_rate, avg_position}';
+COMMENT ON COLUMN papers_dashboard_data.citation_rates_by_query_type IS 'v2 — citation rate quebrado por query_type (knowledge/product/comparison)';
+COMMENT ON COLUMN papers_dashboard_data.false_positive IS 'v2 — taxa de citacao de entidades ficticias (calibracao). {fp_rate, n_fictitious, n_cited}';
 COMMENT ON COLUMN papers_dashboard_data.entity_rankings IS 'Top 15 entidades por contagem de citação: {entity, citation_count, citation_rate, top_llm}';
 COMMENT ON COLUMN papers_dashboard_data.timeseries IS 'Série temporal diária dos últimos 90 dias: {date, rate, observations}';
 COMMENT ON COLUMN papers_dashboard_data.collection_status IS '{last_run, total_runs_24h, modules: {module: status}}';

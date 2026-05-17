@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sqlite3
 import sys
 from datetime import datetime, timezone
@@ -419,37 +420,64 @@ def _build_client() -> "SupabaseClient":
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
+_MISSING_COL_RE = re.compile(
+    r"Could not find the '([^']+)' column", re.IGNORECASE
+)
+
+
 def _upsert(
     client: "SupabaseClient",
     table: str,
     data: list[dict] | dict,
     dry_run: bool = False,
 ) -> bool:
-    """Faz upsert em uma tabela Supabase. Retorna True se bem-sucedido."""
+    """Faz upsert em uma tabela Supabase. Retorna True se bem-sucedido.
+
+    Resiliência (2026-05-17): se Supabase responder PGRST204 indicando que
+    uma coluna do payload não existe no schema, droppa essa coluna de todos
+    os rows e tenta de novo (até 5 colunas). Evita perder a sincronização
+    inteira por causa de schema drift. Loga warnings das colunas dropadas
+    para que a migração seja aplicada manualmente depois.
+    """
     rows = data if isinstance(data, list) else [data]
     if not rows:
         print(f"  [PULO] {table}: nenhum dado para enviar")
         return True
 
     if dry_run:
-        # Exibe preview sem enviar — útil para testar localmente
         preview = json.dumps(rows[0], ensure_ascii=False, default=str)
         print(f"  [DRY-RUN] {table}: {len(rows)} linha(s) — preview: {preview[:120]}...")
         return True
 
-    try:
-        result = (
-            client.table(table)
-            .upsert(rows, on_conflict="vertical" if table == TABLE_DASHBOARD else "id")
-            .execute()
-        )
-        # supabase-py 2.x levanta exceção em caso de erro HTTP — se chegou aqui, OK
-        count = len(result.data) if hasattr(result, "data") and result.data else len(rows)
-        print(f"  [OK] {table}: {count} linha(s) enviada(s)")
-        return True
-    except Exception as exc:
-        print(f"  [ERRO] {table}: {exc}")
-        return False
+    dropped: list[str] = []
+    for attempt in range(6):
+        try:
+            result = (
+                client.table(table)
+                .upsert(rows, on_conflict="vertical" if table == TABLE_DASHBOARD else "id")
+                .execute()
+            )
+            count = len(result.data) if hasattr(result, "data") and result.data else len(rows)
+            print(f"  [OK] {table}: {count} linha(s) enviada(s)")
+            if dropped:
+                print(f"  [WARN] {table}: colunas dropadas por schema drift: {dropped}")
+                print(f"  [ACAO] Aplicar manualmente no SQL Editor:")
+                for col in dropped:
+                    print(f"           ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col} JSONB DEFAULT '[]'::jsonb;")
+            return True
+        except Exception as exc:
+            msg = str(exc)
+            m = _MISSING_COL_RE.search(msg)
+            if m and attempt < 5:
+                col = m.group(1)
+                dropped.append(col)
+                for row in rows:
+                    row.pop(col, None)
+                print(f"  [RETRY] {table}: coluna '{col}' nao existe no schema — dropando e retry")
+                continue
+            print(f"  [ERRO] {table}: {exc}")
+            return False
+    return False
 
 
 # ---------------------------------------------------------------------------
