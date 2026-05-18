@@ -801,7 +801,7 @@ def sync_cmd(ctx: click.Context, dry_run: bool, db_path: str | None, quiet: bool
 # ============================================================
 
 @main.command("serve")
-@click.option("--host", default="0.0.0.0", help="Host para bind do servidor.")
+@click.option("--host", default="0.0.0.0", help="Host para bind do servidor.")  # nosec B104 — bind 0.0.0.0 intencional: servidor roda atras de Cloudflare Tunnel/reverse proxy em prod; user pode override via --host 127.0.0.1 em dev local
 @click.option("--port", default=8000, type=int, help="Porta do servidor.")
 @click.option("--reload", "do_reload", is_flag=True, help="Hot-reload para desenvolvimento.")
 def serve(host: str, port: int, do_reload: bool) -> None:
