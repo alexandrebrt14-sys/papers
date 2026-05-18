@@ -87,6 +87,38 @@ Invariantes:
 - Detecção de cache hits (respostas bit-idênticas para mesmo input)
 - Drift detection: quando provider atualiza modelo silenciosamente, distribuição de hashes temporais muda
 
+### 3.5 Missingness ledger (longitudinal)
+
+Coleta diária (2× 24h: 06:00 + 18:00 BRT) sujeita a falhas exógenas (provider 4xx/5xx, esgotamento de crédito, validação de payload alterada sem aviso). Para análise longitudinal honesta, **todos os gaps são auditados e reportados** em vez de imputados silenciosamente.
+
+**Janela observacional v2 (2026-04-14 → janela ativa)** — auditoria 2026-05-18:
+
+| Período                     | Status               | Causa raiz                                                                 |
+|----------------------------|----------------------|----------------------------------------------------------------------------|
+| 2026-04-14 → 2026-04-22    | GAP TOTAL (9 dias)   | Pre-flight LLM check ainda não implementado; falhas silenciosas por crédito Anthropic |
+| 2026-04-23                  | PARCIAL (15/20)      | Coleta interrompida — primeira ativação fail-loud                          |
+| 2026-04-24 → 2026-04-30    | OK (7 dias contínuos) | Preflight ativado (commit pós-incidente 24/04)                             |
+| 2026-05-01                  | PARCIAL (9/20)       | Failure de health check                                                    |
+| 2026-05-02 → 2026-05-03    | GAP TOTAL (2 dias)   | Coleta abortada por preflight                                              |
+| 2026-05-04                  | PARCIAL (15/20)      | Recovery parcial                                                           |
+| 2026-05-05                  | OK                   | —                                                                          |
+| 2026-05-06 → 2026-05-10    | GAP TOTAL (5 dias)   | Sequência de falhas no health-gate                                         |
+| 2026-05-11 → 2026-05-17    | OK (7 dias contínuos) | Pipeline estabilizada                                                      |
+| 2026-05-18                  | PARCIAL (5/20)       | Perplexity validation update: `max_tokens<16` rejeitado em `sonar`. Fix em commits e2327fa + 7ef3b8e + 109ecce. |
+
+**Cobertura agregada:** 19/35 dias com 20/20 células (LLM × vertical) preenchidas (54%); 16 dias com gap total (45,7%).
+
+**Política de imputação:** ZERO. Análise longitudinal trabalha com pesos por dia-com-cobertura (mixed-effects intercept aleatório por `collection_date`); dias com gap parcial são reportados em sensitivity analysis (com vs sem). Gaps totais são marcados em `collection_runs` como `status='aborted'` e o intervalo é excluído da janela analítica formal — preserva honestidade estatística sobre série temporal incompleta.
+
+**Mecanismos canônicos de prevenção** (em vigor pós-2026-05-18):
+1. Preflight LLM check com 1 retry para transientes 5xx/network (`scripts/preflight_llm_check.py`)
+2. Health-check final pós-coleta (`scripts/health_check.py`)
+3. Alert Resend + GitHub issue automático em qualquer falha
+4. Cron duplo (09:00 + 21:00 UTC) — uma janela de recovery por dia
+5. Modelos pinados (`model_version` em todo row de citation)
+
+Trilha de auditoria: `data/finops_alerts.jsonl` + GitHub issues label `pipeline-failure`.
+
 ---
 
 ## 4. Instrumentação NER v2

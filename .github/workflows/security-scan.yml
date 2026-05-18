@@ -47,8 +47,14 @@ jobs:
           # -r recursivo, -ll low+medium+high, -i inclui info
           # Skip B101 (assert) — usado largamente em testes
           # Skip B404/B603 (subprocess) — necessario em scripts auxiliares
+          # Skip B608 (hardcoded SQL f-string) — todas as queries flagged usam
+          #   parameterized binds (cur.execute(sql, params)) e o where_clause
+          #   interpolado e literal hardcoded (" WHERE x = ?"), nao input do
+          #   usuario. Auditado em scripts/export_data.py e src/finops/queries.py.
+          # Skip B310 (urllib_urlopen) — URLs sao constantes literais (api.openai.com,
+          #   generativelanguage.googleapis.com etc.), sem risco de file:// scheme.
           bandit -r . \
-            --skip B101,B404,B603 \
+            --skip B101,B404,B603,B608,B310 \
             --exclude /tests,/test_,/.venv,/venv,/.tox,/build,/dist \
             -f screen \
             --severity-level medium
