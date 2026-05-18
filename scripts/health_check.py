@@ -177,7 +177,8 @@ def check_api_keys_valid() -> Check:
                 "https://api.perplexity.ai/chat/completions",
                 data=json.dumps({
                     "model": "sonar",
-                    "max_tokens": 1,
+                    # Perplexity sonar exige max_tokens>=16 desde 2026-05-18.
+                    "max_tokens": 16,
                     "messages": [{"role": "user", "content": "x"}],
                 }).encode(),
                 headers={
