@@ -114,13 +114,15 @@ def check_perplexity(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("perplexity", False, 0, "PERPLEXITY_API_KEY ausente")
     try:
+        # Perplexity sonar exige max_tokens>=16 desde validação 2026-05-18
+        # (incidente run #26033337487: HTTP 400 invalid_parameter com max_tokens=1).
         r = httpx.post(
             "https://api.perplexity.ai/chat/completions",
             headers={"Authorization": f"Bearer {key}"},
             json={
                 "model": "sonar",
                 "messages": [{"role": "user", "content": "ok"}],
-                "max_tokens": 1,
+                "max_tokens": 16,
             },
             timeout=20,
         )
