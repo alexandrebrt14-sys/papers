@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T00:27:55.521247+00:00",
+  "generated_at": "2026-05-18T15:36:59.584478+00:00",
   "budgets": [
     {
       "platform": "openai",
@@ -51,6 +51,16 @@
     }
   ],
   "alerts_recent": [
+    {
+      "timestamp": "2026-05-18T15:36:59.580709+00:00",
+      "platform": "google",
+      "alert_type": "budget_warning",
+      "severity": "warning",
+      "message": "google budget_warning: $42.8011/$50.00 (85.6%)",
+      "current_spend_usd": 42.80110375,
+      "pct_used": 85.6,
+      "sent_email": 0
+    },
     {
       "timestamp": "2026-05-17T22:25:31.877123+00:00",
       "platform": "google",
@@ -540,21 +550,11 @@
       "current_spend_usd": 3.003755,
       "pct_used": 100.1,
       "sent_email": 0
-    },
-    {
-      "timestamp": "2026-04-24T23:25:03.309364+00:00",
-      "platform": "google",
-      "alert_type": "daily_critical",
-      "severity": "critical",
-      "message": "google daily_critical: $2.7116/$3.00 (90.4%)",
-      "current_spend_usd": 2.71163875,
-      "pct_used": 90.4,
-      "sent_email": 0
     }
   ],
   "daily_rollups": [
     {
-      "id": 1107,
+      "id": 1112,
       "date": "2026-05-18",
       "platform": "anthropic",
       "total_queries": 48,
@@ -567,7 +567,7 @@
       "vertical": "fintech"
     },
     {
-      "id": 1106,
+      "id": 1111,
       "date": "2026-05-18",
       "platform": "openai",
       "total_queries": 48,
@@ -580,7 +580,7 @@
       "vertical": "fintech"
     },
     {
-      "id": 1105,
+      "id": 1110,
       "date": "2026-05-18",
       "platform": "groq",
       "total_queries": 49,
@@ -593,7 +593,7 @@
       "vertical": "fintech"
     },
     {
-      "id": 1104,
+      "id": 1109,
       "date": "2026-05-18",
       "platform": "perplexity",
       "total_queries": 9,
@@ -606,7 +606,7 @@
       "vertical": "fintech"
     },
     {
-      "id": 1103,
+      "id": 1108,
       "date": "2026-05-18",
       "platform": "google",
       "total_queries": 49,
@@ -1795,22 +1795,22 @@
     "platforms": {
       "openai": {
         "last_activity": "2026-05-18T00:27:24.622811+00:00",
-        "hours_ago": 0.0,
+        "hours_ago": 15.2,
         "stale": false
       },
       "anthropic": {
         "last_activity": "2026-05-18T00:27:26.594545+00:00",
-        "hours_ago": 0.0,
+        "hours_ago": 15.2,
         "stale": false
       },
       "google": {
         "last_activity": "2026-05-18T00:27:49.605965+00:00",
-        "hours_ago": 0.0,
+        "hours_ago": 15.2,
         "stale": false
       },
       "perplexity": {
         "last_activity": "2026-05-18T00:15:47.506775+00:00",
-        "hours_ago": 0.2,
+        "hours_ago": 15.4,
         "stale": false
       }
     }
