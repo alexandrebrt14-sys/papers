@@ -20,8 +20,9 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 from dataclasses import dataclass
-from typing import Optional
+from typing import Callable, Optional
 
 import httpx
 
@@ -34,127 +35,122 @@ class ProviderCheck:
     error: Optional[str] = None
 
 
+def _post_with_retry(name: str, do_post: Callable[[], httpx.Response]) -> ProviderCheck:
+    # 1 retry com backoff 3s para 5xx ou erros de rede (transientes do provider).
+    # 4xx NUNCA retenta — sao bugs nossos (payload invalido, auth, quota) e
+    # retry apenas atrasa diagnostico. Boundary com APIs externas justifica
+    # essa tolerancia para preservar a janela do paper (julho/2026).
+    attempts = 2
+    last_err: Optional[str] = None
+    last_latency = 0
+    for i in range(attempts):
+        try:
+            r = do_post()
+            last_latency = int(r.elapsed.total_seconds() * 1000)
+            if r.status_code == 200:
+                return ProviderCheck(name, True, last_latency)
+            if 500 <= r.status_code < 600 and i < attempts - 1:
+                last_err = f"HTTP {r.status_code} (retry)"
+                time.sleep(3)
+                continue
+            return ProviderCheck(name, False, last_latency, f"HTTP {r.status_code}: {r.text[:200]}")
+        except (httpx.ConnectError, httpx.ReadTimeout, httpx.RemoteProtocolError, httpx.ConnectTimeout) as e:
+            last_err = f"{type(e).__name__}: {e}"
+            if i < attempts - 1:
+                time.sleep(3)
+                continue
+            return ProviderCheck(name, False, 0, last_err)
+        except Exception as e:
+            return ProviderCheck(name, False, 0, f"{type(e).__name__}: {e}")
+    return ProviderCheck(name, False, last_latency, last_err or "unknown")
+
+
 # Endpoints e payloads minimos por provider. Cada chamada usa max_tokens=1
 # (Anthropic exige >=1) e prompt curto. O objetivo e exercitar o auth +
 # billing path sem gerar payload significativo.
 def check_openai(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("chatgpt", False, 0, "OPENAI_API_KEY ausente")
-    try:
-        r = httpx.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {key}"},
-            json={
-                "model": "gpt-4o-mini-2024-07-18",
-                "messages": [{"role": "user", "content": "ok"}],
-                "max_tokens": 1,
-                "temperature": 0,
-            },
-            timeout=15,
-        )
-        if r.status_code == 200:
-            return ProviderCheck("chatgpt", True, int(r.elapsed.total_seconds() * 1000))
-        return ProviderCheck("chatgpt", False, int(r.elapsed.total_seconds() * 1000),
-                             f"HTTP {r.status_code}: {r.text[:200]}")
-    except Exception as e:
-        return ProviderCheck("chatgpt", False, 0, f"{type(e).__name__}: {e}")
+    return _post_with_retry("chatgpt", lambda: httpx.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {key}"},
+        json={
+            "model": "gpt-4o-mini-2024-07-18",
+            "messages": [{"role": "user", "content": "ok"}],
+            "max_tokens": 1,
+            "temperature": 0,
+        },
+        timeout=15,
+    ))
 
 
 def check_anthropic(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("claude", False, 0, "ANTHROPIC_API_KEY ausente")
-    try:
-        r = httpx.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-            },
-            json={
-                "model": "claude-haiku-4-5-20251001",
-                "max_tokens": 1,
-                "messages": [{"role": "user", "content": "ok"}],
-            },
-            timeout=15,
-        )
-        if r.status_code == 200:
-            return ProviderCheck("claude", True, int(r.elapsed.total_seconds() * 1000))
-        return ProviderCheck("claude", False, int(r.elapsed.total_seconds() * 1000),
-                             f"HTTP {r.status_code}: {r.text[:200]}")
-    except Exception as e:
-        return ProviderCheck("claude", False, 0, f"{type(e).__name__}: {e}")
+    return _post_with_retry("claude", lambda: httpx.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={
+            "x-api-key": key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        json={
+            "model": "claude-haiku-4-5-20251001",
+            "max_tokens": 1,
+            "messages": [{"role": "user", "content": "ok"}],
+        },
+        timeout=15,
+    ))
 
 
 def check_google(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("gemini", False, 0, "GOOGLE_AI_API_KEY ausente")
-    try:
-        # Gemini 2.5 Pro thinking consome 1000-3000 tokens internos. maxOutputTokens
-        # baixo retorna candidates sem 'parts'. Pre-flight valida AUTH apenas, nao
-        # qualidade de output — usar 32 tokens evita cobertura zero por max_tokens.
-        r = httpx.post(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
-            params={"key": key},
-            json={
-                "contents": [{"role": "user", "parts": [{"text": "ok"}]}],
-                "generationConfig": {"maxOutputTokens": 32, "temperature": 0},
-            },
-            timeout=20,
-        )
-        if r.status_code == 200:
-            return ProviderCheck("gemini", True, int(r.elapsed.total_seconds() * 1000))
-        return ProviderCheck("gemini", False, int(r.elapsed.total_seconds() * 1000),
-                             f"HTTP {r.status_code}: {r.text[:200]}")
-    except Exception as e:
-        return ProviderCheck("gemini", False, 0, f"{type(e).__name__}: {e}")
+    # Gemini 2.5 Pro thinking consome 1000-3000 tokens internos. maxOutputTokens
+    # baixo retorna candidates sem 'parts'. Pre-flight valida AUTH apenas, nao
+    # qualidade de output — usar 32 tokens evita cobertura zero por max_tokens.
+    return _post_with_retry("gemini", lambda: httpx.post(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
+        params={"key": key},
+        json={
+            "contents": [{"role": "user", "parts": [{"text": "ok"}]}],
+            "generationConfig": {"maxOutputTokens": 32, "temperature": 0},
+        },
+        timeout=20,
+    ))
 
 
 def check_perplexity(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("perplexity", False, 0, "PERPLEXITY_API_KEY ausente")
-    try:
-        # Perplexity sonar exige max_tokens>=16 desde validação 2026-05-18
-        # (incidente run #26033337487: HTTP 400 invalid_parameter com max_tokens=1).
-        r = httpx.post(
-            "https://api.perplexity.ai/chat/completions",
-            headers={"Authorization": f"Bearer {key}"},
-            json={
-                "model": "sonar",
-                "messages": [{"role": "user", "content": "ok"}],
-                "max_tokens": 16,
-            },
-            timeout=20,
-        )
-        if r.status_code == 200:
-            return ProviderCheck("perplexity", True, int(r.elapsed.total_seconds() * 1000))
-        return ProviderCheck("perplexity", False, int(r.elapsed.total_seconds() * 1000),
-                             f"HTTP {r.status_code}: {r.text[:200]}")
-    except Exception as e:
-        return ProviderCheck("perplexity", False, 0, f"{type(e).__name__}: {e}")
+    # Perplexity sonar exige max_tokens>=16 desde validação 2026-05-18
+    # (incidente run #26033337487: HTTP 400 invalid_parameter com max_tokens=1).
+    return _post_with_retry("perplexity", lambda: httpx.post(
+        "https://api.perplexity.ai/chat/completions",
+        headers={"Authorization": f"Bearer {key}"},
+        json={
+            "model": "sonar",
+            "messages": [{"role": "user", "content": "ok"}],
+            "max_tokens": 16,
+        },
+        timeout=20,
+    ))
 
 
 def check_groq(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("groq", False, 0, "GROQ_API_KEY ausente")
-    try:
-        r = httpx.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {key}"},
-            json={
-                "model": "llama-3.3-70b-versatile",
-                "messages": [{"role": "user", "content": "ok"}],
-                "max_tokens": 1,
-                "temperature": 0,
-            },
-            timeout=15,
-        )
-        if r.status_code == 200:
-            return ProviderCheck("groq", True, int(r.elapsed.total_seconds() * 1000))
-        return ProviderCheck("groq", False, int(r.elapsed.total_seconds() * 1000),
-                             f"HTTP {r.status_code}: {r.text[:200]}")
-    except Exception as e:
-        return ProviderCheck("groq", False, 0, f"{type(e).__name__}: {e}")
+    return _post_with_retry("groq", lambda: httpx.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        headers={"Authorization": f"Bearer {key}"},
+        json={
+            "model": "llama-3.3-70b-versatile",
+            "messages": [{"role": "user", "content": "ok"}],
+            "max_tokens": 1,
+            "temperature": 0,
+        },
+        timeout=15,
+    ))
 
 
 def main() -> int:
