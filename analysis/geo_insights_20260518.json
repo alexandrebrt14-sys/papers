@@ -1,0 +1,1553 @@
+{
+  "generated_at": "2026-05-18",
+  "n_citations": 4422,
+  "n_long_form": 10339,
+  "by_llm_vertical": [
+    {
+      "llm": "ChatGPT",
+      "vertical": "fintech",
+      "n": 1200
+    },
+    {
+      "llm": "Claude",
+      "vertical": "fintech",
+      "n": 1200
+    },
+    {
+      "llm": "Gemini",
+      "vertical": "fintech",
+      "n": 1200
+    },
+    {
+      "llm": "Groq",
+      "vertical": "fintech",
+      "n": 1200
+    },
+    {
+      "llm": "Perplexity",
+      "vertical": "fintech",
+      "n": 600
+    },
+    {
+      "llm": "ChatGPT",
+      "vertical": "saude",
+      "n": 1200
+    },
+    {
+      "llm": "Claude",
+      "vertical": "saude",
+      "n": 1162
+    },
+    {
+      "llm": "Gemini",
+      "vertical": "saude",
+      "n": 1200
+    },
+    {
+      "llm": "Groq",
+      "vertical": "saude",
+      "n": 1200
+    },
+    {
+      "llm": "Perplexity",
+      "vertical": "saude",
+      "n": 600
+    },
+    {
+      "llm": "ChatGPT",
+      "vertical": "tecnologia",
+      "n": 1200
+    },
+    {
+      "llm": "Claude",
+      "vertical": "tecnologia",
+      "n": 1104
+    },
+    {
+      "llm": "Gemini",
+      "vertical": "tecnologia",
+      "n": 1200
+    },
+    {
+      "llm": "Groq",
+      "vertical": "tecnologia",
+      "n": 1200
+    },
+    {
+      "llm": "Perplexity",
+      "vertical": "tecnologia",
+      "n": 600
+    },
+    {
+      "llm": "ChatGPT",
+      "vertical": "varejo",
+      "n": 1200
+    },
+    {
+      "llm": "Claude",
+      "vertical": "varejo",
+      "n": 1200
+    },
+    {
+      "llm": "Gemini",
+      "vertical": "varejo",
+      "n": 1200
+    },
+    {
+      "llm": "Groq",
+      "vertical": "varejo",
+      "n": 1200
+    },
+    {
+      "llm": "Perplexity",
+      "vertical": "varejo",
+      "n": 600
+    }
+  ],
+  "entities": [
+    {
+      "entity": "Nubank",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 1534,
+      "n_llms": 5,
+      "in_vertical_mentions": 1534,
+      "vertical_queries": 5400,
+      "rate_pct": 28.40740740740741,
+      "ci95_lo_pct": 27.22222222222222,
+      "ci95_hi_pct": 29.667129629629628,
+      "by_llm_json": {
+        "Claude": 611,
+        "Perplexity": 547,
+        "Groq": 105,
+        "ChatGPT": 217,
+        "Gemini": 54
+      },
+      "by_qtype_json": {
+        "directive": 972,
+        "exploratory": 562
+      }
+    },
+    {
+      "entity": "Magazine Luiza",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 911,
+      "n_llms": 4,
+      "in_vertical_mentions": 911,
+      "vertical_queries": 5400,
+      "rate_pct": 16.87037037037037,
+      "ci95_lo_pct": 15.87037037037037,
+      "ci95_hi_pct": 17.907870370370368,
+      "by_llm_json": {
+        "Perplexity": 444,
+        "Claude": 113,
+        "ChatGPT": 255,
+        "Groq": 99
+      },
+      "by_qtype_json": {
+        "directive": 647,
+        "exploratory": 264
+      }
+    },
+    {
+      "entity": "Mercado Livre",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 882,
+      "n_llms": 4,
+      "in_vertical_mentions": 882,
+      "vertical_queries": 5400,
+      "rate_pct": 16.333333333333332,
+      "ci95_lo_pct": 15.351851851851853,
+      "ci95_hi_pct": 17.37037037037037,
+      "by_llm_json": {
+        "Claude": 184,
+        "Perplexity": 585,
+        "ChatGPT": 68,
+        "Groq": 45
+      },
+      "by_qtype_json": {
+        "directive": 489,
+        "exploratory": 393
+      }
+    },
+    {
+      "entity": "Hypera Pharma",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 459,
+      "n_llms": 3,
+      "in_vertical_mentions": 459,
+      "vertical_queries": 5362,
+      "rate_pct": 8.56023871689668,
+      "ci95_lo_pct": 7.850615441999255,
+      "ci95_hi_pct": 9.324878776575904,
+      "by_llm_json": {
+        "Perplexity": 323,
+        "Claude": 65,
+        "Groq": 71
+      },
+      "by_qtype_json": {
+        "directive": 296,
+        "exploratory": 163
+      }
+    },
+    {
+      "entity": "EMS Pharma",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 402,
+      "n_llms": 3,
+      "in_vertical_mentions": 402,
+      "vertical_queries": 5362,
+      "rate_pct": 7.497202536367027,
+      "ci95_lo_pct": 6.844461022006714,
+      "ci95_hi_pct": 8.224543080939947,
+      "by_llm_json": {
+        "Perplexity": 332,
+        "ChatGPT": 51,
+        "Claude": 19
+      },
+      "by_qtype_json": {
+        "directive": 257,
+        "exploratory": 145
+      }
+    },
+    {
+      "entity": "Americanas",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 400,
+      "n_llms": 4,
+      "in_vertical_mentions": 400,
+      "vertical_queries": 5400,
+      "rate_pct": 7.4074074074074066,
+      "ci95_lo_pct": 6.722222222222222,
+      "ci95_hi_pct": 8.11111111111111,
+      "by_llm_json": {
+        "Perplexity": 278,
+        "Claude": 101,
+        "Groq": 15,
+        "ChatGPT": 6
+      },
+      "by_qtype_json": {
+        "directive": 168,
+        "exploratory": 232
+      }
+    },
+    {
+      "entity": "Totvs",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 388,
+      "n_llms": 3,
+      "in_vertical_mentions": 388,
+      "vertical_queries": 5304,
+      "rate_pct": 7.315233785822022,
+      "ci95_lo_pct": 6.61764705882353,
+      "ci95_hi_pct": 8.031674208144796,
+      "by_llm_json": {
+        "Perplexity": 213,
+        "ChatGPT": 172,
+        "Claude": 3
+      },
+      "by_qtype_json": {
+        "exploratory": 96,
+        "directive": 292
+      }
+    },
+    {
+      "entity": "PicPay",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 376,
+      "n_llms": 3,
+      "in_vertical_mentions": 376,
+      "vertical_queries": 5400,
+      "rate_pct": 6.962962962962963,
+      "ci95_lo_pct": 6.296296296296296,
+      "ci95_hi_pct": 7.648148148148149,
+      "by_llm_json": {
+        "Perplexity": 333,
+        "Gemini": 25,
+        "ChatGPT": 18
+      },
+      "by_qtype_json": {
+        "directive": 158,
+        "exploratory": 218
+      }
+    },
+    {
+      "entity": "C6 Bank",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 360,
+      "n_llms": 4,
+      "in_vertical_mentions": 360,
+      "vertical_queries": 5400,
+      "rate_pct": 6.666666666666667,
+      "ci95_lo_pct": 6.018055555555555,
+      "ci95_hi_pct": 7.333333333333333,
+      "by_llm_json": {
+        "Perplexity": 305,
+        "Gemini": 25,
+        "Claude": 28,
+        "Groq": 2
+      },
+      "by_qtype_json": {
+        "directive": 128,
+        "exploratory": 232
+      }
+    },
+    {
+      "entity": "Amazon Brasil",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 333,
+      "n_llms": 2,
+      "in_vertical_mentions": 333,
+      "vertical_queries": 5400,
+      "rate_pct": 6.166666666666667,
+      "ci95_lo_pct": 5.537037037037037,
+      "ci95_hi_pct": 6.814814814814815,
+      "by_llm_json": {
+        "Perplexity": 330,
+        "Claude": 3
+      },
+      "by_qtype_json": {
+        "directive": 170,
+        "exploratory": 163
+      }
+    },
+    {
+      "entity": "Amazon",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 322,
+      "n_llms": 2,
+      "in_vertical_mentions": 322,
+      "vertical_queries": 5400,
+      "rate_pct": 5.962962962962963,
+      "ci95_lo_pct": 5.333333333333334,
+      "ci95_hi_pct": 6.592592592592593,
+      "by_llm_json": {
+        "Perplexity": 319,
+        "Claude": 3
+      },
+      "by_qtype_json": {
+        "directive": 159,
+        "exploratory": 163
+      }
+    },
+    {
+      "entity": "Eurofarma",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 308,
+      "n_llms": 3,
+      "in_vertical_mentions": 308,
+      "vertical_queries": 5362,
+      "rate_pct": 5.7441253263707575,
+      "ci95_lo_pct": 5.128683327116748,
+      "ci95_hi_pct": 6.360033569563593,
+      "by_llm_json": {
+        "Perplexity": 290,
+        "Claude": 17,
+        "ChatGPT": 1
+      },
+      "by_qtype_json": {
+        "directive": 140,
+        "exploratory": 168
+      }
+    },
+    {
+      "entity": "Banco Inter",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 302,
+      "n_llms": 4,
+      "in_vertical_mentions": 302,
+      "vertical_queries": 5400,
+      "rate_pct": 5.592592592592593,
+      "ci95_lo_pct": 4.981481481481481,
+      "ci95_hi_pct": 6.204166666666664,
+      "by_llm_json": {
+        "Perplexity": 252,
+        "ChatGPT": 41,
+        "Gemini": 6,
+        "Groq": 3
+      },
+      "by_qtype_json": {
+        "directive": 152,
+        "exploratory": 150
+      }
+    },
+    {
+      "entity": "Bradesco",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 235,
+      "n_llms": 2,
+      "in_vertical_mentions": 235,
+      "vertical_queries": 5400,
+      "rate_pct": 4.351851851851852,
+      "ci95_lo_pct": 3.8328703703703697,
+      "ci95_hi_pct": 4.888888888888889,
+      "by_llm_json": {
+        "Perplexity": 127,
+        "Claude": 108
+      },
+      "by_qtype_json": {
+        "directive": 34,
+        "exploratory": 201
+      }
+    },
+    {
+      "entity": "Casas Bahia",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 221,
+      "n_llms": 2,
+      "in_vertical_mentions": 221,
+      "vertical_queries": 5400,
+      "rate_pct": 4.092592592592593,
+      "ci95_lo_pct": 3.574074074074074,
+      "ci95_hi_pct": 4.62962962962963,
+      "by_llm_json": {
+        "Perplexity": 200,
+        "Groq": 21
+      },
+      "by_qtype_json": {
+        "exploratory": 169,
+        "directive": 52
+      }
+    },
+    {
+      "entity": "Accenture",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 191,
+      "n_llms": 2,
+      "in_vertical_mentions": 191,
+      "vertical_queries": 5304,
+      "rate_pct": 3.6010558069381595,
+      "ci95_lo_pct": 3.11038838612368,
+      "ci95_hi_pct": 4.110105580693816,
+      "by_llm_json": {
+        "Perplexity": 169,
+        "Claude": 22
+      },
+      "by_qtype_json": {
+        "directive": 139,
+        "exploratory": 52
+      }
+    },
+    {
+      "entity": "Pfizer",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 186,
+      "n_llms": 3,
+      "in_vertical_mentions": 186,
+      "vertical_queries": 5362,
+      "rate_pct": 3.4688549048862365,
+      "ci95_lo_pct": 2.9839612085042893,
+      "ci95_hi_pct": 3.9542148452070105,
+      "by_llm_json": {
+        "Perplexity": 167,
+        "Claude": 17,
+        "ChatGPT": 2
+      },
+      "by_qtype_json": {
+        "exploratory": 97,
+        "directive": 89
+      }
+    },
+    {
+      "entity": "Mercado Pago",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 175,
+      "n_llms": 1,
+      "in_vertical_mentions": 175,
+      "vertical_queries": 5400,
+      "rate_pct": 3.2407407407407405,
+      "ci95_lo_pct": 2.759259259259259,
+      "ci95_hi_pct": 3.7037037037037033,
+      "by_llm_json": {
+        "Perplexity": 175
+      },
+      "by_qtype_json": {
+        "directive": 72,
+        "exploratory": 103
+      }
+    },
+    {
+      "entity": "Novartis",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 174,
+      "n_llms": 3,
+      "in_vertical_mentions": 174,
+      "vertical_queries": 5362,
+      "rate_pct": 3.245057814248415,
+      "ci95_lo_pct": 2.7601641178664678,
+      "ci95_hi_pct": 3.7113017530772097,
+      "by_llm_json": {
+        "Perplexity": 155,
+        "Claude": 17,
+        "ChatGPT": 2
+      },
+      "by_qtype_json": {
+        "exploratory": 91,
+        "directive": 83
+      }
+    },
+    {
+      "entity": "Itaú",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 173,
+      "n_llms": 2,
+      "in_vertical_mentions": 173,
+      "vertical_queries": 5400,
+      "rate_pct": 3.2037037037037037,
+      "ci95_lo_pct": 2.740740740740741,
+      "ci95_hi_pct": 3.685185185185185,
+      "by_llm_json": {
+        "Perplexity": 147,
+        "Claude": 26
+      },
+      "by_qtype_json": {
+        "directive": 44,
+        "exploratory": 129
+      }
+    },
+    {
+      "entity": "Involves",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 118,
+      "n_llms": 3,
+      "in_vertical_mentions": 118,
+      "vertical_queries": 5304,
+      "rate_pct": 2.22473604826546,
+      "ci95_lo_pct": 1.8288084464555054,
+      "ci95_hi_pct": 2.620663650075415,
+      "by_llm_json": {
+        "ChatGPT": 50,
+        "Groq": 62,
+        "Gemini": 6
+      },
+      "by_qtype_json": {
+        "exploratory": 112,
+        "directive": 6
+      }
+    },
+    {
+      "entity": "Microsoft",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 116,
+      "n_llms": 2,
+      "in_vertical_mentions": 116,
+      "vertical_queries": 5304,
+      "rate_pct": 2.1870286576168927,
+      "ci95_lo_pct": 1.809954751131222,
+      "ci95_hi_pct": 2.5829562594268474,
+      "by_llm_json": {
+        "Perplexity": 53,
+        "Claude": 63
+      },
+      "by_qtype_json": {
+        "directive": 33,
+        "exploratory": 83
+      }
+    },
+    {
+      "entity": "Roche",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 111,
+      "n_llms": 1,
+      "in_vertical_mentions": 111,
+      "vertical_queries": 5362,
+      "rate_pct": 2.0701230883998507,
+      "ci95_lo_pct": 1.6971279373368149,
+      "ci95_hi_pct": 2.461767997016039,
+      "by_llm_json": {
+        "Perplexity": 111
+      },
+      "by_qtype_json": {
+        "exploratory": 68,
+        "directive": 43
+      }
+    },
+    {
+      "entity": "Shein",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 104,
+      "n_llms": 1,
+      "in_vertical_mentions": 104,
+      "vertical_queries": 5400,
+      "rate_pct": 1.925925925925926,
+      "ci95_lo_pct": 1.574074074074074,
+      "ci95_hi_pct": 2.2962962962962963,
+      "by_llm_json": {
+        "Perplexity": 104
+      },
+      "by_qtype_json": {
+        "directive": 13,
+        "exploratory": 91
+      }
+    },
+    {
+      "entity": "Stefanini",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 104,
+      "n_llms": 3,
+      "in_vertical_mentions": 104,
+      "vertical_queries": 5304,
+      "rate_pct": 1.9607843137254901,
+      "ci95_lo_pct": 1.6025641025641024,
+      "ci95_hi_pct": 2.3378582202111615,
+      "by_llm_json": {
+        "Perplexity": 87,
+        "Groq": 14,
+        "Claude": 3
+      },
+      "by_qtype_json": {
+        "exploratory": 31,
+        "directive": 73
+      }
+    },
+    {
+      "entity": "Oracle",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 101,
+      "n_llms": 2,
+      "in_vertical_mentions": 101,
+      "vertical_queries": 5304,
+      "rate_pct": 1.9042232277526394,
+      "ci95_lo_pct": 1.546003016591252,
+      "ci95_hi_pct": 2.2812971342383106,
+      "by_llm_json": {
+        "Perplexity": 82,
+        "Claude": 19
+      },
+      "by_qtype_json": {
+        "exploratory": 74,
+        "directive": 27
+      }
+    },
+    {
+      "entity": "Google",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 96,
+      "n_llms": 2,
+      "in_vertical_mentions": 96,
+      "vertical_queries": 5304,
+      "rate_pct": 1.809954751131222,
+      "ci95_lo_pct": 1.4705882352941175,
+      "ci95_hi_pct": 2.168174962292609,
+      "by_llm_json": {
+        "Perplexity": 34,
+        "Claude": 62
+      },
+      "by_qtype_json": {
+        "exploratory": 88,
+        "directive": 8
+      }
+    },
+    {
+      "entity": "CI&T",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 94,
+      "n_llms": 1,
+      "in_vertical_mentions": 94,
+      "vertical_queries": 5304,
+      "rate_pct": 1.7722473604826545,
+      "ci95_lo_pct": 1.4328808446455505,
+      "ci95_hi_pct": 2.130467571644042,
+      "by_llm_json": {
+        "Perplexity": 94
+      },
+      "by_qtype_json": {
+        "directive": 42,
+        "exploratory": 52
+      }
+    },
+    {
+      "entity": "Walmart",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 82,
+      "n_llms": 2,
+      "in_vertical_mentions": 82,
+      "vertical_queries": 5400,
+      "rate_pct": 1.5185185185185186,
+      "ci95_lo_pct": 1.2037037037037037,
+      "ci95_hi_pct": 1.8337962962962937,
+      "by_llm_json": {
+        "Claude": 81,
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 51,
+        "directive": 31
+      }
+    },
+    {
+      "entity": "AliExpress",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 82,
+      "n_llms": 1,
+      "in_vertical_mentions": 82,
+      "vertical_queries": 5400,
+      "rate_pct": 1.5185185185185186,
+      "ci95_lo_pct": 1.2037037037037037,
+      "ci95_hi_pct": 1.8337962962962937,
+      "by_llm_json": {
+        "Perplexity": 82
+      },
+      "by_qtype_json": {
+        "exploratory": 80,
+        "directive": 2
+      }
+    },
+    {
+      "entity": "iFood",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 82,
+      "n_llms": 3,
+      "in_vertical_mentions": 82,
+      "vertical_queries": 5304,
+      "rate_pct": 1.546003016591252,
+      "ci95_lo_pct": 1.2254901960784315,
+      "ci95_hi_pct": 1.866987179487177,
+      "by_llm_json": {
+        "Perplexity": 54,
+        "ChatGPT": 25,
+        "Gemini": 3
+      },
+      "by_qtype_json": {
+        "directive": 57,
+        "exploratory": 25
+      }
+    },
+    {
+      "entity": "PagBank",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 81,
+      "n_llms": 1,
+      "in_vertical_mentions": 81,
+      "vertical_queries": 5400,
+      "rate_pct": 1.5,
+      "ci95_lo_pct": 1.1851851851851851,
+      "ci95_hi_pct": 1.8148148148148149,
+      "by_llm_json": {
+        "Perplexity": 81
+      },
+      "by_qtype_json": {
+        "directive": 32,
+        "exploratory": 49
+      }
+    },
+    {
+      "entity": "SAP",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 81,
+      "n_llms": 1,
+      "in_vertical_mentions": 81,
+      "vertical_queries": 5304,
+      "rate_pct": 1.5271493212669682,
+      "ci95_lo_pct": 1.206636500754148,
+      "ci95_hi_pct": 1.847662141779789,
+      "by_llm_json": {
+        "Perplexity": 81
+      },
+      "by_qtype_json": {
+        "directive": 58,
+        "exploratory": 23
+      }
+    },
+    {
+      "entity": "Movile",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 80,
+      "n_llms": 2,
+      "in_vertical_mentions": 80,
+      "vertical_queries": 5304,
+      "rate_pct": 1.5082956259426847,
+      "ci95_lo_pct": 1.206636500754148,
+      "ci95_hi_pct": 1.847662141779789,
+      "by_llm_json": {
+        "ChatGPT": 79,
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "directive": 79,
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Agibank",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 65,
+      "n_llms": 1,
+      "in_vertical_mentions": 65,
+      "vertical_queries": 5400,
+      "rate_pct": 1.2037037037037037,
+      "ci95_lo_pct": 0.9259259259259258,
+      "ci95_hi_pct": 1.5,
+      "by_llm_json": {
+        "Perplexity": 65
+      },
+      "by_qtype_json": {
+        "exploratory": 55,
+        "directive": 10
+      }
+    },
+    {
+      "entity": "Sírio-Libanês",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 61,
+      "n_llms": 2,
+      "in_vertical_mentions": 61,
+      "vertical_queries": 5362,
+      "rate_pct": 1.1376352107422603,
+      "ci95_lo_pct": 0.8578888474449832,
+      "ci95_hi_pct": 1.4360313315926894,
+      "by_llm_json": {
+        "Claude": 41,
+        "Perplexity": 20
+      },
+      "by_qtype_json": {
+        "directive": 61
+      }
+    },
+    {
+      "entity": "IBM Brasil",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 59,
+      "n_llms": 1,
+      "in_vertical_mentions": 59,
+      "vertical_queries": 5304,
+      "rate_pct": 1.11236802413273,
+      "ci95_lo_pct": 0.8295625942684767,
+      "ci95_hi_pct": 1.3951734539969836,
+      "by_llm_json": {
+        "Perplexity": 59
+      },
+      "by_qtype_json": {
+        "directive": 41,
+        "exploratory": 18
+      }
+    },
+    {
+      "entity": "BTG Pactual",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 58,
+      "n_llms": 1,
+      "in_vertical_mentions": 58,
+      "vertical_queries": 5400,
+      "rate_pct": 1.074074074074074,
+      "ci95_lo_pct": 0.7962962962962963,
+      "ci95_hi_pct": 1.3523148148148123,
+      "by_llm_json": {
+        "Perplexity": 58
+      },
+      "by_qtype_json": {
+        "exploratory": 46,
+        "directive": 12
+      }
+    },
+    {
+      "entity": "Raia Drogasil",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 51,
+      "n_llms": 2,
+      "in_vertical_mentions": 51,
+      "vertical_queries": 5362,
+      "rate_pct": 0.9511376352107423,
+      "ci95_lo_pct": 0.6900410294666169,
+      "ci95_hi_pct": 1.2308839985080196,
+      "by_llm_json": {
+        "Perplexity": 25,
+        "ChatGPT": 26
+      },
+      "by_qtype_json": {
+        "exploratory": 24,
+        "directive": 27
+      }
+    },
+    {
+      "entity": "Locaweb",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 38,
+      "n_llms": 2,
+      "in_vertical_mentions": 38,
+      "vertical_queries": 5304,
+      "rate_pct": 0.7164404223227753,
+      "ci95_lo_pct": 0.5090497737556561,
+      "ci95_hi_pct": 0.942684766214178,
+      "by_llm_json": {
+        "Perplexity": 16,
+        "Claude": 22
+      },
+      "by_qtype_json": {
+        "exploratory": 33,
+        "directive": 5
+      }
+    },
+    {
+      "entity": "Aché Laboratórios",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 35,
+      "n_llms": 3,
+      "in_vertical_mentions": 35,
+      "vertical_queries": 5362,
+      "rate_pct": 0.6527415143603132,
+      "ci95_lo_pct": 0.4662439388287952,
+      "ci95_hi_pct": 0.8765386049981351,
+      "by_llm_json": {
+        "ChatGPT": 25,
+        "Perplexity": 8,
+        "Groq": 2
+      },
+      "by_qtype_json": {
+        "directive": 35
+      }
+    },
+    {
+      "entity": "Fleury",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 34,
+      "n_llms": 2,
+      "in_vertical_mentions": 34,
+      "vertical_queries": 5362,
+      "rate_pct": 0.6340917568071615,
+      "ci95_lo_pct": 0.4475941812756434,
+      "ci95_hi_pct": 0.8578888474449832,
+      "by_llm_json": {
+        "ChatGPT": 25,
+        "Perplexity": 9
+      },
+      "by_qtype_json": {
+        "directive": 28,
+        "exploratory": 6
+      }
+    },
+    {
+      "entity": "Vtex",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 31,
+      "n_llms": 1,
+      "in_vertical_mentions": 31,
+      "vertical_queries": 5304,
+      "rate_pct": 0.5844645550527904,
+      "ci95_lo_pct": 0.39592760180995473,
+      "ci95_hi_pct": 0.7918552036199095,
+      "by_llm_json": {
+        "Perplexity": 31
+      },
+      "by_qtype_json": {
+        "exploratory": 27,
+        "directive": 4
+      }
+    },
+    {
+      "entity": "Dasa",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 28,
+      "n_llms": 2,
+      "in_vertical_mentions": 28,
+      "vertical_queries": 5362,
+      "rate_pct": 0.5221932114882507,
+      "ci95_lo_pct": 0.3538791495710556,
+      "ci95_hi_pct": 0.7273405445729205,
+      "by_llm_json": {
+        "ChatGPT": 16,
+        "Perplexity": 12
+      },
+      "by_qtype_json": {
+        "directive": 25,
+        "exploratory": 3
+      }
+    },
+    {
+      "entity": "Tivit",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 23,
+      "n_llms": 1,
+      "in_vertical_mentions": 23,
+      "vertical_queries": 5304,
+      "rate_pct": 0.4336349924585219,
+      "ci95_lo_pct": 0.26395173453996984,
+      "ci95_hi_pct": 0.6221719457013575,
+      "by_llm_json": {
+        "Perplexity": 23
+      },
+      "by_qtype_json": {
+        "directive": 23
+      }
+    },
+    {
+      "entity": "Renner",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 22,
+      "n_llms": 1,
+      "in_vertical_mentions": 22,
+      "vertical_queries": 5400,
+      "rate_pct": 0.4074074074074074,
+      "ci95_lo_pct": 0.25925925925925924,
+      "ci95_hi_pct": 0.5925925925925926,
+      "by_llm_json": {
+        "Claude": 22
+      },
+      "by_qtype_json": {
+        "exploratory": 22
+      }
+    },
+    {
+      "entity": "CloudWalk",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 18,
+      "n_llms": 1,
+      "in_vertical_mentions": 18,
+      "vertical_queries": 5400,
+      "rate_pct": 0.33333333333333337,
+      "ci95_lo_pct": 0.1851851851851852,
+      "ci95_hi_pct": 0.5,
+      "by_llm_json": {
+        "Perplexity": 18
+      },
+      "by_qtype_json": {
+        "exploratory": 14,
+        "directive": 4
+      }
+    },
+    {
+      "entity": "Dock",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 17,
+      "n_llms": 1,
+      "in_vertical_mentions": 17,
+      "vertical_queries": 5400,
+      "rate_pct": 0.3148148148148148,
+      "ci95_lo_pct": 0.1851851851851852,
+      "ci95_hi_pct": 0.4814814814814815,
+      "by_llm_json": {
+        "Perplexity": 17
+      },
+      "by_qtype_json": {
+        "exploratory": 15,
+        "directive": 2
+      }
+    },
+    {
+      "entity": "Hapvida",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 14,
+      "n_llms": 2,
+      "in_vertical_mentions": 14,
+      "vertical_queries": 5362,
+      "rate_pct": 0.26109660574412535,
+      "ci95_lo_pct": 0.13054830287206268,
+      "ci95_hi_pct": 0.41029466616933974,
+      "by_llm_json": {
+        "Perplexity": 13,
+        "Claude": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 13,
+        "directive": 1
+      }
+    },
+    {
+      "entity": "Will Bank",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 13,
+      "n_llms": 1,
+      "in_vertical_mentions": 13,
+      "vertical_queries": 5400,
+      "rate_pct": 0.24074074074074076,
+      "ci95_lo_pct": 0.12962962962962962,
+      "ci95_hi_pct": 0.3888888888888889,
+      "by_llm_json": {
+        "Perplexity": 13
+      },
+      "by_qtype_json": {
+        "exploratory": 13
+      }
+    },
+    {
+      "entity": "Netshoes",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 13,
+      "n_llms": 1,
+      "in_vertical_mentions": 13,
+      "vertical_queries": 5400,
+      "rate_pct": 0.24074074074074076,
+      "ci95_lo_pct": 0.12962962962962962,
+      "ci95_hi_pct": 0.3888888888888889,
+      "by_llm_json": {
+        "Perplexity": 13
+      },
+      "by_qtype_json": {
+        "exploratory": 13
+      }
+    },
+    {
+      "entity": "TCS",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 12,
+      "n_llms": 1,
+      "in_vertical_mentions": 12,
+      "vertical_queries": 5304,
+      "rate_pct": 0.22624434389140274,
+      "ci95_lo_pct": 0.11312217194570137,
+      "ci95_hi_pct": 0.35869155354449217,
+      "by_llm_json": {
+        "Perplexity": 12
+      },
+      "by_qtype_json": {
+        "exploratory": 11,
+        "directive": 1
+      }
+    },
+    {
+      "entity": "XP Investimentos",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 11,
+      "n_llms": 1,
+      "in_vertical_mentions": 11,
+      "vertical_queries": 5400,
+      "rate_pct": 0.2037037037037037,
+      "ci95_lo_pct": 0.0925925925925926,
+      "ci95_hi_pct": 0.33333333333333337,
+      "by_llm_json": {
+        "Perplexity": 11
+      },
+      "by_qtype_json": {
+        "exploratory": 10,
+        "directive": 1
+      }
+    },
+    {
+      "entity": "Unimed",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 10,
+      "n_llms": 2,
+      "in_vertical_mentions": 10,
+      "vertical_queries": 5362,
+      "rate_pct": 0.18649757553151808,
+      "ci95_lo_pct": 0.09324878776575904,
+      "ci95_hi_pct": 0.3170458784035807,
+      "by_llm_json": {
+        "Perplexity": 9,
+        "Claude": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 10
+      }
+    },
+    {
+      "entity": "Oncoclínicas",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 10,
+      "n_llms": 1,
+      "in_vertical_mentions": 10,
+      "vertical_queries": 5362,
+      "rate_pct": 0.18649757553151808,
+      "ci95_lo_pct": 0.09324878776575904,
+      "ci95_hi_pct": 0.3170458784035807,
+      "by_llm_json": {
+        "Perplexity": 10
+      },
+      "by_qtype_json": {
+        "exploratory": 7,
+        "directive": 3
+      }
+    },
+    {
+      "entity": "Wise",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 8,
+      "n_llms": 1,
+      "in_vertical_mentions": 8,
+      "vertical_queries": 5400,
+      "rate_pct": 0.14814814814814814,
+      "ci95_lo_pct": 0.05555555555555555,
+      "ci95_hi_pct": 0.25925925925925924,
+      "by_llm_json": {
+        "Perplexity": 8
+      },
+      "by_qtype_json": {
+        "exploratory": 5,
+        "directive": 3
+      }
+    },
+    {
+      "entity": "Sinqia",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 8,
+      "n_llms": 1,
+      "in_vertical_mentions": 8,
+      "vertical_queries": 5304,
+      "rate_pct": 0.1508295625942685,
+      "ci95_lo_pct": 0.056561085972850686,
+      "ci95_hi_pct": 0.26395173453996984,
+      "by_llm_json": {
+        "Perplexity": 8
+      },
+      "by_qtype_json": {
+        "exploratory": 7,
+        "directive": 1
+      }
+    },
+    {
+      "entity": "SulAmérica Saúde",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 6,
+      "n_llms": 1,
+      "in_vertical_mentions": 6,
+      "vertical_queries": 5362,
+      "rate_pct": 0.11189854531891084,
+      "ci95_lo_pct": 0.03729951510630362,
+      "ci95_hi_pct": 0.20514733308466987,
+      "by_llm_json": {
+        "Perplexity": 6
+      },
+      "by_qtype_json": {
+        "exploratory": 6
+      }
+    },
+    {
+      "entity": "NotreDame Intermédica",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 4,
+      "n_llms": 1,
+      "in_vertical_mentions": 4,
+      "vertical_queries": 5362,
+      "rate_pct": 0.07459903021260723,
+      "ci95_lo_pct": 0.01864975755315181,
+      "ci95_hi_pct": 0.1496643043640407,
+      "by_llm_json": {
+        "Perplexity": 4
+      },
+      "by_qtype_json": {
+        "exploratory": 4
+      }
+    },
+    {
+      "entity": "Accenture Brasil",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 4,
+      "n_llms": 1,
+      "in_vertical_mentions": 4,
+      "vertical_queries": 5304,
+      "rate_pct": 0.07541478129713425,
+      "ci95_lo_pct": 0.018853695324283562,
+      "ci95_hi_pct": 0.151300904977373,
+      "by_llm_json": {
+        "Perplexity": 4
+      },
+      "by_qtype_json": {
+        "directive": 4
+      }
+    },
+    {
+      "entity": "Target",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 3,
+      "n_llms": 1,
+      "in_vertical_mentions": 3,
+      "vertical_queries": 5400,
+      "rate_pct": 0.05555555555555555,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.12962962962962962,
+      "by_llm_json": {
+        "Perplexity": 3
+      },
+      "by_qtype_json": {
+        "exploratory": 3
+      }
+    },
+    {
+      "entity": "Rede D'Or",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 3,
+      "n_llms": 1,
+      "in_vertical_mentions": 3,
+      "vertical_queries": 5362,
+      "rate_pct": 0.05594927265945542,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.13054830287206268,
+      "by_llm_json": {
+        "Perplexity": 3
+      },
+      "by_qtype_json": {
+        "directive": 2,
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Stone Co",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 2,
+      "n_llms": 1,
+      "in_vertical_mentions": 2,
+      "vertical_queries": 5400,
+      "rate_pct": 0.037037037037037035,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.0925925925925926,
+      "by_llm_json": {
+        "Perplexity": 2
+      },
+      "by_qtype_json": {
+        "directive": 1,
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Dafiti",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 2,
+      "n_llms": 1,
+      "in_vertical_mentions": 2,
+      "vertical_queries": 5400,
+      "rate_pct": 0.037037037037037035,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.0925925925925926,
+      "by_llm_json": {
+        "Perplexity": 2
+      },
+      "by_qtype_json": {
+        "directive": 1,
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Revolut",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 2,
+      "n_llms": 1,
+      "in_vertical_mentions": 2,
+      "vertical_queries": 5400,
+      "rate_pct": 0.037037037037037035,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.0925925925925926,
+      "by_llm_json": {
+        "Perplexity": 2
+      },
+      "by_qtype_json": {
+        "directive": 2
+      }
+    },
+    {
+      "entity": "NeuralMed",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 2,
+      "n_llms": 1,
+      "in_vertical_mentions": 2,
+      "vertical_queries": 5304,
+      "rate_pct": 0.037707390648567124,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.0942684766214178,
+      "by_llm_json": {
+        "Perplexity": 2
+      },
+      "by_qtype_json": {
+        "directive": 2
+      }
+    },
+    {
+      "entity": "Riachuelo",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5400,
+      "rate_pct": 0.018518518518518517,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.05555555555555555,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "directive": 1
+      }
+    },
+    {
+      "entity": "UnitedHealth",
+      "kind": "unknown",
+      "vertical": "saude",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5362,
+      "rate_pct": 0.01864975755315181,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.05594927265945542,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Salesforce",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5304,
+      "rate_pct": 0.018853695324283562,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.056561085972850686,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Infosys",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5304,
+      "rate_pct": 0.018853695324283562,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.056561085972850686,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 1
+      }
+    },
+    {
+      "entity": "Banco Neon",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5400,
+      "rate_pct": 0.018518518518518517,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.05555555555555555,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "directive": 1
+      }
+    },
+    {
+      "entity": "eBay",
+      "kind": "unknown",
+      "vertical": "varejo",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5400,
+      "rate_pct": 0.018518518518518517,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.05555555555555555,
+      "by_llm_json": {
+        "Claude": 1
+      },
+      "by_qtype_json": {
+        "directive": 1
+      }
+    },
+    {
+      "entity": "N26",
+      "kind": "unknown",
+      "vertical": "fintech",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5400,
+      "rate_pct": 0.018518518518518517,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.05555555555555555,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "directive": 1
+      }
+    },
+    {
+      "entity": "RD Station",
+      "kind": "unknown",
+      "vertical": "tecnologia",
+      "mentions": 1,
+      "n_llms": 1,
+      "in_vertical_mentions": 1,
+      "vertical_queries": 5304,
+      "rate_pct": 0.018853695324283562,
+      "ci95_lo_pct": 0.0,
+      "ci95_hi_pct": 0.056561085972850686,
+      "by_llm_json": {
+        "Perplexity": 1
+      },
+      "by_qtype_json": {
+        "exploratory": 1
+      }
+    }
+  ]
+}

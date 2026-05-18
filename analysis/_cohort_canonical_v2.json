@@ -1,0 +1,159 @@
+{
+  "real": {
+    "fintech": [
+      "Agibank",
+      "BTG Pactual",
+      "Banco Inter",
+      "Banco Neon",
+      "Banco Safra",
+      "Bradesco",
+      "C6 Bank",
+      "Cielo",
+      "CloudWalk",
+      "Dock",
+      "Itaú",
+      "Mercado Pago",
+      "Nubank",
+      "PagBank",
+      "PicPay",
+      "Stone Co",
+      "Swap",
+      "Will Bank",
+      "XP Investimentos"
+    ],
+    "varejo": [
+      "Amazon Brasil",
+      "Americanas",
+      "C&A Brasil",
+      "Casas Bahia",
+      "Centauro",
+      "Dafiti",
+      "Grupo Boticário",
+      "Grupo Pão de Açúcar",
+      "Leroy Merlin Brasil",
+      "M Dias Branco",
+      "Madeira Madeira",
+      "Magazine Luiza",
+      "Mercado Livre",
+      "Mobly",
+      "Netfarma",
+      "Netshoes",
+      "Petz",
+      "Renner",
+      "Riachuelo",
+      "Shopee Brasil"
+    ],
+    "saude": [
+      "Aché Laboratórios",
+      "Alliar",
+      "Amil",
+      "Dasa",
+      "EMS Pharma",
+      "Eurofarma",
+      "Fleury",
+      "Hapvida",
+      "Hermes Pardini",
+      "Hospital Einstein",
+      "Hypera Pharma",
+      "NotreDame Intermédica",
+      "Oncoclínicas",
+      "Porto Saúde",
+      "Prevent Senior",
+      "Raia Drogasil",
+      "Rede D'Or",
+      "SulAmérica Saúde",
+      "Sírio-Libanês",
+      "Unimed"
+    ],
+    "tecnologia": [
+      "Accenture Brasil",
+      "CI&T",
+      "Conta Azul",
+      "Globant Brasil",
+      "IBM Brasil",
+      "Involves",
+      "Linx S.A.",
+      "Locaweb",
+      "Mandic",
+      "Movile",
+      "NeuralMed",
+      "RD Station",
+      "SambaTech",
+      "Semantix",
+      "Sinqia",
+      "Stefanini",
+      "Tivit",
+      "Totvs",
+      "Vtex",
+      "iFood"
+    ]
+  },
+  "fict": {
+    "fintech": [
+      "Banco Aurora",
+      "Banco Floresta Digital",
+      "FinPay Solutions",
+      "PagFast"
+    ],
+    "varejo": [
+      "MegaStore Brasil",
+      "MercadoPlus Brasil",
+      "ShopNova Digital",
+      "VareJo Express"
+    ],
+    "saude": [
+      "Clínica Horizonte Digital",
+      "ClínicaVita",
+      "HealthTech Brasil",
+      "SaúdeAgora"
+    ],
+    "tecnologia": [
+      "DataBridge Brasil",
+      "DataCore Brasil",
+      "TechBridge BR",
+      "TechNova Solutions"
+    ]
+  },
+  "anchors": {
+    "fintech": [
+      "Chime",
+      "Klarna",
+      "Monzo",
+      "N26",
+      "Revolut",
+      "Robinhood",
+      "SoFi",
+      "Wise"
+    ],
+    "varejo": [
+      "AliExpress",
+      "Amazon",
+      "IKEA",
+      "Shein",
+      "Target",
+      "Walmart",
+      "Zalando",
+      "eBay"
+    ],
+    "saude": [
+      "HCA Healthcare",
+      "Kaiser Permanente",
+      "Mayo Clinic",
+      "NHS",
+      "Novartis",
+      "Pfizer",
+      "Roche",
+      "UnitedHealth"
+    ],
+    "tecnologia": [
+      "Accenture",
+      "Google",
+      "Infosys",
+      "Microsoft",
+      "Oracle",
+      "SAP",
+      "Salesforce",
+      "TCS"
+    ]
+  }
+}
