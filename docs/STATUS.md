@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-05-18 23:54 UTC
+**Gerado automaticamente em:** 2026-05-19 00:50 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 7ef3b8ea22ef5f3eb1bf2a7f79e86f7440c6b625 fix(health_check): perplexity sonar exi
+**Último commit:** c9a39efb78343bcf022230f6a68d13cd7af15dbc chore(security): nosec B104 com justifi
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 20,182 | OK |
+| Código (linhas Python) | 20,178 | OK |
 | Testes unitários | 204 | OK |
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 26,394 | Coletando |
 | Taxa de citação | 32.1% | — |
-| Última coleta | 2026-05-18T23:54 | Ativo |
+| Última coleta | 2026-05-19T00:49 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.6526 |
-| Anthropic | $4.1866 |
+| OpenAI | $0.6520 |
+| Anthropic | $4.1865 |
 | Gemini | $0.0000 |
-| Perplexity | $0.3088 |
-| **Total** | **$5.1480** |
+| Perplexity | $0.3092 |
+| **Total** | **$5.1477** |
 
 ## Próximas Ações
 
