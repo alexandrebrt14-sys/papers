@@ -7,6 +7,8 @@
 > **Versão:** 1.0 · 2026-05-13 · Repo: papers
 >
 > **Como usar este documento:** anexe como contexto em decisões metodológicas, definição de métricas, escolha de conferences, framing de papers. Cite trechos por seção (`§X.Y`).
+>
+> **Snapshot mais recente — 20-mai-2026:** consulte primeiro `docs/research/state-of-art-2026-05/GEO_STATE_OF_ART_2026_05_MASTER.md` (sumário executivo + 6 tracks, ~50.800 palavras) que enriquece este documento com 18 papers Q2 2026 validados arXiv (FeatGEO, selection/absorption, GhostCite, CiteAudit, CiteTracer, urlhealth, ResRank, PyRAG, ReaLM-Retrieve, SoK Agentic RAG, Causal Memory Intervention, Tabular Chunking), 22 KPIs operacionais novos, estado da arte RAG/vector/agentic, 17 vendors atualizados, ranking factors em 10 surfaces e 30+ AI crawlers. Use Track A como referência bibliográfica para próximos papers (5+).
 
 ---
 
