@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T00:51:21.788209+00:00",
+  "generatedAt": "2026-05-26T12:05:36.688936+00:00",
   "lastCollection": "2026-05-26 00:51:10",
   "dbVersion": "papers.db (38714 queries dataset)",
   "windowStart": "2026-04-23",
@@ -1090,5 +1090,231 @@
     "totalResponses": 38714,
     "falsePositiveRate": 8.467,
     "specificity": 91.533
+  },
+  "weeklyDeltas": {
+    "fintech": {
+      "vertical": "fintech",
+      "windowCurrent": {
+        "start": "2026-05-20",
+        "end": "2026-05-26"
+      },
+      "windowPrevious": {
+        "start": "2026-05-13",
+        "end": "2026-05-19"
+      },
+      "risers": [
+        {
+          "entity": "Stone",
+          "currentWeek": 31,
+          "previousWeek": 20,
+          "deltaAbs": 11,
+          "deltaPct": 55.0,
+          "direction": "up"
+        }
+      ],
+      "fallers": [
+        {
+          "entity": "BTG Pactual",
+          "currentWeek": 3,
+          "previousWeek": 9,
+          "deltaAbs": -6,
+          "deltaPct": -66.7,
+          "direction": "down"
+        },
+        {
+          "entity": "Mercado Pago",
+          "currentWeek": 26,
+          "previousWeek": 56,
+          "deltaAbs": -30,
+          "deltaPct": -53.6,
+          "direction": "down"
+        },
+        {
+          "entity": "PagBank",
+          "currentWeek": 17,
+          "previousWeek": 21,
+          "deltaAbs": -4,
+          "deltaPct": -19.0,
+          "direction": "down"
+        }
+      ],
+      "newEntrants": []
+    },
+    "saude": {
+      "vertical": "saude",
+      "windowCurrent": {
+        "start": "2026-05-20",
+        "end": "2026-05-26"
+      },
+      "windowPrevious": {
+        "start": "2026-05-13",
+        "end": "2026-05-19"
+      },
+      "risers": [
+        {
+          "entity": "Hapvida",
+          "currentWeek": 12,
+          "previousWeek": 5,
+          "deltaAbs": 7,
+          "deltaPct": 140.0,
+          "direction": "up"
+        },
+        {
+          "entity": "Dasa",
+          "currentWeek": 19,
+          "previousWeek": 15,
+          "deltaAbs": 4,
+          "deltaPct": 26.7,
+          "direction": "up"
+        },
+        {
+          "entity": "Fleury",
+          "currentWeek": 20,
+          "previousWeek": 17,
+          "deltaAbs": 3,
+          "deltaPct": 17.6,
+          "direction": "up"
+        }
+      ],
+      "fallers": [
+        {
+          "entity": "Einstein",
+          "currentWeek": 19,
+          "previousWeek": 24,
+          "deltaAbs": -5,
+          "deltaPct": -20.8,
+          "direction": "down"
+        },
+        {
+          "entity": "Eurofarma",
+          "currentWeek": 89,
+          "previousWeek": 107,
+          "deltaAbs": -18,
+          "deltaPct": -16.8,
+          "direction": "down"
+        },
+        {
+          "entity": "Hypera Pharma",
+          "currentWeek": 98,
+          "previousWeek": 110,
+          "deltaAbs": -12,
+          "deltaPct": -10.9,
+          "direction": "down"
+        }
+      ],
+      "newEntrants": []
+    },
+    "tecnologia": {
+      "vertical": "tecnologia",
+      "windowCurrent": {
+        "start": "2026-05-20",
+        "end": "2026-05-26"
+      },
+      "windowPrevious": {
+        "start": "2026-05-13",
+        "end": "2026-05-19"
+      },
+      "risers": [
+        {
+          "entity": "RD Station",
+          "currentWeek": 8,
+          "previousWeek": 3,
+          "deltaAbs": 5,
+          "deltaPct": 166.7,
+          "direction": "up"
+        },
+        {
+          "entity": "Vtex",
+          "currentWeek": 26,
+          "previousWeek": 13,
+          "deltaAbs": 13,
+          "deltaPct": 100.0,
+          "direction": "up"
+        },
+        {
+          "entity": "iFood",
+          "currentWeek": 42,
+          "previousWeek": 29,
+          "deltaAbs": 13,
+          "deltaPct": 44.8,
+          "direction": "up"
+        }
+      ],
+      "fallers": [
+        {
+          "entity": "IBM Brasil",
+          "currentWeek": 1,
+          "previousWeek": 19,
+          "deltaAbs": -18,
+          "deltaPct": -94.7,
+          "direction": "down"
+        },
+        {
+          "entity": "Tivit",
+          "currentWeek": 2,
+          "previousWeek": 9,
+          "deltaAbs": -7,
+          "deltaPct": -77.8,
+          "direction": "down"
+        },
+        {
+          "entity": "Locaweb",
+          "currentWeek": 11,
+          "previousWeek": 16,
+          "deltaAbs": -5,
+          "deltaPct": -31.2,
+          "direction": "down"
+        }
+      ],
+      "newEntrants": []
+    },
+    "varejo": {
+      "vertical": "varejo",
+      "windowCurrent": {
+        "start": "2026-05-20",
+        "end": "2026-05-26"
+      },
+      "windowPrevious": {
+        "start": "2026-05-13",
+        "end": "2026-05-19"
+      },
+      "risers": [
+        {
+          "entity": "Netshoes",
+          "currentWeek": 10,
+          "previousWeek": 6,
+          "deltaAbs": 4,
+          "deltaPct": 66.7,
+          "direction": "up"
+        },
+        {
+          "entity": "Renner",
+          "currentWeek": 9,
+          "previousWeek": 7,
+          "deltaAbs": 2,
+          "deltaPct": 28.6,
+          "direction": "up"
+        }
+      ],
+      "fallers": [
+        {
+          "entity": "Casas Bahia",
+          "currentWeek": 42,
+          "previousWeek": 61,
+          "deltaAbs": -19,
+          "deltaPct": -31.1,
+          "direction": "down"
+        },
+        {
+          "entity": "Amazon Brasil",
+          "currentWeek": 78,
+          "previousWeek": 98,
+          "deltaAbs": -20,
+          "deltaPct": -20.4,
+          "direction": "down"
+        }
+      ],
+      "newEntrants": []
+    }
   }
 }

@@ -30,6 +30,121 @@ VERT_META = {
 }
 
 
+def compute_weekly_deltas(con) -> dict:
+    """Compara citacoes por entity em duas janelas de 7 dias (ultima vs anterior).
+
+    Retorna estrutura compativel com WeeklyDeltasByVertical do frontend:
+      {
+        "<slug>": {
+          "vertical": "<slug>",
+          "windowCurrent": {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"},
+          "windowPrevious": {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"},
+          "risers":      [{entity, currentWeek, previousWeek, deltaAbs, deltaPct, direction}],
+          "fallers":     [...],
+          "newEntrants": [...],
+        }
+      }
+
+    Heuristica:
+      - Janelas calculadas a partir da ultima data com dados em citation_context.
+      - Soh entra em risers/fallers entidade com >=5 citacoes em pelo menos uma das janelas
+        (corte de ruido amostral).
+      - newEntrants: entidades com previousWeek=0 e currentWeek>=3.
+      - direction: "up" / "down" / "flat" / "new" / "dropped".
+    """
+    from datetime import datetime, timedelta
+
+    # Pega data mais recente no citation_context (via JOIN com citations.timestamp).
+    row = con.execute("""
+        SELECT MAX(date(c.timestamp)) AS d
+        FROM citation_context cc JOIN citations c ON c.id = cc.citation_id
+    """).fetchone()
+    if not row or not row["d"]:
+        return {}
+
+    latest = datetime.fromisoformat(row["d"]).date()
+    cur_end = latest
+    cur_start = cur_end - timedelta(days=6)
+    prev_end = cur_start - timedelta(days=1)
+    prev_start = prev_end - timedelta(days=6)
+
+    out: dict = {}
+    for vslug in ["fintech", "saude", "tecnologia", "varejo"]:
+        # Janela corrente
+        cur = {}
+        for r in con.execute("""
+            SELECT cc.entity AS entity, COUNT(*) AS n
+            FROM citation_context cc
+            JOIN citations c ON c.id = cc.citation_id
+            WHERE c.vertical = ? AND date(c.timestamp) BETWEEN ? AND ?
+            GROUP BY cc.entity
+        """, (vslug, cur_start.isoformat(), cur_end.isoformat())):
+            cur[r["entity"]] = r["n"]
+
+        # Janela anterior
+        prev = {}
+        for r in con.execute("""
+            SELECT cc.entity AS entity, COUNT(*) AS n
+            FROM citation_context cc
+            JOIN citations c ON c.id = cc.citation_id
+            WHERE c.vertical = ? AND date(c.timestamp) BETWEEN ? AND ?
+            GROUP BY cc.entity
+        """, (vslug, prev_start.isoformat(), prev_end.isoformat())):
+            prev[r["entity"]] = r["n"]
+
+        # Universo: entidades em qualquer das janelas
+        all_entities = set(cur.keys()) | set(prev.keys())
+        deltas = []
+        for ent in all_entities:
+            cw = cur.get(ent, 0)
+            pw = prev.get(ent, 0)
+            if pw == 0 and cw >= 3:
+                direction = "new"
+                delta_pct = 100.0  # convencao: novo entra como +100%
+            elif cw == 0 and pw >= 3:
+                direction = "dropped"
+                delta_pct = -100.0
+            elif pw == 0:
+                # Volume baixo em ambas as janelas; pula
+                continue
+            else:
+                # Filtro de ruido: pelo menos 5 em alguma janela
+                if max(cw, pw) < 5:
+                    continue
+                delta_pct = ((cw - pw) / max(pw, 1)) * 100
+                if abs(delta_pct) < 10:
+                    direction = "flat"
+                elif delta_pct > 0:
+                    direction = "up"
+                else:
+                    direction = "down"
+
+            deltas.append({
+                "entity": ent,
+                "currentWeek": cw,
+                "previousWeek": pw,
+                "deltaAbs": cw - pw,
+                "deltaPct": round(delta_pct, 1),
+                "direction": direction,
+            })
+
+        # Ordena
+        risers = sorted([d for d in deltas if d["direction"] == "up"], key=lambda x: -x["deltaPct"])[:3]
+        fallers = sorted([d for d in deltas if d["direction"] == "down"], key=lambda x: x["deltaPct"])[:3]
+        new_entrants = sorted([d for d in deltas if d["direction"] == "new"], key=lambda x: -x["currentWeek"])[:5]
+
+        out[vslug] = {
+            "vertical": vslug,
+            "windowCurrent":  {"start": cur_start.isoformat(),  "end": cur_end.isoformat()},
+            "windowPrevious": {"start": prev_start.isoformat(), "end": prev_end.isoformat()},
+            "risers": risers,
+            "fallers": fallers,
+            "newEntrants": new_entrants,
+        }
+
+    return out
+
+
 def main():
     con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
@@ -314,6 +429,11 @@ def main():
     false_positive_rate = round((fp_count / max(total_responses, 1)) * 100, 3)
     specificity = round(100 - false_positive_rate, 3)
 
+    # === Weekly deltas por vertical (Onda 16 - 2026-05-26) ====================
+    # Compara citacoes dos ultimos 7d com os 7d anteriores, agrupado por entity.
+    # Output alimenta o bloco "Variacoes semanais" no /research da landing.
+    weekly_deltas = compute_weekly_deltas(con)
+
     # === Build final JSON ===
     from datetime import datetime, timezone, date, timedelta
     # Window v2: dia 1 = 23/04/2026, dia 90 = 21/07/2026
@@ -366,6 +486,8 @@ def main():
             "falsePositiveRate": false_positive_rate,
             "specificity": specificity,
         },
+        # Variacoes semanais por vertical (Onda 16 - 2026-05-26)
+        "weeklyDeltas": weekly_deltas,
     }
 
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
