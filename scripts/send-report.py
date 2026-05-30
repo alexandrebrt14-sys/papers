@@ -22,8 +22,10 @@ import httpx
 DB_PATH = os.getenv("PAPERS_DB_PATH", "data/papers.db")
 RESEND_KEY = os.getenv("RESEND_API_KEY", "")
 TO_EMAIL = os.getenv("FINOPS_ALERT_EMAIL", "caramaschiai@caramaschiai.io")
-FROM_EMAIL = "Papers GEO <onboarding@resend.dev>"
+FROM_EMAIL = os.getenv("RESEND_FROM") or os.getenv("RESEND_FROM_EMAIL") or "Papers GEO <alerts@brasilgeo.ai>"
 DRY_RUN = "--dry-run" in sys.argv
+
+SANDBOX_MARKERS = ("resend.dev", "@example.com", "@test.com")
 
 
 def get_db():
@@ -190,6 +192,12 @@ def send_email(subject: str, html: str) -> bool:
     """Envia email via Resend API."""
     if not RESEND_KEY:
         print("[WARN] RESEND_API_KEY não configurada — email não enviado")
+        return False
+    if any(m in FROM_EMAIL for m in SANDBOX_MARKERS):
+        print(
+            f"[ERRO] FROM_EMAIL={FROM_EMAIL} aponta para sandbox Resend. "
+            "Defina RESEND_FROM (ou RESEND_FROM_EMAIL) com um domínio verificado em resend.com/domains."
+        )
         return False
 
     resp = httpx.post(

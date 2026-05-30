@@ -17,7 +17,10 @@ Em **toda** decisão metodológica (escolha de dataset, framing de paper, defini
 - [`docs/research/geo-q2-2026/CITATIONS_POOL.md`](docs/research/geo-q2-2026/CITATIONS_POOL.md) — **325 URLs verificáveis** (arXiv IDs prioritários para ingestão).
 - [`docs/research/geo-q2-2026/raw/`](docs/research/geo-q2-2026/raw/) — 10 JSONs originais das waves.
 
-Citar `§X.Y` do KB/OS/INCREMENT ao tomar decisões. Atualizar trimestralmente (ciclo de submissão).
+**Wave Maio 2026 Pós-IO (24-05-2026)** — adiciona aos anteriores sem substituir:
+- [`docs/research/geo-wave-maio-posio-2026/WAVE_MAIO_2026_POSIO_CANONICAL.md`](docs/research/geo-wave-maio-posio-2026/WAVE_MAIO_2026_POSIO_CANONICAL.md) — **doc canônico de 511 linhas** cobrindo delta 17-mai → 24-mai-2026 com foco metodológico-acadêmico: (a) 6 novos arXiv IDs prioritários para ingestão (2604.25707 Citation Selection→Absorption framework dual-stage, 2603.09296 7-type failure taxonomy, 2604.03656 Semantic Entropy Drift, 2509.08919 v2, 2603.10913 LLM2Vec-Gen, 2508.21038 ICLR'26 limites teóricos embeddings); (b) **AutoGEO ICLR'26** (Wu/Zhong/Kim/Xiong CMU, +50,99% lift, github.com/cxcscmu/AutoGEO) — replicar em PT-BR como preprint ECIR 2027; (c) novos campos de schema SQLite (`citation_selection_rate`, `citation_absorption_rate`, `failure_type` enum, `semantic_entropy_drift`); (d) novo módulo `src/collectors/failure_classifier.py` (taxonomia 7 tipos); (e) glossário CAR vs CSR como métricas distintas com fonte primária; (f) **Profound 27M citation dataset** (owned-content só 4,3% global); (g) convergência cross-disciplina (GEO + RAG + citation patterns + vector retrieval) — pre-registro Q3/2026 deve declarar hipóteses cross-camada; (h) 3 camadas de KPI (Visibilidade → Infraestrutura → Negócio) — Camada 2 é a menos explorada cientificamente; (i) **24 URLs verificáveis** adicionais. Inclui apêndice §10 com achados complementares do orchestrator 5 LLMs (raw em [`raw/orchestrator_5llm_20260524_213700.json`](docs/research/geo-wave-maio-posio-2026/raw/orchestrator_5llm_20260524_213700.json)). **§6.2 é a aplicação específica deste repo** (5 entregáveis 60 dias, métrica de sucesso preprint AutoGEO-PT-BR no arXiv com IC 95% para lift até 23-jul-2026).
+
+Citar `§X.Y` do KB/OS/INCREMENT/WAVE ao tomar decisões. Atualizar trimestralmente (ciclo de submissão).
 
 ## REGRA #2 — Taxonomia canônica de 50 conceitos GEO/SEO 2026 (classificação obrigatória)
 
@@ -202,3 +205,18 @@ Ver `.env.example`. Resumo:
 - Entidades fictícias são **parte da metodologia**. Nunca desativar em produção sem publicar os resultados já coletados.
 - Auditorias antigas vão para `docs/audits/<data>/` — nunca deletar, nunca usar como source of truth atual.
 - `AUDIT_*.txt` na raiz = red flag: deve ser movido para `docs/audits/<data>/` no próximo refactor.
+
+
+## Plugin Resend Claude Code (instalado 2026-05-28)
+
+`resend@claude-plugins-official` v1.0.0 ativo (escopo user + project). Expõe 5 skills carregadas automaticamente quando o trabalho toca email, templates, deliverability ou inbound:
+
+- `resend:resend` — SDK + gotchas (idempotência, webhook signing, template vars)
+- `resend:react-email` — templates HTML via React Email
+- `resend:email-best-practices` — SPF/DKIM/DMARC, CAN-SPAM/GDPR/CASL, retry, bounces, complaints
+- `resend:agent-email-inbox` — patterns seguros para processar email inbound (sender allowlist, sandbox, content filtering)
+- `resend:resend-cli` — flags non-interativas para shell/CI/CD (`--react-email` envia .tsx direto)
+
+MCP server `resend-mcp` lê `RESEND_API_KEY` do env (configurado em `~/.claude/.env`). Para fixes em código que envia email, deixar essas skills acionarem por palavra-chave em vez de reimplementar lógica de retry/auth/headers.
+
+Helper Python canônico para precheck sandbox: `C:/Sandyboxclaude/scripts/python/resend_precheck.py` (porta `landing-page-geo/src/lib/resend-precheck.ts`).
