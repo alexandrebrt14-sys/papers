@@ -9,10 +9,33 @@ GitHub raw com ISR (revalidate 24h).
 
 import sqlite3
 import json
+import sys
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "papers.db"
-OUT_PATH = Path(__file__).resolve().parent.parent / "data" / "dashboard_data.json"
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+DB_PATH = _REPO_ROOT / "data" / "papers.db"
+OUT_PATH = _REPO_ROOT / "data" / "dashboard_data.json"
+
+# Cohort canônico v2 — fonte de verdade é src/config_v2.py, NÃO a tabela
+# `verticals` (legado v1, congelada em 61 entidades). Importar daqui garante
+# que o headline do site reflita o cohort realmente consultado.
+from src.config_v2 import (  # noqa: E402
+    COHORT_FINTECH_REAL, COHORT_RETAIL_REAL, COHORT_HEALTH_REAL, COHORT_TECHNOLOGY_REAL,
+    COHORT_FINTECH_ANCHORS, COHORT_RETAIL_ANCHORS, COHORT_HEALTH_ANCHORS, COHORT_TECHNOLOGY_ANCHORS,
+    FICTITIOUS_DECOYS_V2,
+)
+
+ENTITIES_REAL_BR = (len(COHORT_FINTECH_REAL) + len(COHORT_RETAIL_REAL)
+                    + len(COHORT_HEALTH_REAL) + len(COHORT_TECHNOLOGY_REAL))          # 79
+ENTITIES_ANCHORS = (len(COHORT_FINTECH_ANCHORS) + len(COHORT_RETAIL_ANCHORS)
+                    + len(COHORT_HEALTH_ANCHORS) + len(COHORT_TECHNOLOGY_ANCHORS))    # 32
+FICTITIOUS_ENTITIES = sorted({e for lst in FICTITIOUS_DECOYS_V2.values() for e in lst})  # 16 decoys
+ENTITIES_FICTITIOUS = len(FICTITIOUS_ENTITIES)                                         # 16
+ENTITIES_REAL = ENTITIES_REAL_BR + ENTITIES_ANCHORS                                   # 111
+ENTITIES_MONITORED = ENTITIES_REAL + ENTITIES_FICTITIOUS                              # 127
 
 LLM_META = {
     "Perplexity": {"provider": "Perplexity AI", "model": "sonar", "color": "#20b2aa"},
@@ -269,7 +292,9 @@ def main():
     # === Days collecting ===
     days_collecting = con.execute("SELECT COUNT(DISTINCT date(timestamp)) AS n FROM citations").fetchone()["n"]
 
-    entities_real = sum(v["rosterCount"] for v in verticals_full.values())
+    # Roster legado por vertical (tabela `verticals`, v1) — mantido só para o
+    # detalhamento per-vertical da UI. O headline usa o cohort v2 (constantes acima).
+    entities_real_legacy = sum(v["rosterCount"] for v in verticals_full.values())
 
     # === ENRIQUECIMENTO ANALITICO (2026-04-16) ================================
 
@@ -415,16 +440,25 @@ def main():
         })
 
     # --- False-positive calibration result ---
-    fictitious_entities = [
-        "Banco Floresta Digital", "FinPay Solutions",
-        "MegaStore Brasil", "ShopNova Digital",
-        "HealthTech Brasil", "Clínica Horizonte Digital",
-        "TechNova Solutions", "DataBridge Brasil",
-    ]
-    total_responses = con.execute("SELECT COUNT(*) n FROM citations WHERE response_text IS NOT NULL").fetchone()["n"]
+    # Varre os 16 decoys fictícios do cohort v2 (config_v2.FICTITIOUS_DECOYS_V2),
+    # não um subconjunto hardcoded de 8 — senão a especificidade é medida sobre
+    # metade dos decoys.
+    #
+    # CRÍTICO: excluir linhas de probe adversarial (is_probe=1). Nessas queries o
+    # nome fictício é injetado no próprio prompt, então o modelo ecoá-lo NÃO é um
+    # falso-positivo — é resposta ao probe. Incluí-las inflava a FP rate (medindo
+    # eco de probe, ~95%, em vez de alucinação espontânea, ~0%).
+    fictitious_entities = FICTITIOUS_ENTITIES
+    _non_probe = " AND (is_probe = 0 OR is_probe IS NULL)"
+    total_responses = con.execute(
+        f"SELECT COUNT(*) n FROM citations WHERE response_text IS NOT NULL{_non_probe}"
+    ).fetchone()["n"]
     fp_count = 0
     for e in fictitious_entities:
-        r = con.execute("SELECT COUNT(*) n FROM citations WHERE response_text LIKE ?", (f"%{e}%",)).fetchone()
+        r = con.execute(
+            f"SELECT COUNT(*) n FROM citations WHERE response_text LIKE ?{_non_probe}",
+            (f"%{e}%",),
+        ).fetchone()
         fp_count += r["n"]
     false_positive_rate = round((fp_count / max(total_responses, 1)) * 100, 3)
     specificity = round(100 - false_positive_rate, 3)
@@ -456,9 +490,11 @@ def main():
         "totalCited": total_cited,
         "overallRate": round((total_cited / max(total_queries, 1)) * 100, 1),
         "overallCI95": {"low": overall_lo, "high": overall_hi},
-        "entitiesMonitored": entities_real + 8,  # 8 fictícias para validação
-        "entitiesReal": entities_real,
-        "entitiesFictitious": 8,
+        "entitiesMonitored": ENTITIES_MONITORED,        # 127 = 111 reais + 16 fictícias
+        "entitiesReal": ENTITIES_REAL,                  # 111 = 79 BR + 32 âncoras intl
+        "entitiesRealBR": ENTITIES_REAL_BR,             # 79 entidades brasileiras
+        "entitiesAnchors": ENTITIES_ANCHORS,            # 32 âncoras internacionais
+        "entitiesFictitious": ENTITIES_FICTITIOUS,      # 16 decoys de calibração
         "contextAnalyses": ctx_count,
         "collectionRounds": rounds,
         "daysCollecting": days_collecting,
@@ -494,7 +530,7 @@ def main():
 
     print(f"OK — {OUT_PATH.relative_to(DB_PATH.parent.parent)}")
     print(f"  {total_queries} queries, {total_cited} citadas, {data['overallRate']}% taxa global")
-    print(f"  {entities_real} entidades reais + 8 fictícias")
+    print(f"  {ENTITIES_REAL} entidades reais ({ENTITIES_REAL_BR} BR + {ENTITIES_ANCHORS} âncoras) + {ENTITIES_FICTITIOUS} fictícias = {ENTITIES_MONITORED}")
     print(f"  {ctx_count} análises de contexto")
     print(f"  {rounds} rodadas de coleta")
     print(f"  Última coleta: {last_coll}")

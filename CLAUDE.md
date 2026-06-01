@@ -108,7 +108,7 @@ papers/
 
 ## Verticais e Coortes
 
-**Total: 69 entidades (61 reais + 8 fictícias), 4 verticais, 5 LLMs.**
+**Total: 127 entidades (79 reais BR + 32 âncoras internacionais + 16 fictícias), 4 verticais, 5 LLMs.** Fonte canônica: `src/config_v2.py`. As listas detalhadas abaixo são do cohort v1 (legado) e estão sendo migradas — ver README §Verticals para o roster v2 atual.
 
 ### Fintech (21 entidades)
 Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itaú, Bradesco, C6 Bank, PicPay, Neon, Safra, BTG Pactual, XP Investimentos

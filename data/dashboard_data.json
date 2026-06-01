@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T00:35:40.763252+00:00",
+  "generatedAt": "2026-06-01T09:22:50.055117+00:00",
   "lastCollection": "2026-06-01 00:35:30",
   "dbVersion": "papers.db (45432 queries dataset)",
   "windowStart": "2026-04-23",
@@ -14,9 +14,11 @@
     "low": 33.8,
     "high": 34.6
   },
-  "entitiesMonitored": 69,
-  "entitiesReal": 61,
-  "entitiesFictitious": 8,
+  "entitiesMonitored": 127,
+  "entitiesReal": 111,
+  "entitiesRealBR": 79,
+  "entitiesAnchors": 32,
+  "entitiesFictitious": 16,
   "contextAnalyses": 18163,
   "collectionRounds": 172,
   "daysCollecting": 32,
@@ -1111,19 +1113,27 @@
   ],
   "calibration": {
     "fictitiousEntities": [
+      "Banco Aurora",
       "Banco Floresta Digital",
-      "FinPay Solutions",
-      "MegaStore Brasil",
-      "ShopNova Digital",
-      "HealthTech Brasil",
       "Clínica Horizonte Digital",
+      "ClínicaVita",
+      "DataBridge Brasil",
+      "DataCore Brasil",
+      "FinPay Solutions",
+      "HealthTech Brasil",
+      "MegaStore Brasil",
+      "MercadoPlus Brasil",
+      "PagFast",
+      "SaúdeAgora",
+      "ShopNova Digital",
+      "TechBridge BR",
       "TechNova Solutions",
-      "DataBridge Brasil"
+      "VareJo Express"
     ],
-    "fictitiousMentions": 4014,
-    "totalResponses": 45432,
-    "falsePositiveRate": 8.835,
-    "specificity": 91.165
+    "fictitiousMentions": 0,
+    "totalResponses": 37017,
+    "falsePositiveRate": 0.0,
+    "specificity": 100.0
   },
   "weeklyDeltas": {
     "fintech": {

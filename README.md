@@ -14,7 +14,7 @@ Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation 
 
 ## v2.0.0-reboot (2026-04-23)
 
-Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 128-entity cohort, a 192-query balanced battery, and a pre-registered decision rule. **78/78 tests passing.**
+Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 127-entity cohort (79 Brazilian + 32 international anchors + 16 fictional decoys), a 192-query balanced battery, and a pre-registered decision rule. **78/78 tests passing.**
 
 Canonical pillars:
 
@@ -23,7 +23,7 @@ Canonical pillars:
 3. **Null simulation (Monte Carlo)** — empirical null distribution replaces the arbitrary Jaccard 0.30 threshold. [`src/analysis/null_simulation.py`](src/analysis/null_simulation.py) (8 tests)
 4. **Power analysis** — Rule-of-3 inverse, Cohen's h, design effect, `reboot_roadmap()`. [`src/analysis/power_analysis.py`](src/analysis/power_analysis.py) (10 tests)
 5. **Mixed-effects GLMM** — `BinomialBayesMixedGLM` with random intercepts per entity and per query. [`src/analysis/mixed_effects.py`](src/analysis/mixed_effects.py)
-6. **Cohort v2** — 80 Brazilian entities + 32 international anchors + 16 fictional decoys (128 total). [`src/config_v2.py`](src/config_v2.py) (16 tests)
+6. **Cohort v2** — 79 Brazilian entities + 32 international anchors + 16 fictional decoys (127 total). [`src/config_v2.py`](src/config_v2.py) (16 tests)
 7. **Query battery v2** — 192 balanced queries across verticals, framings, and directives.
 8. **Hypothesis engine** — BH-FDR correction with a pre-registered decision rule. [`src/analysis/hypothesis_engine.py`](src/analysis/hypothesis_engine.py) (14 tests)
 9. **Forward-only migrations** — `0005` NER v2 columns, `0006` SHA-256 response hashes, `0007` fictitious-probe flag.
@@ -38,12 +38,12 @@ Canonical pillars:
 | Dimension | Value |
 |---|---|
 | Verticals | 4 (Fintech, Retail, Healthcare, Technology) |
-| Entities | 69 (61 real + 8 fictional for calibration) |
-| LLM Models | 4 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Flash, Perplexity Sonar) |
-| Queries per vertical | 12 specific + 6 cross-vertical = 18 |
-| Daily observations | ~288 (18 queries x 4 models x 4 verticals) |
-| Observations collected | 653 citations, 172 contexts, 11 runs |
-| Code | 7,010 lines Python, 35 files, 91 commits |
+| Entities | 127 (79 Brazilian real + 32 international anchors + 16 fictional decoys) |
+| LLM Models | 5 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Pro, Perplexity Sonar, Groq Llama 3.3 70B) |
+| Queries per vertical | 48 balanced (battery v2 = 192 canonical) |
+| Daily observations | ~1,420/day measured (5 models x query battery x 4 verticals) |
+| Observations collected | 45,432 citations, 18,163 contexts, 172 runs (as of 2026-06-01) |
+| Code | 7,010 lines Python, 35 files |
 | Schema | 21 tables (citations, contexts, finops, interventions, snapshots, model_versions) |
 | Collection | Automated daily (GitHub Actions, 06:00 UTC) |
 | Persistence | SQLite WAL (canonical ledger) + Supabase (read projection) |
@@ -53,42 +53,48 @@ Canonical pillars:
 
 ## Verticals and Cohorts
 
-### Fintech (21 entities)
-**Real (14):** Nubank, PagBank, Cielo, Stone, Banco Inter, Mercado Pago, Itau, Bradesco, C6 Bank, PicPay, Neon, Safra, BTG Pactual, XP Investimentos
-**Cross-market (5):** Revolut, Monzo, N26, Chime, Wise
-**Fictional (2):** Banco Floresta Digital, FinPay Solutions
+Cohort canonical source: [`src/config_v2.py`](src/config_v2.py). Each vertical = real Brazilian entities + international anchors + 4 fictional decoys.
 
-### Retail (16 entities)
-**Real (14):** Magazine Luiza, Casas Bahia, Americanas, Amazon Brasil, Mercado Livre, Shopee Brasil, Renner, Riachuelo, C&A Brasil, Leroy Merlin, Centauro, Netshoes, Via Varejo, Grupo Pao de Acucar
-**Fictional (2):** MegaStore Brasil, ShopNova Digital
+### Fintech (31 entities)
+**Real BR (19):** Nubank, PagBank, Cielo, Stone Co, Banco Inter, Mercado Pago, Itau, Bradesco, C6 Bank, PicPay, Banco Neon, Banco Safra, BTG Pactual, XP Investimentos, Dock, CloudWalk, Will Bank, Swap, Agibank
+**International anchors (8):** Revolut, Monzo, N26, Chime, Wise, Klarna, Robinhood, SoFi
+**Fictional (4):** Banco Floresta Digital, FinPay Solutions, Banco Aurora, PagFast
 
-### Healthcare (16 entities)
-**Real (14):** Dasa, Hapvida, Unimed, Fleury, Rede D'Or, Einstein, Sirio-Libanes, Raia Drogasil, Eurofarma, Ache, EMS, Hypera Pharma, NotreDame Intermedica, SulAmerica Saude
-**Fictional (2):** HealthTech Brasil, Clinica Horizonte Digital
+### Retail (32 entities)
+**Real BR (20):** Magazine Luiza, Casas Bahia, Americanas, Amazon Brasil, Mercado Livre, Shopee Brasil, Renner, Riachuelo, C&A Brasil, Leroy Merlin Brasil, Centauro, Netshoes, Grupo Pao de Acucar, Petz, Dafiti, Madeira Madeira, M Dias Branco, Grupo Boticario, Netfarma, Mobly
+**International anchors (8):** Amazon, Walmart, AliExpress, Shein, Zalando, IKEA, Target, eBay
+**Fictional (4):** MegaStore Brasil, ShopNova Digital, MercadoPlus Brasil, VareJo Express
 
-### Technology (16 entities)
-**Real (14):** Totvs, Stefanini, Tivit, CI&T, Locaweb, Linx, Movile, iFood, Vtex, RD Station, Conta Azul, Involves, Accenture Brasil, IBM Brasil
-**Fictional (2):** TechNova Solutions, DataBridge Brasil
+### Healthcare (32 entities)
+**Real BR (20):** Dasa, Hapvida, Unimed, Fleury, Rede D'Or, Hospital Einstein, Sirio-Libanes, Raia Drogasil, Eurofarma, Ache Laboratorios, EMS Pharma, Hypera Pharma, NotreDame Intermedica, SulAmerica Saude, Amil, Prevent Senior, Porto Saude, Alliar, Oncoclinicas, Hermes Pardini
+**International anchors (8):** Pfizer, Novartis, Kaiser Permanente, UnitedHealth, Roche, Mayo Clinic, NHS, HCA Healthcare
+**Fictional (4):** HealthTech Brasil, Clinica Horizonte Digital, SaudeAgora, ClinicaVita
+
+### Technology (32 entities)
+**Real BR (20):** Totvs, Stefanini, Tivit, CI&T, Locaweb, Movile, iFood, Vtex, RD Station, Conta Azul, Involves, Accenture Brasil, IBM Brasil, Linx S.A., NeuralMed, Semantix, SambaTech, Mandic, Sinqia, Globant Brasil
+**International anchors (8):** Microsoft, Google, Salesforce, SAP, Oracle, Infosys, Accenture, TCS
+**Fictional (4):** TechNova Solutions, DataBridge Brasil, TechBridge BR, DataCore Brasil
 
 ---
 
-## Collection Status (March 2026)
+## Collection Status (updated 2026-06-01)
 
 | Criterion | Target | Current |
 |---|---|---|
-| Total observations | >= 25,920 (288/day x 90 days) | 397 (1.5%) |
-| N per LLM | >= 1,000 | 30-136 |
-| Collection days | >= 90 continuous | 2 |
+| Total observations | >= 25,920 (v1 target) | 45,432 (175% of v1 target) |
+| Collection window (v2) | 90 days (2026-04-23 -> 2026-07-21) | day 40/90 |
+| N per LLM | >= 1,000 | 4,128 (Perplexity) - 10,368 (ChatGPT/Groq) |
+| Collection days (distinct) | >= 90 continuous | 32 |
 | Pre-registered hypotheses | >= 3 | 0 |
 | A/B experiments | >= 2 | 0 |
-| Fictional entity validation | 8 (false positive rate) | 0 queries |
+| Fictional entity validation | 16 decoys (false positive rate) | 8,415 probes collected |
 
 ### Known Limitations
 
-1. **Effective N < Gross N**: 54% of observations are cache hits (identical responses reused). N_eff ~181
-2. **Sample imbalance**: Gemini Flash has N=3 in 3 of 4 verticals (API failures in early rounds)
+1. **Effective N < Gross N**: a fraction of observations are cache hits (identical responses reused), so the effective N is below the gross 45,432.
+2. **Sample imbalance**: Perplexity Sonar is underrepresented (4,128 vs ~10,300 for the other four models) due to search-call cost throttling.
 3. **Directive queries**: Categories like "fintech_trust" produce 100% citation rate by design — do not represent spontaneous citation
-4. **Non-stationarity**: LLMs update models without notice. `model_versions` table exists but is not being populated
+4. **Non-stationarity**: LLMs update models without notice. `model_versions` table is now populated (5 model fingerprints) but updates between fingerprints remain untracked.
 5. **Non-independent observations**: Similar queries to the same model in the same session share internal state
 
 ---
@@ -149,7 +155,7 @@ Each detected citation undergoes analysis of:
 | 2 | GEO vs SEO: Source Divergence | SIGIR/WWW | planned | Weekly Jaccard index (top-10 Google vs LLM sources), 12+ weeks |
 | 3 | Industry-Specific Patterns in AI Citation | Information Sciences (Q1) | planned | Fisher exact test, odds ratios, 95% CI, 2 A/B experiments |
 | 4 | Three Ways to Fail to Conclude: A Null-Triad Post-Mortem | SSRN / arXiv / SIGIR 2027 | **submitted** ([10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)) | Null-triad decomposition: H1 underpower, H2 design-null, H3 instrumentation asymmetry |
-| 5 | (in preparation) | Elsevier (target) | **in preparation** — v2 infrastructure operational, 90-day collection window pending OSF preregistration v2 | Balanced 128-entity cohort, 192-query battery, cluster-robust CR1, Monte Carlo null, GLMM, BH-FDR |
+| 5 | (in preparation) | Elsevier (target) | **in preparation** — v2 infrastructure operational, 90-day collection window pending OSF preregistration v2 | Balanced 127-entity cohort, 192-query battery, cluster-robust CR1, Monte Carlo null, GLMM, BH-FDR |
 
 ---
 
