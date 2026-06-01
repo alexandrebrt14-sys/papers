@@ -4,6 +4,21 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [docs] — 2026-06-01 (estado da arte GEO · documental, sem tocar coleta)
+
+Atualização **exclusivamente documental** rumo ao Paper 5. Nenhuma mudança na mecânica de coleta: pipeline, `config*.py`, cohort/battery, schema do `papers.db`, workflows e geradores de saída (`generate_dashboard_json.py`, `compute_weekly_deltas.py`) permanecem congelados. Reprodutibilidade bit-a-bit preservada.
+
+### Added
+
+- **`docs/research/STATE_OF_ART_2026_06_INCREMENT.md`**: incremento de *related work* / *discussion* consolidando o cânone GEO de junho/2026 — métricas GEO Score/GEU Score (AutoGEO, ICLR 2026), 12 alavancas de redação com lift medido, 4 deltas conceituais pós Google I/O, Citation Drift/Persistence e Entity Boundary Drift como justificativa da janela de 90 dias, e a taxonomia de 8 sinais observáveis. Espelha o conhecimento canônico de `landing-page-geo/docs/GEO_*` e alimenta as seções de Related Work do paper.
+
+### Notes
+
+- Wiki do repositório habilitada para documentação navegável complementar.
+- Páginas `alexandrecaramaschi.com/research` e `/papers-roadmap` passaram a expor a movimentação semanal cross-vertical (risers/fallers/novos) e o painel "Estado da arte GEO 2026" — consumindo `data/dashboard_data.json` sem alterar sua geração.
+
+---
+
 ## [v2.2.0-onda16] — 2026-04-29 (Onda 16 — health-check profundo + 4 fixes estruturais)
 
 Auditoria completa da janela v2 (dias 1-7) identificou 4 bugs estruturais que comprometiam pilares metodológicos do paper sem paralisar a coleta. Todos corrigidos sem perda de dados; janela v2 segue válida com calibração H2 a partir de 2026-04-30.
