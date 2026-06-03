@@ -172,7 +172,7 @@ Inserir endereço postal completo aqui após Positiva Contabilidade finalizar ab
 
 | Campo | Valor |
 |-------|-------|
-| URL | https://www.linkedin.com/in/alexandrecaramaschi/ |
+| URL | https://www.linkedin.com/in/alexandre-caramaschi/ |
 | Uso | Networking profissional, não citar em metadata acadêmica |
 
 ### 6.3 YouTube
@@ -217,15 +217,15 @@ Entrevistas em vídeo (para bio pública e media kit):
 
 ### 8.1 Bio curta (ArXiv, SSRN short description, ~50 palavras)
 
-> Alexandre Caramaschi is an independent AI researcher focused on Generative Engine Optimization (GEO) and how Large Language Models mediate business discovery. He is the founder of Brasil GEO and former CMO of Semantix (Nasdaq: STIX). His current research centers on longitudinal citation dynamics across leading LLMs.
+> Alexandre Caramaschi is an independent AI researcher focused on Generative Engine Optimization (GEO) and how Large Language Models mediate business discovery. He is the founder and CEO of Brasil GEO, former CMO of Semantix (Nasdaq: STIX), Strategic AI Advisor at Nuvini (Nasdaq: NVNI), and co-founder of AI Brasil. His current research centers on longitudinal citation dynamics across leading LLMs.
 
 ### 8.2 Bio média (journal author statement, ~100 palavras)
 
-> Alexandre Caramaschi is an independent AI researcher investigating Generative Engine Optimization (GEO), a nascent discipline concerned with how Large Language Models cite, rank, and mediate entity discovery. He is the founder of Brasil GEO, a research-driven GEO practice, and previously served as Chief Marketing Officer at Semantix (Nasdaq: STIX), a Brazilian data and AI company. His current work focuses on longitudinal citation dynamics across five leading LLMs spanning four industry verticals, with methodological contributions in false-positive calibration via fictional entities and Action Design Research applied to corporate GEO interventions.
+> Alexandre Caramaschi is an independent AI researcher investigating Generative Engine Optimization (GEO), a nascent discipline concerned with how Large Language Models cite, rank, and mediate entity discovery. He is the founder and CEO of Brasil GEO, a research-driven GEO practice, and previously served as Chief Marketing Officer at Semantix (Nasdaq: STIX), a Brazilian data and AI company. Since June 2026 he is Strategic AI Advisor at Nuvini (Nasdaq: NVNI), and he is a co-founder of AI Brasil. His current work focuses on longitudinal citation dynamics across five leading LLMs spanning four industry verticals, with methodological contributions in false-positive calibration via fictional entities and Action Design Research applied to corporate GEO interventions.
 
 ### 8.3 Bio longa (invited talks, media kit, ~200 palavras)
 
-> Alexandre Caramaschi is an independent AI researcher and practitioner focused on Generative Engine Optimization (GEO) — the emerging discipline concerned with how Large Language Models cite, rank, and mediate the discovery of entities in conversational search. He is the founder of Brasil GEO, a research-driven GEO practice headquartered in Goiânia, Brazil, and a co-founder of AI Brasil. Previously, he served as Chief Marketing Officer at Semantix (Nasdaq: STIX), a publicly listed Brazilian data and AI company. His first peer-visible publication, "Algorithmic Authority: A Practitioner Framework for Generative Engine Optimization Based on a 7-Day Implementation Sprint" (SSRN, DOI 10.2139/ssrn.6460680), proposes a replicable sprint methodology grounded in Action Design Research (Sein et al., 2011). His ongoing research program monitors a cohort of 69 entities across four Brazilian verticals (fintech, retail, healthcare, technology) on five LLMs, with methodological contributions including fictional-entity calibration for false-positive control, longitudinal non-stationarity detection, and cross-LLM citation overlap analysis. He can be reached at caramaschiai@caramaschiai.io and on ORCID at 0009-0004-9150-485X.
+> Alexandre Caramaschi is an independent AI researcher and practitioner focused on Generative Engine Optimization (GEO) — the emerging discipline concerned with how Large Language Models cite, rank, and mediate the discovery of entities in conversational search. He is the founder of Brasil GEO, a research-driven GEO practice headquartered in Goiânia, Brazil, and a co-founder of AI Brasil. Previously, he served as Chief Marketing Officer at Semantix (Nasdaq: STIX), a publicly listed Brazilian data and AI company. Since June 2026, he serves as Strategic AI Advisor at Nuvini (Nasdaq: NVNI), the Brazilian B2B software (SaaS) holding Nuvini Group Limited. His first peer-visible publication, "Algorithmic Authority: A Practitioner Framework for Generative Engine Optimization Based on a 7-Day Implementation Sprint" (SSRN, DOI 10.2139/ssrn.6460680), proposes a replicable sprint methodology grounded in Action Design Research (Sein et al., 2011). His ongoing research program monitors a cohort of 69 entities across four Brazilian verticals (fintech, retail, healthcare, technology) on five LLMs, with methodological contributions including fictional-entity calibration for false-positive control, longitudinal non-stationarity detection, and cross-LLM citation overlap analysis. He can be reached at caramaschiai@caramaschiai.io and on ORCID at 0009-0004-9150-485X.
 
 ---
 
@@ -248,5 +248,6 @@ Antes de cada submissão, validar que os seguintes campos batem entre si:
 | Data | Mudança | Trigger |
 |------|---------|---------|
 | 2026-04-21 | Criação do inventário | Primeiro paper publicado no SSRN |
+| 2026-06-03 | Adiciona cargo "Strategic AI Advisor at Nuvini (Nasdaq: NVNI)" às bios §8.1–8.3; corrige URL LinkedIn para `/in/alexandre-caramaschi/` | Nomeação como Conselheiro Estratégico de IA da Nuvini (junho/2026) |
 
 Próximas atualizações devem adicionar linha aqui indicando o trigger (novo paper, nova afiliação, URL indexada).

@@ -1,6 +1,6 @@
 # O monopólio invisível dentro dos LLMs: o que 8.571 queries em 5 modelos revelam sobre Generative Engine Optimization
 
-*Newsletter IA Insights — Alexandre Caramaschi · CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), cofundador da AI Brasil*
+*Newsletter IA Insights — Alexandre Caramaschi · CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil*
 
 ---
 
@@ -121,4 +121,4 @@ A pergunta operacional que cada CMO brasileiro precisa responder até o fim dest
 
 *O dataset, código de coleta, metodologia v2 e CHANGELOG estão em `github.com/alexandrebrt14-sys/papers` sob licença MIT. Comentários e sugestões para a próxima onda de coleta são bem-vindos diretamente nas issues do repositório.*
 
-*Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), cofundador da AI Brasil.*
+*Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil.*

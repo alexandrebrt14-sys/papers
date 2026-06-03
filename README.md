@@ -303,7 +303,7 @@ MIT
 
 ---
 
-**Author:** [Alexandre Caramaschi](https://alexandrecaramaschi.com) — CEO of Brasil GEO, former CMO at Semantix (Nasdaq), co-founder of AI Brasil.
+**Author:** [Alexandre Caramaschi](https://alexandrecaramaschi.com) — CEO of Brasil GEO, former CMO at Semantix (Nasdaq), Strategic AI Advisor at Nuvini (Nasdaq: NVNI), co-founder of AI Brasil.
 
 ---
 

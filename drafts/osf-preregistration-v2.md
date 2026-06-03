@@ -2,7 +2,7 @@
 
 **Working title**: *"How LLMs cite Brazilian companies: a 90-day confirmatory longitudinal study across five generative engines"*
 
-**Principal investigator**: Alexandre Caramaschi (CEO Brasil GEO; ex-CMO Semantix; co-founder AI Brasil)
+**Principal investigator**: Alexandre Caramaschi (CEO Brasil GEO; ex-CMO Semantix (Nasdaq); Strategic AI Advisor at Nuvini (Nasdaq: NVNI); co-founder AI Brasil)
 **Affiliation**: Brasil GEO — independent research
 **Contact**: alexandre@caramaschiai.io
 **ORCID**: 0009-0004-9150-485X

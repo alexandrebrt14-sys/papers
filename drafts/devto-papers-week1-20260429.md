@@ -77,4 +77,4 @@ A próxima vez que alguém te disser que "a IA está citando" a sua marca, a res
 
 ---
 
-*Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), cofundador da AI Brasil.*
+*Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil.*
