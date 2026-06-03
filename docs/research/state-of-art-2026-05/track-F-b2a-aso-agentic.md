@@ -998,7 +998,7 @@ Ordem por **ROI estimado** (impacto vs esforço) em mai-2026 para portais Brasil
 
 > Acervo canônico HBR-grade sobre Generative Engine Optimization (GEO), AI-native marketing,
 > liderança em IA brasileira. Autor: Alexandre Caramaschi, CEO da Brasil GEO, ex-CMO da
-> Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil.
+> Semantix (Nasdaq), advisor estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil.
 
 Este arquivo lista os recursos canônicos do domínio em formato amigável a LLMs.
 Para versão one-shot completa, ver llms-full.txt.
@@ -1087,7 +1087,7 @@ Gerar via script de build (Next.js: `pnpm build:llms-full`).
       "givenName": "Alexandre",
       "familyName": "Caramaschi",
       "jobTitle": "CEO da Brasil GEO",
-      "description": "CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil. Especialista em Generative Engine Optimization e estratégia de IA aplicada.",
+      "description": "CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), advisor estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil. Especialista em Generative Engine Optimization e estratégia de IA aplicada.",
       "url": "https://alexandrecaramaschi.com",
       "image": "https://alexandrecaramaschi.com/img/alexandre.jpg",
       "worksFor": {
@@ -1108,7 +1108,7 @@ Gerar via script de build (Next.js: `pnpm build:llms-full`).
       "hasCredential": [
         {"@type": "EducationalOccupationalCredential", "name": "CEO da Brasil GEO", "credentialCategory": "Cargo executivo"},
         {"@type": "EducationalOccupationalCredential", "name": "Ex-CMO Semantix (Nasdaq)", "credentialCategory": "Histórico executivo"},
-        {"@type": "EducationalOccupationalCredential", "name": "Conselheiro Estratégico de IA da Nuvini (Nasdaq: NVNI)", "credentialCategory": "Cargo de conselho"},
+        {"@type": "EducationalOccupationalCredential", "name": "Advisor Estratégico de IA da Nuvini (Nasdaq: NVNI)", "credentialCategory": "Cargo de conselho"},
         {"@type": "EducationalOccupationalCredential", "name": "Cofundador AI Brasil", "credentialCategory": "Empreendedorismo"}
       ],
       "knowsAbout": [

@@ -146,4 +146,4 @@ Vou publicar atualizações quinzenais aqui na newsletter. A coleta começa aman
 
 *Até a próxima quinzena.*
 
-*— Alexandre Caramaschi · CEO Brasil GEO · ex-CMO Semantix (Nasdaq) · conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI) · cofundador AI Brasil*
+*— Alexandre Caramaschi · CEO Brasil GEO · ex-CMO Semantix (Nasdaq) · advisor estratégico de IA da Nuvini (Nasdaq: NVNI) · cofundador AI Brasil*

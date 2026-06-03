@@ -1,6 +1,6 @@
 # Track E — Ranking Factors AI Search Surfaces (mai-2026)
 
-> Sub-agent Opus · 2026-05-20 · Owner: Brasil GEO (Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil).
+> Sub-agent Opus · 2026-05-20 · Owner: Brasil GEO (Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), advisor estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil).
 >
 > **Escopo:** sinais operacionais que movem citação em cada surface de IA-search em maio/2026. Complementa `curso-factory/docs/SEO_GEO_INCREMENT_20260520.md` (Two-Phase JSON-LD theory, Princeton GEO playbook KDD 2024 Aggarwal arXiv:2311.09735, Entity Boundary Drift, ASO) com sinais por superfície e tabela comparativa cross-platform.
 >

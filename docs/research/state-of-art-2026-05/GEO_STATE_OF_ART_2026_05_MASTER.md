@@ -1,7 +1,7 @@
 # GEO State of the Art · 20-mai-2026 · Brasil GEO Master Index
 
 > **Versão**: 1.0 · 20-mai-2026
-> **Owner**: Brasil GEO (Alexandre Caramaschi — CEO Brasil GEO, ex-CMO Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador AI Brasil).
+> **Owner**: Brasil GEO (Alexandre Caramaschi — CEO Brasil GEO, ex-CMO Semantix (Nasdaq), advisor estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador AI Brasil).
 > **Repositórios cobertos**: [landing-page-geo](https://github.com/alexandrebrt14-sys/landing-page-geo) · [papers](https://github.com/alexandrebrt14-sys/papers) · [curso-factory](https://github.com/alexandrebrt14-sys/curso-factory).
 > **Método**: 6 sub-agents Opus paralelos, 30+ chamadas Perplexity sonar-deep-research, ~50 WebFetches em fontes primárias, ~47.300 palavras de pesquisa densa, custo total ~US$ 11 em Perplexity + Opus.
 >

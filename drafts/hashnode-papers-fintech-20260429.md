@@ -145,4 +145,4 @@ Sete dias. Mais oitenta e três pela frente.
 
 ---
 
-*Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), conselheiro estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil.*
+*Alexandre Caramaschi — CEO da Brasil GEO, ex-CMO da Semantix (Nasdaq), advisor estratégico de IA da Nuvini (Nasdaq: NVNI), cofundador da AI Brasil.*
