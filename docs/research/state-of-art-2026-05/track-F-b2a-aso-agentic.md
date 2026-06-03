@@ -1102,7 +1102,7 @@ Gerar via script de build (Next.js: `pnpm build:llms-full`).
       "memberOf": {
         "@type": "Organization",
         "name": "Nuvini Group Limited",
-        "url": "https://nuvini.com",
+        "url": "https://nuvini.ai",
         "description": "Holding brasileira de software B2B (SaaS), Nasdaq: NVNI"
       },
       "hasCredential": [
