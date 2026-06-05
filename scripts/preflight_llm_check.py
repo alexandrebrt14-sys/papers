@@ -165,34 +165,61 @@ def main() -> int:
         check_groq(os.environ.get("GROQ_API_KEY", "")),
     ]
 
+    # Mandatory vs opcional: so providers em MANDATORY_LLMS bloqueiam a coleta.
+    # Um provider opcional (ex.: Gemini quando o billing prepay esgota) e
+    # degradavel — a coleta prossegue com os demais e a lacuna fica logada,
+    # em vez de zerar a coleta diaria de TODAS as verticais. O circuit breaker
+    # em llm_client ja pula o provider degradado apos o 1o 429 (sem crash).
+    # Default mantem todos os 5 obrigatorios — o workflow e quem marca opcionais.
+    mandatory = {
+        n.strip().lower()
+        for n in os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Groq").split(",")
+        if n.strip()
+    }
+
     failed = [c for c in checks if not c.ok]
+    hard_failed = [c for c in failed if c.name.lower() in mandatory]
+    soft_failed = [c for c in failed if c.name.lower() not in mandatory]
 
     for c in checks:
         if c.ok:
             print(f"  [OK]      {c.name:<11} {c.latency_ms}ms")
-        else:
+        elif c.name.lower() in mandatory:
             print(f"  [FAIL]    {c.name:<11} {c.error}")
+        else:
+            print(f"  [WARN]    {c.name:<11} (opcional/degradado) {c.error}")
 
     print()
 
     if failed:
-        names = ", ".join(c.name for c in failed)
-        print(f"CRITICO: {len(failed)}/5 LLMs falharam: {names}")
+        # Telemetria estruturada para parsing por monitoring/alerting.
+        # preflight_failed=True so quando ha falha MANDATORY (bloqueante).
+        print(json.dumps({
+            "preflight_failed": bool(hard_failed),
+            "failed_providers": [c.name for c in hard_failed],
+            "optional_degraded": [c.name for c in soft_failed],
+            "errors": {c.name: c.error for c in failed},
+        }))
+        print()
+
+    if hard_failed:
+        names = ", ".join(c.name for c in hard_failed)
+        print(f"CRITICO: {len(hard_failed)} LLM(s) mandatory falharam: {names}")
         print("Coleta abortada para evitar dataset enviesado na janela confirmatoria v2.")
         print("Acoes possiveis:")
         print("  1. Verificar credit balance em cada provider (especialmente Anthropic)")
         print("  2. Confirmar que API keys nao foram rotacionadas")
         print("  3. Checar status pages: status.openai.com, status.anthropic.com, etc.")
-        print()
-        # Telemetria estruturada para parsing por monitoring/alerting
-        print(json.dumps({
-            "preflight_failed": True,
-            "failed_providers": [c.name for c in failed],
-            "errors": {c.name: c.error for c in failed},
-        }))
         return 2
 
-    print("Todas as 5 LLMs OK — prosseguindo com coleta.")
+    if soft_failed:
+        names = ", ".join(c.name for c in soft_failed)
+        print(f"AVISO: provider(s) OPCIONAL(is) degradado(s): {names} — coleta prossegue com cobertura parcial.")
+        print("  Gemini 'prepayment credits depleted'? Reabasteca em https://ai.studio/projects")
+        print("  para restaurar a cobertura 5/5. A lacuna deste run fica registrada no dataset.")
+        return 0
+
+    print("Todas as LLMs mandatory OK — prosseguindo com coleta.")
     return 0
 
 

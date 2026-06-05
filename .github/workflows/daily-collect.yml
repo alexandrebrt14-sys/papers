@@ -40,6 +40,16 @@ env:
   ENABLE_SERP_OVERLAP: ${{ vars.ENABLE_SERP_OVERLAP || 'false' }}
   PAPERS_DB_PATH: data/papers.db
   FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
+  # LLMs obrigatorios para os gates (preflight + validate-run). Gemini fica de
+  # FORA por padrao desde 2026-06-05: o billing prepay do AI Studio esgota de
+  # forma recorrente (HTTP 429 'prepayment credits depleted') e derrubava a
+  # coleta diaria INTEIRA das 4 verticais (pior para a serie longitudinal do que
+  # uma lacuna so de Gemini). Gemini continua sendo coletado best-effort quando
+  # responde; sua falha apenas nao bloqueia mais o run. Para restaurar 5/5 apos
+  # reabastecer o billing, defina a repo variable MANDATORY_LLMS com Gemini:
+  #   gh variable set MANDATORY_LLMS -R alexandrebrt14-sys/papers \
+  #     -b "ChatGPT,Claude,Gemini,Perplexity,Groq"
+  MANDATORY_LLMS: ${{ vars.MANDATORY_LLMS || 'ChatGPT,Claude,Perplexity,Groq' }}
 
 jobs:
   collect-and-finalize:
