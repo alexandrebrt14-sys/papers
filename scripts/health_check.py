@@ -255,8 +255,16 @@ def check_4_verticais_today() -> Check:
 
 
 def check_4_llms_today() -> Check:
-    """Todas as 4 LLMs (ChatGPT/Claude/Gemini/Perplexity) coletaram nas ultimas 24h."""
-    c = Check("4/4 LLMs responderam nas ultimas 24h")
+    """Cohort de LLMs (ChatGPT/Claude/Gemini/Perplexity) coletou nas ultimas 24h.
+
+    Um LLM do cohort fora de MANDATORY_LLMS (ex.: Gemini quando o billing prepay
+    do AI Studio esgota) e DEGRADAVEL: sua ausencia vira WARNING (gap registrado,
+    visivel para os autores), nao um erro bloqueante que dispara o alerta de
+    'pipeline falhou'. Perder so o Gemini num dia e melhor para a serie
+    longitudinal do que perder o cohort inteiro. Coerente com os gates de
+    preflight/validate-run (mesma env MANDATORY_LLMS).
+    """
+    c = Check("Cohort de LLMs coletou nas ultimas 24h")
     conn = _get_conn()
     if not conn:
         return c.fail("db nao acessivel")
@@ -267,14 +275,31 @@ def check_4_llms_today() -> Check:
             (cutoff,),
         ).fetchall()
         present = {r[0]: r[1] for r in rows}
-        expected = {"ChatGPT", "Claude", "Gemini", "Perplexity"}
-        missing = expected - set(present.keys())
-        if missing:
+        cohort = {"ChatGPT", "Claude", "Gemini", "Perplexity"}
+        mandatory = {
+            n.strip()
+            for n in os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity").split(",")
+            if n.strip()
+        }
+        missing = cohort - set(present.keys())
+        missing_mandatory = missing & mandatory
+        missing_optional = missing - mandatory
+        if missing_mandatory:
             return c.fail(
-                f"LLMs faltando: {missing}. presentes: {present}",
-                missing=list(missing), present=present,
+                f"LLMs mandatory faltando: {missing_mandatory}. "
+                f"degradados(opcional): {missing_optional or '-'}. presentes: {present}",
+                missing=list(missing_mandatory),
+                degraded=list(missing_optional),
+                present=present,
             )
-        return c.ok(f"todas LLMs OK: {present}", present=present)
+        if missing_optional:
+            return c.fail(
+                f"LLM(s) opcional(is) degradado(s): {missing_optional} "
+                f"(gap registrado, nao bloqueia). presentes: {present}",
+                severity="warning",
+                degraded=list(missing_optional), present=present,
+            )
+        return c.ok(f"cohort completo: {present}", present=present)
     finally:
         conn.close()
 
