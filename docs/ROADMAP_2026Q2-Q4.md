@@ -19,6 +19,24 @@
 
 _Sem ondas planejadas para Q2 2026._
 
+### 2026-06-05 — Resiliência + economia do Gemini no pipeline diário
+
+Otimizações de FinOps e resiliência aplicadas à coleta diária, **forward-only** e com a integridade científica preservada. O Gemini responde por ~91% do custo de LLM do paper (US$ 166 acumulados, contra US$ 16 da Anthropic, US$ 5,67 do Groq, US$ 2,50 da OpenAI e US$ 1,16 da Perplexity), o que justifica tratá-lo como ponto de atenção tanto de custo quanto de disponibilidade.
+
+**(a) Resiliência do Gemini nos gates (a coleta não cai mais).**
+`scripts/preflight_llm_check.py` e `scripts/health_check.py` passam a respeitar a variável `MANDATORY_LLMS`, tornando o Gemini **opcional** nos gates. O workflow `daily-collect.yml` define `MANDATORY_LLMS=ChatGPT,Claude,Perplexity,Groq`. Consequência prática: se o billing do Gemini esgotar (HTTP 429 / prepay obrigatório sem método), a coleta **degrada com WARNING** em vez de falhar — segue com os outros quatro LLMs e o gap fica registrado, em vez de zerar o dia inteiro de coleta. Commits `29152b4` e `cf802fe`.
+
+**(b) Economia via `GEMINI_THINKING_BUDGET` (modelo permanece pinado).**
+`src/collectors/llm_client.py` ganhou o cap configurável `GEMINI_THINKING_BUDGET` (default **1024** tokens, definido no `daily-collect.yml`), que limita apenas os tokens de "thinking" (raciocínio interno) do `gemini-2.5-pro`. Pontos críticos para a reprodutibilidade:
+
+- O **modelo continua pinado** em `gemini-2.5-pro` — o check `check_model_pinning` segue válido e a reprodutibilidade permanece intacta. O teto atua sobre o orçamento de raciocínio, **não** sobre a identidade do modelo.
+- A mudança é **forward-only**: os dados já coletados **não são reprocessados nem alterados**. As 54.980 citations acumuladas e o equilíbrio do cohort (ChatGPT 12.672, Claude 12.506, Gemini 12.138, Groq 12.672, Perplexity 4.992) permanecem como estão.
+- Sem degradação observada: em teste, o modelo usou apenas ~323 thinking tokens, bem abaixo do teto de 1024 — ou seja, o cap não corta o raciocínio efetivo nas tarefas do paper, apenas evita gastos de cauda.
+
+Commit `1cedf14`.
+
+**Conclusão.** As duas mudanças reduzem custo e risco de indisponibilidade do componente mais caro do paper sem tocar na identidade do modelo nem nos dados históricos, preservando integridade científica e reprodutibilidade.
+
 ## Q3 2026 (ago-set-out) — consolidação e infraestrutura
 
 | ID | Janela | Esforço (h) | Owner | Critical path | Saída esperada | Pré-requisitos |
@@ -58,6 +76,7 @@ Toda mudança neste repo passa pelos gates transversais aplicáveis:
 - LLM API spend rastreado em [`geo-finops/calls.db`](https://github.com/alexandre-/geo-finops).
 - Build minutes Vercel monitorados; alertas WhatsApp/email em ≥80% da quota.
 - Quebrar prompts no orchestrator: `< 5KB` input e `< 30KB` output (limite Gemini MAX_TOKENS).
+- Gemini = ~91% do custo de LLM do paper. Cap `GEMINI_THINKING_BUDGET` (default 1024) e Gemini opcional nos gates (`MANDATORY_LLMS`) reduzem custo e risco de indisponibilidade — ver entrada **2026-06-05** em Q2 2026.
 
 ## Política de revisão
 
