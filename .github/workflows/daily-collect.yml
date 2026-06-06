@@ -50,6 +50,13 @@ env:
   #   gh variable set MANDATORY_LLMS -R alexandrebrt14-sys/papers \
   #     -b "ChatGPT,Claude,Gemini,Perplexity,Groq"
   MANDATORY_LLMS: ${{ vars.MANDATORY_LLMS || 'ChatGPT,Claude,Perplexity,Groq' }}
+  # FinOps (2026-06-05): teto de tokens de "thinking" do Gemini 2.5 Pro. O raciocinio
+  # interno do 2.5-pro e ~91% do custo LLM do paper (~US$6/dia). Este cap limita SO os
+  # tokens de raciocinio — o modelo segue gemini-2.5-pro (model_pinning intacto) e os
+  # dados ja coletados nao sao alterados (mudanca forward-only). 1024 e generoso para
+  # as respostas curtas de citacao; ajustavel por repo var sem mexer em codigo.
+  # Para reverter ao comportamento anterior (thinking ilimitado), defina como vazio.
+  GEMINI_THINKING_BUDGET: ${{ vars.GEMINI_THINKING_BUDGET || '1024' }}
 
 jobs:
   collect-and-finalize:

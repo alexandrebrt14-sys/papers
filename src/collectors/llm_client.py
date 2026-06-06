@@ -335,14 +335,32 @@ class LLMClient:
         is_pro = "pro" in llm.model.lower()
         max_tokens = llm.max_output_tokens * 4 if is_pro else llm.max_output_tokens
 
+        generation_config: dict[str, Any] = {
+            "temperature": 0.0,
+            "maxOutputTokens": max_tokens,
+        }
+
+        # FinOps (2026-06-05): cap OPCIONAL de tokens de "thinking" do Gemini 2.5 Pro.
+        # O raciocinio interno do 2.5-pro e o maior custo do pipeline (~91% do gasto
+        # LLM do paper, ~US$6/dia). thinkingBudget limita SO os tokens de raciocinio —
+        # NAO troca o modelo (continua gemini-2.5-pro, model_pinning intacto) e nao
+        # toca nos dados ja coletados (mudanca forward-only). Desativado por padrao
+        # (env ausente = comportamento atual); o workflow define GEMINI_THINKING_BUDGET
+        # com um teto generoso o bastante para nao degradar as respostas curtas de
+        # citacao. maxOutputTokens (3200) segue separado, evitando resposta vazia.
+        if is_pro:
+            _tb = os.getenv("GEMINI_THINKING_BUDGET", "").strip()
+            if _tb:
+                try:
+                    generation_config["thinkingConfig"] = {"thinkingBudget": int(_tb)}
+                except ValueError:
+                    logger.warning(f"[gemini] GEMINI_THINKING_BUDGET invalido: {_tb!r} (ignorado)")
+
         body: dict[str, Any] = {
             "contents": [
                 {"role": "user", "parts": [{"text": prompt_text}]}
             ],
-            "generationConfig": {
-                "temperature": 0.0,
-                "maxOutputTokens": max_tokens,
-            },
+            "generationConfig": generation_config,
         }
         if self._json_mode and llm.supports_json_mode:
             body["generationConfig"]["responseMimeType"] = "application/json"
