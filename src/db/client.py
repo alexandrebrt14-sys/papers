@@ -69,6 +69,7 @@ class DatabaseClient:
         self._migrate_add_query_type()
         self._migrate_add_fictional_columns()
         self._migrate_snapshot_composite_unique()
+        self._migrate_add_citation_absorption_columns()
 
     def _migrate_add_query_type(self) -> None:
         """Adiciona citations.query_type (Migration 0003 inline).
@@ -133,6 +134,22 @@ class DatabaseClient:
             self._conn.commit()
         except Exception as exc:
             logger.debug("fictional_* migration skipped: %s", exc)
+
+    def _migrate_add_citation_absorption_columns(self) -> None:
+        """Adiciona colunas de Citation Selection vs Absorption (Migration 0009 inline).
+
+        citations.selection_status / absorption_status / failure_type +
+        daily_snapshots.citation_selection_rate / citation_absorption_rate /
+        semantic_entropy_drift. Distinção seleção × absorção: arXiv:2604.25707.
+        Idempotente — delega à migration standalone que detecta colunas via PRAGMA.
+        """
+        try:
+            from src.db import migrate_0009_citation_absorption
+            added = migrate_0009_citation_absorption.apply(self._conn)
+            if added:
+                logger.info("Migracao 0009 aplicada: %d coluna(s) CSR/CAR/failure", added)
+        except Exception as exc:
+            logger.debug("citation absorption migration skipped: %s", exc)
 
     def _migrate_add_model_version(self) -> None:
         """Add model_version column to citations for non-stationarity tracking.

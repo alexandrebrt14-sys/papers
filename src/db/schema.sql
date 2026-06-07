@@ -51,6 +51,9 @@ CREATE TABLE IF NOT EXISTS citations (
     query_type      TEXT DEFAULT 'exploratory',  -- 'directive' | 'exploratory' (Onda 3 — isolamento de framing)
     fictional_hit   INTEGER NOT NULL DEFAULT 0,  -- 1 se LLM citou entidade fictícia (Migration 0004 — false-positive calibration)
     fictional_names_json TEXT NOT NULL DEFAULT '[]',  -- JSON array com os nomes fictícios detectados
+    selection_status INTEGER DEFAULT NULL,       -- Migration 0009: 1 se a fonte foi SELECIONADA para o source set (CSR); 0 não; NULL legacy/desconhecido (arXiv:2604.25707)
+    absorption_status INTEGER DEFAULT NULL,      -- Migration 0009: 1 se a fonte selecionada foi ABSORVIDA na resposta final (CAR); 0 não; NULL legacy/desconhecido (arXiv:2604.25707)
+    failure_type    TEXT DEFAULT NULL,           -- Migration 0009: enum de falha de citação (broken-fetch|parsing-failure|retrieval-miss|summarization-collapse|attribution-drop|hallucinated-source|blocked-by-robots) — arXiv:2603.09296; NULL = sem falha
     created_at      TEXT DEFAULT (datetime('now'))
 );
 
@@ -195,11 +198,17 @@ CREATE TABLE IF NOT EXISTS daily_snapshots (
     module      TEXT NOT NULL,
     vertical    TEXT NOT NULL DEFAULT 'fintech',
     data_json   TEXT NOT NULL,                   -- Full snapshot as JSON
+    citation_selection_rate  REAL DEFAULT NULL,  -- Migration 0009: CSR agregada do dia/módulo/vertical (% prompts com fonte selecionada) — arXiv:2604.25707
+    citation_absorption_rate REAL DEFAULT NULL,  -- Migration 0009: CAR agregada (% prompts com fonte absorvida na resposta) — arXiv:2604.25707
+    semantic_entropy_drift   REAL DEFAULT NULL,  -- Migration 0009: deriva de entropia semântica das respostas vs baseline — arXiv:2604.03656 / 2508.14496
     created_at  TEXT DEFAULT (datetime('now')),
     UNIQUE(date, module, vertical)
 );
 
 CREATE INDEX IF NOT EXISTS idx_snapshots_date ON daily_snapshots(date);
+-- Migration 0009: filtragem rápida de observações por status de seleção/absorção
+CREATE INDEX IF NOT EXISTS idx_citations_selection_status  ON citations(selection_status);
+CREATE INDEX IF NOT EXISTS idx_citations_absorption_status ON citations(absorption_status);
 CREATE INDEX IF NOT EXISTS idx_snapshots_module ON daily_snapshots(module);
 CREATE INDEX IF NOT EXISTS idx_snapshots_vertical ON daily_snapshots(vertical);
 
