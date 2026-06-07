@@ -19,6 +19,7 @@ import re
 from typing import Any
 
 from src.collectors.base import BaseCollector, LLMResponse
+from src.collectors.failure_classifier import classify_failure, derive_citation_status
 from src.config import AMBIGUOUS_ENTITIES, CANONICAL_NAMES, is_fictional, query_type_for
 
 
@@ -230,6 +231,22 @@ class CitationTracker(BaseCollector):
         # -- Response hash (Onda 6b drift + Onda 7 G5) --------------------------
         response_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
+        # -- Citation selection vs absorption + failure (Migration 0009) --------
+        # CSR/CAR por observação (arXiv:2604.25707) + taxonomia de falha (arXiv:2603.09296).
+        selection_status, absorption_status = derive_citation_status(
+            cited=cited,
+            cited_entities=cited_entities_list,
+            cohort=self.cohort,
+            sources=response.sources,
+        )
+        failure_type = classify_failure(
+            cited=cited,
+            selection_status=selection_status,
+            absorption_status=absorption_status,
+            fictional_hit=fictional_hit,
+            response_text=text,
+        )
+
         return {
             # --- v1 compat fields (preserve API de clientes downstream) ---
             "cited": cited,
@@ -267,4 +284,8 @@ class CitationTracker(BaseCollector):
             "is_calibration": is_calibration,
             # Drift (migrate_0006)
             "response_hash": response_hash,
+            # Citation selection vs absorption + failure (migrate_0009)
+            "selection_status": selection_status,
+            "absorption_status": absorption_status,
+            "failure_type": failure_type,
         }

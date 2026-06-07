@@ -98,6 +98,13 @@ Permite report mensal direcional (ex.: "X% das falhas de coleta são `parsing-fa
 | Método inline `_migrate_add_citation_absorption_columns()` em `client.py` | ✅ na cadeia de migrations |
 | Testes `tests/test_migration_0009.py` (fresh/legacy/idempotência/enum) | ✅ 4 passed (suíte total 208 verde) |
 | Catálogo dos papers tagueado (REGRA #2) | ✅ este doc |
-| **PENDENTE:** popular `selection_status`/`absorption_status` na coleta (`citation_tracker.py` + `context_analyzer.py`) | ⏳ próximo ciclo |
-| **PENDENTE:** `src/collectors/failure_classifier.py` (7 tipos) | ⏳ próximo ciclo |
+| Popular `selection_status`/`absorption_status` na coleta (`citation_tracker.py` + `insert_citations`) | ✅ via `failure_classifier.derive_citation_status` |
+| `src/collectors/failure_classifier.py` (taxonomia de 7 tipos + derivação CSR/CAR) | ✅ + `tests/test_failure_classifier.py` (9 testes) |
 | **PENDENTE:** confirmar arXiv ID do GEO-Bench | ⏳ |
+| **PENDENTE:** detectar `summarization-collapse` / `retrieval-miss` com ground-truth de expectativa por query | ⏳ próximo ciclo |
+
+**Como funciona a derivação (observacional, proxies — ver docstrings):**
+- `absorption_status` = 1 se a entidade foi citada no texto da resposta (camada de geração).
+- `selection_status` = 1 se o slug da entidade aparece em alguma URL do source set (camada de busca).
+- `failure_type`: `hallucinated-source` (entidade fictícia citada), `attribution-drop` (absorvida sem fonte), `broken-fetch`/`blocked-by-robots`/`parsing-failure` (sinais de transporte/parsing), `retrieval-miss` (esperada mas ausente). `NULL` quando não há falha.
+- Agregar para as taxas `daily_snapshots.citation_selection_rate`/`citation_absorption_rate` é o passo de persistência diária (consumir `AVG(selection_status)`/`AVG(absorption_status)` por dia/módulo/vertical).

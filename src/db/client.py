@@ -209,12 +209,15 @@ class DatabaseClient:
                 response_hash,
                 -- Migration 0007 (probe design)
                 is_probe, probe_type, adversarial_framing,
-                fictitious_target, is_calibration
+                fictitious_target, is_calibration,
+                -- Migration 0009 (citation selection vs absorption + failure)
+                selection_status, absorption_status, failure_type
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                       ?, ?,
                       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                       ?,
-                      ?, ?, ?, ?, ?)
+                      ?, ?, ?, ?, ?,
+                      ?, ?, ?)
         """
         rows = []
         for r in records:
@@ -255,6 +258,10 @@ class DatabaseClient:
                 r.get("adversarial_framing", 0) or 0,
                 r.get("fictitious_target"),
                 r.get("is_calibration", 0) or 0,
+                # Migration 0009: citation selection vs absorption + failure
+                r.get("selection_status"),
+                r.get("absorption_status"),
+                r.get("failure_type"),
             ))
         self._conn.executemany(sql, rows)
         self._conn.commit()
