@@ -1,36 +1,36 @@
 {
-  "generatedAt": "2026-06-08T00:12:58.990220+00:00",
-  "lastCollection": "2026-06-08 00:12:46",
-  "dbVersion": "papers.db (59460 queries dataset)",
+  "generatedAt": "2026-06-08T15:34:26.466304+00:00",
+  "lastCollection": "2026-06-08 15:34:10",
+  "dbVersion": "papers.db (60580 queries dataset)",
   "windowStart": "2026-04-23",
   "windowEnd": "2026-07-21",
   "dayNumber": 47,
   "windowTotalDays": 90,
   "methodologyVersion": "v2",
-  "totalQueries": 59460,
-  "totalCited": 20826,
-  "overallRate": 35.0,
+  "totalQueries": 60580,
+  "totalCited": 21252,
+  "overallRate": 35.1,
   "overallCI95": {
-    "low": 34.6,
-    "high": 35.4
+    "low": 34.7,
+    "high": 35.5
   },
   "entitiesMonitored": 127,
   "entitiesReal": 111,
   "entitiesRealBR": 79,
   "entitiesAnchors": 32,
   "entitiesFictitious": 16,
-  "contextAnalyses": 23441,
-  "collectionRounds": 224,
+  "contextAnalyses": 23873,
+  "collectionRounds": 228,
   "daysCollecting": 39,
   "byLLM": [
     {
       "name": "Perplexity",
       "model": "sonar",
       "provider": "Perplexity AI",
-      "queries": 5376,
-      "cited": 4086,
+      "queries": 5472,
+      "cited": 4157,
       "rate": 76.0,
-      "avgLatencyMs": 3038,
+      "avgLatencyMs": 3028,
       "color": "#20b2aa",
       "ci95_low": 74.8,
       "ci95_high": 77.1
@@ -39,33 +39,33 @@
       "name": "Claude",
       "model": "claude-haiku-4-5-20251001",
       "provider": "Anthropic",
-      "queries": 13530,
-      "cited": 5656,
-      "rate": 41.8,
-      "avgLatencyMs": 3814,
+      "queries": 13786,
+      "cited": 5772,
+      "rate": 41.9,
+      "avgLatencyMs": 3816,
       "color": "#d4a574",
       "ci95_low": 41.0,
-      "ci95_high": 42.6
+      "ci95_high": 42.7
     },
     {
       "name": "ChatGPT",
       "model": "gpt-4o-mini-2024-07-18",
       "provider": "OpenAI",
-      "queries": 13696,
-      "cited": 4686,
-      "rate": 34.2,
-      "avgLatencyMs": 5860,
+      "queries": 13952,
+      "cited": 4781,
+      "rate": 34.3,
+      "avgLatencyMs": 5881,
       "color": "#10a37f",
-      "ci95_low": 33.4,
-      "ci95_high": 35.0
+      "ci95_low": 33.5,
+      "ci95_high": 35.1
     },
     {
       "name": "Groq",
       "model": "llama-3.3-70b-versatile",
       "provider": "Groq",
-      "queries": 13696,
-      "cited": 3821,
-      "rate": 27.9,
+      "queries": 13952,
+      "cited": 3901,
+      "rate": 28.0,
       "avgLatencyMs": 1796,
       "color": "#f55036",
       "ci95_low": 27.2,
@@ -75,46 +75,46 @@
       "name": "Gemini",
       "model": "gemini-2.5-pro",
       "provider": "Google",
-      "queries": 13162,
-      "cited": 2577,
-      "rate": 19.6,
-      "avgLatencyMs": 25920,
+      "queries": 13418,
+      "cited": 2641,
+      "rate": 19.7,
+      "avgLatencyMs": 25840,
       "color": "#4285f4",
-      "ci95_low": 18.9,
-      "ci95_high": 20.3
+      "ci95_low": 19.0,
+      "ci95_high": 20.4
     }
   ],
   "byVertical": [
     {
       "slug": "fintech",
       "name": "Fintech",
-      "queries": 14912,
-      "cited": 6243,
+      "queries": 15192,
+      "cited": 6365,
       "rate": 41.9,
       "color": "#0ea5e9"
     },
     {
       "slug": "varejo",
       "name": "Varejo",
-      "queries": 14912,
-      "cited": 5809,
+      "queries": 15192,
+      "cited": 5927,
       "rate": 39.0,
       "color": "#ec4899"
     },
     {
       "slug": "tecnologia",
       "name": "Tecnologia",
-      "queries": 14778,
-      "cited": 4449,
-      "rate": 30.1,
+      "queries": 15058,
+      "cited": 4543,
+      "rate": 30.2,
       "color": "#f59e0b"
     },
     {
       "slug": "saude",
       "name": "Saúde",
-      "queries": 14858,
-      "cited": 4325,
-      "rate": 29.1,
+      "queries": 15138,
+      "cited": 4417,
+      "rate": 29.2,
       "color": "#0d9488"
     }
   ],
@@ -122,141 +122,141 @@
     {
       "vertical": "fintech",
       "model": "ChatGPT",
-      "queries": 3424,
-      "cited": 1205,
+      "queries": 3488,
+      "cited": 1229,
       "rate": 35.2
     },
     {
       "vertical": "fintech",
       "model": "Claude",
-      "queries": 3424,
-      "cited": 2104,
-      "rate": 61.4
+      "queries": 3488,
+      "cited": 2145,
+      "rate": 61.5
     },
     {
       "vertical": "fintech",
       "model": "Gemini",
-      "queries": 3296,
-      "cited": 796,
-      "rate": 24.2
+      "queries": 3360,
+      "cited": 815,
+      "rate": 24.3
     },
     {
       "vertical": "fintech",
       "model": "Groq",
-      "queries": 3424,
-      "cited": 968,
+      "queries": 3488,
+      "cited": 988,
       "rate": 28.3
     },
     {
       "vertical": "fintech",
       "model": "Perplexity",
-      "queries": 1344,
-      "cited": 1170,
-      "rate": 87.1
+      "queries": 1368,
+      "cited": 1188,
+      "rate": 86.8
     },
     {
       "vertical": "saude",
       "model": "ChatGPT",
-      "queries": 3424,
-      "cited": 900,
-      "rate": 26.3
+      "queries": 3488,
+      "cited": 920,
+      "rate": 26.4
     },
     {
       "vertical": "saude",
       "model": "Claude",
-      "queries": 3370,
-      "cited": 1002,
-      "rate": 29.7
+      "queries": 3434,
+      "cited": 1024,
+      "rate": 29.8
     },
     {
       "vertical": "saude",
       "model": "Gemini",
-      "queries": 3296,
-      "cited": 584,
-      "rate": 17.7
+      "queries": 3360,
+      "cited": 598,
+      "rate": 17.8
     },
     {
       "vertical": "saude",
       "model": "Groq",
-      "queries": 3424,
-      "cited": 899,
+      "queries": 3488,
+      "cited": 918,
       "rate": 26.3
     },
     {
       "vertical": "saude",
       "model": "Perplexity",
-      "queries": 1344,
-      "cited": 940,
-      "rate": 69.9
+      "queries": 1368,
+      "cited": 957,
+      "rate": 70.0
     },
     {
       "vertical": "tecnologia",
       "model": "ChatGPT",
-      "queries": 3424,
-      "cited": 1266,
+      "queries": 3488,
+      "cited": 1292,
       "rate": 37.0
     },
     {
       "vertical": "tecnologia",
       "model": "Claude",
-      "queries": 3312,
-      "cited": 990,
+      "queries": 3376,
+      "cited": 1011,
       "rate": 29.9
     },
     {
       "vertical": "tecnologia",
       "model": "Gemini",
-      "queries": 3274,
-      "cited": 568,
-      "rate": 17.3
+      "queries": 3338,
+      "cited": 583,
+      "rate": 17.5
     },
     {
       "vertical": "tecnologia",
       "model": "Groq",
-      "queries": 3424,
-      "cited": 897,
-      "rate": 26.2
+      "queries": 3488,
+      "cited": 916,
+      "rate": 26.3
     },
     {
       "vertical": "tecnologia",
       "model": "Perplexity",
-      "queries": 1344,
-      "cited": 728,
+      "queries": 1368,
+      "cited": 741,
       "rate": 54.2
     },
     {
       "vertical": "varejo",
       "model": "ChatGPT",
-      "queries": 3424,
-      "cited": 1315,
+      "queries": 3488,
+      "cited": 1340,
       "rate": 38.4
     },
     {
       "vertical": "varejo",
       "model": "Claude",
-      "queries": 3424,
-      "cited": 1560,
+      "queries": 3488,
+      "cited": 1592,
       "rate": 45.6
     },
     {
       "vertical": "varejo",
       "model": "Gemini",
-      "queries": 3296,
-      "cited": 629,
-      "rate": 19.1
+      "queries": 3360,
+      "cited": 645,
+      "rate": 19.2
     },
     {
       "vertical": "varejo",
       "model": "Groq",
-      "queries": 3424,
-      "cited": 1057,
+      "queries": 3488,
+      "cited": 1079,
       "rate": 30.9
     },
     {
       "vertical": "varejo",
       "model": "Perplexity",
-      "queries": 1344,
-      "cited": 1248,
+      "queries": 1368,
+      "cited": 1271,
       "rate": 92.9
     }
   ],
@@ -286,55 +286,55 @@
       "citedEntities": [
         {
           "entity": "Nubank",
-          "count": 3359
+          "count": 3420
         },
         {
           "entity": "PicPay",
-          "count": 739
+          "count": 753
         },
         {
           "entity": "FinPay Solutions",
-          "count": 728
+          "count": 744
         },
         {
           "entity": "Banco Floresta Digital",
-          "count": 718
+          "count": 734
         },
         {
           "entity": "C6 Bank",
-          "count": 596
+          "count": 605
         },
         {
           "entity": "Banco Inter",
-          "count": 538
+          "count": 545
         },
         {
           "entity": "Bradesco",
-          "count": 421
+          "count": 427
         },
         {
           "entity": "Neon",
-          "count": 296
+          "count": 302
         },
         {
           "entity": "Mercado Pago",
-          "count": 287
+          "count": 293
         },
         {
           "entity": "Itaú",
-          "count": 277
+          "count": 281
         },
         {
           "entity": "PagBank",
-          "count": 154
+          "count": 157
         },
         {
           "entity": "Stone",
-          "count": 152
+          "count": 157
         },
         {
           "entity": "Revolut",
-          "count": 138
+          "count": 139
         },
         {
           "entity": "BTG Pactual",
@@ -388,39 +388,39 @@
       "citedEntities": [
         {
           "entity": "Mercado Livre",
-          "count": 1944
+          "count": 1978
         },
         {
           "entity": "Magazine Luiza",
-          "count": 1783
+          "count": 1815
         },
         {
           "entity": "Americanas",
-          "count": 751
+          "count": 761
         },
         {
           "entity": "ShopNova Digital",
-          "count": 716
+          "count": 732
         },
         {
           "entity": "MegaStore Brasil",
-          "count": 675
+          "count": 690
         },
         {
           "entity": "Amazon Brasil",
-          "count": 555
+          "count": 562
         },
         {
           "entity": "Casas Bahia",
-          "count": 365
+          "count": 368
         },
         {
           "entity": "Via Varejo",
-          "count": 159
+          "count": 160
         },
         {
           "entity": "Renner",
-          "count": 52
+          "count": 53
         },
         {
           "entity": "Netshoes",
@@ -462,51 +462,51 @@
       "citedEntities": [
         {
           "entity": "EMS",
-          "count": 807
+          "count": 818
         },
         {
           "entity": "Clínica Horizonte Digital",
-          "count": 667
+          "count": 683
         },
         {
           "entity": "HealthTech Brasil",
-          "count": 662
+          "count": 677
         },
         {
           "entity": "Hypera Pharma",
-          "count": 662
+          "count": 673
         },
         {
           "entity": "Eurofarma",
-          "count": 557
+          "count": 563
         },
         {
           "entity": "Aché",
-          "count": 312
+          "count": 315
         },
         {
           "entity": "Sírio-Libanês",
-          "count": 148
+          "count": 152
         },
         {
           "entity": "Einstein",
-          "count": 116
+          "count": 119
         },
         {
           "entity": "Raia Drogasil",
-          "count": 110
+          "count": 114
         },
         {
           "entity": "Fleury",
-          "count": 87
+          "count": 90
         },
         {
           "entity": "Dasa",
-          "count": 83
+          "count": 86
         },
         {
           "entity": "Hapvida",
-          "count": 39
+          "count": 41
         },
         {
           "entity": "Unimed",
@@ -552,55 +552,55 @@
       "citedEntities": [
         {
           "entity": "Totvs",
-          "count": 886
+          "count": 903
         },
         {
           "entity": "DataBridge Brasil",
-          "count": 702
+          "count": 718
         },
         {
           "entity": "TechNova Solutions",
-          "count": 672
+          "count": 687
         },
         {
           "entity": "Involves",
-          "count": 260
+          "count": 265
         },
         {
           "entity": "CI&T",
-          "count": 217
+          "count": 221
         },
         {
           "entity": "iFood",
-          "count": 204
+          "count": 208
         },
         {
           "entity": "Stefanini",
-          "count": 181
+          "count": 185
         },
         {
           "entity": "Movile",
-          "count": 170
+          "count": 174
         },
         {
           "entity": "Vtex",
-          "count": 116
+          "count": 120
         },
         {
           "entity": "IBM Brasil",
-          "count": 77
+          "count": 78
         },
         {
           "entity": "Locaweb",
-          "count": 66
+          "count": 67
         },
         {
           "entity": "Tivit",
-          "count": 52
+          "count": 54
         },
         {
           "entity": "RD Station",
-          "count": 20
+          "count": 21
         },
         {
           "entity": "Linx",
@@ -618,138 +618,138 @@
   "topEntities": [
     {
       "name": "Nubank",
-      "citations": 3359
+      "citations": 3420
     },
     {
       "name": "Mercado Livre",
-      "citations": 1944
+      "citations": 1978
     },
     {
       "name": "Magazine Luiza",
-      "citations": 1783
+      "citations": 1815
     },
     {
       "name": "Totvs",
-      "citations": 886
+      "citations": 903
     },
     {
       "name": "EMS",
-      "citations": 807
+      "citations": 818
     },
     {
       "name": "Americanas",
-      "citations": 751
+      "citations": 761
     },
     {
       "name": "PicPay",
-      "citations": 739
+      "citations": 753
     },
     {
       "name": "FinPay Solutions",
-      "citations": 728
+      "citations": 744
     },
     {
       "name": "Banco Floresta Digital",
-      "citations": 718
+      "citations": 734
     },
     {
       "name": "ShopNova Digital",
-      "citations": 716
+      "citations": 732
     },
     {
       "name": "DataBridge Brasil",
-      "citations": 702
+      "citations": 718
     },
     {
       "name": "MegaStore Brasil",
-      "citations": 675
+      "citations": 690
     },
     {
       "name": "TechNova Solutions",
-      "citations": 672
+      "citations": 687
     },
     {
       "name": "Clínica Horizonte Digital",
-      "citations": 667
+      "citations": 683
     },
     {
       "name": "HealthTech Brasil",
-      "citations": 662
+      "citations": 677
     },
     {
       "name": "Hypera Pharma",
-      "citations": 662
+      "citations": 673
     },
     {
       "name": "C6 Bank",
-      "citations": 596
+      "citations": 605
     },
     {
       "name": "Eurofarma",
-      "citations": 557
+      "citations": 563
     },
     {
       "name": "Amazon Brasil",
-      "citations": 555
+      "citations": 562
     },
     {
       "name": "Banco Inter",
-      "citations": 538
+      "citations": 545
     },
     {
       "name": "Bradesco",
-      "citations": 421
+      "citations": 427
     },
     {
       "name": "Casas Bahia",
-      "citations": 365
+      "citations": 368
     },
     {
       "name": "Aché",
-      "citations": 312
+      "citations": 315
     },
     {
       "name": "Neon",
-      "citations": 296
+      "citations": 302
     },
     {
       "name": "Mercado Pago",
-      "citations": 287
+      "citations": 293
     },
     {
       "name": "Itaú",
-      "citations": 277
+      "citations": 281
     },
     {
       "name": "Involves",
-      "citations": 260
+      "citations": 265
     },
     {
       "name": "CI&T",
-      "citations": 217
+      "citations": 221
     },
     {
       "name": "iFood",
-      "citations": 204
+      "citations": 208
     },
     {
       "name": "Stefanini",
-      "citations": 181
+      "citations": 185
     }
   ],
   "sentiment": {
-    "neutral": 18259,
-    "positive": 5126,
-    "negative": 56
+    "neutral": 18597,
+    "positive": 5219,
+    "negative": 57
   },
   "attribution": {
-    "named": 23430,
+    "named": 23862,
     "linked": 11
   },
   "positionInResponse": {
-    "initial": 10392,
-    "middle": 7632,
-    "final": 5417
+    "initial": 10555,
+    "middle": 7769,
+    "final": 5549
   },
   "dailySeries": [
     {
@@ -982,9 +982,9 @@
     },
     {
       "date": "2026-06-08",
-      "queries": 115,
-      "cited": 63,
-      "rate": 54.8
+      "queries": 1235,
+      "cited": 489,
+      "rate": 39.6
     }
   ],
   "uncitedByVertical": {
@@ -1018,125 +1018,125 @@
   "crossVerticalEntities": [],
   "sentimentByLLM": {
     "ChatGPT": {
-      "neutral": 3141,
-      "positive": 740,
+      "neutral": 3203,
+      "positive": 753,
       "negative": 0
     },
     "Claude": {
-      "neutral": 3546,
-      "positive": 989,
+      "neutral": 3617,
+      "positive": 1007,
       "negative": 13
     },
     "Gemini": {
-      "neutral": 1519,
-      "positive": 70,
+      "neutral": 1555,
+      "positive": 74,
       "negative": 0
     },
     "Groq": {
-      "neutral": 2309,
-      "positive": 119,
-      "negative": 28
+      "neutral": 2356,
+      "positive": 120,
+      "negative": 29
     },
     "Perplexity": {
-      "neutral": 7744,
-      "positive": 3208,
+      "neutral": 7866,
+      "positive": 3265,
       "negative": 15
     }
   },
   "byCategory": [
     {
       "category": "calibracao_fp",
-      "queries": 11599,
-      "cited": 11135,
+      "queries": 11855,
+      "cited": 11383,
       "rate": 96.0
     },
     {
       "category": "comparativo",
-      "queries": 8880,
-      "cited": 2940,
+      "queries": 9040,
+      "cited": 2992,
       "rate": 33.1
     },
     {
       "category": "mercado",
-      "queries": 8864,
-      "cited": 2631,
+      "queries": 9024,
+      "cited": 2680,
       "rate": 29.7
     },
     {
       "category": "descoberta",
-      "queries": 8880,
-      "cited": 2441,
+      "queries": 9040,
+      "cited": 2487,
       "rate": 27.5
     },
     {
       "category": "confianca",
-      "queries": 7088,
-      "cited": 881,
+      "queries": 7216,
+      "cited": 898,
       "rate": 12.4
     },
     {
       "category": "inovacao",
-      "queries": 7067,
-      "cited": 612,
+      "queries": 7195,
+      "cited": 623,
       "rate": 8.7
     },
     {
       "category": "experiencia",
-      "queries": 7082,
-      "cited": 186,
+      "queries": 7210,
+      "cited": 189,
       "rate": 2.6
     }
   ],
   "byLanguage": [
     {
       "lang": "en",
-      "queries": 29730,
-      "cited": 10993,
+      "queries": 30290,
+      "cited": 11218,
       "rate": 37.0
     },
     {
       "lang": "pt",
-      "queries": 29730,
-      "cited": 9833,
+      "queries": 30290,
+      "cited": 10034,
       "rate": 33.1
     }
   ],
   "byQueryType": [
     {
       "type": "directive",
-      "queries": 23934,
-      "cited": 6406,
+      "queries": 24366,
+      "cited": 6529,
       "rate": 26.8
     },
     {
       "type": "exploratory",
-      "queries": 23927,
-      "cited": 3285,
+      "queries": 24359,
+      "cited": 3340,
       "rate": 13.7
     },
     {
       "type": "probe",
-      "queries": 11599,
-      "cited": 11135,
+      "queries": 11855,
+      "cited": 11383,
       "rate": 96.0
     }
   ],
   "latencyStats": [
     {
       "llm": "ChatGPT",
-      "avgMs": 5860,
+      "avgMs": 5881,
       "minMs": 697,
       "maxMs": 164199
     },
     {
       "llm": "Claude",
-      "avgMs": 3814,
+      "avgMs": 3816,
       "minMs": 1023,
       "maxMs": 127594
     },
     {
       "llm": "Gemini",
-      "avgMs": 25920,
+      "avgMs": 25840,
       "minMs": 10978,
       "maxMs": 148792
     },
@@ -1148,7 +1148,7 @@
     },
     {
       "llm": "Perplexity",
-      "avgMs": 3038,
+      "avgMs": 3028,
       "minMs": 1573,
       "maxMs": 49414
     }
@@ -1173,7 +1173,7 @@
       "VareJo Express"
     ],
     "fictitiousMentions": 0,
-    "totalResponses": 47861,
+    "totalResponses": 48725,
     "falsePositiveRate": 0.0,
     "specificity": 100.0
   },
@@ -1191,26 +1191,26 @@
       "risers": [
         {
           "entity": "Stone",
-          "currentWeek": 38,
+          "currentWeek": 43,
           "previousWeek": 14,
-          "deltaAbs": 24,
-          "deltaPct": 171.4,
+          "deltaAbs": 29,
+          "deltaPct": 207.1,
           "direction": "up"
         },
         {
           "entity": "Neon",
-          "currentWeek": 52,
+          "currentWeek": 58,
           "previousWeek": 28,
-          "deltaAbs": 24,
-          "deltaPct": 85.7,
+          "deltaAbs": 30,
+          "deltaPct": 107.1,
           "direction": "up"
         },
         {
-          "entity": "Banco Inter",
-          "currentWeek": 92,
-          "previousWeek": 66,
-          "deltaAbs": 26,
-          "deltaPct": 39.4,
+          "entity": "Nubank",
+          "currentWeek": 716,
+          "previousWeek": 472,
+          "deltaAbs": 244,
+          "deltaPct": 51.7,
           "direction": "up"
         }
       ],
@@ -1239,39 +1239,30 @@
       "risers": [
         {
           "entity": "Dasa",
-          "currentWeek": 25,
+          "currentWeek": 28,
           "previousWeek": 9,
-          "deltaAbs": 16,
-          "deltaPct": 177.8,
+          "deltaAbs": 19,
+          "deltaPct": 211.1,
+          "direction": "up"
+        },
+        {
+          "entity": "Fleury",
+          "currentWeek": 22,
+          "previousWeek": 11,
+          "deltaAbs": 11,
+          "deltaPct": 100.0,
           "direction": "up"
         },
         {
           "entity": "Sírio-Libanês",
-          "currentWeek": 35,
+          "currentWeek": 39,
           "previousWeek": 20,
-          "deltaAbs": 15,
-          "deltaPct": 75.0,
-          "direction": "up"
-        },
-        {
-          "entity": "Einstein",
-          "currentWeek": 28,
-          "previousWeek": 16,
-          "deltaAbs": 12,
-          "deltaPct": 75.0,
+          "deltaAbs": 19,
+          "deltaPct": 95.0,
           "direction": "up"
         }
       ],
-      "fallers": [
-        {
-          "entity": "Hapvida",
-          "currentWeek": 5,
-          "previousWeek": 6,
-          "deltaAbs": -1,
-          "deltaPct": -16.7,
-          "direction": "down"
-        }
-      ],
+      "fallers": [],
       "newEntrants": []
     },
     "tecnologia": {
@@ -1287,26 +1278,26 @@
       "risers": [
         {
           "entity": "Tivit",
-          "currentWeek": 14,
+          "currentWeek": 16,
           "previousWeek": 6,
-          "deltaAbs": 8,
-          "deltaPct": 133.3,
+          "deltaAbs": 10,
+          "deltaPct": 166.7,
           "direction": "up"
         },
         {
           "entity": "RD Station",
-          "currentWeek": 6,
+          "currentWeek": 7,
           "previousWeek": 3,
-          "deltaAbs": 3,
-          "deltaPct": 100.0,
+          "deltaAbs": 4,
+          "deltaPct": 133.3,
           "direction": "up"
         },
         {
           "entity": "CI&T",
-          "currentWeek": 49,
+          "currentWeek": 53,
           "previousWeek": 28,
-          "deltaAbs": 21,
-          "deltaPct": 75.0,
+          "deltaAbs": 25,
+          "deltaPct": 89.3,
           "direction": "up"
         }
       ],
@@ -1326,26 +1317,26 @@
       "risers": [
         {
           "entity": "Renner",
-          "currentWeek": 13,
+          "currentWeek": 14,
           "previousWeek": 7,
-          "deltaAbs": 6,
-          "deltaPct": 85.7,
+          "deltaAbs": 7,
+          "deltaPct": 100.0,
           "direction": "up"
         },
         {
           "entity": "MegaStore Brasil",
-          "currentWeek": 172,
+          "currentWeek": 187,
           "previousWeek": 104,
-          "deltaAbs": 68,
-          "deltaPct": 65.4,
+          "deltaAbs": 83,
+          "deltaPct": 79.8,
           "direction": "up"
         },
         {
           "entity": "ShopNova Digital",
-          "currentWeek": 182,
+          "currentWeek": 198,
           "previousWeek": 112,
-          "deltaAbs": 70,
-          "deltaPct": 62.5,
+          "deltaAbs": 86,
+          "deltaPct": 76.8,
           "direction": "up"
         }
       ],
