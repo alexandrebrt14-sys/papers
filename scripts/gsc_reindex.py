@@ -36,7 +36,10 @@ def token() -> str:
     if env_tok:
         return env_tok.strip()
     gcloud = shutil.which("gcloud") or shutil.which("gcloud.cmd") or "gcloud"
-    out = subprocess.run(
+    # shell=True only on Windows (os.name == "nt") to resolve the gcloud.cmd shim via
+    # cmd.exe; on Linux/macOS shell=False. argv is a list of literals and gcloud path
+    # comes from shutil.which — no user-controlled input, so CWE-78 does not apply.
+    out = subprocess.run(  # nosec B602
         [gcloud, "auth", "application-default", "print-access-token"],
         capture_output=True, text=True, shell=(os.name == "nt"),
     )
