@@ -78,11 +78,14 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # NOTA: papers.db agora e commitado no git como source-of-truth
-      # (incidente 2026-04-16: artifact papers-db-latest "not found" causava
-      # reset diario para 0 linhas; drift 255 vs 1004 na pagina publica).
-      # O checkout@v4 acima ja traz a versao mais recente do DB; artifact e
-      # mantido como safety-net secundario mas nao e mais source of truth.
+      # NOTA (2026-06-11, PR #20 + R2): papers.db NAO e mais versionado em git
+      # (cruzou 100MB e travava o git push no pre-receive hook). A continuidade
+      # entre runs vem agora de DUAS fontes redundantes, restauradas abaixo:
+      #   1) artifact papers-db-latest (safety net, step abaixo)
+      #   2) Cloudflare R2 papers/db/latest.db (source of truth off-site)
+      # O step "Restore DB from Cloudflare R2" adota a MAIOR das duas bases como
+      # papers.db (forward-only, nunca encolhe), defendendo contra o incidente
+      # 2026-04-16 (artifact "not found" -> reset para 0 linhas).
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
@@ -90,6 +93,86 @@ jobs:
           path: data/
           workflow_conclusion: ""
           if_no_artifact_found: ignore
+        continue-on-error: true
+
+      # ================================================================
+      # RESTORE DB DO CLOUDFLARE R2 (source of truth) — Onda 2026-06-11
+      # Baixa papers/db/latest.db do R2 (mesmo bucket do backup off-site no
+      # fim do run) e compara, por contagem total de linhas, com o papers.db
+      # vindo do artifact. Adota a base MAIOR como source of truth. Assim,
+      # se QUALQUER uma das fontes vier vazia/menor (reset, artifact ausente,
+      # upload truncado), a outra prevalece — forward-only, nunca encolhe.
+      # Skip silencioso (exit 0) se os secrets do R2 nao estiverem presentes,
+      # preservando 100% o comportamento atual baseado em artifact.
+      # ================================================================
+      - name: Restore DB from Cloudflare R2 (source of truth)
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$R2_ENDPOINT" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ]; then
+            echo "R2 secrets ausentes — usando apenas o artifact (skip silencioso)"
+            exit 0
+          fi
+          pip install -q boto3
+          python - <<'PY'
+          import os, sqlite3, boto3
+          from botocore.config import Config
+
+          local = "data/papers.db"
+          tmp = "data/_r2_latest.db"
+          key = "papers/db/latest.db"
+
+          s3 = boto3.client(
+              "s3",
+              endpoint_url=os.environ["R2_ENDPOINT"],
+              aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
+              aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+              config=Config(signature_version="s3v4"),
+          )
+          bucket = os.environ["R2_BUCKET"]
+
+          try:
+              s3.download_file(bucket, key, tmp)
+          except Exception as e:
+              print(f"R2 latest.db indisponivel ({e}) — mantendo artifact")
+              raise SystemExit(0)
+
+          def total_rows(path):
+              if not os.path.exists(path):
+                  return -1
+              try:
+                  con = sqlite3.connect(path)
+                  cur = con.cursor()
+                  total = 0
+                  for (name,) in cur.execute(
+                      "SELECT name FROM sqlite_master WHERE type='table'"
+                  ).fetchall():
+                      try:
+                          total += cur.execute(
+                              f'SELECT COUNT(*) FROM "{name}"'
+                          ).fetchone()[0]
+                      except sqlite3.Error:
+                          pass
+                  con.close()
+                  return total
+              except sqlite3.Error:
+                  return -1
+
+          r_local = total_rows(local)
+          r_r2 = total_rows(tmp)
+          print(f"linhas artifact={r_local}  linhas R2={r_r2}")
+
+          if r_r2 > r_local:
+              os.replace(tmp, local)
+              print(f"R2 e a base maior ({r_r2} linhas) — adotada como source of truth")
+          else:
+              if os.path.exists(tmp):
+                  os.remove(tmp)
+              print(f"Artifact >= R2 ({r_local} >= {r_r2}) — artifact mantido")
+          PY
         continue-on-error: true
 
       - name: Validate Python imports
