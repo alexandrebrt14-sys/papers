@@ -40,8 +40,9 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      # NOTA: papers.db agora vem do git checkout (pos-incidente 2026-04-16).
-      # Artifact mantido como safety-net secundario.
+      # NOTA (2026-06-11): papers.db NAO vem mais do git (saiu no #20/#21).
+      # Continuidade = artifact (safety net) + R2 (source of truth), adotando
+      # a base MAIOR — mesmo contrato do daily-collect.
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
@@ -49,6 +50,76 @@ jobs:
           path: data/
           workflow_conclusion: ""
           if_no_artifact_found: ignore
+        continue-on-error: true
+
+      - name: Restore DB from Cloudflare R2 (source of truth)
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$R2_ENDPOINT" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ]; then
+            echo "R2 secrets ausentes — usando apenas o artifact (skip silencioso)"
+            exit 0
+          fi
+          pip install -q boto3
+          python - <<'PY'
+          import os, sqlite3, boto3
+          from botocore.config import Config
+
+          local = "data/papers.db"
+          tmp = "data/_r2_latest.db"
+          key = "papers/db/latest.db"
+
+          s3 = boto3.client(
+              "s3",
+              endpoint_url=os.environ["R2_ENDPOINT"],
+              aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
+              aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+              config=Config(signature_version="s3v4"),
+          )
+          bucket = os.environ["R2_BUCKET"]
+
+          try:
+              s3.download_file(bucket, key, tmp)
+          except Exception as e:
+              print(f"R2 latest.db indisponivel ({e}) — mantendo artifact")
+              raise SystemExit(0)
+
+          def total_rows(path):
+              if not os.path.exists(path):
+                  return -1
+              try:
+                  con = sqlite3.connect(path)
+                  cur = con.cursor()
+                  total = 0
+                  for (name,) in cur.execute(
+                      "SELECT name FROM sqlite_master WHERE type='table'"
+                  ).fetchall():
+                      try:
+                          total += cur.execute(
+                              f'SELECT COUNT(*) FROM "{name}"'
+                          ).fetchone()[0]
+                      except sqlite3.Error:
+                          pass
+                  con.close()
+                  return total
+              except sqlite3.Error:
+                  return -1
+
+          r_local = total_rows(local)
+          r_r2 = total_rows(tmp)
+          print(f"linhas artifact={r_local}  linhas R2={r_r2}")
+
+          if r_r2 > r_local:
+              os.replace(tmp, local)
+              print(f"R2 e a base maior ({r_r2} linhas) — adotada como source of truth")
+          else:
+              if os.path.exists(tmp):
+                  os.remove(tmp)
+              print(f"Artifact >= R2 ({r_local} >= {r_r2}) — artifact mantido")
+          PY
         continue-on-error: true
 
       - name: Validate Python imports
