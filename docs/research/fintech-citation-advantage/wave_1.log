@@ -1,0 +1,83 @@
+═══════════════════════════════════════════════
+  geo-bridge board — 5 LLMs em paralelo (modo expert)
+  Anthropic | OpenAI | Google AI | Perplexity | Groq
+═══════════════════════════════════════════════
+Demanda: Voce e um painel de especialistas em GEO (Generative Engine Optimization) e LLMs. Dataset: 62.820 observacoes (queries a 5 LLMs: ChatGPT gpt-4o-mini, Claude haiku-4.5, Gemini 2.5-pro, Perplexity sonar, Groq llama-3.3-70b), 23/abr a 09/jun de 2026, 4 verticais brasileiras (fintech, varejo, tecnologia, saude), cohort de 127 entidades (79 BR reais + 32 ancoras internacionais + 16 decoys ficticios), 2 coletas/dia via GitHub Actions, NER v2, probes adversariais e calibracao com decoys. Nucleo sem probes/calibracao: n=50.453, taxa global de citacao espontanea 20,3%. Taxas por vertical: fintech 28,15% (IC95 27,38-28,95), varejo 24,94%, tecnologia 14,50%, saude 13,35% — qui-quadrado fintech vs varejo p=7e-9, vs tecnologia e saude p<1e-15. Interacao vertical x LLM: Claude cita fintech em 51,0% vs 10,4% tecnologia; Perplexity 86,5% fintech vs 54,3% tecnologia; Gemini quase zero fora de fintech (4,9% fintech, 0,0% varejo/saude). Concentracao de mencoes: Nubank sozinho = 3.533 de 7.112 mencoes fintech (49,7%); top3 fintech = 70,9% (HHI 0,283, o mais alto); tecnologia HHI 0,110. Roster: fintech 19 entidades vs 15 nas demais. FPR dos decoys baixo (calibracao ok). PERGUNTA CENTRAL: por que a vertical fintech obtem taxa de citacao espontanea sistematicamente maior que varejo, tecnologia e saude em LLMs? Gere o conjunto mais completo possivel de HIPOTESES MECANICISTAS testaveis (minimo 10), cada uma com: nome, mecanismo causal detalhado (training data density, digital-first content, midia especializada, brand entity strength tipo Nubank, frequencia em corpora PT-BR, estrutura competitiva do setor, recencia, RAG vs conhecimento parametrico), predicoes observaveis no dataset descrito, e como falsea-la. Considere tambem que ~50% das mencoes fintech sao Nubank: o efeito e da vertical ou de uma entidade-estrela? Responda em portugues do Brasil.
+
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 1. State: CLOSED
+Retry 1/3 for google (HTTP 429): waiting 2.9s
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 2. State: CLOSED
+Retry 2/3 for google (HTTP 429): waiting 4.7s
+Circuit breaker 'provider:google' transitioned to OPEN
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 3. State: OPEN
+Retry 3/3 for google (HTTP 429): waiting 8.5s
+======================================================================
+BANCA DE 5 ESPECIALISTAS EM IA - 5 LLMs EM PARALELO (modelos canonicos)
+======================================================================
+
+Lancando 5 agentes em paralelo...
+  [1] Andrew Ng (CEO)              -> claude (claude-opus-4-8)
+  [2] Harrison Chase (LangChain)   -> gpt4o (gpt-5.5)
+  [3] Jerry Liu (LlamaIndex)       -> gemini (gemini-3.1-pro-preview)
+  [4] Yohei Nakajima (BabyAGI)     -> perplexity (sonar-deep-research)
+  [5] Eng. Performance (Groq)      -> groq (meta-llama/llama-4-scout-17b-16e-instruct)
+
+Concluido: 4/5 agentes em 72.7s (paralelo)
+
+  Agente                       Modelo                      Tempo     In    Out     Custo
+  --------------------------------------------------------------------------------------
+  [OK] Andrew Ng (CEO)            claude-opus-4-8             34.5s  1003  2000 $ 0.16504
+  [OK] Harrison Chase (LangChain) gpt-5.5                     57.0s   623  2000 $ 0.03311
+  [XX] Jerry Liu (LlamaIndex)     gemini-3.1-pro-preview      17.8s     0     0 $ 0.00000
+  [OK] Yohei Nakajima (BabyAGI)   sonar-deep-research         72.0s   702     0 $ 0.00140
+  [OK] Eng. Performance (Groq)    meta-llama/llama-4-scout-17b-16e-instruct   3.9s   609  1339 $ 0.00052
+  --------------------------------------------------------------------------------------
+  TOTAL                        5 LLMs                      72.7s  2937  5339 $ 0.20009
+
+======================================================================
+Andrew Ng (CEO) (claude-opus-4-8, 34.5s, $0.16504)
+======================================================================
+# Análise GEO: Por que Fintech Domina a Citação Espontânea em LLMs
+
+*Andrew Ng, na cadeira de CEO e observador*
+
+Antes das hipóteses, preciso fazer minha provocação metodológica de sempre: vocês me trouxeram um dataset lindo, mas a pergunta central tem um confounder gritante que precisa virar o eixo de toda investigação. Vamos a ele e às hipóteses.
+
+---
+
+## O PROBLEMA DOS 49,7%: Vertical ou Entidade-Estrela?
+
+Antes de qualquer hipótese mecanística, **a primeira tarefa do workflow agêntico é desconfundir Nubank da vertical**. Com HHI fintech = 0,283 (quase 3x tecnologia) e Nubank sozinho em 49,7%, vocês podem estar medindo "o efeito Nubank" e chamando de "o efeito fintech".
+
+**Teste-gate obrigatório (roda antes de tudo):** recalcule todas as taxas de citação fintech *excluindo Nubank* e dep
+...[truncado]
+
+======================================================================
+Harrison Chase (LangChain) (gpt-5.5, 57.0s, $0.03311)
+======================================================================
+
+
+======================================================================
+Jerry Liu (LlamaIndex) (gemini-3.1-pro-preview, 17.8s, $0.00000)
+======================================================================
+ERRO: CircuitBreakerError: Provider google tripped circuit during retry — abandoning attempts.
+
+======================================================================
+Yohei Nakajima (BabyAGI) (sonar-deep-research, 72.0s, $0.00140)
+======================================================================
+
+
+======================================================================
+Eng. Performance (Groq) (meta-llama/llama-4-scout-17b-16e-instruct, 3.9s, $0.00052)
+======================================================================
+Que desafio complexo e fascinante!
+
+Antes de apresentar as hipóteses mecanicistas, é importante destacar que a taxa de citação espontânea mais alta da vertical fintech em comparação com as demais pode ser influenciada por vários fatores. Aqui estão 12 hipóteses testáveis, cada uma com nome, mecanismo causal detalhado, predições observáveis no dataset e como falseá-la:
+
+1. **Densidade de dados de treinamento** (Training Data Density)
+ * Mecanismo causal: A vertical fintech tem uma densidade de dados de treinamento mais alta devido à grande quantidade de informações financeiras e de mercado disponíveis.
+ * Predições observáveis: A taxa de citação espontânea da fintech é correlacionada com a quantidade de dados de treinamento disponíveis para os LLMs.
+ * Falseamento: Se a densidade de dados d
+...[truncado]
+
+Resultados salvos em C:\Sandyboxclaude\geo-orchestrator\output\5llm_board_analysis.json

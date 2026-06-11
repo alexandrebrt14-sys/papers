@@ -1,0 +1,79 @@
+═══════════════════════════════════════════════
+  geo-bridge board — 5 LLMs em paralelo (modo expert)
+  Anthropic | OpenAI | Google AI | Perplexity | Groq
+═══════════════════════════════════════════════
+Demanda: Voce e um painel red-team de revisores cetico-hostis de um periodico A1 (Information Sciences / ACM TOIS). Dataset: 62.820 observacoes (queries a 5 LLMs: ChatGPT gpt-4o-mini, Claude haiku-4.5, Gemini 2.5-pro, Perplexity sonar, Groq llama-3.3-70b), 23/abr a 09/jun de 2026, 4 verticais brasileiras (fintech, varejo, tecnologia, saude), cohort de 127 entidades (79 BR reais + 32 ancoras internacionais + 16 decoys ficticios), 2 coletas/dia via GitHub Actions, NER v2, probes adversariais e calibracao com decoys. Nucleo sem probes/calibracao: n=50.453, taxa global de citacao espontanea 20,3%. Taxas por vertical: fintech 28,15% (IC95 27,38-28,95), varejo 24,94%, tecnologia 14,50%, saude 13,35% — qui-quadrado fintech vs varejo p=7e-9, vs tecnologia e saude p<1e-15. Interacao vertical x LLM: Claude cita fintech em 51,0% vs 10,4% tecnologia; Perplexity 86,5% fintech vs 54,3% tecnologia; Gemini quase zero fora de fintech (4,9% fintech, 0,0% varejo/saude). Concentracao de mencoes: Nubank sozinho = 3.533 de 7.112 mencoes fintech (49,7%); top3 fintech = 70,9% (HHI 0,283, o mais alto); tecnologia HHI 0,110. Roster: fintech 19 entidades vs 15 nas demais. FPR dos decoys baixo (calibracao ok). TAREFA: liste TODAS as ameacas a validade e objecoes que um revisor faria contra a claim 'fintech obtem mais citacoes por causa de X': vies de construcao do roster (19 vs 15; selecao das marcas), vies das queries (mix de categorias difere?), NER v2 (alias matching favorece nomes unicos tipo Nubank?), confundimento Perplexity-RAG vs modelos parametricos, janela curta, modelos mini/haiku nao representativos, generalizabilidade alem do Brasil, multiple testing, e qualquer outra. Para cada objecao: gravidade (alta/media/baixa), resposta possivel com os dados existentes, ou experimento adicional necessario. Responda em portugues do Brasil.
+
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 1. State: CLOSED
+Retry 1/3 for google (HTTP 429): waiting 2.8s
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 2. State: CLOSED
+Retry 2/3 for google (HTTP 429): waiting 4.2s
+Circuit breaker 'provider:google' transitioned to OPEN
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 3. State: OPEN
+Retry 3/3 for google (HTTP 429): waiting 9.0s
+======================================================================
+BANCA DE 5 ESPECIALISTAS EM IA - 5 LLMs EM PARALELO (modelos canonicos)
+======================================================================
+
+Lancando 5 agentes em paralelo...
+  [1] Andrew Ng (CEO)              -> claude (claude-opus-4-8)
+  [2] Harrison Chase (LangChain)   -> gpt4o (gpt-5.5)
+  [3] Jerry Liu (LlamaIndex)       -> gemini (gemini-3.1-pro-preview)
+  [4] Yohei Nakajima (BabyAGI)     -> perplexity (sonar-deep-research)
+  [5] Eng. Performance (Groq)      -> groq (meta-llama/llama-4-scout-17b-16e-instruct)
+
+Concluido: 4/5 agentes em 51.2s (paralelo)
+
+  Agente                       Modelo                      Tempo     In    Out     Custo
+  --------------------------------------------------------------------------------------
+  [OK] Andrew Ng (CEO)            claude-opus-4-8             31.5s   986  2000 $ 0.16479
+  [OK] Harrison Chase (LangChain) gpt-5.5                     50.9s   618  2000 $ 0.03309
+  [XX] Jerry Liu (LlamaIndex)     gemini-3.1-pro-preview      17.7s     0     0 $ 0.00000
+  [OK] Yohei Nakajima (BabyAGI)   sonar-deep-research         23.8s   691     0 $ 0.00138
+  [OK] Eng. Performance (Groq)    meta-llama/llama-4-scout-17b-16e-instruct   3.7s   606  1028 $ 0.00042
+  --------------------------------------------------------------------------------------
+  TOTAL                        5 LLMs                      51.2s  2901  5028 $ 0.19968
+
+======================================================================
+Andrew Ng (CEO) (claude-opus-4-8, 31.5s, $0.16479)
+======================================================================
+# Red-Team Review — Threats to Validity da Claim "Fintech obtém mais citações por causa de X"
+
+Antes de listar as objeções, registro meu posicionamento como CEO/observador e evangelista de Agentic Workflows: **a falha central deste paper não é estatística, é arquitetural.** Vocês mediram 5 LLMs em *single-shot* (uma query → uma resposta) e estão tratando o output como se fosse a "verdade" do modelo. Isso é como avaliar um analista júnior pela primeira frase que ele diz, sem deixá-lo revisar. Voltarei a este ponto no fechamento, mas ele contamina **várias** das ameaças abaixo. Vamos ao red-team.
+
+---
+
+## Bloco A — Viés de Construção (Construct & Selection Bias)
+
+### A1. Desbalanceamento do roster (19 vs 15) — **GRAVIDADE ALTA**
+**Objeção:** Fintech tem 19 entidades elegíveis contra 15 nas d
+...[truncado]
+
+======================================================================
+Harrison Chase (LangChain) (gpt-5.5, 50.9s, $0.03309)
+======================================================================
+
+
+======================================================================
+Jerry Liu (LlamaIndex) (gemini-3.1-pro-preview, 17.7s, $0.00000)
+======================================================================
+ERRO: CircuitBreakerError: Provider google tripped circuit during retry — abandoning attempts.
+
+======================================================================
+Yohei Nakajima (BabyAGI) (sonar-deep-research, 23.8s, $0.00138)
+======================================================================
+
+
+======================================================================
+Eng. Performance (Groq) (meta-llama/llama-4-scout-17b-16e-instruct, 3.7s, $0.00042)
+======================================================================
+Segue aqui uma lista de ameaças à validade e objeções que um revisor poderia fazer contra a claim "fintech obtém mais citações por causa de X", juntamente com a gravidade de cada objeção, respostas possíveis com os dados existentes e sugestões de experimentos adicionais necessários:
+
+1. **Viés de construção do roster**:
+ * Gravidade: Alta
+ * Objeção: O roster de entidades é desequilibrado, com 19 entidades fintech vs 15 nas demais verticais.
+ * Resposta possível: Apresentar a distribuição de entidades por vertical e argumentar que o roster foi construído para representar as principais entidades em cada vertical. No entanto, admitir que isso pode influenciar os resultados.
+ * Experimento adicional necessário: Recoletar dados com um roster mais balanceado para verificar se os resultados se m
+...[truncado]
+
+Resultados salvos em C:\Sandyboxclaude\geo-orchestrator\output\5llm_board_analysis.json

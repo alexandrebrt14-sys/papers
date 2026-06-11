@@ -1,0 +1,88 @@
+═══════════════════════════════════════════════
+  geo-bridge board — 5 LLMs em paralelo (modo expert)
+  Anthropic | OpenAI | Google AI | Perplexity | Groq
+═══════════════════════════════════════════════
+Demanda: Voce e um painel de editores academicos experientes em NLP/IR. Dataset: 62.820 observacoes (queries a 5 LLMs: ChatGPT gpt-4o-mini, Claude haiku-4.5, Gemini 2.5-pro, Perplexity sonar, Groq llama-3.3-70b), 23/abr a 09/jun de 2026, 4 verticais brasileiras (fintech, varejo, tecnologia, saude), cohort de 127 entidades (79 BR reais + 32 ancoras internacionais + 16 decoys ficticios), 2 coletas/dia via GitHub Actions, NER v2, probes adversariais e calibracao com decoys. Nucleo sem probes/calibracao: n=50.453, taxa global de citacao espontanea 20,3%. Taxas por vertical: fintech 28,15% (IC95 27,38-28,95), varejo 24,94%, tecnologia 14,50%, saude 13,35% — qui-quadrado fintech vs varejo p=7e-9, vs tecnologia e saude p<1e-15. Interacao vertical x LLM: Claude cita fintech em 51,0% vs 10,4% tecnologia; Perplexity 86,5% fintech vs 54,3% tecnologia; Gemini quase zero fora de fintech (4,9% fintech, 0,0% varejo/saude). Concentracao de mencoes: Nubank sozinho = 3.533 de 7.112 mencoes fintech (49,7%); top3 fintech = 70,9% (HHI 0,283, o mais alto); tecnologia HHI 0,110. Roster: fintech 19 entidades vs 15 nas demais. FPR dos decoys baixo (calibracao ok). TAREFA: proponha a ESTRUTURA COMPLETA do artigo (IMRaD detalhado, secao a secao com bullets do conteudo), 5 titulos candidatos (EN), abstract candidato (EN, 250 palavras), 4 contribution claims defensaveis, venues-alvo ranqueadas (Information Sciences, ACM TOIS, EMNLP/ACL findings, ICWSM, Web Conference) com justificativa de fit, e checklist de artefatos para reproducibilidade (dataset publico, codigo, manifests SHA-256). Considere que o dataset e publico no GitHub e ja existem papers companion na SSRN/Zenodo do mesmo grupo. Responda em portugues do Brasil.
+
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 1. State: CLOSED
+Retry 1/3 for google (HTTP 429): waiting 2.4s
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 2. State: CLOSED
+Retry 2/3 for google (HTTP 429): waiting 4.5s
+Circuit breaker 'provider:google' transitioned to OPEN
+Circuit breaker 'provider:google': Failure recorded. Consecutive failures: 3. State: OPEN
+Retry 3/3 for google (HTTP 429): waiting 8.0s
+======================================================================
+BANCA DE 5 ESPECIALISTAS EM IA - 5 LLMs EM PARALELO (modelos canonicos)
+======================================================================
+
+Lancando 5 agentes em paralelo...
+  [1] Andrew Ng (CEO)              -> claude (claude-opus-4-8)
+  [2] Harrison Chase (LangChain)   -> gpt4o (gpt-5.5)
+  [3] Jerry Liu (LlamaIndex)       -> gemini (gemini-3.1-pro-preview)
+  [4] Yohei Nakajima (BabyAGI)     -> perplexity (sonar-deep-research)
+  [5] Eng. Performance (Groq)      -> groq (meta-llama/llama-4-scout-17b-16e-instruct)
+
+Concluido: 4/5 agentes em 78.4s (paralelo)
+
+  Agente                       Modelo                      Tempo     In    Out     Custo
+  --------------------------------------------------------------------------------------
+  [OK] Andrew Ng (CEO)            claude-opus-4-8             31.3s   961  2000 $ 0.16442
+  [OK] Harrison Chase (LangChain) gpt-5.5                     45.8s   596  2000 $ 0.03298
+  [XX] Jerry Liu (LlamaIndex)     gemini-3.1-pro-preview      16.6s     0     0 $ 0.00000
+  [OK] Yohei Nakajima (BabyAGI)   sonar-deep-research         77.7s   664     0 $ 0.00133
+  [OK] Eng. Performance (Groq)    meta-llama/llama-4-scout-17b-16e-instruct   3.1s   588   932 $ 0.00038
+  --------------------------------------------------------------------------------------
+  TOTAL                        5 LLMs                      78.4s  2809  4932 $ 0.19910
+
+======================================================================
+Andrew Ng (CEO) (claude-opus-4-8, 31.3s, $0.16442)
+======================================================================
+# Análise Editorial — Painel NLP/IR
+
+Antes da estrutura, um enquadramento honesto: vocês têm um dataset observacional forte, longitudinal e com calibração adversarial decente (decoys, FPR baixo). Mas o "produto" científico aqui **não é o número 20,3%** — é o **mecanismo de medição reprodutível** e a **caracterização da concentração/viés de citação espontânea entre LLMs**. Vou estruturar para maximizar defensabilidade e fit de venue.
+
+---
+
+## 1. ESTRUTURA COMPLETA DO ARTIGO (IMRaD)
+
+### Title block + Abstract + Keywords
+
+### 1. Introduction
+- **Problema:** LLMs citam entidades espontaneamente em respostas; isso vira canal de visibilidade econômica (a nova "SEO"). Falta medição sistemática, longitudinal e calibrada.
+- **Gap:** estudos prévios são pontuais, single-model, ou sem controle de al
+...[truncado]
+
+======================================================================
+Harrison Chase (LangChain) (gpt-5.5, 45.8s, $0.03298)
+======================================================================
+
+
+======================================================================
+Jerry Liu (LlamaIndex) (gemini-3.1-pro-preview, 16.6s, $0.00000)
+======================================================================
+ERRO: CircuitBreakerError: Provider google tripped circuit during retry — abandoning attempts.
+
+======================================================================
+Yohei Nakajima (BabyAGI) (sonar-deep-research, 77.7s, $0.00133)
+======================================================================
+
+
+======================================================================
+Eng. Performance (Groq) (meta-llama/llama-4-scout-17b-16e-instruct, 3.1s, $0.00038)
+======================================================================
+Segue abaixo a estrutura completa do artigo, incluindo título, abstract, contribuições, venues-alvo e checklist de artefatos:
+
+**Títulos Candidatos (EN):**
+
+1. "Unveiling LLM Adoption Patterns Across Brazilian Verticals: A Large-Scale Analysis"
+2. "LLM Citation Dynamics in Brazilian Industries: A Comparative Study"
+3. "Large Language Models in Brazil: A Vertical Analysis of Citation Patterns"
+4. "Citation Spontaneity in LLMs: A Study of Brazilian Entities and Verticals"
+5. "LLM Performance Across Verticals: An Empirical Analysis of Brazilian Entities"
+
+**Abstract Candidato (EN, 250 palavras):**
+
+This study presents a large-scale analysis of Large Language Model (LLM) adoption patterns across four Brazilian verticals: fintech, retail, technology, and healthcare. We collected data from 62,82
+...[truncado]
+
+Resultados salvos em C:\Sandyboxclaude\geo-orchestrator\output\5llm_board_analysis.json
