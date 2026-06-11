@@ -260,7 +260,7 @@ jobs:
           # HEAD com conflitos não resolvidos, push falhava com exit 128.
 
           TMPDIR=$(mktemp -d)
-          for p in data/papers.db data/dashboard_data.json \
+          for p in data/dashboard_data.json \
                    data/finops_checkpoint.json data/finops_alerts.jsonl \
                    output/finops_dashboard.html docs data/daily_*.csv; do
             [ -e "$p" ] || continue
@@ -274,7 +274,7 @@ jobs:
 
             cp -r "$TMPDIR"/. .
 
-            git add data/papers.db data/dashboard_data.json \
+            git add data/dashboard_data.json \
                     data/finops_checkpoint.json data/finops_alerts.jsonl \
                     output/finops_dashboard.html docs/ 2>/dev/null || true
             git add data/daily_*.csv 2>/dev/null || true
@@ -435,14 +435,14 @@ jobs:
                 \"from\": \"papers-alerts@mail.brasilgeo.ai\",
                 \"to\": \"${{ secrets.FINOPS_ALERT_EMAIL }}\",
                 \"subject\": \"[ALERTA] Papers daily-collect falhou em $(date -u '+%Y-%m-%d %H:%M')\",
-                \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto na publicacao cientifica (julho/2026):</strong> gap de dados compromete serie temporal longitudinal.</p><p>Acao imediata: abrir o run, identificar vertical/LLM faltante, re-executar workflow_dispatch.</p>\"
+                \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto na publicacao cientifica (julho/2026):</strong> gap de dados compromete serie temporal longitudinal.</p><p><strong>Acao imediata:</strong> abrir o run e ler o LOG DO JOB para achar o step vermelho — pode ser coleta (vertical/LLM), push (papers.db &gt; 100MB), health check ou Supabase/R2. NAO basta re-executar.</p>\"
               }" | head -c 200
           fi
           # Tambem cria uma issue para rastreamento
           gh issue create \
             --repo alexandrebrt14-sys/papers \
             --title "daily-collect falhou em $(date -u +%Y-%m-%d)" \
-            --body "Run #${{ github.run_number }} falhou. Link: https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}. Investigar e re-executar via workflow_dispatch." \
+            --body "Run #${{ github.run_number }} falhou. Link: https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}. Abrir o log do job e identificar o step vermelho ANTES de re-executar." \
             --label "pipeline-failure" \
             || echo "issue creation failed"
         env:

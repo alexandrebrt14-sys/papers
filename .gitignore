@@ -55,3 +55,4 @@ data/cache/
 # Temp injection artifacts from Medium/LinkedIn publishing (Wave 10 — 23/04)
 drafts/_*
 drafts/*.html
+data/papers.db
