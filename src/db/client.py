@@ -42,6 +42,17 @@ class DatabaseClient:
         schema = SCHEMA_PATH.read_text(encoding="utf-8")
         self._conn.executescript(schema)
         self._conn.commit()
+        # NER v2 / response_hash / probe — rodam DEPOIS do schema.sql (fix
+        # 2026-06-11, runs #151/#152): num papers.db vazio/novo a tabela
+        # `citations` so existe APOS o executescript acima. Rodar antes (em
+        # _migrate_add_vertical) as fazia pular com 'no such table', e como o
+        # schema.sql nao define cited_v2 a coleta quebrava com
+        # 'table citations has no column named cited_v2'. Idempotentes; o
+        # schema.sql nao indexa estas colunas, entao rodar depois e seguro
+        # tanto para DB novo quanto restaurado.
+        self._migrate_add_ner_v2_columns()
+        self._migrate_add_response_hash_column()
+        self._migrate_add_probe_fictitious_columns()
 
     def _migrate_add_vertical(self) -> None:
         """Add vertical column to existing tables if not present."""
@@ -70,15 +81,6 @@ class DatabaseClient:
         self._migrate_add_fictional_columns()
         self._migrate_snapshot_composite_unique()
         self._migrate_add_citation_absorption_columns()
-        # NER v2 / response_hash / probe — inline idempotente (gap corrigido
-        # 2026-06-11, incidente run #151): um papers.db restaurado de
-        # artifact/R2 que predata estas migrations standalone nao recebia
-        # `cited_v2` e a coleta quebrava com
-        # 'table citations has no column named cited_v2'. connect() agora
-        # auto-cura estas colunas ANTES de qualquer insert da coleta.
-        self._migrate_add_ner_v2_columns()
-        self._migrate_add_response_hash_column()
-        self._migrate_add_probe_fictitious_columns()
 
     def _migrate_add_query_type(self) -> None:
         """Adiciona citations.query_type (Migration 0003 inline).
