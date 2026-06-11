@@ -96,6 +96,57 @@ jobs:
         continue-on-error: true
 
       # ================================================================
+      # RESTORE DO ARTIFACT DO RECOVER — fix 2026-06-11 (incidente run #155)
+      # O step acima (dawidd6 sem `workflow:`) so enxerga artifacts gravados
+      # pelo PROPRIO daily-collect.yml. O artifact papers-db-latest promovido
+      # pelo recover-historical-db.yml pertence a OUTRO workflow e era
+      # invisivel aqui — por isso o run #155 regenerou o dashboard com 216
+      # queries mesmo apos a recuperacao ter promovido 62.820 citations.
+      # Baixa o artifact do recover para data/_recover/ e adota a base com
+      # MAIS linhas de citations (forward-only, nunca encolhe).
+      # ================================================================
+      - name: Download recovered DB (recover-historical-db artifact)
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: papers-db-latest
+          path: data/_recover/
+          workflow: recover-historical-db.yml
+          workflow_conclusion: success
+          if_no_artifact_found: ignore
+        continue-on-error: true
+
+      - name: Adopt richer base (recovered vs artifact)
+        run: |
+          python - <<'PY'
+          import os, shutil, sqlite3
+
+          def citation_rows(path):
+              if not os.path.exists(path):
+                  return -1
+              try:
+                  con = sqlite3.connect(path)
+                  try:
+                      n = con.execute("SELECT COUNT(*) FROM citations").fetchone()[0]
+                  except sqlite3.Error:
+                      n = 0
+                  con.close()
+                  return n
+              except sqlite3.Error:
+                  return -1
+
+          cur = "data/papers.db"
+          rec = "data/_recover/papers.db"
+          r_cur, r_rec = citation_rows(cur), citation_rows(rec)
+          print(f"citations: artifact daily={r_cur}  artifact recover={r_rec}")
+          if r_rec > r_cur:
+              shutil.copyfile(rec, cur)
+              print(f"Base do recover adotada ({r_rec} > {r_cur} linhas)")
+          else:
+              print("Base do daily mantida (>= recover ou recover ausente)")
+          shutil.rmtree("data/_recover", ignore_errors=True)
+          PY
+
+      # ================================================================
       # RESTORE DB DO CLOUDFLARE R2 (source of truth) — Onda 2026-06-11
       # Baixa papers/db/latest.db do R2 (mesmo bucket do backup off-site no
       # fim do run) e compara, por contagem total de linhas, com o papers.db
