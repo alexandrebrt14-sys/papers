@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-11T13:24:33.047812+00:00",
-  "lastCollection": "2026-06-11 13:24:27",
+  "generatedAt": "2026-06-11T14:03:48.107657+00:00",
+  "lastCollection": "2026-06-11 14:03:42",
   "dbVersion": "papers.db (216 queries dataset)",
   "windowStart": "2026-04-23",
   "windowEnd": "2026-07-21",
@@ -8,18 +8,18 @@
   "windowTotalDays": 90,
   "methodologyVersion": "v2",
   "totalQueries": 216,
-  "totalCited": 101,
-  "overallRate": 46.8,
+  "totalCited": 104,
+  "overallRate": 48.1,
   "overallCI95": {
-    "low": 40.2,
-    "high": 53.4
+    "low": 41.6,
+    "high": 54.8
   },
   "entitiesMonitored": 127,
   "entitiesReal": 111,
   "entitiesRealBR": 79,
   "entitiesAnchors": 32,
   "entitiesFictitious": 16,
-  "contextAnalyses": 133,
+  "contextAnalyses": 147,
   "collectionRounds": 1,
   "daysCollecting": 1,
   "byLLM": [
@@ -28,36 +28,36 @@
       "model": "sonar",
       "provider": "Perplexity AI",
       "queries": 24,
-      "cited": 17,
-      "rate": 70.8,
-      "avgLatencyMs": 2262,
+      "cited": 18,
+      "rate": 75.0,
+      "avgLatencyMs": 2157,
       "color": "#20b2aa",
-      "ci95_low": 50.8,
-      "ci95_high": 85.1
+      "ci95_low": 55.1,
+      "ci95_high": 88.0
     },
     {
       "name": "Claude",
       "model": "claude-haiku-4-5-20251001",
       "provider": "Anthropic",
       "queries": 64,
-      "cited": 40,
-      "rate": 62.5,
-      "avgLatencyMs": 5127,
+      "cited": 41,
+      "rate": 64.1,
+      "avgLatencyMs": 5476,
       "color": "#d4a574",
-      "ci95_low": 50.3,
-      "ci95_high": 73.3
+      "ci95_low": 51.8,
+      "ci95_high": 74.7
     },
     {
       "name": "ChatGPT",
       "model": "gpt-4o-mini-2024-07-18",
       "provider": "OpenAI",
       "queries": 64,
-      "cited": 24,
-      "rate": 37.5,
-      "avgLatencyMs": 5776,
+      "cited": 25,
+      "rate": 39.1,
+      "avgLatencyMs": 7876,
       "color": "#10a37f",
-      "ci95_low": 26.7,
-      "ci95_high": 49.7
+      "ci95_low": 28.1,
+      "ci95_high": 51.3
     },
     {
       "name": "Groq",
@@ -66,7 +66,7 @@
       "queries": 64,
       "cited": 20,
       "rate": 31.2,
-      "avgLatencyMs": 1850,
+      "avgLatencyMs": 1750,
       "color": "#f55036",
       "ci95_low": 21.2,
       "ci95_high": 43.4
@@ -77,8 +77,8 @@
       "slug": "fintech",
       "name": "Fintech",
       "queries": 216,
-      "cited": 101,
-      "rate": 46.8,
+      "cited": 104,
+      "rate": 48.1,
       "color": "#0ea5e9"
     }
   ],
@@ -87,15 +87,15 @@
       "vertical": "fintech",
       "model": "ChatGPT",
       "queries": 64,
-      "cited": 24,
-      "rate": 37.5
+      "cited": 25,
+      "rate": 39.1
     },
     {
       "vertical": "fintech",
       "model": "Claude",
       "queries": 64,
-      "cited": 40,
-      "rate": 62.5
+      "cited": 41,
+      "rate": 64.1
     },
     {
       "vertical": "fintech",
@@ -108,8 +108,8 @@
       "vertical": "fintech",
       "model": "Perplexity",
       "queries": 24,
-      "cited": 17,
-      "rate": 70.8
+      "cited": 18,
+      "rate": 75.0
     }
   ],
   "verticalsFull": {
@@ -138,10 +138,14 @@
       "citedEntities": [
         {
           "entity": "Nubank",
-          "count": 54
+          "count": 56
         },
         {
           "entity": "Banco Floresta Digital",
+          "count": 12
+        },
+        {
+          "entity": "Banco Inter",
           "count": 12
         },
         {
@@ -150,15 +154,11 @@
         },
         {
           "entity": "PicPay",
-          "count": 11
-        },
-        {
-          "entity": "Banco Inter",
-          "count": 9
+          "count": 12
         },
         {
           "entity": "C6 Bank",
-          "count": 8
+          "count": 10
         },
         {
           "entity": "Mercado Pago",
@@ -166,35 +166,27 @@
         },
         {
           "entity": "Neon",
+          "count": 6
+        },
+        {
+          "entity": "PagBank",
+          "count": 6
+        },
+        {
+          "entity": "Stone",
+          "count": 6
+        },
+        {
+          "entity": "Bradesco",
           "count": 5
         },
         {
           "entity": "Itaú",
-          "count": 4
-        },
-        {
-          "entity": "PagBank",
-          "count": 4
-        },
-        {
-          "entity": "Bradesco",
           "count": 3
-        },
-        {
-          "entity": "Stone",
-          "count": 2
-        },
-        {
-          "entity": "Wise",
-          "count": 1
-        },
-        {
-          "entity": "XP Investimentos",
-          "count": 1
         }
       ],
-      "citedCount": 14,
-      "coverage": 87.5
+      "citedCount": 12,
+      "coverage": 75.0
     },
     "varejo": {
       "slug": "varejo",
@@ -275,10 +267,14 @@
   "topEntities": [
     {
       "name": "Nubank",
-      "citations": 54
+      "citations": 56
     },
     {
       "name": "Banco Floresta Digital",
+      "citations": 12
+    },
+    {
+      "name": "Banco Inter",
       "citations": 12
     },
     {
@@ -287,15 +283,11 @@
     },
     {
       "name": "PicPay",
-      "citations": 11
-    },
-    {
-      "name": "Banco Inter",
-      "citations": 9
+      "citations": 12
     },
     {
       "name": "C6 Bank",
-      "citations": 8
+      "citations": 10
     },
     {
       "name": "Mercado Pago",
@@ -303,53 +295,45 @@
     },
     {
       "name": "Neon",
+      "citations": 6
+    },
+    {
+      "name": "PagBank",
+      "citations": 6
+    },
+    {
+      "name": "Stone",
+      "citations": 6
+    },
+    {
+      "name": "Bradesco",
       "citations": 5
     },
     {
       "name": "Itaú",
-      "citations": 4
-    },
-    {
-      "name": "PagBank",
-      "citations": 4
-    },
-    {
-      "name": "Bradesco",
       "citations": 3
-    },
-    {
-      "name": "Stone",
-      "citations": 2
-    },
-    {
-      "name": "Wise",
-      "citations": 1
-    },
-    {
-      "name": "XP Investimentos",
-      "citations": 1
     }
   ],
   "sentiment": {
-    "neutral": 90,
-    "positive": 42,
+    "neutral": 113,
+    "positive": 33,
     "negative": 1
   },
   "attribution": {
-    "named": 133,
+    "named": 147,
     "linked": 0
   },
   "positionInResponse": {
-    "initial": 67,
-    "middle": 33,
-    "final": 33
+    "initial": 61,
+    "middle": 37,
+    "final": 49
   },
   "dailySeries": [
     {
       "date": "2026-06-11",
       "queries": 216,
-      "cited": 101,
-      "rate": 46.8
+      "cited": 104,
+      "rate": 48.1
     }
   ],
   "uncitedByVertical": {
@@ -421,18 +405,18 @@
       "negative": 0
     },
     "Claude": {
-      "neutral": 27,
-      "positive": 10,
+      "neutral": 28,
+      "positive": 11,
       "negative": 0
     },
     "Groq": {
-      "neutral": 10,
-      "positive": 1,
+      "neutral": 11,
+      "positive": 0,
       "negative": 1
     },
     "Perplexity": {
-      "neutral": 37,
-      "positive": 27,
+      "neutral": 58,
+      "positive": 18,
       "negative": 0
     }
   },
@@ -440,8 +424,8 @@
     {
       "category": "calibracao_fp",
       "queries": 48,
-      "cited": 47,
-      "rate": 97.9
+      "cited": 48,
+      "rate": 100.0
     },
     {
       "category": "descoberta",
@@ -458,8 +442,8 @@
     {
       "category": "comparativo",
       "queries": 32,
-      "cited": 12,
-      "rate": 37.5
+      "cited": 14,
+      "rate": 43.8
     },
     {
       "category": "inovacao",
@@ -484,14 +468,14 @@
     {
       "lang": "en",
       "queries": 108,
-      "cited": 54,
-      "rate": 50.0
+      "cited": 55,
+      "rate": 50.9
     },
     {
       "lang": "pt",
       "queries": 108,
-      "cited": 47,
-      "rate": 43.5
+      "cited": 49,
+      "rate": 45.4
     }
   ],
   "byQueryType": [
@@ -504,40 +488,40 @@
     {
       "type": "exploratory",
       "queries": 84,
-      "cited": 16,
-      "rate": 19.0
+      "cited": 18,
+      "rate": 21.4
     },
     {
       "type": "probe",
       "queries": 48,
-      "cited": 47,
-      "rate": 97.9
+      "cited": 48,
+      "rate": 100.0
     }
   ],
   "latencyStats": [
     {
       "llm": "ChatGPT",
-      "avgMs": 5776,
-      "minMs": 1339,
-      "maxMs": 16898
+      "avgMs": 7876,
+      "minMs": 1426,
+      "maxMs": 125818
     },
     {
       "llm": "Claude",
-      "avgMs": 5127,
-      "minMs": 2439,
-      "maxMs": 9102
+      "avgMs": 5476,
+      "minMs": 2544,
+      "maxMs": 9376
     },
     {
       "llm": "Groq",
-      "avgMs": 1850,
-      "minMs": 223,
-      "maxMs": 3869
+      "avgMs": 1750,
+      "minMs": 213,
+      "maxMs": 3523
     },
     {
       "llm": "Perplexity",
-      "avgMs": 2262,
-      "minMs": 1751,
-      "maxMs": 3196
+      "avgMs": 2157,
+      "minMs": 1649,
+      "maxMs": 2654
     }
   ],
   "calibration": {
@@ -580,9 +564,17 @@
       "newEntrants": [
         {
           "entity": "Nubank",
-          "currentWeek": 54,
+          "currentWeek": 56,
           "previousWeek": 0,
-          "deltaAbs": 54,
+          "deltaAbs": 56,
+          "deltaPct": 100.0,
+          "direction": "new"
+        },
+        {
+          "entity": "Banco Inter",
+          "currentWeek": 12,
+          "previousWeek": 0,
+          "deltaAbs": 12,
           "deltaPct": 100.0,
           "direction": "new"
         },
@@ -595,7 +587,7 @@
           "direction": "new"
         },
         {
-          "entity": "FinPay Solutions",
+          "entity": "PicPay",
           "currentWeek": 12,
           "previousWeek": 0,
           "deltaAbs": 12,
@@ -603,18 +595,10 @@
           "direction": "new"
         },
         {
-          "entity": "PicPay",
-          "currentWeek": 11,
+          "entity": "FinPay Solutions",
+          "currentWeek": 12,
           "previousWeek": 0,
-          "deltaAbs": 11,
-          "deltaPct": 100.0,
-          "direction": "new"
-        },
-        {
-          "entity": "Banco Inter",
-          "currentWeek": 9,
-          "previousWeek": 0,
-          "deltaAbs": 9,
+          "deltaAbs": 12,
           "deltaPct": 100.0,
           "direction": "new"
         }

@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-06-11 13:24 UTC
+**Gerado automaticamente em:** 2026-06-11 14:03 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 5d79cc12f3268902de469b432965ec155d5123fb fix(db): rodar migrations NER v2/respon
+**Último commit:** 833f9941bc5fd0b18e863fa939cd0eefc76b8db4 fix(ops): recuperar papers.db historico
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 21,255 | OK |
+| Código (linhas Python) | 21,247 | OK |
 | Testes unitários | 217 | OK |
 | Tabelas no banco | 23 | OK |
 | Citações coletadas | 216 | Coletando |
-| Taxa de citação | 46.8% | — |
-| Última coleta | 2026-06-11T13:24 | Ativo |
+| Taxa de citação | 48.1% | — |
+| Última coleta | 2026-06-11T14:03 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0126 |
-| Anthropic | $0.0841 |
+| OpenAI | $0.0127 |
+| Anthropic | $0.0837 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0046 |
-| **Total** | **$0.1013** |
+| Perplexity | $0.0043 |
+| **Total** | **$0.1007** |
 
 ## Próximas Ações
 
