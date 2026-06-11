@@ -70,6 +70,15 @@ class DatabaseClient:
         self._migrate_add_fictional_columns()
         self._migrate_snapshot_composite_unique()
         self._migrate_add_citation_absorption_columns()
+        # NER v2 / response_hash / probe — inline idempotente (gap corrigido
+        # 2026-06-11, incidente run #151): um papers.db restaurado de
+        # artifact/R2 que predata estas migrations standalone nao recebia
+        # `cited_v2` e a coleta quebrava com
+        # 'table citations has no column named cited_v2'. connect() agora
+        # auto-cura estas colunas ANTES de qualquer insert da coleta.
+        self._migrate_add_ner_v2_columns()
+        self._migrate_add_response_hash_column()
+        self._migrate_add_probe_fictitious_columns()
 
     def _migrate_add_query_type(self) -> None:
         """Adiciona citations.query_type (Migration 0003 inline).
@@ -150,6 +159,50 @@ class DatabaseClient:
                 logger.info("Migracao 0009 aplicada: %d coluna(s) CSR/CAR/failure", added)
         except Exception as exc:
             logger.debug("citation absorption migration skipped: %s", exc)
+
+    def _migrate_add_ner_v2_columns(self) -> None:
+        """Adiciona o pacote de colunas NER v2 em citations (Migration 0005 inline).
+
+        cited_v2 + colunas *_v2 + extraction_version. Sem este inline, um
+        papers.db restaurado (artifact/R2) que predata a migration standalone
+        nao recebia as colunas e a coleta quebrava com
+        'table citations has no column named cited_v2' (incidente run #151,
+        2026-06-11). Idempotente — delega a migration que detecta via PRAGMA.
+        """
+        try:
+            from src.db import migrate_0005_ner_v2
+            added = migrate_0005_ner_v2.apply(self._conn)
+            if added:
+                logger.info("Migracao 0005 (NER v2) aplicada: %s", added)
+        except Exception as exc:
+            logger.debug("ner_v2 migration skipped: %s", exc)
+
+    def _migrate_add_response_hash_column(self) -> None:
+        """Adiciona citations.response_hash + indices (Migration 0006 inline).
+
+        Idempotente; apply() so adiciona coluna/indices — o backfill pesado
+        e uma funcao separada que NAO e chamada aqui.
+        """
+        try:
+            from src.db import migrate_0006_response_hash
+            added = migrate_0006_response_hash.apply(self._conn)
+            if added:
+                logger.info("Migracao 0006 (response_hash) aplicada: %s", added)
+        except Exception as exc:
+            logger.debug("response_hash migration skipped: %s", exc)
+
+    def _migrate_add_probe_fictitious_columns(self) -> None:
+        """Adiciona colunas de probe/fictitious em citations (Migration 0007 inline).
+
+        Idempotente — delega a migration que detecta colunas via PRAGMA.
+        """
+        try:
+            from src.db import migrate_0007_probe_fictitious
+            added = migrate_0007_probe_fictitious.apply(self._conn)
+            if added:
+                logger.info("Migracao 0007 (probe/fictitious) aplicada: %s", added)
+        except Exception as exc:
+            logger.debug("probe_fictitious migration skipped: %s", exc)
 
     def _migrate_add_model_version(self) -> None:
         """Add model_version column to citations for non-stationarity tracking.
