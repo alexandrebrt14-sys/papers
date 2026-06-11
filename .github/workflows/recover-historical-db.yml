@@ -1,18 +1,18 @@
-name: Recover historical papers.db (R2)
+name: Recover historical papers.db (artifacts)
 
-# One-shot de recuperacao: apos os dias de pipeline quebrado, o papers.db
-# "latest" (artifact + R2) ficou vazio e a serie historica (~6.568 linhas de
-# citations) sumiu do restore diario. Os backups DATADOS no R2
-# (papers/db/<stamp>-<hash>.db, gravados a cada run com sucesso) ainda tem a
-# base cheia. Este workflow encontra o backup datado MAIS RICO (por contagem
-# de linhas de citations) e o promove para papers/db/latest.db no R2 + sobe
-# como artifact papers-db-latest. FORWARD-ONLY: so promove se tiver MAIS
-# linhas que o latest atual. Seguro rodar a qualquer momento — nunca encolhe.
+# R2 nao esta configurado (secrets ausentes) — a continuidade depende SO do
+# artifact papers-db-latest, que ficou vazio apos os dias de pipeline quebrado.
+# Os artifacts DATADOS papers-db-<run> (retencao 90d, gravados so em runs que
+# passaram do push, i.e. ate ~09/jun) ainda tem a base cheia (~6.568 linhas).
+# Este workflow lista os artifacts, baixa os datados mais recentes, conta
+# citations e promove o MAIS RICO para papers-db-latest. Forward-only: so
+# promove se tiver MAIS linhas que o latest atual. Seguro — nunca encolhe.
 on:
   workflow_dispatch: {}
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   recover:
@@ -25,115 +25,104 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Recuperar DB historico mais rico do R2
+      - name: Encontrar artifact datado mais rico
         id: recover
         env:
-          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          if [ -z "$R2_ENDPOINT" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ]; then
-            echo "R2 secrets ausentes — nada a recuperar"
-            echo "recovered=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          pip install -q boto3
+          pip install -q requests
           mkdir -p data
           python - <<'PY'
-          import os, sqlite3, tempfile, boto3
-          from botocore.config import Config
+          import os, io, zipfile, tempfile, sqlite3, requests
 
-          s3 = boto3.client(
-              "s3",
-              endpoint_url=os.environ["R2_ENDPOINT"],
-              aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
-              aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
-              config=Config(signature_version="s3v4"),
-          )
-          bucket = os.environ["R2_BUCKET"]
+          token = os.environ["GH_TOKEN"]
+          repo = os.environ["REPO"]
+          H = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
 
-          # 1) lista todos os objetos sob papers/db/
-          objs = []
-          paginator = s3.get_paginator("list_objects_v2")
-          for page in paginator.paginate(Bucket=bucket, Prefix="papers/db/"):
-              for o in page.get("Contents", []):
-                  objs.append((o["Key"], o["Size"]))
-          print(f"Encontrados {len(objs)} objetos em papers/db/")
+          arts, page = [], 1
+          while True:
+              r = requests.get(
+                  f"https://api.github.com/repos/{repo}/actions/artifacts",
+                  headers=H, params={"per_page": 100, "page": page},
+              ).json()
+              items = r.get("artifacts", [])
+              arts += items
+              if len(items) < 100:
+                  break
+              page += 1
+          print(f"{len(arts)} artifacts no total")
 
-          dated = [(k, s) for (k, s) in objs if not k.endswith("/latest.db")]
-          dated.sort(key=lambda t: t[1], reverse=True)  # maiores primeiro
-
-          def citation_rows(path):
-              if not os.path.exists(path):
-                  return -1
+          def rows_of(a):
               try:
-                  con = sqlite3.connect(path)
-                  cur = con.cursor()
+                  r = requests.get(a["archive_download_url"], headers=H)
+                  z = zipfile.ZipFile(io.BytesIO(r.content))
+                  dbname = next((n for n in z.namelist() if n.endswith(".db")), None)
+                  if not dbname:
+                      return -1, None
+                  fd, tmp = tempfile.mkstemp(suffix=".db")
+                  with os.fdopen(fd, "wb") as f:
+                      f.write(z.read(dbname))
+                  con = sqlite3.connect(tmp)
                   try:
-                      n = cur.execute("SELECT COUNT(*) FROM citations").fetchone()[0]
+                      n = con.execute("SELECT COUNT(*) FROM citations").fetchone()[0]
                   except sqlite3.Error:
                       n = 0
                   con.close()
-                  return n
-              except sqlite3.Error:
-                  return -1
+                  return n, tmp
+              except Exception as e:
+                  print(f"  erro lendo {a['name']}: {e}")
+                  return -1, None
 
-          def download(key):
-              fd, tmp = tempfile.mkstemp(suffix=".db")
-              os.close(fd)
-              s3.download_file(bucket, key, tmp)
-              return tmp
+          dated = [
+              a for a in arts
+              if a["name"].startswith("papers-db-")
+              and a["name"] != "papers-db-latest"
+              and not a["expired"]
+          ]
+          dated.sort(key=lambda a: a["created_at"], reverse=True)
+          print(f"{len(dated)} artifacts datados papers-db-<run> nao expirados")
 
-          # 2) avalia os candidatos datados mais pesados (ate 8)
-          best_key, best_rows, best_tmp = None, -1, None
-          for key, size in dated[:8]:
-              tmp = download(key)
-              n = citation_rows(tmp)
-              print(f"  candidato {key}  ({size/1e6:.1f} MB)  citations={n}")
+          best_rows, best_tmp, best_name = -1, None, None
+          for a in dated[:8]:
+              n, tmp = rows_of(a)
+              print(f"  {a['name']}  {a['created_at']}  citations={n}")
               if n > best_rows:
                   if best_tmp:
                       os.remove(best_tmp)
-                  best_rows, best_key, best_tmp = n, key, tmp
-              else:
+                  best_rows, best_tmp, best_name = n, tmp, a["name"]
+              elif tmp:
                   os.remove(tmp)
 
-          # 3) latest atual
+          latest = next(
+              (a for a in arts if a["name"] == "papers-db-latest" and not a["expired"]),
+              None,
+          )
           latest_rows = -1
-          try:
-              lt = download("papers/db/latest.db")
-              latest_rows = citation_rows(lt)
-              os.remove(lt)
-          except Exception as e:
-              print(f"latest.db indisponivel: {e}")
-
-          print(f"\n>>> latest atual: {latest_rows} citations")
-          print(f">>> backup datado mais rico: {best_key} = {best_rows} citations")
+          if latest:
+              latest_rows, lt = rows_of(latest)
+              if lt:
+                  os.remove(lt)
+          print(f"\n>>> papers-db-latest atual: {latest_rows} citations")
+          print(f">>> datado mais rico: {best_name} = {best_rows} citations")
 
           gh = os.environ.get("GITHUB_OUTPUT", os.devnull)
-          if best_key is not None and best_rows > latest_rows and best_rows > 0:
-              # promove no R2: copia o datado para latest.db
-              s3.copy_object(
-                  Bucket=bucket,
-                  CopySource={"Bucket": bucket, "Key": best_key},
-                  Key="papers/db/latest.db",
-              )
-              # salva localmente para subir como artifact papers-db-latest
-              os.replace(best_tmp, "data/papers.db")
-              print(f"PROMOVIDO {best_key} -> papers/db/latest.db ({best_rows} citations)")
-              with open(gh, "a") as f:
+          with open(gh, "a") as f:
+              if best_name and best_rows > latest_rows and best_rows > 0:
+                  os.replace(best_tmp, "data/papers.db")
+                  print(f"PROMOVENDO {best_name} ({best_rows} citations) -> papers-db-latest")
                   f.write("recovered=true\n")
                   f.write(f"rows={best_rows}\n")
-          else:
-              if best_tmp:
-                  os.remove(best_tmp)
-              print("latest ja e a base mais rica (ou nenhum backup com dados) — nada a promover")
-              with open(gh, "a") as f:
+                  f.write(f"source={best_name}\n")
+              else:
+                  if best_tmp:
+                      os.remove(best_tmp)
+                  print("latest ja e o mais rico (ou sem dados) — nada a promover")
                   f.write("recovered=false\n")
                   f.write(f"rows={latest_rows}\n")
           PY
 
-      - name: Subir DB recuperado como artifact papers-db-latest
+      - name: Promover DB recuperado para papers-db-latest
         if: steps.recover.outputs.recovered == 'true'
         uses: actions/upload-artifact@v5
         with:
@@ -144,4 +133,4 @@ jobs:
 
       - name: Resumo
         run: |
-          echo "recovered=${{ steps.recover.outputs.recovered }}  citations=${{ steps.recover.outputs.rows }}"
+          echo "recovered=${{ steps.recover.outputs.recovered }}  rows=${{ steps.recover.outputs.rows }}  source=${{ steps.recover.outputs.source }}"
