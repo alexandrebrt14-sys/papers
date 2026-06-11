@@ -9,6 +9,9 @@ concurrency:
   group: papers-${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 env:
   PAPERS_DB_PATH: data/papers.db
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

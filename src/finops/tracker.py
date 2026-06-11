@@ -48,11 +48,10 @@ PRICING: dict[str, dict[str, dict[str, float]]] = {
         "_default":                    {"input": 3.00,  "output": 15.00},
     },
     "google": {
-        "gemini-2.5-pro":        {"input": 1.25,  "output": 5.00},   # default (regra global)
         "gemini-2.5-flash":      {"input": 0.15,  "output": 0.60},   # legado: aliases mantidos para historico
         "gemini-2.0-flash":      {"input": 0.10,  "output": 0.40},
         "gemini-2.0-flash-lite": {"input": 0.0,   "output": 0.0},
-        "gemini-2.5-pro":        {"input": 1.25,  "output": 10.00},
+        "gemini-2.5-pro":        {"input": 1.25,  "output": 10.00},  # default (regra global)
         "_default":              {"input": 0.15,  "output": 0.60},
     },
     "perplexity": {

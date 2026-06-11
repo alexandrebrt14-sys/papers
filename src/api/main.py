@@ -169,6 +169,7 @@ def health():
             uptime_seconds=round(time.time() - _start_time, 1),
         )
     except Exception as e:
+        logger.error(f"Health check degradado: {e}")
         return HealthStatus(
             status="degraded",
             db_ok=False,

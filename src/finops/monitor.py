@@ -100,7 +100,6 @@ def check_stale_data(tracker: FinOpsTracker, max_hours: int = 48) -> dict[str, A
     conn.row_factory = sqlite3.Row
 
     result = {"stale": False, "hours_since_last": 0, "platforms": {}}
-    cutoff = (datetime.now(timezone.utc) - timedelta(hours=max_hours)).isoformat()
 
     for platform in ["openai", "anthropic", "google", "perplexity"]:
         last = conn.execute(
@@ -270,13 +269,6 @@ def generate_dashboard(tracker: FinOpsTracker) -> Path:
         "SELECT platform, model, SUM(cost_usd) as cost, SUM(total_tokens) as tokens, COUNT(*) as queries "
         "FROM finops_usage WHERE timestamp >= ? GROUP BY platform, model ORDER BY cost DESC LIMIT 20",
         (now.strftime("%Y-%m-01T00:00:00Z"),),
-    ).fetchall()
-
-    # Daily costs (last 30 days)
-    daily_costs = conn.execute(
-        "SELECT DATE(timestamp) as day, platform, SUM(cost_usd) as cost, COUNT(*) as queries "
-        "FROM finops_usage WHERE timestamp >= ? GROUP BY day, platform ORDER BY day",
-        ((now - timedelta(days=30)).isoformat(),),
     ).fetchall()
 
     # Recent alerts
