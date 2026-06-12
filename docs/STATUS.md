@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-06-11 14:03 UTC
+**Gerado automaticamente em:** 2026-06-12 01:05 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 833f9941bc5fd0b18e863fa939cd0eefc76b8db4 fix(ops): recuperar papers.db historico
+**Último commit:** 705fa3b2d9e59a1f3fed9b0ef2fa0397725b58de docs(research): peer-review input draft
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 21,247 | OK |
+| Código (linhas Python) | 21,760 | OK |
 | Testes unitários | 217 | OK |
-| Tabelas no banco | 23 | OK |
-| Citações coletadas | 216 | Coletando |
-| Taxa de citação | 48.1% | — |
-| Última coleta | 2026-06-11T14:03 | Ativo |
+| Tabelas no banco | 22 | OK |
+| Citações coletadas | 63,940 | Coletando |
+| Taxa de citação | 35.2% | — |
+| Última coleta | 2026-06-12T01:05 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0127 |
-| Anthropic | $0.0837 |
+| OpenAI | $0.8464 |
+| Anthropic | $5.5519 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0043 |
-| **Total** | **$0.1007** |
+| Perplexity | $0.3073 |
+| **Total** | **$6.7056** |
 
 ## Próximas Ações
 
@@ -37,7 +37,7 @@
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 216/1.000 |
+| Dados mínimos | 1.000 citações | 63,940/1.000 |
 | Série temporal | 90 dias contínuos | Em progresso |
 | Grupo de controle | 15 concorrentes | 0 observações |
 | Análise estatística | p < 0.05 | Disponível |
