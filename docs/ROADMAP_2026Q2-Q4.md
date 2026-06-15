@@ -37,6 +37,19 @@ Commit `1cedf14`.
 
 **Conclusão.** As duas mudanças reduzem custo e risco de indisponibilidade do componente mais caro do paper sem tocar na identidade do modelo nem nos dados históricos, preservando integridade científica e reprodutibilidade.
 
+### 2026-06-15 — Estado da coleta rumo aos 90 dias + reparo de healthcheck e workflows semanais
+
+**Estado da série longitudinal (Papers 1-3, alvo de 90 dias completos — `ARXIV_SUBMISSION_PLAN.md`).** No dia **54** da janela de **90** (snapshot de produção `data/dashboard_data.json`, fresco de 15-jun via Supabase): **42 dias coletados**, **63.940 queries**, **22.517 citações**, **51.317 respostas de calibração**. Cohort equilibrado nas 4 verticais (fintech/varejo/saúde/tecnologia). A coleta diária está saudável (`daily-collect.yml` rodando 2×/dia, sucessos em 13 e 14-jun + run em progresso em 15-jun); o `papers.db` não é mais versionado em git desde o PR #20 — vive como artifact `papers-db-latest` (forward-only) + R2 (source of truth), por isso o db local fica congelado e os checks de "últimas 24h" só passam no CI/Supabase (esperado). **Gap residual:** 54 dias decorridos × 42 coletados = ~12 dias históricos perdidos; a 90-day window fecha por volta de **28-jul** (alinhada ao início da janela Q3-W1 em 23-07). Para o artigo revisado por pares, a prioridade até lá é **não perder mais dias** (o `check_no_consecutive_failures` do healthcheck vigia gaps).
+
+**(a) Healthcheck do papers reparado e endurecido (15 dimensões reais).** `scripts/health_check.py`:
+- `check_word_boundary_matching` estava **órfão** (definido mas fora da lista de checks) **e quebrado** (importava `detect_entities` de `citation_tracker`, função removida no refactor de JSON `cited` array). Reapontado para o mecanismo atual (`EntityExtractor`, NER v2) testando **falso-positivo** ("internet" não casa "Banco Inter") **e** verdadeiro-positivo, e **conectado** à lista — o docstring "15 dimensões" agora é verdade.
+- `check_fictional_calibration_present` era um **no-op** (rodava uma query e descartava o resultado, sempre OK). Agora valida de verdade o cohort fictício contra `FICTIONAL_ENTITIES`/`is_fictional` do config.
+- Limpeza de lint (ruff: 5 erros pré-existentes → 0). Suíte: **217 testes passam**.
+
+**(b) Workflows semanais que NUNCA completavam — corrigidos.** `weekly-benchmark.yml` e `weekly-calibration.yml` vinham sendo **cancelados toda semana desde ≥ 2026-05-17** ao bater timeouts irreais (45min e 60min) menores que o próprio trabalho de coleta (SERP+citation+competitor / calibração fictícia para 4 verticais — cada vertical de citation sozinho já passa de 5min, medido no E2E de 15-jun). Consequência científica: a **calibração de false-positive** (controle exigido pelo revisor do Paper 1) **nunca era persistida**. Correção na raiz, sem tocar na concorrência afinada do daily:
+- Timeouts realistas: benchmark 45→**180min** (teto comprovado do daily), calibration 60→**120min**.
+- Reescalonamento para serializar a escrita no artifact compartilhado `papers-db-latest` e evitar corrida (last-writer-wins): daily 09:00 (teto 12:00) → **benchmark 13:00** (teto 16:00) → **calibration 17:00** (teto 19:00) → daily 21:00, com ≥60min de folga entre janelas.
+
 ## Q3 2026 (ago-set-out) — consolidação e infraestrutura
 
 | ID | Janela | Esforço (h) | Owner | Critical path | Saída esperada | Pré-requisitos |

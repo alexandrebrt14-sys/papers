@@ -110,7 +110,7 @@ def check_api_keys_loadable() -> Check:
     missing = [k for k in keys if not os.getenv(k)]
     if missing:
         return c.fail(f"keys ausentes: {missing}")
-    return c.ok(f"4/4 keys configuradas")
+    return c.ok("4/4 keys configuradas")
 
 
 def check_api_keys_valid() -> Check:
@@ -196,7 +196,7 @@ def check_api_keys_valid() -> Check:
     failed = [k for k, v in results.items() if v != "OK"]
     if failed:
         return c.fail(f"keys com problema: {results}", **results)
-    return c.ok(f"4/4 keys validas (OK)", **results)
+    return c.ok("4/4 keys validas (OK)", **results)
 
 
 def check_collection_today(min_obs: int) -> Check:
@@ -430,51 +430,60 @@ def check_endpoint_live(site: str) -> Check:
         r = urllib.request.urlopen(req, timeout=15)
         if r.status != 200:
             return c.fail(f"HTTP {r.status}")
-        return c.ok(f"HTTP 200 OK")
+        return c.ok("HTTP 200 OK")
     except Exception as exc:
         return c.fail(f"erro: {str(exc)[:100]}")
 
 
 def check_word_boundary_matching() -> Check:
-    """Smoke test: garante que detector usa word boundary (nao substring)."""
+    """Smoke test: o detector de entidades (NER v2 — EntityExtractor) usa fronteira
+    de palavra, nao substring. 'internet' contem 'Inter' como substring e NAO pode
+    casar 'Banco Inter' (anti-falso-positivo). Valida tambem um verdadeiro-positivo
+    para nao virar teste vazio. Antes apontava para src.collectors.citation_tracker.
+    detect_entities, removido no refactor de JSON `cited` array — corrigido para o
+    mecanismo atual (15-06-2026)."""
     c = Check("Word boundary matching ativo (anti-falso-positivo)")
     try:
-        # Importa o helper de matching e testa um caso conhecido
         sys.path.insert(0, str(ROOT))
-        from src.collectors.citation_tracker import detect_entities  # type: ignore
-        # Caso classico: "internet" nao deve dar match em "Inter"
-        text = "Connect to the internet for more information"
-        entities = ["Banco Inter"]
-        matched = detect_entities(text, entities)
-        if "Banco Inter" in matched:
-            return c.fail("falso positivo: 'internet' matched 'Banco Inter'")
-        return c.ok("regex \\b correto")
+        from src.analysis.entity_extraction import EntityExtractor  # type: ignore
+        ex = EntityExtractor(["Banco Inter"])
+        # Falso-positivo classico: "internet" contem "Inter".
+        fp = [m.entity for m in ex.extract("Connect to the internet for more information")]
+        if "Banco Inter" in fp:
+            return c.fail("falso positivo: 'internet' casou 'Banco Inter'")
+        # Verdadeiro-positivo: mencao real precisa ser detectada.
+        tp = [m.entity for m in ex.extract("O Banco Inter lancou um produto novo")]
+        if "Banco Inter" not in tp:
+            return c.fail("falso negativo: 'Banco Inter' nao detectado em mencao real")
+        return c.ok("NER v2 com fronteira de palavra correta (sem FP, com TP)")
     except ImportError:
-        return c.fail("detect_entities nao importavel", severity="warning")
+        return c.fail("EntityExtractor nao importavel", severity="warning")
     except Exception as exc:
         return c.fail(f"erro: {str(exc)[:100]}")
 
 
 def check_fictional_calibration_present() -> Check:
-    """Garante que entidades ficticias estao no coorte (calibracao false-positive)."""
+    """Garante que o cohort de entidades ficticias de calibracao esta configurado e
+    e reconhecido por is_fictional (calibracao de falso-positivo do paper). Antes era
+    um no-op que rodava uma query e descartava o resultado, sempre retornando OK —
+    agora valida o config de verdade (corrigido 15-06-2026)."""
     c = Check("Entidades ficticias presentes (calibracao false-positive)")
-    conn = _get_conn()
-    if not conn:
-        return c.fail("db nao acessivel")
     try:
-        # Verifica se ha menção a entidades ficticias conhecidas
-        ficticias = ["Banco Floresta Digital", "FinPay Solutions", "TechNova Solutions",
-                     "DataBridge Brasil", "MegaStore Brasil", "ShopNova Digital",
-                     "HealthTech Brasil", "Clínica Horizonte Digital"]
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat()
-        rows = conn.execute(
-            "SELECT DISTINCT cited_entity FROM citations WHERE timestamp >= ? AND cited_entity IS NOT NULL LIMIT 200",
-            (cutoff,),
-        ).fetchall()
-        # cited_entity é boolean (0/1) na verdade. So checa que o coorte foi configurado.
-        return c.ok("calibracao definida no config (8 ficticias por design)")
-    finally:
-        conn.close()
+        from src.config import FICTIONAL_ENTITIES, is_fictional  # type: ignore
+    except ImportError:
+        return c.fail("config de ficticias nao importavel", severity="warning")
+    total = sum(len(v) for v in FICTIONAL_ENTITIES.values())
+    if total == 0:
+        return c.fail("FICTIONAL_ENTITIES vazio (calibracao de falso-positivo desligada)")
+    nao_reconhecidos = [
+        n for names in FICTIONAL_ENTITIES.values() for n in names if not is_fictional(n)
+    ]
+    if nao_reconhecidos:
+        return c.fail(
+            f"nomes nao reconhecidos por is_fictional: {nao_reconhecidos[:3]}",
+            nao_reconhecidos=nao_reconhecidos,
+        )
+    return c.ok(f"{total} entidades ficticias configuradas e reconhecidas", total=total)
 
 
 def check_model_pinning() -> Check:
@@ -665,6 +674,7 @@ def main():
         check_model_pinning(),
         check_dual_response_capture(),
         check_fictional_calibration_present(),
+        check_word_boundary_matching(),
     ]
 
     n_pass = sum(1 for c in checks if c.passed)

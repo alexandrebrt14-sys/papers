@@ -5,12 +5,19 @@ name: Weekly Fictional Calibration
 # 6.568 rows históricas têm fictional_hit=0 e 100% specificity reportado
 # sem replicação metodológica — crítico para revisor do Paper 1.
 #
-# Frequência: domingo 10h BRT (13:00 UTC), não colide com daily (9h/21h UTC).
-# Custo estimado: +~30 queries × 5 LLMs × 4 verticais = 600 calls extras/semana.
+# Frequência: domingo 14h BRT (17:00 UTC). Custo: +~30 queries × 5 LLMs × 4
+# verticais = 600 calls extras/semana.
+#
+# 2026-06-15: movido de 13:00 -> 17:00 UTC. Antes batia no timeout de 60min e
+# era CANCELADO toda semana (~1h0m17s) desde >= 2026-05-17 — a calibração de
+# false-positive NUNCA persistia. Com timeout realista (120min), 13:00
+# colidiria com o weekly-benchmark (agora 13:00, teto 16:00) na escrita do
+# artifact compartilhado papers-db-latest. 17:00 inicia depois do benchmark e
+# termina <=19:00, antes do daily das 21:00 — serializacao por horario.
 
 on:
   schedule:
-    - cron: '0 13 * * 0'   # Domingo 10:00 BRT
+    - cron: '0 17 * * 0'   # Domingo 14:00 BRT
   workflow_dispatch: {}
 
 concurrency:
@@ -34,7 +41,10 @@ env:
 jobs:
   calibrate:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # 2026-06-15: 60 -> 120. A coleta de calibração (4 verticais × ~600 calls
+    # com INCLUDE_FICTIONAL_ENTITIES=true) excede 60min; o job vinha sendo
+    # cancelado em ~1h0m17s toda semana, nunca persistindo a calibração.
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v5

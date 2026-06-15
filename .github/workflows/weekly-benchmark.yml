@@ -2,7 +2,14 @@ name: Weekly Benchmark + Analysis
 
 on:
   schedule:
-    - cron: '0 11 * * 0'  # domingo 08:00 BRT (UTC-3)
+    # 2026-06-15: movido de 11:00 -> 13:00 UTC. O job coleta SERP+citation+
+    # competitor para 4 verticais (~tao pesado quanto o daily) e estava sendo
+    # CANCELADO toda semana ao bater o antigo timeout de 45min. Com timeout
+    # realista (180min, teto do daily), 11:00 colidiria com o daily das 09:00
+    # (teto 12:00) e com a calibration. 13:00 inicia apos o daily das 09:00 e
+    # termina <=16:00, antes da calibration (17:00) e do daily das 21:00 — sem
+    # overlap de escrita no artifact compartilhado papers-db-latest.
+    - cron: '0 13 * * 0'  # domingo 10:00 BRT (UTC-3)
   workflow_dispatch:
 
 concurrency:
@@ -27,7 +34,11 @@ env:
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # 2026-06-15: 45 -> 180. O passo "citation + competitor — all verticals"
+    # sozinho excede 45min; o job vinha sendo cancelado em ~45m18s toda semana
+    # desde >= 2026-05-17 (nunca completou, nunca persistiu o artifact nem o
+    # relatorio). 180 = mesmo teto comprovado do daily-collect.
+    timeout-minutes: 180
 
     steps:
       - uses: actions/checkout@v5
