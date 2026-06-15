@@ -1,0 +1,79 @@
+{
+  "qid": "P1",
+  "query": "Profound AI visibility platform 2026 updates: new features, number of AI engines tracked, Personas, Profound Agents, Series C funding round, founder blog posts and methodology changes. What did Profound launch in 2026?",
+  "content": "A partir dos resultados live, **Profound lançou em 2026 a expansão de “Agents”/“Profound Sheets”**, reforçando um fluxo de trabalho de IA dentro da própria plataforma, com execução de tarefas como análise de intenção, redação de blog posts, geração de meta descriptions e conteúdo social.[2][3] Os resultados também apontam **uma rodada Series C de US$ 96M em fevereiro de 2026, com valuation de US$ 1B**, mas essa afirmação aparece só em fontes secundárias nos resultados fornecidos, então a atribuição é de mercado/review, não confirmação direta da empresa.[3][5]\n\n- **Novo produto/feature em 2026:**  \n  - **Profound Sheets** foi descrito em 26 mar. 2026 como uma atualização para operar **centenas de agents em paralelo**, com foco em analytics, insights e execução.[2]  \n  - O vídeo também diz que **Profound agents** permitem criar workflows de IA “no mesmo lugar onde os dados vivem”, incluindo tarefas como **analisar search intent, escrever blog posts, gerar meta descriptions e rascunhar social content**.[2]\n\n- **Agents:**  \n  - Um review de 2026 afirma que a funcionalidade **Agents** já tinha sido lançada no fim de 2025 e que, em 2026, passou a incluir **drag-and-drop builder**, **templates prebuilt** (Content Refresh, AEO FAQ Generation, Competitive Research, Net-New Content), **brand kit injection**, **knowledge base retrieval** e **publishing para WordPress / Sanity / Contentful**.[3]  \n  - A mesma fonte menciona **Sheets** para processamento paralelo.[3]\n\n- **Número de AI engines rastreados:**  \n  - Os resultados não trazem um número único e oficial consolidado em 2026.  \n  - A própria página da empresa e reviews citam rastreamento em plataformas como **ChatGPT, Gemini, Claude, Perplexity, Google AI Overviews, Microsoft Copilot** e outras; um review lista cobertura “multi-platform” incluindo **Google AI Mode**, **Google Gemini**, **Amazon Rufus** “coming soon” e **Grok**.[1][6]  \n  - Outra fonte afirma que o produto de entrada cobre só **ChatGPT**, enquanto níveis superiores cobrem **3 plataformas** e o enterprise adiciona mais engines, mas isso é descrição de pricing/tiers, não um total global fixo.[4]\n\n- **Personas:**  \n  - Nos resultados fornecidos, **não há evidência direta** de uma feature chamada **“Personas”** lançada pela Profound em 2026.[1][2][3][6]  \n  - Se você estiver se referindo a *personas* como segmento/target de produto, as fontes descrevem a oferta para **enterprise brands**, **Fortune 500** e times de marketing/AEO, mas não um módulo com esse nome.[1][3][6]\n\n- **Founder blog posts:**  \n  - Os resultados **não incluem posts do fundador** nem identificam publicações específicas do fundador em 2026.[1][2][3][6]  \n  - Portanto, **não dá para confirmar** esse item com os resultados live fornecidos.\n\n- **Methodology changes:**  \n  - As fontes mostram uma mudança de metodologia na forma como a Profound mede AI visibility:  \n    - **Prompt Volumes** estimando demanda real por tópico a partir de um **panel of opted-in consumers**.[3]  \n    - **Agent Analytics** lendo **server logs** para ver quais crawlers visitam quais páginas.[3][6]  \n    - **Conversation Explorer** para revelar **real-time AI search volume data** antes invisível aos marketers.[1]  \n  - Uma review também diz que a empresa passou de ferramenta de monitoramento para um modelo mais “read/write”, combinando **análise + otimização/execução**.[1][3]\n\n- **Funding round em 2026:**  \n  - Uma fonte secundária afirma que a Profound levantou **US$ 96M na Series C em fevereiro de 2026** com valuation de **US$ 1B**.[3]  \n  - Outras fontes nos resultados citam fundings anteriores e/ou repetem esse número indiretamente, mas **nenhuma fonte primária da empresa aparece nos resultados** para validação direta.[1][5]\n\nSe você quiser, eu posso transformar isso em uma **timeline de 2026** com apenas os lançamentos confirmados pelos resultados live.",
+  "citations": [
+    "https://www.rankability.com/blog/profound-ai-review/",
+    "https://www.youtube.com/watch?v=s-R3RJXpIoE",
+    "https://www.tryanalyze.ai/blog/profound-ai-review",
+    "https://astiva.ai/blog/profound-alternatives",
+    "https://www.frictionai.co/blog/profound-ai-alternative-affordable-ai-visibility",
+    "https://www.tryprofound.com",
+    "https://checkthat.ai/brands/tryprofound",
+    "https://www.scalenut.com/blogs/profound-ai-reviews"
+  ],
+  "search_results": [
+    {
+      "title": "Profound AI Review for 2026: Is It Worth the Investment? - Rankability",
+      "url": "https://www.rankability.com/blog/profound-ai-review/",
+      "date": "2026-05-07",
+      "last_updated": "2026-06-14",
+      "snippet": "Rankability is the SEO and AI visibility platform built for agencies that want top 1% results for their clients. Our team writes about what ...",
+      "source": "web"
+    },
+    {
+      "title": "How to Maximize AI Visibility Analytics with Profound Sheets",
+      "url": "https://www.youtube.com/watch?v=s-R3RJXpIoE",
+      "date": "2026-03-26",
+      "last_updated": "2026-06-15",
+      "snippet": "Unlock the full potential of AI visibility analytics with the latest upgrade to Profound Sheets. In this video, we explore how the ...",
+      "source": "web"
+    },
+    {
+      "title": "Profound AI Review 2026: Limits, Pricing & Results - Analyze AI",
+      "url": "https://www.tryanalyze.ai/blog/profound-ai-review",
+      "date": "2026-05-15",
+      "last_updated": "2026-06-08",
+      "snippet": "In this article, you'll see what Profound AI does well in 2026, where it stops being useful, what its Agents feature can and cannot ship, what ...",
+      "source": "web"
+    },
+    {
+      "title": "Profound Alternatives 2026: 7 Tools Compared | Astiva AI Blog",
+      "url": "https://astiva.ai/blog/profound-alternatives",
+      "date": "2024-12-14",
+      "last_updated": "2026-06-13",
+      "snippet": "Profound alternatives are AI visibility platforms tracking brand citations across ChatGPT, Perplexity, Claude, and other major AI platforms at lower prices or ...",
+      "source": "web"
+    },
+    {
+      "title": "Profound Alternatives: 5 Platforms to Evaluate (2026) - friction AI",
+      "url": "https://www.frictionai.co/blog/profound-ai-alternative-affordable-ai-visibility",
+      "date": "2026-03-12",
+      "last_updated": "2026-06-14",
+      "snippet": "Profound is the most well-funded company in the AI visibility space. In February 2026, they raised $96M at a $1B valuation, bringing total ...",
+      "source": "web"
+    },
+    {
+      "title": "Profound | Optimize Your Brand's Visibility in AI Search",
+      "url": "https://www.tryprofound.com",
+      "last_updated": "2026-06-15",
+      "snippet": "Profound helps brands gain visibility in AI-generated answers, optimize their presence in LLM-based answer engines, and stay competitive in the zero-click ...",
+      "source": "web"
+    },
+    {
+      "title": "Profound: Details, Reviews, Pricing, & Features - CheckThat.ai",
+      "url": "https://checkthat.ai/brands/tryprofound",
+      "last_updated": "2026-06-15",
+      "snippet": "Profound is an Answer Engine Optimization platform that helps enterprise brands track and improve their visibility in AI-powered search engines like ChatGPT ...",
+      "source": "web"
+    },
+    {
+      "title": "Profound AI Reviews: Is It Really the Best GEO Tool In 2026?",
+      "url": "https://www.scalenut.com/blogs/profound-ai-reviews",
+      "date": "2026-05-12",
+      "last_updated": "2026-06-13",
+      "snippet": "Profound AI is a GEO and AI visibility platform that helps you see how your brand shows up in AI-generated answers across ChatGPT, Perplexity, ...",
+      "source": "web"
+    }
+  ]
+}

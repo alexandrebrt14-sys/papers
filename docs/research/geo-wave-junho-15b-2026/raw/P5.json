@@ -1,0 +1,62 @@
+{
+  "qid": "P5",
+  "query": "Google AI Mode and AI Overviews changes 2026, ChatGPT Search and ads, agentic shopping checkout, zero-click search data 2026 (SparkToro, Semrush), llms.txt adoption vs IETF AIPREF ai-preferences standard. Numbers, dates, primary sources.",
+  "content": "Há evidência primária, em maio de 2026, de que o **Google Search** passou a integrar mais profundamente **AI Mode**, **AI Overview**, agentes e experiências de compra/booking no fluxo de busca; porém, os resultados fornecidos aqui cobrem bem o anúncio do Google e fracos em dados primários sobre **ads no ChatGPT Search**, **zero-click 2026** e **adoção de llms.txt / AIPREF**.[3] Como você pediu “números, datas, primary sources”, abaixo separo o que está sustentado por fonte primária e o que *não* está sustentado pelos resultados.\n\n- **Google AI Mode / AI Overview: mudanças em 2026**\n  - Em **19 de maio de 2026**, o Google anunciou “a new era for AI Search”, dizendo que estava trazendo “advanced model capabilities to Search” e lançando uma “intelligent AI-powered Search box” como a maior atualização em mais de 25 anos.[3]\n  - O Google afirmou que o **Gemini 3.5 Flash** virou o modelo padrão em **AI Mode** “for everyone globally” a partir desse lançamento.[3]\n  - O Google disse que seria possível continuar a conversa a partir de um **AI Overview** e “flow into a conversational back and forth with AI Mode”, com essa experiência “live today across desktop and mobile, worldwide”.[3]\n  - O Google também anunciou a expansão de **AI Mode** para “nearly **200 countries and territories** across **98 languages**”, sem necessidade de assinatura.[3]\n  - O Google declarou que seus **information agents** seriam lançados primeiro para assinantes de **Google AI Pro & Ultra** “this summer”, e que capacidades agentic para booking e tarefas locais chegariam “to everyone in the U.S. this summer”.[3]\n\n- **Google Ads dentro de AI Overviews / AI Mode**\n  - Nos resultados enviados, a única descrição detalhada de ads em AI Overviews vem de conteúdo secundário e vídeo, não de fonte primária do Google.[2]\n  - Esse conteúdo afirma que anúncios podem aparecer **above, within or below AI Overviews**, mas ele também indica limitações de controle e segmentação que são atribuídas ao Google sem documentação primária no material fornecido.[2]\n  - Portanto, com base *apenas* nesses resultados, eu **não consigo validar primariamente** regras como “broad match only inside AI Overviews” ou “no opt-out” para 2026.[2]\n\n- **ChatGPT Search e ads**\n  - Os resultados fornecidos **não trazem uma fonte primária da OpenAI** sobre anúncios no **ChatGPT Search**.[1][2][3][4][5][6]\n  - Assim, não dá para afirmar, com suporte desses resultados, se houve mudança em **2026**, nem quais formatos de ads existem, nem se há rollout público, geo, ou critérios de elegibilidade.\n\n- **Agentic shopping checkout**\n  - O anúncio do Google em **19 de maio de 2026** confirma expansão de **agentic capabilities** para compra e booking em Search.[3]\n  - O texto diz que o Search vai “bring together the latest pricing and availability with direct links to finish booking through the provider of your choice” para tarefas de booking, e que haverá capacidades para “help you shop in Search”.[3]\n  - Os resultados, porém, **não mostram detalhes primários de checkout finalizado dentro da interface**; o que está documentado é suporte a tarefas agentic e links para concluir com o provedor, não um comprovante de checkout nativo completo.[3]\n\n- **Zero-click search em 2026: SparkToro / Semrush**\n  - Os resultados fornecidos **não incluem** o estudo primário da SparkToro nem um relatório primário da Semrush sobre **zero-click search data 2026**.[1][2][3][4][5][6]\n  - O conteúdo secundário sobre AI Overviews afirma que “for many queries, users no longer need to click through to a website” e menciona quedas de CTR “up to ~61%” em queries informacionais, mas isso está em uma página de terceiros e não vem acompanhado, nos resultados fornecidos, do paper original ou do recorte metodológico.[1]\n  - Portanto, o número **~61%** aparece aqui apenas como alegação secundária, não como dado primário verificável neste conjunto.[1]\n\n- **llms.txt vs IETF AIPREF / ai-preferences**\n  - Os resultados fornecidos **não trazem** documentos primários do projeto **llms.txt** nem do trabalho do **IETF AIPREF / ai-preferences**.[1][2][3][4][5][6]\n  - Assim, eu **não consigo afirmar adoção, cronologia, nem comparação de tração** entre os dois padrões com base nesses resultados.\n\n- **O que dá para sustentar com segurança**\n  - O Google formalizou em **19/05/2026** uma integração mais profunda entre busca conversacional, AI Mode, AI Overviews, agentes e shopping/booking no Search.[3]\n  - As expansões declaradas incluem **nearly 200 countries and territories**, **98 languages**, e início de rollout “this summer” para várias capacidades agentic.[3]\n  - Os materiais fornecidos aqui são **insuficientes** para fechar, com rigor, os tópicos de **ads no ChatGPT Search**, **zero-click 2026 com SparkToro/Semrush**, e **adoção de llms.txt vs AIPREF**.[1][2][3][4][5][6]\n\nSe você quiser, eu posso fazer uma segunda passada **apenas com fontes primárias** e montar um quadro comparativo por tópico com colunas **data / número / claim / fonte primária / evidência independente**.",
+  "citations": [
+    "https://www.enfuse-solutions.com/how-googles-ai-overviews-are-changing-seo-in-2026/",
+    "https://www.youtube.com/watch?v=Imaxx2epB1c",
+    "https://blog.google/products-and-platforms/products/search/search-io-2026/",
+    "https://discoveredlabs.com/blog/google-ai-mode-may-2026-search-update",
+    "https://www.cmswire.com/digital-marketing/google-ai-mode-changes-the-customer-journey-your-content-strategy-must-too/",
+    "https://cloud.google.com/resources/content/ai-agent-trends-2026"
+  ],
+  "search_results": [
+    {
+      "title": "How Google's AI Overviews Are Changing SEO In 2026",
+      "url": "https://www.enfuse-solutions.com/how-googles-ai-overviews-are-changing-seo-in-2026/",
+      "date": "2026-02-03",
+      "last_updated": "2026-04-17",
+      "snippet": "One major analysis reported organic CTR drops of up to ~61% on informational queries after AI Overviews became widespread, with paid CTRs ...",
+      "source": "web"
+    },
+    {
+      "title": "How AI Search Ads are REALLY shaping Google Ads in 2026",
+      "url": "https://www.youtube.com/watch?v=Imaxx2epB1c",
+      "date": "2026-01-10",
+      "last_updated": "2026-06-14",
+      "snippet": "In this video, I break down Google AI Mode and AI Overview Ads ... change user intent and what this means for PPC strategy, keyword ...",
+      "source": "web"
+    },
+    {
+      "title": "A new era for AI Search - Google Blog",
+      "url": "https://blog.google/products-and-platforms/products/search/search-io-2026/",
+      "date": "2026-05-19",
+      "last_updated": "2026-06-15",
+      "snippet": "We're bringing our advanced model capabilities to Search with new AI features, enabling you to use agents just by asking a question.",
+      "source": "web"
+    },
+    {
+      "title": "Google AI Mode and the May 2026 search update - Discovered Labs",
+      "url": "https://discoveredlabs.com/blog/google-ai-mode-may-2026-search-update",
+      "date": "2026-05-20",
+      "last_updated": "2026-06-14",
+      "snippet": "Google AI Mode and the May 2026 search update changed how B2B buyers research software before contacting sales or booking demos.",
+      "source": "web"
+    },
+    {
+      "title": "AI Mode Is Growing — Here's How Marketers Can Still Win Search",
+      "url": "https://www.cmswire.com/digital-marketing/google-ai-mode-changes-the-customer-journey-your-content-strategy-must-too/",
+      "date": "2025-11-19",
+      "last_updated": "2026-06-14",
+      "snippet": "AI-powered results reshape how customers search, evaluate and click. Marketers who adapt early will own the next era of organic visibility.",
+      "source": "web"
+    },
+    {
+      "title": "AI agent trends 2026 report | Google Cloud",
+      "url": "https://cloud.google.com/resources/content/ai-agent-trends-2026",
+      "last_updated": "2026-06-11",
+      "snippet": "Our new report reveals the 5 top trends in agentic AI that can help transform businesses, for 2026 and beyond. Download your copy.",
+      "source": "web"
+    }
+  ]
+}

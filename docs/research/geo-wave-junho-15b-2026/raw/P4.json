@@ -1,0 +1,71 @@
+{
+  "qid": "P4",
+  "query": "GEO KPIs and measurement frameworks 2026: Share of Voice vs Share of Answer, mention rate, citation rate, recommendation rate, prompt coverage, AI Visibility Index methodology. How vendors compute them, public benchmarks, standardization proposals. Source articles from 2026.",
+  "content": "Os principais KPIs de GEO/AEO em 2026 giram em torno de **visibilidade competitiva em respostas de IA**: *Share of Voice / AI Share of Voice*, *prompt coverage / answer inclusion*, *citation rate / AI citation frequency*, *brand mention/visibility*, além de métricas derivadas como *AI-referred pipeline ou traffic*.[1][3][4][5][6][7]  \nEntretanto, **quase não há padronização formal nem benchmarks públicos amplos em 2026**; o que existe são definições e metodologias de vendors (LLM Pulse, Similarweb, OptimizeGEO, Discovered Labs, BrightEdge, Lumar, agências) com convergência conceitual, mas diferenças práticas de cálculo.[1][3][4][5][6][7]\n\nAbaixo organizo por KPI, metodologia típica (como vendors calculam), benchmarks públicos (se existem) e sinais de padronização.\n\n---\n\n## 1. Share of Voice vs. Share of Answer em GEO/AEO 2026\n\n### 1.1. Conceitos básicos\n\n- **AI Share of Voice (SoV)**  \n  - Definição geral em GEO: “medir com que frequência sua marca aparece em respostas de IA comparada a concorrentes, em um conjunto de prompts relevantes”.[1][3][5][7]  \n  - LLM Pulse: SoV mede “com que frequência a marca é mencionada em respostas de IA comparada a concorrentes, ao longo dos prompts rastreados” e é descrito como “equivalente de AI do search visibility score do SEO tradicional”.[1]  \n  - Similarweb: fala em **“Gen AI share of voice”** e **“brand mention share”** como principais indicadores na seção de “AI brand visibility”.[6]  \n  - OptimizeGEO: define **AI Share of Voice** como “porcentagem de respostas geradas em sua categoria que mencionam sua marca”.[5]  \n\n- **Share of Answer**  \n  - Nenhuma das fontes cita explicitamente um KPI com o nome formal **“Share of Answer”** em 2026.[1][2][3][4][5][6][7]  \n  - Conceitos próximos:\n    - **Answer inclusion rate / answer presence** (Lumar): % de prompts relevantes em que sua marca/conteúdo aparece na resposta.[3]  \n    - **Prompt coverage** (Lumar, Similarweb, LLM Pulse em parte): quão amplamente a marca aparece em diferentes tipos de prompts, tópicos e modelos.[1][3][6]  \n  - Na prática, vendors tratam “Share of Voice” já dentro do contexto de **respostas geradas**, então o que alguns profissionais chamam de “Share of Answer” tende a ser operacionalizado como:\n    - proporção de **respostas** em que a marca está presente vs. todo o universo de respostas da categoria (SoV),\n    - ou como **Answer inclusion rate** (nível de pergunta/prompt).  \n\n**Conclusão conceitual**:  \n- **Share of Voice** em GEO 2026 = visibilidade competitiva em *respostas de IA* (menções/citações) numa cesta de prompts.[1][3][5][6][7]  \n- **Share of Answer** como termo não aparece normatizado nas fontes; o conceito é coberto, na prática, por **AI Share of Voice** + **Answer inclusion rate / prompt coverage**.[1][3][6]\n\n---\n\n## 2. Metodologias típicas de cálculo (como vendors fazem)\n\n### 2.1. AI Share of Voice / Brand Mention Share\n\n**Componentes comuns (a partir de LLM Pulse, OptimizeGEO, Similarweb, agências):**\n\n- **Base de prompts rastreados**  \n  - Conjunto de prompts “relevantes” para a categoria (palavras‑chave, use cases, categorias de produto, perguntas de comparação, etc.).[1][3][5][6][7]  \n  - Geralmente segmentado por:\n    - modelo (ChatGPT, Perplexity, Gemini, Copilot, etc.),[1][3][6]\n    - estágio de funil (informacional, comparação, transacional),[3]\n    - idioma/região (dependendo do vendor).  \n\n- **Coleta das respostas de IA**  \n  - Chamadas automatizadas aos assistentes ou scraping de experiências de AI search; cada prompt gera 1 ou mais “respostas” que são armazenadas.[1][3][5][6]  \n\n- **Detecção de menções de marca**  \n  - Reconhecimento da marca no texto (brand name textual).  \n  - LLM Pulse explicita que **URLs ou domínios sozinhos não bastam**; é preciso o nome explícito da marca no texto gerado.[1]  \n\n- **Cálculo típico de SoV**  \n  - OptimizeGEO descreve explicitamente: **AI Share of Voice é a porcentagem de respostas relevantes na categoria que mencionam sua marca**.[5]  \n    - Fórmula implícita:  \n      \\[\n      \\text{AI SOV} = \\frac{\\text{respostas (ou passagens) que mencionam a marca}}{\\text{total de respostas na categoria}} \\times 100\\%\n      \\]\n  - LLM Pulse: SoV é calculado **“ao longo de todos os modelos de IA rastreados”**, mostrando “onde você está no landscape competitivo”.[1]  \n  - Similarweb fala em **“brand mention share”** e “Gen AI share of voice” na visão de AI brand visibility, sugerindo divisão do volume de menções/ocorrências da marca pelo total de menções de todas as marcas rastreadas.[6]  \n  - Agências como Hop Online: SoV é “KPI primário” em GEO, definido como **visibilidade relativa vs. concorrência para prompts que importam**.[7]  \n\n**Pontos que variam entre vendors (não padronizados):**\n\n- Unidade de contagem:\n  - por **resposta completa** (se a resposta cita a marca ou não),[5][7]\n  - por **parágrafo/passage** (mais granular),\n  - por **slot** em listas de recomendações (“top tools”, “best X”).  \n- Ponderação:\n  - alguns vendors podem ponderar por:\n    - posição na resposta (cabeçalho vs. rodapé),\n    - destaque visual (cards, boxes),\n    - volume estimado de buscas do prompt (para aproximar impressões)[3] (Lumar sugere usar interesse de busca via Google Trends para inferir potencial de exposição).[3]  \n\n### 2.2. Prompt coverage & Answer inclusion rate (Share of Answer “de fato”)\n\n- **Prompt coverage (Lumar)**  \n  - Métrica: **percentual de prompts relevantes em que sua marca aparece ou influencia a resposta**.[3]  \n  - É descrita como: “quão amplamente sua marca aparece em diferentes tipos de prompts, tópicos, estágios de funil e modelos”.[3]  \n  - Cálculo típico:  \n    - Numerador: nº de prompts onde a marca:\n      - é mencionada explicitamente, ou\n      - é citada como fonte, ou\n      - suas páginas são usadas como base para o conteúdo (mesmo sem menção direta, se o vendor conseguir detectar).  \n    - Denominador: total de prompts rastreados no cluster.  \n\n- **Answer inclusion rate (Lumar)**  \n  - Definida como “porcentagem de prompts relevantes em que sua marca ou conteúdo aparece na resposta (verbatim, resumido ou parafraseado)”.[3]  \n  - Complementa o SoV: foca em **estar ou não no answer** em vez de share competitivo de menções.  \n\nEssas duas métricas são as mais próximas do que muitos chamariam de **“Share of Answer”** em GEO, embora esse nome não apareça formalmente nos artigos de 2026.[3]\n\n---\n\n## 3. Mention rate (taxa de menções de marca)\n\nNenhum vendor usa explicitamente o rótulo “mention rate” nos textos analisados, mas a métrica está embutida nos conceitos de:\n\n- **Brand mentions** (LLM Pulse)  \n  - “Medem com que frequência uma marca é referenciada em respostas de IA.”[1]  \n  - Inclui menções em texto simples e âncoras com o nome da marca.[1]  \n\n- **Brand mention share** (Similarweb)  \n  - Termo usado no contexto de “AI brand visibility overview”, como share de menções.[6]  \n\nMetodologia geral (implícita, combinando definições):\n\n- **Mention count**:  \n  - contar o número de vezes que a marca aparece no texto gerado (em todas as respostas de um dataset).[1][6]  \n- **Mention rate** (interpretação operacional comum):\n  - menções por 100 respostas, por 1.000 prompts ou % de respostas que contêm ao menos 1 menção.  \n- Vendors diferenciam **“brand mentions”** de **“brand visibility”**, em que visibilidade considera:\n  - frequência,\n  - distribuição por modelos e tópicos,\n  - cobertura de prompts.[1]  \n\n---\n\n## 4. Citation rate (AI citation frequency)\n\n### 4.1. Definições\n\n- **Citations** (LLM Pulse)  \n  - “Medem quando uma resposta de IA inclui link clicável para uma fonte.”[1]  \n  - Consideram como citação tanto URL cru quanto texto âncora, desde que seja clicável.[1]  \n  - Representam as **fontes de informação que o modelo usou** para compor a resposta.[1]  \n\n- **AI citation frequency** (Lumar)  \n  - Métrica: “com que frequência sua marca ou conteúdo é referenciado em respostas de IA.”[3]  \n  - Aparece como um dos KPIs centrais junto de prompt coverage e AI share of voice.[3]  \n\n- **Citation Rate** (Discovered Labs)  \n  - Discovered Labs lista “Citation Rate, Share of Voice, and AI-referred pipeline” como GEO metrics que importam em 2026.[4]  \n  - O artigo (título de 2026) foca em medir quão frequentemente a marca é citada com links em ChatGPT e outros assistentes, mas não expõe fórmula completa no trecho disponível.[4]  \n\n### 4.2. Metodologias típicas\n\nCombinando descrições:\n\n- **Unidade de observação**: resposta ou prompt.  \n- **Detecção de citação**:\n  - varredura da resposta em busca de links clicáveis,\n  - classificação se apontam para:\n    - site próprio,\n    - concorrentes,\n    - terceiros neutros.[1][3]  \n\n- **Cálculo típico de “citation rate / AI citation frequency”**:\n  - Porcentagem de respostas (ou prompts) em qu",
+  "citations": [
+    "https://llmpulse.ai/blog/geo-metrics/",
+    "https://www.brightedge.com/blog/what-share-of-voice-really-means-for-search-in-2026",
+    "https://www.lumar.io/webinars-events/geo-aeo-kpis-ai-search-metrics-lumar-webinar-replay/",
+    "https://discoveredlabs.com/blog/geo-metrics-what-kpis-matter-how-to-track-them-2026",
+    "https://www.optimizegeo.ai/blog/ai-share-of-voice",
+    "https://www.similarweb.com/blog/marketing/geo/geo-kpis/",
+    "https://hoponline.ai/faqs/what-kpis-and-metrics-should-i-actually-track-for-a-geo-campaign"
+  ],
+  "search_results": [
+    {
+      "title": "AI Search KPIs for Competitive Visibility in 2026 - LLM Pulse",
+      "url": "https://llmpulse.ai/blog/geo-metrics/",
+      "date": "2025-12-16",
+      "last_updated": "2026-06-12",
+      "snippet": "For competitive visibility, the most relevant GEO KPIs are brand mentions, brand visibility, and share of voice. Together, they indicate ...",
+      "source": "web"
+    },
+    {
+      "title": "What Share of Voice Really Means for Search in 2026 - BrightEdge",
+      "url": "https://www.brightedge.com/blog/what-share-of-voice-really-means-for-search-in-2026",
+      "last_updated": "2026-06-12",
+      "snippet": "For share of voice, that means understanding where your brand shows up when customers are researching and being recommended by AI—and whether you're there in ...",
+      "source": "web"
+    },
+    {
+      "title": "The New Metrics of AI Search - GEO/AEO KPIs to Track Now ... - Lumar",
+      "url": "https://www.lumar.io/webinars-events/geo-aeo-kpis-ai-search-metrics-lumar-webinar-replay/",
+      "date": "2026-02-26",
+      "last_updated": "2026-06-14",
+      "snippet": "AI share of voice: How often your brand appears compared with competitors. Answer accuracy and narrative control: Whether AI systems are ...",
+      "source": "web"
+    },
+    {
+      "title": "GEO Metrics: What KPIs Matter & How to Track Them (2026)",
+      "url": "https://discoveredlabs.com/blog/geo-metrics-what-kpis-matter-how-to-track-them-2026",
+      "date": "2026-01-09",
+      "last_updated": "2026-05-24",
+      "snippet": "GEO metrics that matter: Track Citation Rate, Share of Voice, and AI-referred pipeline to measure your visibility across ChatGPT and ...",
+      "source": "web"
+    },
+    {
+      "title": "AI Share of Voice (SOV): A Guide to Measuring Brand Visibility in AI",
+      "url": "https://www.optimizegeo.ai/blog/ai-share-of-voice",
+      "date": "2026-06-03",
+      "last_updated": "2026-06-12",
+      "snippet": "AI Share of Voice is the percentage of AI-generated responses in your category that mention your brand. If 100 relevant AI answers are generated ...",
+      "source": "web"
+    },
+    {
+      "title": "GEO KPIs: How To Measure The Right GEO Metrics - Similarweb",
+      "url": "https://www.similarweb.com/blog/marketing/geo/geo-kpis/",
+      "date": "2025-12-24",
+      "last_updated": "2026-05-22",
+      "snippet": "How to measure brand mention share and Gen AI share of voice? This data appears at the top of the overview section in the AI brand visibility ...",
+      "source": "web"
+    },
+    {
+      "title": "What KPIs and Metrics Should I Actually Track for a GEO Campaign?",
+      "url": "https://hoponline.ai/faqs/what-kpis-and-metrics-should-i-actually-track-for-a-geo-campaign",
+      "date": "2025-12-20",
+      "last_updated": "2026-06-14",
+      "snippet": "For GEO, Share of Voice is the primary KPI and is defined as brand visibility relative to your competition for prompts that matter. It measures ...",
+      "source": "web"
+    }
+  ]
+}

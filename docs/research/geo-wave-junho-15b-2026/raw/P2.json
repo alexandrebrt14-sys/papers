@@ -1,0 +1,90 @@
+{
+  "qid": "P2",
+  "query": "Ahrefs Brand Radar 2026 features and methodology, number of prompts, AI Overviews most-cited domains study 2026; and Semrush AI Visibility Index / Enterprise AIO / AI SEO toolkit 2026 launches, methodology, MCP access. Recent product announcements and blog posts.",
+  "content": "Segue um panorama sintetizado, focado em 2026, com o que já é público sobre Ahrefs e Semrush para AI / AEO. Quando algo não está em nenhuma fonte, sinalizo explicitamente.\n\n---\n\n## 1. Ahrefs Brand Radar (2026) – recursos, metodologia, prompts e estudo de AI Overviews\n\n### 1.1. Objetivo e escopo\n\n- **Função principal:** ferramenta de **AI visibility / AI Share of Voice** para acompanhar como marcas aparecem em respostas de **ChatGPT, Perplexity, Gemini, Microsoft Copilot, Google AI Overviews e Google AI Mode**.[1][6][7]  \n- **Ângulo de produto:** não é um “rank tracker de prompts”, mas um **banco de dados de pesquisa macro** para visibilidade de marca em LLM + canais que influenciam AI (SEO, YouTube, TikTok, Reddit).[3][6][7]\n\n### 1.2. Metodologia – como o Brand Radar coleta e modela os dados\n\n**Fonte principal: post oficial “Ahrefs Brand Radar Methodology”**.[1]\n\n- **Base de palavras‑chave / perguntas**\n  - Parte de um banco de dados de **100+ bilhões de keywords** da Ahrefs.[1]  \n  - Usa **People Also Ask (PAA)** do Google + um sistema de **semantic fanout** para expandir consultas em sub‑perguntas.[1]  \n  - O objetivo é modelar *“como as pessoas naturalmente fazem perguntas online”*, em vez de prompts sintéticos.[1][5]\n\n- **Geração de prompts e volume**\n  - Os prompts são derivados de:\n    - PAA + base de 110 bilhões de keywords, com 28,7 bilhões com volume positivo.[1]  \n    - Expansão por PAA e Fanout, que às vezes se sobrepõem, mas cumprem papéis distintos (capturar dúvidas reais e cobrir o “espaço semântico” do tópico).[1]  \n  - O help center atual fala em **320+ milhões de search‑backed prompts** usados em 6 plataformas de IA.[7]  \n  - Reviews de terceiros citam números de ordem similar:\n    - 200M–240M prompts em avaliações independentes.[3][6]  \n    - Outra review fala em **259M monthly prompts**.[5]  \n    - A página de suporte mais recente menciona **350+ milhões de search‑backed prompts**, o que indica expansão contínua da amostra.[7]  \n  - Isso sugere crescimento do corpus ao longo de 2024–2026; não há um número único e definitivo, apenas faixas (200M → 350M+).[3][5][6][7]\n\n- **Execução dos prompts nos AIs**\n  - Ahrefs executa **milhões de perguntas** nos AIs via as interfaces web públicas de:\n    - ChatGPT, Perplexity, Gemini, Copilot, Google AI Overviews e AI Mode.[1]  \n  - As respostas são armazenadas (texto + links) para permitir busca de menções de marca ou qualquer termo.[1]\n\n- **Métrica de AI Share of Voice (SOV)**\n  - Calcula **AI SOV** com base em:\n    - frequência de menções de marca em respostas, e  \n    - frequência de citações (links/domínios citados).[1][5]  \n  - Os principais KPIs citados nas reviews:\n    - **AI Mentions**  \n    - **AI Citations**  \n    - **AI Share of Voice**.[3][5]  \n\n- **Modelagem de comportamento real**\n  - Enfatizam que não “fabricam prompts”; o modelo tenta espelhar **demanda de busca real** e **estrutura semântica do tópico**, combinando:\n    - consultas reais (keywords + PAA) e  \n    - expansão semântica estruturada.[1][5]  \n\n### 1.3. Volume aproximado de prompts por plataforma (dado oficial)\n\nO artigo de metodologia publica um recorte de **“Monthly query volume (approx.)”** por plataforma, atribuindo o **mesmo volume de prompts** para vários LLMs:[1]\n\n- **ChatGPT:** ~**13,3 milhões** de prompts/mês.[1]  \n- **Perplexity:** ~**13,3 milhões** de prompts/mês.[1]  \n- **Gemini:** ~**12,4 milhões** de prompts/mês.[1]  \n- **Copilot:** ~**13,3 milhões** de prompts/mês.[1]  \n- **Google AI Overviews:** ~**143 milhões** de prompts/mês.[1]  \n- **Google AI Mode:** ~**41 milhões** de prompts/mês.[1]  \n\nEsses números são **claims do próprio Ahrefs**; não há validação independente nesses volumes específicos nas demais fontes.\n\n### 1.4. Plataformas, índices e canais adicionais (2026)\n\n- **6 AI indexes principais** (produto 2026): Google AI Overviews, Google AI Mode, ChatGPT, Perplexity, Gemini, Copilot.[3][6][7]  \n- **Canais adicionais (beta / multi‑canal):**\n  - **YouTube:** títulos, descrições, transcrições.[3]  \n  - **TikTok:** títulos/descrições e menções, incluindo impacto em descoberta.[3][6]  \n  - **Reddit:** monitora menções e quando threads aparecem em SERPs do Google.[3]  \n\n### 1.5. Estudo de “AI Overviews most‑cited domains” em 2026\n\n- Não há, nos resultados, um conteúdo explicitamente intitulado “Ahrefs AI Overviews most‑cited domains study 2026”.  \n- O que existe:\n  - A própria metodologia descreve como eles contam **citações em AI Overviews** a partir dos prompts de Brand Radar, incluindo **contagem de domínios citados**.[1]  \n  - Reviews independentes de 2026 mencionam que:\n    - os dados de **AI Overview mentions** são considerados “figuras realistas” e úteis como indicador direcional de visibilidade.[4]  \n- Nenhuma fonte indexada traz:\n  - uma lista pública dos **domínios mais citados em AI Overviews** em 2026,  \n  - nem um whitepaper dedicado apenas a isso.  \n- Portanto, até onde as buscas alcançam, **não há estudo público separado da Ahrefs em 2026 listando “most‑cited domains” em AI Overviews**; o tracking existe dentro do Brand Radar, mas os rankings detalhados parecem ficar na interface do produto.[1][4][7]  \n\n---\n\n## 2. Ahrefs Brand Radar – preços, planos e recursos 2026\n\n### 2.1. Acesso, planos e add‑ons\n\nHá diferenças claras entre o material oficial e algumas reviews mais antigas/beta:\n\n- **Help Center (documentação atual):**\n  - Brand Radar é descrito como um **add‑on de AI visibility** acessível via Ahrefs, com:\n    - acesso por **índice individual** ou  \n    - **bundle All platforms**.[7]  \n  - Preços (AI Index):  \n    - **$199/mês por plataforma (index)**.[7]  \n    - **$699/mês para All platforms**, incluindo **2.500 custom prompt checks/mês**.[7]  \n\n- **Reviews de 2026 (independentes):**\n  - EWR Digital (2026) lista:\n    - Ahrefs Lite a partir de **$129/mês**.[3]  \n    - Brand Radar AI tracking:  \n      - **$199/mês por AI index**  \n      - **$699/mês bundle para 6 AI indexes** (ChatGPT, Perplexity, Gemini, Copilot, AI Overviews, AI Mode).[3]  \n  - Rankability lembra que, na fase beta inicial, o Brand Radar estava **incluído em todos os planos Ahrefs sem custo extra**, inclusive no Lite ($129/mês), mas isso era um estágio anterior.[4]  \n\n**Conclusão com base nas fontes:**  \n- Em 2026, o modelo consolidado é:  \n  - **assinatura Ahrefs (ex.: Lite $129/mês)** +  \n  - add‑on Brand Radar por index ou all‑platform bundle.[3][4][7]  \n\n### 2.2. Custom prompt tracking (lançamento 2026) e tiers\n\n- **Custom prompt tracking**:\n  - Lançado em **janeiro de 2026** como feature para usuários pagos, permitindo acompanhar **prompts específicos definidos pelo usuário**, além do índice nativo.[6]  \n- **Tiers oficiais de custom prompts (help center):**[7]  \n  - **Basic:**  \n    - $50/mês  \n    - 2.500 checks/mês  \n    - $0,020 per‑check de overage  \n  - **Growth:**  \n    - $100/mês  \n    - 7.000 checks/mês  \n    - $0,015 overage  \n  - **Scale:**  \n    - $250/mês  \n    - 25.000 checks/mês  \n    - $0,010 overage  \n\n### 2.3. Integrações e API (incluindo atualizações 2026)\n\n- **Integração com o ecossistema Ahrefs:**  \n  - AI citation data aparece em **Site Explorer** e outros módulos, permitindo ver AI mentions + métricas SEO tradicionais no mesmo fluxo.[4][6]  \n- **Histórico de dados:**\n  - Reviews apontam que o Brand Radar já tem dados históricos de AI mention desde **2024**.[6]  \n- **API – atualizações de abril 2026:**\n  - Post “New features – Apr 2026” anuncia:\n    - **novos endpoints de API** para gerenciar Brand Radar reports (GET para listar, POST para criar, etc.).[8]  \n  - **Grok em Brand Radar:**  \n    - Grok (plataforma da xAI) foi adicionado como AI suportado para prompts de Ahrefs e custom prompts.[8]  \n    - Disponível:\n      - incluído no **All Indexes add‑on** ou  \n      - como add‑on separado de **$199/mês**.[8]  \n    - Para **custom queries**, não é necessário add‑on; basta ter **monthly checks**.[8]  \n\n---\n\n## 3. Semrush – AI Visibility Index, Enterprise AIO, AI SEO toolkit, MCP\n\nPara Semrush, a sua pergunta é específica sobre:\n\n1. **AI Visibility Index**  \n2. **Enterprise AIO**  \n3. **AI SEO toolkit**  \n4. Lançamentos 2026, metodologia e **MCP access** (provavelmente Marketplaces / Model Context Protocol / similar).\n\nPesquisando apenas em fontes indexadas, o que aparece é:\n\n- Resultados públicos sobre Semrush em IA/AEO em 2026 são essencialmente genéricos (SEO + AI features tradicionais",
+  "citations": [
+    "https://ahrefs.com/blog/brand-radar-methodology/",
+    "https://dageno.ai/blog/ahrefs-brand-radar-review-2026",
+    "https://www.ewrdigital.com/blog/ahrefs-brand-radar-review-alternatives-pricing-comparison/",
+    "https://www.rankability.com/blog/ahrefs-brand-radar-review/",
+    "https://www.amicited.com/blog/ahrefs-brand-radar-review/",
+    "https://arvow.com/blog/arvow-vs-ahrefs-brand-radar-which-is-better-for-ai-visibility-tracking-in-2026",
+    "https://help.ahrefs.com/en/articles/11064852-what-is-brand-radar-and-how-to-use-it",
+    "https://ahrefs.com/blog/new-features-apr-2026/",
+    "https://www.tryprofound.com/blog/ahrefs-brand-radar-review"
+  ],
+  "search_results": [
+    {
+      "title": "Ahrefs Brand Radar Methodology: How we collect and model AI ...",
+      "url": "https://ahrefs.com/blog/brand-radar-methodology/",
+      "date": "2026-02-26",
+      "last_updated": "2026-06-12",
+      "snippet": "Brand Radar lets you monitor and explore how visible brands are across AI and search. Learn how data is collected, modeled, and kept ...",
+      "source": "web"
+    },
+    {
+      "title": "Ahrefs Brand Radar Review 2026: Does It Meet Expectations?",
+      "url": "https://dageno.ai/blog/ahrefs-brand-radar-review-2026",
+      "date": "2026-04-22",
+      "last_updated": "2026-06-15",
+      "snippet": "The tool uses a keyword-first methodology rather than prompt-level tracking, creating fundamental mismatches with how AI search actually works",
+      "source": "web"
+    },
+    {
+      "title": "Ahrefs Brand Radar Alternatives & Review: Is It Worth It? (2026)",
+      "url": "https://www.ewrdigital.com/blog/ahrefs-brand-radar-review-alternatives-pricing-comparison/",
+      "date": "2026-02-02",
+      "last_updated": "2026-06-14",
+      "snippet": "Flawed Methodology: Relies on a keyword-based model that doesn't fully align with the conversational nature of AI prompts. Not Agency-Friendly:",
+      "source": "web"
+    },
+    {
+      "title": "Ahrefs Brand Radar Review 2026: Is It Worth the Investment?",
+      "url": "https://www.rankability.com/blog/ahrefs-brand-radar-review/",
+      "date": "2026-01-08",
+      "last_updated": "2026-06-14",
+      "snippet": "Brand Radar's most exciting feature is its attempt to monitor mentions within AI chatbot responses across platforms like ChatGPT and Perplexity.",
+      "source": "web"
+    },
+    {
+      "title": "Ahrefs Brand Radar: Complete Review and Use Cases - Am I Cited",
+      "url": "https://www.amicited.com/blog/ahrefs-brand-radar-review/",
+      "date": "2026-01-03",
+      "last_updated": "2026-06-13",
+      "snippet": "Ahrefs Brand Radar offers five core features designed to provide comprehensive AI visibility insights. Each feature addresses a different aspect ...",
+      "source": "web"
+    },
+    {
+      "title": "Arvow vs Ahrefs Brand Radar: Which Is Better for AI Visibility ...",
+      "url": "https://arvow.com/blog/arvow-vs-ahrefs-brand-radar-which-is-better-for-ai-visibility-tracking-in-2026",
+      "date": "2026-01-07",
+      "last_updated": "2026-06-06",
+      "snippet": "Key features include: Six AI platform indexes: Google AI Overviews, Google AI Mode, TikTok brand mentions. Brand Radar is best understood as a research ...",
+      "source": "web"
+    },
+    {
+      "title": "What is Brand Radar, and how to use it? - Help Center - Ahrefs",
+      "url": "https://help.ahrefs.com/en/articles/11064852-what-is-brand-radar-and-how-to-use-it",
+      "date": "2026-06-02",
+      "last_updated": "2026-06-15",
+      "snippet": "Brand Radar is Ahrefs' AI visibility tool that tracks how any brand shows up in AI search in over 350+ million search-backed prompts",
+      "source": "web"
+    },
+    {
+      "title": "Grok in Brand Radar, higher API limits, and more (April 2026) - Ahrefs",
+      "url": "https://ahrefs.com/blog/new-features-apr-2026/",
+      "date": "2026-05-25",
+      "last_updated": "2026-06-15",
+      "snippet": "New endpoints let you manage Brand Radar reports end to end: a GET to list existing reports with metadata, a POST to create a new report and ...",
+      "source": "web"
+    },
+    {
+      "title": "Ahrefs Brand Radar Review (2026): Good for SEO Teams, Not ...",
+      "url": "https://www.tryprofound.com/blog/ahrefs-brand-radar-review",
+      "date": "2026-03-11",
+      "last_updated": "2026-06-13",
+      "snippet": "A hands-on review of Ahrefs Brand Radar covering pricing, prompt data, LLM coverage, and how it compares to dedicated AEO tools like ...",
+      "source": "web"
+    }
+  ]
+}

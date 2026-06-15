@@ -1,0 +1,77 @@
+{
+  "qid": "P3",
+  "query": "Generative Engine Optimization academic papers 2026 on arXiv: citation prediction, retrievability in RAG, document structure and citation rate, answer engineering. Give arXiv IDs, authors, dates and main quantitative results. Also GEO-SFE, AgentGEO, AutoGEO, GEO-16 follow-ups.",
+  "content": "Segue o que a literatura em 2025–2026 em arXiv cobre hoje sobre **Generative Engine Optimization (GEO)** e temas próximos. Onde os resultados não existem ou não são quantificados, explicito isso. Foco em: predição de citação, retrievability em RAG, estrutura de documento vs taxa de citação, answer engineering, e follow‑ups de GEO-SFE, AgentGEO, AutoGEO, GEO-16.\n\n---\n\n## 1. Visão geral: o que existe em arXiv sobre GEO (2025–2026)\n\nPelos resultados atuais do arXiv, você tem:\n\n- Um paper de posição de 2026 sobre riscos de GEO, com um resumo formal de pipeline e discussão de métricas, incluindo GEO‑16 como auditoria externa.[2][1]  \n- Um paper empírico de 2025 sobre “como dominar AI search”, com experimentos de grande escala sobre diferenças entre AI search e Google.[4]  \n- Um paper de 2026 sobre GEO como framework de VLM+agentes para crescimento de aquisição do Pinterest (GEO em cenário de produto; resumo disponível, mas ainda sem detalhes quantitativos no snippet de busca).[5]  \n\nNão aparecem, até agora, no arXiv:\n\n- Um artigo dedicado a **predição de citações em answer engines** (modelo de scoring tipo “GEO‑score” treinado para prever citações).  \n- Um artigo centrado em **retrievability em RAG** com nome explícito ligado a GEO (há trabalhos de PoisonedRAG e RAG robustness citados indiretamente).[1]  \n- Um artigo que quantifique, de forma isolada, **estrutura de documento → taxa de citação** em LLM answer engines com modelos estatísticos explícitos.  \n- Artigos nomeados **GEO‑SFE, AgentGEO, AutoGEO** em arXiv.  \n- Follow‑ups dedicados e independentes a **GEO‑16** além das referências de auditoria na literatura de GEO.[1]\n\nOnde algo é descrito, mas sem números ou sem estar num paper peer‑reviewed, eu trato como **alegação de fornecedor/blog** e não como evidência independente.\n\n---\n\n## 2. Wen et al. 2026 – “Position: Generative Engine Optimization Creates Underexamined Risks…” (ICML 2026)\n\n- **arXiv ID:** **arXiv:2606.12439**.[2]  \n- **Versão:** v1, submetido em **18 Mai 2026**.[2]  \n- **Autores:** Yizhu Wen, Nan Zhang, Haohan Yuan, Xun Chen, Haopeng Zhang, Hanqing Guo.[2]  \n- **Tipo:** paper de posição (ICML 2026 Position Track).[2]  \n\n### 2.1. Escopo e conceitos principais\n\n- Define **GEO** como otimização conjunta sobre:\n  - **retrievability** (probabilidade de o conteúdo entrar no pool de evidências de um answer engine).  \n  - **ranking impact** (quanto esse conteúdo influencia a resposta gerada).[1]  \n- Formaliza o conteúdo otimizado como decomposto em:\n  - **retrieval booster messages** \\(b \\sim \\mathcal{B}\\), que aumentam a retrievability.  \n  - **ranking shifter messages** \\(c \\sim \\mathcal{C}\\), que deslocam o ranking de resposta uma vez que entram no contexto do answer engine.[1]  \n\nIsso é um formalismo conceitual, **não** há modelo estatístico de predição de citação disponível nem coeficientes quantitativos nesses trechos acessíveis.[1]\n\n### 2.2. Métricas e diferença academia vs indústria\n\n- Diz que a pesquisa acadêmica em GEO foca em:\n  - métodos explícitos de otimização (GCG, reescrita via LLM, TAP).  \n  - métricas como **ranking position, Recall@k, nDCG@k, visibility scores**.[1]  \n- Para sistemas de GEO na indústria, afirma que:\n  - são mais guiados por LLMs + distribuição multi‑plataforma.  \n  - otimizam métricas orientadas a resultado como **answer visibility, citation frequency e posição dentro da resposta**.[1]  \n\nEssas são **caracterizações qualitativas**, não há percentuais ou regressões associadas a essas métricas no texto visível.[1]\n\n### 2.3. GEO‑16 dentro do paper\n\n- **GEO‑16** é descrito como um **framework externo de auditoria empírica** que:\n  - “prediz e explica quais páginas web são citadas por answer engines de LLM”,  \n  - com base em **sinais de página em formato machine‑parsable**.[1]  \n- O estudo de **Kumar e Palkhouski (2025)** é descrito assim:\n  - Auditam **70 prompts de indústria** em múltiplos engines.  \n  - Coletam **1.702 citações** em Brave Summary, Google AI Overviews e Perplexity.[1]  \n  - Cobrem **1.100 URLs únicas**.[1]  \n- Principais achados reportados pelo paper de posição:\n  - Há “grandes diferenças” na **qualidade média das páginas citadas**; Brave Summary e Google AI Overviews citam páginas de maior qualidade que Perplexity na amostra.[1]  \n  - Os “pilares” mais associados à probabilidade de citação são:\n    - **Metadata & Freshness**.  \n    - **Semantic HTML**.  \n    - **Structured Data**.[1]  \n  - Há **comportamento de limiar**:\n    - Páginas acima de um certo **GEO‑score cutoff**, ou com muitos “pillar hits”, apresentam **saltos acentuados na taxa de citação**, o que fornece **operating points concretos** para auditorias.[1]  \n\n#### 2.3.1. Quantitativos disponíveis (GEO‑16)\n\nO paper de Wen et al. **não** fornece:\n\n- A fórmula do GEO‑score.  \n- Coeficientes de regressão, odds ratios ou valores exatos de “salto” na taxa de citação.  \n- Curvas (p.ex. ROC) ou AUC para predição de citações.\n\nA única informação numérica explícita disponível é:\n\n- **1.702 citações**,  \n- **1.100 URLs**,  \n- **70 prompts**.[1]  \n\nTodo o restante é descrito qualitativamente como “threshold behavior” e “sharply higher citation rates” acima de certos valores de score, sem números.[1]\n\n---\n\n## 3. Chen et al. 2025 – “Generative Engine Optimization: How to Dominate AI Search”\n\n- **arXiv ID:** **arXiv:2509.08919**.[4]  \n- **Data:** submetido em **10 Set 2025**.[4]  \n- **Autores:** Mahe Chen, Xiaoxuan Wang, Kaiwen Chen, Nick Koudas.[4]  \n- **Área:** cs.IR.[4]  \n\n### 3.1. Setup empírico (segundo o abstract)\n\n- Compara **AI Search** (ChatGPT, Perplexity, Gemini) vs **web search tradicional (Google)**.[4]  \n- Faz “**large‑scale, controlled experiments** across multiple verticals, languages, and query paraphrases”, para quantificar diferenças de sourcing de informação.[4]  \n\n### 3.2. Resultados principais (qualitativos)\n\nDo abstract, os achados centrais:\n\n- AI Search tem **viés sistemático e forte** a favor de **Earned media** (fontes de terceiros, autoritativas) em relação a:\n  - Brand‑owned content.  \n  - Social content.[4]  \n- Google Search tem um mix mais equilibrado entre esses tipos de domínio.[4]  \n- Serviços de AI Search diferem entre si em:\n  - **domain diversity**,  \n  - **freshness**,  \n  - **cross‑language stability**,  \n  - **sensibilidade à formulação da query**.[4]  \n\nO abstract não apresenta:\n\n- Números de efeito (ex.: “AI Search cita Earned media X% do tempo vs Y% em Google”).  \n- Tabelas de domínio, métricas de recall ou nDCG.  \n\nEsses detalhes podem estar no PDF, mas **não aparecem** no trecho acessível via arXiv abstract/HTML na busca.[4]\n\n### 3.3. Relação com seus tópicos\n\n- **Predição de citação:**  \n  O paper fala em “quantificar como sistemas fonteiam informação”, mas não menciona explicitamente um modelo preditivo de citação para páginas individuais. Pelo abstract, é mais um estudo de **bias e composição de fontes** ao nível de domínios/verticais.[4]  \n- **Retrievability em RAG:**  \n  O foco é AI Search vs Google, não RAG interno; não há menção explícita a RAG no abstract.[4]  \n- **Estrutura de documento e taxa de citação:**  \n  Não há qualquer referência explícita a estrutura de documento (headers, HTML semântico) no abstract. Logo, não há evidência de algum modelo regressivo ligando estrutura à taxa de citação nessa fonte.[4]  \n- **Answer engineering:**  \n  O paper oferece uma agenda de GEO, com recomendações como:\n  - “engineer content for machine scannability and justification”,  \n  - “dominate earned media to build AI‑perceived authority”,  \n  - “adopt engine‑specific and language‑aware strategies”,  \n  - “overcome big brand bias for niche players”.[4]  \n  Isso é answer‑/content‑engineering estratégico, mas o abstract não traz ganhos percentuais ou métricas antes/depois.[4]  \n\n---\n\n## 4. GEO como framework de VLM + agentes (Pinterest) – arXiv:2602.02961\n\n- **arXiv ID:** **arXiv:2602.02961**.[5]  \n- **Título:** “Generative Engine Optimization: A VLM and Agent Framework for Pinterest Acquisition Growth”.[5]  \n- O abstract existe, mas o snippet de busca só confirma que trata de um **framework de GEO com VLM + agentes**, aplicado a **aquisição de usuários do Pinterest**.[5]  \n\nAté onde o resultado mostra:\n\n- Não são exibidos:\n  - autores,  \n  - data de submissão,  \n  - resultados numéricos.  \n\nSem acesso ao texto completo via snippet, não é possível relatar **quantitativos concretos** (melhora em growth, CTR etc.), nem ver se há modelos de predição de citação ou retrievability em RAG.[5]  \nCom base apenas no abstract curto, o paper parece mais um **caso de uso aplicado / framework de sistema**, não um estudo metodológico focado em GEO‑score ou estrutura de documento.[5]\n\n---\n\n## 5. GEO‑16 – follow‑ups e resultados quantitativos\n\nAté agora:\n\n",
+  "citations": [
+    "https://arxiv.org/html/2606.12439v1",
+    "https://arxiv.org/abs/2606.12439",
+    "https://www.digitalapplied.com/blog/geo-guide-generative-engine-optimization-2026",
+    "https://arxiv.org/abs/2509.08919",
+    "https://arxiv.org/abs/2602.02961",
+    "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6546718",
+    "https://www.mersel.ai/generative-engine-optimization",
+    "https://arxiv.org/html/2509.05607v1"
+  ],
+  "search_results": [
+    {
+      "title": "Generative Engine Optimization Creates Underexamined Risks ...",
+      "url": "https://arxiv.org/html/2606.12439v1",
+      "last_updated": "2026-06-13",
+      "snippet": "arXiv:2606.12439v1 [cs.CY] 18 May 2026. Position: Generative Engine Optimization Creates Underexamined Risks, Governance Must Target Concentration, ...",
+      "source": "web"
+    },
+    {
+      "title": "Generative Engine Optimization Creates Underexamined Risks ...",
+      "url": "https://arxiv.org/abs/2606.12439",
+      "date": "2026-05-18",
+      "last_updated": "2026-06-12",
+      "snippet": "Abstract page for arXiv paper 2606.12439: Position: Generative Engine Optimization Creates Underexamined Risks, Governance Must Target ...",
+      "source": "web"
+    },
+    {
+      "title": "GEO Guide 2026: Generative Engine Optimization Explained",
+      "url": "https://www.digitalapplied.com/blog/geo-guide-generative-engine-optimization-2026",
+      "date": "2026-01-02",
+      "last_updated": "2026-06-14",
+      "snippet": "This guide covers everything you need to know about GEO: what it is, how it differs from SEO and AEO, proven optimization strategies, and how to ...",
+      "source": "web"
+    },
+    {
+      "title": "Generative Engine Optimization: How to Dominate AI Search - arXiv",
+      "url": "https://arxiv.org/abs/2509.08919",
+      "date": "2025-09-10",
+      "last_updated": "2026-06-15",
+      "snippet": "This paper presents a comprehensive comparative analysis of AI Search and traditional web search (Google). Through a series of large-scale, ...",
+      "source": "web"
+    },
+    {
+      "title": "Generative Engine Optimization: A VLM and Agent Framework for ...",
+      "url": "https://arxiv.org/abs/2602.02961",
+      "date": "2026-02-03",
+      "snippet": "Abstract page for arXiv paper 2602.02961: Generative Engine Optimization: A VLM and Agent Framework for Pinterest Acquisition Growth.",
+      "source": "web"
+    },
+    {
+      "title": "Generative Engine Optimization (GEO) :The Architecture of Visibility ...",
+      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6546718",
+      "date": "2026-04-20",
+      "snippet": "Abstract. This paper examines a structural transition in digital discovery driven by the rise of generative AI systems.",
+      "source": "web"
+    },
+    {
+      "title": "Generative Engine Optimization (GEO) for B2B - Mersel AI",
+      "url": "https://www.mersel.ai/generative-engine-optimization",
+      "last_updated": "2026-06-12",
+      "snippet": "This guide covers the complete GEO framework: why brands disappear from AI search, the five signals that drive citations, how to measure AI visibility, and what ...",
+      "source": "web"
+    },
+    {
+      "title": "Driving Generative Search Engine Optimization with Content-Centric ...",
+      "url": "https://arxiv.org/html/2509.05607v1",
+      "date": "2025-09-06",
+      "last_updated": "2026-06-07",
+      "snippet": "This paper introduces a comprehensive, end-to-end framework for Generative Search Engine Optimization (GSEO) to address this challenge. We make ...",
+      "source": "web"
+    }
+  ]
+}

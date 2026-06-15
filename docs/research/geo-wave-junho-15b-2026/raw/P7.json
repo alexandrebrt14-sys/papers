@@ -1,0 +1,81 @@
+{
+  "qid": "P7",
+  "query": "Semantic and vector retrieval behind AI search 2026: how ChatGPT Search, Perplexity, Gemini AI Mode and Google AI Overviews retrieve and select sources; embeddings models, chunking strategies, hybrid search BM25 plus vector, reranking, query fan-out. Technical best practices 2026.",
+  "content": "Os grandes mecanismos de “AI search” em 2026 convergiram num mesmo *stack conceitual*: **recuperação híbrida (BM25 + vetores) com expansão de consulta, re‑ranqueamento neural e seleção de chunks citáveis**, mas cada um implementa isso com nuances próprias (infra, sinais de confiança, política de citações). Abaixo organizo por: visão geral, depois plataforma a plataforma, e por fim melhores práticas técnicas (embeddings, chunking, fan‑out, reranking) para GEO/SEO/AEO.\n\n---\n\n## 1. Arquitetura conceitual de AI search em 2026\n\n### 1.1 Pipeline típico de recuperação para respostas gerativas\n\nA partir de estudos comparativos de ChatGPT, Perplexity e Google AI Overviews em 2026, o *pipeline médio* é descrito em quatro estágios principais[6]:\n\n- **1) Indexação**\n  - Rastreamento via crawlers próprios + APIs + dados de parceiros (por ex., OpenAI cita uso de “third‑party search providers” e conteúdo de parceiros para ChatGPT Search[1]).\n  - Criação de:\n    - índice lexical (BM25 ou variações) para *keyword match*,\n    - índice vetorial baseado em **embeddings** para similaridade semântica,\n    - grafo de entidades/autores e sinais de confiança de domínio[2][5][6].\n\n- **2) Recuperação inicial (recall)**\n  - **Hybrid retrieval**: combinação de BM25 (ou similar) com busca vetorial para obter 100–1000 documentos candidatos[6].\n  - Expansão de consulta (query expansion / fan‑out) gerada pelo próprio LLM, criando múltiplas reformulações e sub‑consultas que rodam em paralelo no índice[6].\n\n- **3) Reranking e seleção de chunks**\n  - Reranker neural (muitas vezes um modelo separado, tipo cross‑encoder) para ordenar candidatos por relevância semântica fina, evidência factual e diversidade de perspectivas[6].\n  - Divisão dos documentos em **chunks** autocontidos; o sistema escolhe os chunks mais “citáveis” (curtos, específicos, com números/nomes) e com alto “chunk‑level citability”[2][4].\n\n- **4) Geração e atribuição**\n  - LLM (por ex. *fine‑tuned GPT‑4o* no caso de ChatGPT Search[1]) recebe:\n    - consulta do usuário,\n    - lista de chunks relevantes,\n    - metadados de fonte, datas e entidades.\n  - O modelo gera resposta usando *retrieval‑augmented generation (RAG)*, e o sistema seleciona um subconjunto pequeno de fontes para exibir como citações, com forte viés para domínios “trusted” e chunks limpos[2][4][6][7].\n\n---\n\n## 2. ChatGPT Search (OpenAI)\n\n### 2.1 Modelo e stack de busca\n\n- OpenAI afirma que a “search model is a fine‑tuned version of **GPT‑4o**” treinado com técnicas de dados sintéticos distilados de *OpenAI o1‑preview*[1].\n- ChatGPT Search “leverages third‑party search providers, as well as content provided directly by our partners” para localizar informação[1].\n  - Isso implica uma camada de **meta‑search** sobre índices de parceiros + eventual índice próprio, embora detalhes de BM25 ou modelos vetoriais não sejam revelados explicitamente[1].\n- Estudos independentes em 2026 descrevem o stack de ChatGPT Search como:\n  - **recuperação híbrida** (BM25 + embeddings),\n  - expansão de consulta multi‑step,\n  - reranking neural e forte filtro de qualidade de fonte[4][6] (baseado em testes empíricos, não em documentação oficial).\n\n### 2.2 Como escolhe e cita fontes\n\n- ChatGPT “retrieves far more pages than it cites”; apenas um subconjunto pequeno vira fonte mostrada[4].\n- Hierarquia de confiança de fontes em 2026 (estudo Magna)[7]:\n  - 1º: **Wikipedia / Wikidata**,\n  - 2º: grandes publicações editoriais e fontes institucionais (governos, universidades, órgãos setoriais),\n  - 3º: marcas com forte autoridade de domínio e perfil de entidade consistente,\n  - 4º: blogs de nicho e fontes comerciais com boas evidências e reputação[7].\n- Fatores apontados como determinantes da seleção de fonte (vendor‑neutral, a partir de dados observacionais)[2][4][5][6]:\n  - **Domain‑level authority**: histórico, backlinks de fontes já confiáveis, marcação de entidade consistente em schema.org (Organization, Person)[2][5][7].\n  - **Chunk‑level citability**: seções H2 com até ~150 palavras, contendo uma afirmação completa, específica, com números/nomes, e pouco “encheção de linguiça”[2][4].\n  - **Freshness**: datas claras (“Last updated”), schema Article com `datePublished` e `dateModified` coerentes, sinais de atualização real[2][5].\n  - **Entity clarity**: uso consistente de schema e `sameAs` para ligar site a perfis oficiais (LinkedIn, Wikipédia, diretórios setoriais)[2][5].\n  - **Corroboração externa**: quando outras fontes confiáveis concordam com você, a chance de citação aumenta[2][6].\n\n### 2.3 Estratégia de chunking para ser citado por ChatGPT\n\nRecomendada com base em estudos de 2026[2][4]:\n\n- Estruturar cada H2 como **uma única resposta citável**:\n  - ≤ 150 palavras,\n  - resposta completa no primeiro parágrafo,\n  - conter dados específicos (números, nomes de modelos, anos, benchmarks)[2].\n- “Chunking rubric” sugerida[2]:\n  - *Complete‑on‑its‑own* (0/1),\n  - *Under 150 words* (0/1),\n  - *Specific claim with numbers or names* (0/1).\n- Páginas em que cada H2 tira “3/3” têm probabilidade muito maior de serem usadas como chunks de citação[2].\n\n---\n\n## 3. Perplexity (AI search engine)\n\n*(Não há documentação oficial detalhada de stack técnico nas fontes fornecidas; o que segue vem de análises independentes de 2026.)*\n\n### 3.1 Recuperação e seleção de fontes\n\n- Perplexity é descrito como o mecanismo que mais **expõe** suas fontes, citando 5–20 links por resposta em muitos casos[6].\n- Estudos de 2026 indicam que Perplexity:\n  - Executa **query fan‑out agressivo**: para uma pergunta complexa, dispara múltiplas sub‑consultas em paralelo (por tópicos, entidades, perspectivas)[6].\n  - Combina BM25 e busca vetorial para recall inicial (índice próprio + APIs de terceiros)[6].\n  - Usa **reranking neural** voltado para:\n    - diversidade de domínios,\n    - abrangência (cobrir todas as sub‑perguntas),\n    - evidência factual (preferência por fontes primárias)[6].\n- Perplexity tende a:\n  - citar mais resultados long tail,\n  - incluir docs não apenas de alta autoridade geral, mas também **autoridade contextual** (sites de nicho com forte cobertura do tema)[6].\n\n### 3.2 Implicações de GEO/SEO/AEO para Perplexity\n\n- Sinais de **contextual expertise** (mesma temática coberta em profundidade ao longo de dezenas de páginas) elevam chance de citação, mesmo com domínio menor[5][6].\n- **Money pages** (páginas de oferta/solução bem otimizadas) também aparecem muito em respostas comerciais, quando estruturadas com comparativos, seções de “pros/cons” e FAQs bem chunkadas[3][6].\n- Como Perplexity cita muitos links, ele é um dos melhores alvos para **aquisição de tráfego direto** via AI search, desde que:\n  - haja resposta muito clara e específica para queries de fundo de funil,\n  - conteúdo em inglês e idioma local relevante,\n  - boa estrutura de headings e FAQ[3][6].\n\n---\n\n## 4. Google AI Overviews (Gemini / AI Mode)\n\nAs buscas Google com AI Overviews e o modo “AI” do Gemini partilham muito da mesma infraestrutura de indexação e ranking do Google tradicional, com camada generativa por cima.\n\n### 4.1 Fonte de dados e indexação\n\n- AI Overviews “draw from the existing search index” do Google; ou seja, a página **precisa primeiro estar bem ranqueada** na busca orgânica tradicional para ser candidata a aparecer no Overview[2][6].\n- Isso diferencia Google de ChatGPT/Perplexity: a seleção inicial de candidatos é fortemente limitada por **ranking clássico de SEO** (PageRank, E‑E‑A‑T, signals de spam, etc.)[2][6].\n\n### 4.2 Recuperação e geração\n\n- Pipeline típico observado em 2025–2026[2][6]:\n  - Google Search executa consulta, seleciona top N (por ex. top‑20 ou top‑50) resultados clássicos.\n  - A camada de AI Overview usa **Gemini** para:\n    - extrair trechos relevantes (snippets/chunks) das páginas top,\n    - sintetizar uma resposta,\n    - selecionar alguns trechos para aparecer com citações na caixa de Overview.\n- Há forte preferência por:\n  - páginas que já têm *featured snippet* ou trechos bem otimizados,\n  - uso de **FAQPage** e **HowTo schema** para tornar respostas “citáveis de forma individual”[2].\n\n### 4.3 Citação e exibição\n\n- AI Overviews normalmente mostra:\n  - 3–5 fontes principais dentro do Overview,\n  - com links posicionados ao lado de blocos de texto, muitas vezes agrupando várias fontes por sub‑tópico[2][6].\n- Estratégias que aumentam probabilidade de aparecer[2]:\n  - rankear bem no orgânico para aquela query,\n  - posicionar resposta bullet‑point ou parágrafo conciso logo após o heading,\n  - usar FAQ e HowTo para transformar perguntas específicas em entidades cítaveis.\n\n---\n\n## 5. Embeddings, modelos vetoriais e chunking (best practices 2026)\n\n### 5.1 Modelos de embeddings\n\nOs mecanismos em si não divulgam detalhes específicos (dimensã",
+  "citations": [
+    "https://openai.com/index/introducing-chatgpt-search/",
+    "https://www.winstondigitalmarketing.com/playbooks/how-to-get-cited-by-chatgpt-in-2026/",
+    "https://www.youtube.com/watch?v=NkOcLZpCMxI",
+    "https://www.erlin.ai/blog/chatgpt-search-optimization",
+    "https://www.digitalsuccess.us/blog/how-to-get-cited-in-chatgpt-and-ai-search-results-in-2026.html",
+    "https://www.leapd.ai/blog/ai-visibility/how-chatgpt-google-ai-overviews-and-perplexity-source-information-in-2026",
+    "https://usemagna.com/blog/research/chatgpt-trusted-sources.html",
+    "https://sellershorts.com/resources/blog/how-to-get-website-indexed-by-chatgpt-search-2026"
+  ],
+  "search_results": [
+    {
+      "title": "Introducing ChatGPT search - OpenAI",
+      "url": "https://openai.com/index/introducing-chatgpt-search/",
+      "date": "2024-10-31",
+      "last_updated": "2026-06-09",
+      "snippet": "Update on February 5, 2025: ChatGPT search is now available to everyone in regions where ChatGPT is available. No signup required.",
+      "source": "web"
+    },
+    {
+      "title": "How to Get Cited by ChatGPT in 2026 - Winston Digital Marketing",
+      "url": "https://www.winstondigitalmarketing.com/playbooks/how-to-get-cited-by-chatgpt-in-2026/",
+      "date": "2026-04-26",
+      "last_updated": "2026-06-13",
+      "snippet": "A complete, tested playbook for getting your brand cited by ChatGPT, Perplexity, Claude, and Google AI Overviews in 2026.",
+      "source": "web"
+    },
+    {
+      "title": "How to Get Mentioned in ChatGPT in 2026: Make Money Pages!",
+      "url": "https://www.youtube.com/watch?v=NkOcLZpCMxI",
+      "date": "2025-12-17",
+      "last_updated": "2026-06-14",
+      "snippet": "Get your brand mentioned more in ChatGPT by optimizing the revenue-driving money pages on your website! According to recent studies, ...",
+      "source": "web"
+    },
+    {
+      "title": "ChatGPT Search Optimization (2026 Guide) - Erlin AI",
+      "url": "https://www.erlin.ai/blog/chatgpt-search-optimization",
+      "date": "2026-04-14",
+      "last_updated": "2026-06-14",
+      "snippet": "ChatGPT retrieves far more pages than it cites. This guide covers the exact factors that determine which brands get selected in 2026.",
+      "source": "web"
+    },
+    {
+      "title": "How to Get Cited in ChatGPT and AI Search Results in 2026",
+      "url": "https://www.digitalsuccess.us/blog/how-to-get-cited-in-chatgpt-and-ai-search-results-in-2026.html",
+      "date": "2026-05-12",
+      "last_updated": "2026-06-06",
+      "snippet": "AI-driven search systems attempt to identify trusted entities, reliable sources, contextual expertise, and semantically relevant information ...",
+      "source": "web"
+    },
+    {
+      "title": "How ChatGPT, Google AI Overviews, and Perplexity Source ... - Leapd",
+      "url": "https://www.leapd.ai/blog/ai-visibility/how-chatgpt-google-ai-overviews-and-perplexity-source-information-in-2026",
+      "date": "2026-04-17",
+      "last_updated": "2026-06-15",
+      "snippet": "ChatGPT, Google AI Overviews, and Perplexity use completely different citation logic. Here's the 2026 data on how each platform sources ...",
+      "source": "web"
+    },
+    {
+      "title": "Study: What Sources ChatGPT Trusts Most in 2026 | Magna",
+      "url": "https://usemagna.com/blog/research/chatgpt-trusted-sources.html",
+      "date": "2026-01-08",
+      "last_updated": "2026-05-25",
+      "snippet": "ChatGPT trusts a predictable hierarchy of sources: Wikipedia and Wikidata first, major editorial publications second (Search Engine Journal, ...",
+      "source": "web"
+    },
+    {
+      "title": "How to Get Your Website Indexed by ChatGPT Search in 2026",
+      "url": "https://sellershorts.com/resources/blog/how-to-get-website-indexed-by-chatgpt-search-2026",
+      "date": "2026-01-19",
+      "last_updated": "2026-06-13",
+      "snippet": "Wondering how to get your website indexed by ChatGPT search? Learn to optimize for AI crawlers, build authority, and become a citable source ...",
+      "source": "web"
+    }
+  ]
+}
