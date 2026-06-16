@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-06-15 17:32 UTC
+**Gerado automaticamente em:** 2026-06-16 01:18 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** f6f32eff02ca346425d6a884026c0592387ef5c0 docs(geo): wave canônica 15-jun-2026 (G
+**Último commit:** 5cba3bfb00da2df4891ef64b8c0457dcd68d45c8 data: daily collection 2026-06-15 [skip
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 21,760 | OK |
+| Código (linhas Python) | 21,770 | OK |
 | Testes unitários | 217 | OK |
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 63,940 | Coletando |
 | Taxa de citação | 35.2% | — |
-| Última coleta | 2026-06-15T17:32 | Ativo |
+| Última coleta | 2026-06-16T01:17 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.8463 |
-| Anthropic | $5.5520 |
+| OpenAI | $0.8466 |
+| Anthropic | $5.5516 |
 | Gemini | $0.0000 |
-| Perplexity | $0.3068 |
-| **Total** | **$6.7051** |
+| Perplexity | $0.3058 |
+| **Total** | **$6.7040** |
 
 ## Próximas Ações
 
