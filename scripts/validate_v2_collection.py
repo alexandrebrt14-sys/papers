@@ -123,18 +123,32 @@ def main() -> int:
                     warnings.append(msg)
         print(f"   [info]   is_probe=1 rows: {v2['probe_count']} ({round(100*v2['probe_count']/total,1)}%, esperado ~10%)")
 
-    # 5. Fictitious hit rate (should be ~0 in clean collection)
+    # 5. Fictitious hit rate. O que importa para a QUALIDADE dos dados e a
+    #    alucinacao ESPONTANEA (is_probe=0) — deve ser ~0. As linhas de probe
+    #    ficticio (is_probe=1) sao DESENHADAS para provocar a mencao da entidade
+    #    decoy (medem susceptibilidade, H2) e tem hit alto POR DESIGN — nao devem
+    #    disparar o warning de qualidade. Fix 2026-06-17: antes o calculo somava
+    #    as duas categorias e o WARN disparava todo run (~22%, pois ~10% das rows
+    #    sao probes); o rate espontaneo real e ~0% (validado por modelo, incl. Flash).
     print(f"\n5. Fictitious hallucination rate:")
     fict = conn.execute(
-        "SELECT SUM(fictional_hit) AS fict, COUNT(*) AS n FROM citations WHERE timestamp >= ?",
+        "SELECT "
+        "SUM(CASE WHEN COALESCE(is_probe,0)=0 THEN fictional_hit ELSE 0 END) AS fict, "
+        "SUM(CASE WHEN COALESCE(is_probe,0)=0 THEN 1 ELSE 0 END) AS n, "
+        "SUM(CASE WHEN is_probe=1 THEN fictional_hit ELSE 0 END) AS probe_fict, "
+        "SUM(CASE WHEN is_probe=1 THEN 1 ELSE 0 END) AS probe_n "
+        "FROM citations WHERE timestamp >= ?",
         (since_iso,)
     ).fetchone()
     if fict["n"]:
         rate = round(100 * (fict["fict"] or 0) / fict["n"], 3)
         status = "OK" if rate < 1.0 else "WARN"
-        print(f"   [{status:>7}]  {fict['fict']} fictitious hits / {fict['n']} rows = {rate}%")
+        print(f"   [{status:>7}]  espontanea (is_probe=0): {fict['fict']} hits / {fict['n']} rows = {rate}%")
+        if fict["probe_n"]:
+            prate = round(100 * (fict["probe_fict"] or 0) / fict["probe_n"], 1)
+            print(f"   [info]   probe ficticio (is_probe=1, susceptibilidade por design): {fict['probe_fict']}/{fict['probe_n']} = {prate}%")
         if rate >= 5.0:
-            warnings.append(f"fictitious hit rate elevated: {rate}%")
+            warnings.append(f"spontaneous fictitious hit rate elevated: {rate}%")
 
     # 6. Model versions tracked
     print(f"\n6. Model versions tracking:")
