@@ -348,13 +348,17 @@ class LLMClient:
         # (env ausente = comportamento atual); o workflow define GEMINI_THINKING_BUDGET
         # com um teto generoso o bastante para nao degradar as respostas curtas de
         # citacao. maxOutputTokens (3200) segue separado, evitando resposta vazia.
-        if is_pro:
-            _tb = os.getenv("GEMINI_THINKING_BUDGET", "").strip()
-            if _tb:
-                try:
-                    generation_config["thinkingConfig"] = {"thinkingBudget": int(_tb)}
-                except ValueError:
-                    logger.warning(f"[gemini] GEMINI_THINKING_BUDGET invalido: {_tb!r} (ignorado)")
+        # 2026-06-17: aplica-se a QUALQUER modelo Gemini (antes so *-pro). Com a
+        # troca para gemini-2.5-flash, GEMINI_THINKING_BUDGET=0 DESLIGA o raciocinio
+        # interno (apenas o Flash aceita budget 0), maximizando a economia sem risco
+        # de resposta vazia — a deteccao de citacao nao precisa de thinking. Modelos
+        # *-pro continuam com o teto generoso herdado de max_tokens (x4 acima).
+        _tb = os.getenv("GEMINI_THINKING_BUDGET", "").strip()
+        if _tb:
+            try:
+                generation_config["thinkingConfig"] = {"thinkingBudget": int(_tb)}
+            except ValueError:
+                logger.warning(f"[gemini] GEMINI_THINKING_BUDGET invalido: {_tb!r} (ignorado)")
 
         body: dict[str, Any] = {
             "contents": [

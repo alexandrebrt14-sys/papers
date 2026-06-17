@@ -40,23 +40,22 @@ env:
   ENABLE_SERP_OVERLAP: ${{ vars.ENABLE_SERP_OVERLAP || 'false' }}
   PAPERS_DB_PATH: data/papers.db
   FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
-  # LLMs obrigatorios para os gates (preflight + validate-run). Gemini fica de
-  # FORA por padrao desde 2026-06-05: o billing prepay do AI Studio esgota de
-  # forma recorrente (HTTP 429 'prepayment credits depleted') e derrubava a
-  # coleta diaria INTEIRA das 4 verticais (pior para a serie longitudinal do que
-  # uma lacuna so de Gemini). Gemini continua sendo coletado best-effort quando
-  # responde; sua falha apenas nao bloqueia mais o run. Para restaurar 5/5 apos
-  # reabastecer o billing, defina a repo variable MANDATORY_LLMS com Gemini:
-  #   gh variable set MANDATORY_LLMS -R alexandrebrt14-sys/papers \
-  #     -b "ChatGPT,Claude,Gemini,Perplexity,Groq"
-  MANDATORY_LLMS: ${{ vars.MANDATORY_LLMS || 'ChatGPT,Claude,Perplexity,Groq' }}
-  # FinOps (2026-06-05): teto de tokens de "thinking" do Gemini 2.5 Pro. O raciocinio
-  # interno do 2.5-pro e ~91% do custo LLM do paper (~US$6/dia). Este cap limita SO os
-  # tokens de raciocinio — o modelo segue gemini-2.5-pro (model_pinning intacto) e os
-  # dados ja coletados nao sao alterados (mudanca forward-only). 1024 e generoso para
-  # as respostas curtas de citacao; ajustavel por repo var sem mexer em codigo.
-  # Para reverter ao comportamento anterior (thinking ilimitado), defina como vazio.
-  GEMINI_THINKING_BUDGET: ${{ vars.GEMINI_THINKING_BUDGET || '1024' }}
+  # LLMs obrigatorios para os gates (preflight + validate-run).
+  # 2026-06-17: Gemini RE-INCLUIDO como obrigatorio (5/5). Foi removido em
+  # 2026-06-05 porque o 2.5 Pro (caro) esgotava o wallet e o 429 derrubava a
+  # coleta INTEIRA. Agora a coleta usa gemini-2.5-flash com thinking DESLIGADO
+  # (budget 0) — custo ~4x menor, wallet dura muito mais — entao a reativacao
+  # plena e segura. Risco residual: auto-reload do wallet AI Studio ainda OFF
+  # (acao do operador). Para voltar a deixar Gemini best-effort, defina a repo
+  # var: gh variable set MANDATORY_LLMS -R alexandrebrt14-sys/papers \
+  #   -b "ChatGPT,Claude,Perplexity,Groq"
+  MANDATORY_LLMS: ${{ vars.MANDATORY_LLMS || 'ChatGPT,Claude,Gemini,Perplexity,Groq' }}
+  # FinOps (2026-06-17): teto de tokens de "thinking" do Gemini. Com a troca para
+  # gemini-2.5-flash, o default agora e 0 = thinking DESLIGADO (so o Flash aceita
+  # budget 0). Reasoning e faturado como output e a deteccao de citacao nao precisa
+  # dele — desligar e a maior economia. Mudanca forward-only; cada linha grava
+  # citation.model_version. Ajustavel por repo var sem mexer em codigo.
+  GEMINI_THINKING_BUDGET: ${{ vars.GEMINI_THINKING_BUDGET || '0' }}
 
 jobs:
   collect-and-finalize:

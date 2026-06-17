@@ -577,13 +577,20 @@ class CollectionConfig:
         LLMConfig(
             name="Gemini",
             provider="google",
-            model="gemini-2.5-pro",      # Billing ativo (R$500 credito). 30+ RPM.
+            # FinOps 2026-06-17: troca Pro->Flash. O 2.5 Pro (thinking) era ~91% do
+            # custo LLM do paper (~R$2,1k/mes de uso real). Flash: output ~4x mais
+            # barato e, com thinkingBudget=0 (so o Flash aceita 0), o raciocinio e
+            # DESLIGADO — deteccao de citacao nao precisa de thinking. Mudanca
+            # metodologica forward-only, rastreada por citation.model_version
+            # (cada linha grava o modelo usado; analise segmenta por versao).
+            model="gemini-2.5-flash",
             api_key=os.getenv("GOOGLE_AI_API_KEY"),
-            input_cost_per_mtok=1.25,    # Gemini 2.5 Pro oficial: $1.25/MTok <=128K context
-            output_cost_per_mtok=5.00,   # Gemini 2.5 Pro oficial: $5.00/MTok output
+            input_cost_per_mtok=0.30,    # Gemini 2.5 Flash oficial: $0.30/MTok input (texto)
+            output_cost_per_mtok=2.50,   # Gemini 2.5 Flash oficial: $2.50/MTok output
             max_output_tokens=800,          # Increased from 250 (Proposal 4)
             supports_json_mode=True,
-            supports_batch=False,
+            supports_batch=True,            # Flash suporta Batch API (-50%)
+            batch_discount=0.5,
         ),
         LLMConfig(
             name="Perplexity",
