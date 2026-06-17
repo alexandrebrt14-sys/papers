@@ -236,6 +236,24 @@ jobs:
       # rodou 30min de fintech sem Claude (gap seletivo no dataset v2).
       # Custo: ~5 calls de 1 token (<US$0.0001).
       # ================================================================
+      # ================================================================
+      # RECONCILE FINOPS BUDGET (2026-06-17): o teto mensal vive na tabela
+      # SQLite finops_budgets DENTRO do papers.db (restaurado do R2/artifact),
+      # NAO no codigo — e _ensure_budgets so INSERE se a plataforma estiver
+      # ausente, nunca ATUALIZA um teto ja existente. Resultado: o teto do
+      # Google ficou preso em $50 e bateu 108% (is_blocked) em 2026-06-11,
+      # reprovando o provider mesmo apos recarregar o wallet do AI Studio.
+      # Este step aplica o teto desejado de forma idempotente (UPDATE) sobre o
+      # DB restaurado, a cada run. Ajustavel por repo var sem mexer no codigo:
+      #   gh variable set GOOGLE_MONTHLY_BUDGET -R alexandrebrt14-sys/papers -b "90"
+      # ================================================================
+      - name: Reconcile FinOps budget (Google ceiling)
+        run: |
+          python -m src.cli finops set-budget google \
+            --monthly ${{ vars.GOOGLE_MONTHLY_BUDGET || '90' }} \
+            --daily ${{ vars.GOOGLE_DAILY_BUDGET || '3' }}
+        continue-on-error: true
+
       - name: Preflight LLM connectivity + auth check
         run: python scripts/preflight_llm_check.py
 

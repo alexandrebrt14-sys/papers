@@ -74,7 +74,13 @@ DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
     # Margem 3x para variacoes, anomalias e expansao futura (prompt variants, paraphrases).
     "openai":     {"monthly": 15.0, "daily": 0.80, "alert_pct": 0.75, "hard_stop_pct": 0.95},
     "anthropic":  {"monthly": 20.0, "daily": 1.00, "alert_pct": 0.75, "hard_stop_pct": 0.95},
-    "google":     {"monthly": 15.0, "daily": 0.80, "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    # google: teto subido 15->90 em 2026-06-17. O Gemini 2.5-pro (thinking) e
+    # ~91% do custo LLM do paper; mesmo capado (GEMINI_THINKING_BUDGET=1024) e
+    # best-effort, o gasto mensal cruzou os $50 antigos (108%, is_blocked em
+    # 11/06) e reprovava o provider. NOTA: este default so vale para DB novo —
+    # o teto real e reconciliado a cada run pelo step "Reconcile FinOps budget"
+    # do daily-collect.yml (UPDATE idempotente sobre o DB restaurado do R2).
+    "google":     {"monthly": 90.0, "daily": 3.00, "alert_pct": 0.80, "hard_stop_pct": 1.00},
     "perplexity": {"monthly": 25.0, "daily": 1.20, "alert_pct": 0.70, "hard_stop_pct": 0.95},
     "groq":       {"monthly": 10.0, "daily": 0.50, "alert_pct": 0.80, "hard_stop_pct": 1.00},
     "global":     {"monthly": 100.0, "daily": 5.00, "alert_pct": 0.70, "hard_stop_pct": 0.95},
