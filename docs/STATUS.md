@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-06-17 23:51 UTC
+**Gerado automaticamente em:** 2026-06-18 13:32 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** f43a42be65d54bcfad369513b076d1a068dcb64a feat(collect): switch Gemini from 2.5 P
+**Último commit:** cf4cfcee537ed3f8e5cc05ec852497d5c75fab40 data: daily collection 2026-06-17 [skip
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 21,787 | OK |
+| Código (linhas Python) | 21,801 | OK |
 | Testes unitários | 217 | OK |
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 63,940 | Coletando |
 | Taxa de citação | 35.2% | — |
-| Última coleta | 2026-06-17T23:51 | Ativo |
+| Última coleta | 2026-06-18T13:32 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.8467 |
-| Anthropic | $5.5512 |
+| OpenAI | $0.8463 |
+| Anthropic | $5.5519 |
 | Gemini | $0.0000 |
-| Perplexity | $0.3054 |
-| **Total** | **$6.7033** |
+| Perplexity | $0.3061 |
+| **Total** | **$6.7043** |
 
 ## Próximas Ações
 
