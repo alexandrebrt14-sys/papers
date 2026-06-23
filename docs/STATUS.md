@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-06-23 13:18 UTC
+**Gerado automaticamente em:** 2026-06-23 23:21 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** f9233ade5832fc0da606cc88e484e9298bc42c59 data: daily collection 2026-06-22 [skip
+**Último commit:** f454ea775db033eafb8cb3f734e43bbe22503683 docs(research): fintech citation advant
 
 ---
 
@@ -10,22 +10,22 @@
 
 | Indicador | Valor | Status |
 |-----------|-------|--------|
-| Código (linhas Python) | 21,801 | OK |
+| Código (linhas Python) | 22,363 | OK |
 | Testes unitários | 217 | OK |
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 63,940 | Coletando |
 | Taxa de citação | 35.2% | — |
-| Última coleta | 2026-06-23T13:18 | Ativo |
+| Última coleta | 2026-06-23T23:20 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.8465 |
-| Anthropic | $5.5512 |
+| OpenAI | $0.8466 |
+| Anthropic | $5.5504 |
 | Gemini | $0.0000 |
-| Perplexity | $0.3124 |
-| **Total** | **$6.7101** |
+| Perplexity | $0.3128 |
+| **Total** | **$6.7098** |
 
 ## Próximas Ações
 
