@@ -36,8 +36,14 @@ def v2_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> str:
     if src_db.exists():
         shutil.copy(src_db, tmp_db)
     else:
-        # fallback para CI: cria DB do zero
-        tmp_db.touch()
+        # fallback para clone novo / CI sem o papers.db (source-of-truth no R2):
+        # aplica o schema base canônico antes das migrations v2, senão os
+        # ALTER TABLE de migrate_0005+ falham com "no such table: citations".
+        schema_sql = Path(__file__).resolve().parents[1] / "src" / "db" / "schema.sql"
+        base = sqlite3.connect(tmp_db)
+        base.executescript(schema_sql.read_text(encoding="utf-8"))
+        base.commit()
+        base.close()
     monkeypatch.setenv("PAPERS_DB_PATH", str(tmp_db))
     monkeypatch.setenv("PAPERS_METHODOLOGY_VERSION", "v2")
 
