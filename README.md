@@ -14,7 +14,7 @@ Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation 
 
 ## v2.0.0-reboot (2026-04-23)
 
-Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 127-entity cohort (79 Brazilian + 32 international anchors + 16 fictional decoys), a 192-query balanced battery, and a pre-registered decision rule. **78/78 tests passing.**
+Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 127-entity cohort (79 Brazilian + 32 international anchors + 16 fictional decoys), a 192-query balanced battery, and a pre-registered decision rule. **217/217 tests passing.**
 
 Canonical pillars:
 
@@ -42,7 +42,7 @@ Canonical pillars:
 | LLM Models | 5 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Pro, Perplexity Sonar, Groq Llama 3.3 70B) |
 | Queries per vertical | 48 balanced (battery v2 = 192 canonical) |
 | Daily observations | ~1,420/day measured (5 models x query battery x 4 verticals) |
-| Observations collected | 45,432 citations, 18,163 contexts, 172 runs (as of 2026-06-01) |
+| Observations collected | 63,940 queries, 22,527 citations, 25,134 contexts, 240 runs (as of 2026-06-23; live: [alexandrecaramaschi.com/research](https://alexandrecaramaschi.com/research)) |
 | Code | 7,010 lines Python, 35 files |
 | Schema | 21 tables (citations, contexts, finops, interventions, snapshots, model_versions) |
 | Collection | Automated daily (GitHub Actions, 06:00 UTC) |
@@ -77,22 +77,22 @@ Cohort canonical source: [`src/config_v2.py`](src/config_v2.py). Each vertical =
 
 ---
 
-## Collection Status (updated 2026-06-01)
+## Collection Status (updated 2026-06-23)
 
 | Criterion | Target | Current |
 |---|---|---|
-| Total observations | >= 25,920 (v1 target) | 45,432 (175% of v1 target) |
-| Collection window (v2) | 90 days (2026-04-23 -> 2026-07-21) | day 40/90 |
-| N per LLM | >= 1,000 | 4,128 (Perplexity) - 10,368 (ChatGPT/Groq) |
-| Collection days (distinct) | >= 90 continuous | 32 |
+| Total observations | >= 25,920 (v1 target) | 63,940 queries / 22,527 citations (247% of v1 target) |
+| Collection window (v2) | 90 days (2026-04-23 -> 2026-07-21) | day 62/90 |
+| N per LLM | >= 1,000 | 5,760 (Perplexity) - 14,720 (ChatGPT/Groq) |
+| Collection days (distinct) | >= 90 continuous | 41 |
 | Pre-registered hypotheses | >= 3 | 0 |
 | A/B experiments | >= 2 | 0 |
-| Fictional entity validation | 16 decoys (false positive rate) | 8,415 probes collected |
+| Fictional entity validation | 16 decoys (false positive rate) | 12,623 probes collected, 0 false positives (100% specificity over 51,317 responses) |
 
 ### Known Limitations
 
-1. **Effective N < Gross N**: a fraction of observations are cache hits (identical responses reused), so the effective N is below the gross 45,432.
-2. **Sample imbalance**: Perplexity Sonar is underrepresented (4,128 vs ~10,300 for the other four models) due to search-call cost throttling.
+1. **Effective N < Gross N**: a fraction of observations are cache hits (identical responses reused), so the effective N is below the gross 63,940.
+2. **Sample imbalance**: Perplexity Sonar is underrepresented (5,760 vs ~14,500 for the other four models) due to search-call cost throttling.
 3. **Directive queries**: Categories like "fintech_trust" produce 100% citation rate by design — do not represent spontaneous citation
 4. **Non-stationarity**: LLMs update models without notice. `model_versions` table is now populated (5 model fingerprints) but updates between fingerprints remain untracked.
 5. **Non-independent observations**: Similar queries to the same model in the same session share internal state
