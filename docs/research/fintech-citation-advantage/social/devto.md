@@ -1,0 +1,88 @@
+---
+title: "Por que n=50.000 mentiu para mim: a armadilha estatística por trás de uma falsa vantagem setorial"
+published: false
+tags: [datascience, llm, machinelearning, statistics]
+canonical_url: https://alexandrecaramaschi.com/publicacoes/anchor-entity-effect
+---
+
+Passei 50 dias coletando 62.820 respostas de cinco LLMs para descobrir qual setor da economia brasileira é mais citado espontaneamente pela IA. O resultado preliminar parecia limpo: a fintech lidera, com 28,15% de citação espontânea de marca, contra 24,94% do varejo, 14,50% da tecnologia e 13,35% da saúde. Com mais de 50 mil observações e um qui-quadrado cuspindo p < 10⁻¹⁷⁰, dava vontade de fechar o notebook e publicar.
+
+Foi exatamente aí que o dado me enganou. Este post é sobre as três decisões de engenharia e estatística que separaram a conclusão errada da conclusão defensável. Se você roda análise sobre saídas de LLM, ou sobre qualquer dado com estrutura de cluster, provavelmente vai pisar em pelo menos uma dessas minas.
+
+## O pipeline, em uma respiração
+
+A coleta é deliberadamente sem graça, porque infraestrutura chata é infraestrutura confiável:
+
+- **GitHub Actions, 2x por dia.** Um cron dispara o coletor de manhã e à noite. Sem servidor para manter, sem cara olhando. O histórico de runs é o próprio log de auditoria.
+- **48 prompts template-paralelos por vertical**, em português e inglês. "Paralelos" é a palavra-chave: as 48 perguntas de fintech têm a mesma estrutura sintática das 48 de saúde, trocando só o nome da categoria. E **nenhuma das 48 menciona qualquer marca** — o modelo escolhe sozinho quem citar.
+- **SQLite.** Um arquivo `papers.db` versionável, sem servidor de banco. Cada resposta vira uma linha: prompt_id, engine, dia, response_text, entidades extraídas.
+- **NER v2 sobre um roster de 127 entidades**, com aliases por vertical e regras de folding (Nubank/Nu/Roxinho colapsam numa entidade só).
+- **Decoys fictícios.** Marcas inventadas plantadas no roster, como controle negativo: o detector NUNCA deveria "encontrar" uma empresa que não existe.
+
+Cinco engines de tier econômico: GPT-4o-mini, Claude Haiku-4.5, Gemini 2.5-pro, Perplexity sonar e Llama-3.3-70B. Tudo isso por menos do que custa um café por dia.
+
+## Armadilha 1: n=50.000 é uma mentira confortável
+
+O qui-quadrado ingênuo tratava cada uma das ~50 mil respostas como uma observação independente. Não são. Cada prompt foi repetido ~293 vezes ao longo dos dias e engines. O n **efetivo** não é 50.453; é da ordem de **240 clusters** (48 queries × 5 engines). Respostas ao mesmo prompt são correlacionadas — pertencem ao mesmo cluster.
+
+p < 10⁻¹⁷⁰ sobre 240 clusters não é evidência forte; é sinal vermelho de não-independência ignorada. Qualquer revisor de measurement track devolve isso na triagem.
+
+O teste honesto é agregar por cluster e comparar as médias **por query**, não por observação. Rodei um Welch entre as taxas médias por cluster:
+
+```
+                          fintech    varejo
+clusters (queries)          48         48
+taxa média por cluster    26,51%     23,30%
+desvio entre clusters     24,74 pp   23,60 pp
+Welch t = 0,645 (df ~94)  ->  NÃO significativo
+```
+
+A variância **entre** queries (~24 pp) engole o gap de 3,2 pp. Traduzindo: a "vantagem da fintech sobre o varejo" não sobrevive ao clustering. O número-título do meu próprio rascunho era frágil. Lição: antes de comemorar um p minúsculo, pergunte qual é o seu n efetivo. Em dado de LLM, repetição de prompt não é amostra nova.
+
+## Armadilha 2: leave-one-out como teste de validade barato
+
+Aqui veio a virada. Se a fintech lidera, de onde vem a liderança? Decomposição por entidade: **o Nubank sozinho responde por 49,7% das menções de fintech**. Quase metade do setor é uma marca só.
+
+O teste mais barato que existe para isso é o leave-one-out (jackknife de uma entidade): recodifique o desfecho ignorando a âncora e refaça a conta. Parafraseando a query:
+
+```sql
+-- taxa original da vertical
+SELECT vertical,
+       AVG(CASE WHEN n_entidades > 0 THEN 1.0 ELSE 0 END) AS taxa
+FROM respostas
+GROUP BY vertical;
+
+-- taxa "leave-one-out": a citação só conta se houver
+-- ALGUMA entidade do setor que NÃO seja a âncora
+SELECT r.vertical,
+       AVG(CASE WHEN EXISTS (
+             SELECT 1 FROM mencoes m
+             WHERE m.resposta_id = r.id
+               AND m.entidade <> r.ancora_do_setor
+           ) THEN 1.0 ELSE 0 END) AS taxa_loo
+FROM respostas r
+GROUP BY r.vertical;
+```
+
+```python
+# o delta é o "efeito âncora" da vertical
+delta = taxa["fintech"] - taxa_loo["fintech"]   # 28,15 - 11,46 = 16,69 pp
+```
+
+Resultado: removendo só o Nubank, a fintech cai de **28,15% para 11,46%** — de primeiro para último lugar. A razão de chances ajustada vs saúde inverte de **4,13 para 0,77**. E, ao contrário do gap bruto, essa reversão **sobrevive** ao clustering (Welch t = −3,35).
+
+O leave-one-out funciona como teste de validade de construto: qualquer afirmação do tipo "LLMs preferem o setor X" deveria sobreviver à remoção da entidade modal do setor. Se não sobrevive, você mediu uma empresa, não um setor. Aplicando o mesmo corte ao varejo (que tem duas âncoras), ele cai 14,35 pp. Toda categoria é movida pelo seu núcleo de âncoras top-k; a fintech é só o caso extremo k=1.
+
+## Armadilha 3: o bug de 200 caracteres que contaminou a métrica
+
+A lição de engenharia de coleta que mais dói. Em 4 dos 5 coletores, o `response_text` foi persistido **truncado em exatamente 200 caracteres**. Só o Perplexity guardou o texto íntegro.
+
+Parece detalhe de log. Não é. O NER passou a medir **front-loading** (o que aparece nos primeiros 200 chars), não citação plena. Pior: o corte distorce a métrica de concentração de forma direcional. Medindo no Perplexity íntegro, o Nubank aparece em offset médio de 118 chars (dentro da janela), enquanto as âncoras de cauda aparecem tarde — Itaú em 402, PicPay em 515, Banco Inter em 838, BTG em 906 chars. O truncamento apaga justamente os rivais domésticos e **infla a dominância aparente do Nubank**. Os 49,7% viraram um limite superior, não um valor confiável.
+
+A correção de raiz é trivial e devastadoramente óbvia em retrospecto: nunca trunque o payload bruto na coleta. Você pode sempre truncar na análise; não pode des-truncar o que não salvou. Persista íntegro, derive features depois.
+
+## O que sobra de honesto
+
+Depois de passar o dado pelas três peneiras: a frase "a IA prefere fintech" é frágil (morre no clustering, e só 2/5 engines a sustentam — o agregado é quase todo um artefato do Claude Haiku). A frase que sobrevive é "a IA prefere o Nubank, e isso se disfarça de preferência setorial". É uma vantagem cumulativa, super-linear, projetada sobre a média da categoria — e o share do Nubank inclusive **cresce de 41% para 57%** dentro da própria janela de medição.
+
+O dataset está aberto. Se você duvida de qualquer número aqui — e depois deste post você deveria duvidar de números bonitos por princípio — rode você mesmo: github.com/alexandrebrt14-sys/papers. O working paper completo, com o protocolo e as 21 críticas que a revisão por pares levantou, está em https://alexandrecaramaschi.com/publicacoes/anchor-entity-effect. Quebra de réplica é bem-vinda.

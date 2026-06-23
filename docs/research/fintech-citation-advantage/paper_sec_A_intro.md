@@ -1,0 +1,91 @@
+# The Anchor-Entity Effect: How Superstar Brands Drive Sectoral Citation Concentration in Large Language Models
+
+**Alexandre Caramaschi**
+Brasil GEO, Goiânia, Brazil
+ORCID: 0009-0004-9150-485X
+
+*Companion work.* This paper extends the author's prior study "Algorithmic Authority" (SSRN; Zenodo paper DOI [10.5281/zenodo.19687866](https://doi.org/10.5281/zenodo.19687866); Zenodo software DOI [10.5281/zenodo.19687958](https://doi.org/10.5281/zenodo.19687958)), which introduced the measurement pipeline reused here.
+
+*Target venue tier:* ICWSM / WWW / ACM TOIS.
+
+---
+
+## Abstract
+
+Spontaneous brand mentions in large language model (LLM) outputs are an emerging channel of economic visibility, yet systematic, longitudinal, calibrated measurement remains scarce, especially outside English-language markets. We report a complete 48-day audit, covering the full collection record from the first run to the most recent (April 23 - June 9, 2026), of spontaneous brand citation across five economy-tier LLMs (GPT-4o-mini, Claude Haiku-4.5, Gemini-2.5-pro, Perplexity sonar, Llama-3.3-70B) for four Brazilian verticals, using 48 structurally paired prompts per vertical in Portuguese and English and per-entity NER over a 127-entity cohort with fictitious decoys. Naively, fintech leads spontaneous citation at 28.15%, ahead of retail (24.94%), technology (14.50%), and healthcare (13.35%). We show this advantage is not a diffuse sectoral effect. It is dominated by a category's top-k anchor entities. In fintech, a single anchor (Nubank) accounts for 49.7% of mentions, and 59.3% of fintech citations name Nubank exclusively. A leave-one-out recoding drops fintech to 11.46% — last place — and inverts its adjusted odds ratio from 4.13 to 0.77. Crucially, the raw fintech-retail gap dies under cluster-level inference (Welch t = 0.65, n.s.), while the leave-one-out reversal survives it (t = −3.35). The same jackknife per vertical shows every sector is anchor-driven, with fintech the extreme k = 1 case. The effect is engine-heterogeneous: only two of five engines place fintech above retail. The anchor's within-window share grows from 41% to 57%, consistent with cumulative advantage in progress. We document measurement threats — 200-character response truncation and a 97-99% decoy false-positive rate — and specify the confirmatory protocol. All absolute rates are reported as upper bounds pending untruncated re-collection.
+
+## Keywords
+
+generative engine optimization; LLM citation bias; anchor entity; brand concentration; cumulative advantage; sectoral bias; non-Anglophone markets; share of model; superstar firms; longitudinal audit
+
+---
+
+## 1. Introduction
+
+Ask five large language models, twice a day for fifty days, which Brazilian banks, retailers, technology vendors, and health companies are worth knowing. Count how often each sector's brands surface unprompted. One vertical wins by a clear margin. Brazilian fintech brands are cited spontaneously in 28.15% of responses, ahead of retail (24.94%), technology (14.50%), and healthcare (13.35%). The ordering is stable across eight weeks. It also matches industry folklore: vendor reports have long claimed that financial-services content earns more AI citations than technology or consumer goods. So the surface story writes itself — fintech is the favored sector, and being fintech is the advantage.
+
+That story is wrong, and the way it breaks is the point of this paper.
+
+When we decompose the fintech rate by entity, almost half of it traces to one firm. Nubank accounts for 49.68% of all fintech mentions, and 59.31% of fintech responses that cite anything cite Nubank and nothing else. We then recode the outcome with a single brand removed — a leave-one-out (LOO) of the modal entity — and rerun the measurement. Fintech falls from 28.15% to 11.46%, moving from first place to last. Its adjusted odds ratio against healthcare inverts from 4.13 to 0.77, crossing the line of no effect and changing sign. The apparent sectoral advantage was the shadow of one brand.
+
+This is the **anchor-entity effect**. A category's spontaneous-citation rate is governed not by a diffuse property of the sector but by its top-k *anchor entities* — the brands that occupy the category's semantic slot. Item-level popularity bias, when a category has produced a single dominant firm, surfaces as an apparent sectoral advantage. The leave-one-out estimator separates the two. Fintech is the extreme single-anchor (k = 1) case, but the mechanism generalizes: applied per vertical, the same jackknife shows every sector is anchor-driven, and retail, a two-anchor category, falls 14.35 points once both Mercado Livre and Magazine Luiza are removed.
+
+The explanatory question is worth stating plainly, because it is what the decomposition answers. *Why does fintech get more citations?* Not because fintech is privileged as a vertical. Because Brazilian fintech produced the country's strongest anchor entity. "Nubank" maps almost one-to-one onto "Brazilian digital bank" — a brand evoked across the most category entry points and carried by a lexically unique, clean name. Anchor concentration then masquerades as sectoral advantage. The vertical is an epiphenomenon. The anchor is the asset.
+
+Two findings sharpen the claim and guard it against the obvious objection that we have rediscovered popularity bias under a new name. First, the raw fintech-retail gap of 3.2 points does not survive correct inference. Treating the roughly 240 query-by-engine clusters as the unit, a per-cluster Welch test gives t = 0.65 (not significant): the variance between prompts swallows the gap. The leave-one-out reversal, by contrast, survives the same clustering at t = −3.35, and is stable across all eight weeks. The fragile claim dies exactly where it should; the robust one holds. Second, the anchor's share is not static. Nubank's within-fintech share rises from roughly 41% in weeks 16-18 to 53-59% in weeks 19-23 — a relative gain near 30% inside the measurement window itself. The rich get richer during the experiment, which is cumulative advantage caught in motion rather than inferred after the fact.
+
+This paper makes four contributions.
+
+**A construct.** We formalize the anchor-entity effect as a falsifiable construct, separating the anchor *entity* (an item), anchor *concentration* (a sector property, the pair of a Herfindahl index and the leader's share), and the anchor *effect* (the transmission, measured as the leave-one-out drop Δᵥ). An entity is the sector's anchor only if its share clears a pre-registered threshold τ and leads the runner-up by a margin δ. This makes "having an anchor" discrete and testable, and it ports an established mechanism — cumulative advantage, a convex map from market share to citation share — onto the parametric attention of LLMs.
+
+**A diagnostic.** The leave-one-out of a sector's modal entity is a construct-validity test for the entire "sectoral bias" literature. Any claim that LLMs favor sector X should survive removal of X's modal brand, lest it measure a firm rather than a sector. We provide the estimator and demonstrate the failure mode on the strongest available case.
+
+**An engine result.** Sectoral systematicity is false across engines. Only two of five engines place fintech above retail; the aggregate advantage comes almost entirely from one parametric engine (Claude Haiku, +574 cited responses) plus a truncation artifact (Gemini, +134), against three engines pointing the other way. The engine matters more than the sector.
+
+**A measurement lesson.** We surface and quantify the threats any spontaneous-citation audit must confront. Response text was truncated to 200 characters in four of five engines, so the detector measured front-loading rather than full citation, and that truncation inflates the anchor's apparent concentration by erasing late-appearing rivals. Fictitious decoys triggered a 97-99% false-positive rate. We treat both as open threats, report every absolute rate as an upper bound, and specify the dual-track recollection and clustered-inference protocol required for confirmatory claims.
+
+A note on scope. Four of five engines are economy-tier models, the snapshot covers the complete collection record from the first to the most recent run (April 23 - June 9, 2026), and the market is single and non-Anglophone. We do not generalize to flagship models, and we name no brand evaluatively: high citation does not imply quality, and low citation does not imply deficiency. The measurement is observational, and any bias it surfaces is attributed to the model, not to the conduct of the firms measured.
+
+---
+
+## 2. Related Work
+
+Our work sits at the intersection of four literatures that, individually, are mature, and that no prior study has combined. Generative engine optimization (GEO) explains *what* gets cited at the document level: the founding KDD work introduced GEO-bench and visibility levers such as citing sources and adding statistics (Aggarwal et al., 2024); follow-ups learn engine preferences automatically (AutoGEO; Zhong et al., 2026) and isolate topical relevance and list position as the drivers of being cited first (Vishwakarma et al., 2026), with multi-vertical, multi-language designs confirming a strong earned-media bias (Chen et al., 2025). A second stream audits *which sources* AI engines cite at scale — tens of thousands of conversations mapping citations to news domains (Yang, 2025) — and links page-level features to citation through frameworks like GEO-16 (Schockaert et al., 2026). A third explains *why the engine axis dominates our matrix*: under retrieval, models lean almost exclusively on retrieved context rather than the parametric prior (Sun et al., 2024), so a RAG engine resamples the long tail that a parametric engine collapses onto whatever pre-training consolidated. A fourth treats popularity and salience: even when they know the fact, LLMs favor shortcuts — entity popularity, mention order, co-occurrence — more so in smaller models (Lehmann et al., 2026), though one study finds LLM recommenders less popularity-biased than classical systems (Lichtenberg et al., 2024), and brand bias carries a country-of-origin component relevant to a Portuguese-language, Brazil-local prompt design (Kamruzzaman et al., 2024). Investment-recommendation work documents an analogous winner-take-most concentration of capital in a few firms (productbias2025investment).
+
+We depart from prior work on popularity bias along two axes. Prior work operates at the item level: popular entities are favored when models compare or recommend (Lehmann et al., 2026; Lichtenberg et al., 2024), and recent audits show that citation of source domains is more concentrated in LLM search engines than in traditional ones (Zhang et al., 2025). First, our unit of concern is the category, not the item or the domain: we show that an item-level popularity bias, when a category has produced a single superstar firm, surfaces as an apparent sectoral citation advantage, and we provide a leave-one-out estimator of the anchor effect (Δᵥ) that separates the two. Second, we treat the anchor decomposition as a construct-validity test for the broader "sectoral bias" literature: any claim that LLMs favor sector X should survive removal of the sector's modal entity, lest it measure a firm rather than a sector.
+
+The closest neighbor in measuring citation concentration is Zhang et al. (2025), "Source Coverage and Citation Bias in LLM-based vs. Traditional Search Engines" (arXiv:2512.09483, December 2025). Across 55,936 queries over six LLM search engines and two traditional ones, they report that fewer than ten distinct URLs appear in 80% of responses — tighter concentration than traditional search. The contrast with our study is exact, and mandatory. They measure concentration of source *domains*; we measure concentration of commercial *brands within a category*. Their design is cross-sectional; ours is longitudinal. They study an Anglophone setting; we study a non-Anglophone emerging market. Domain coverage is long-tailed, which is why "even the most-cited domain rarely exceeds 5%" recurs in industry analyses. Within-category brand attention, the object we measure, is winner-take-most. The two coexist, and conflating them is the error our decomposition guards against.
+
+A growing body of industry analyses reports that financial-services content is cited more often than technology or consumer-goods content, and popularizes "share of model" as the AI-era successor to share of voice. We treat these as motivation rather than evidence: they lack statistical testing, entity-level decomposition, longitudinal design, and peer review, and they conflate source-domain concentration — which is long-tailed (Zhang et al., 2025) — with within-category brand concentration, which we show is winner-take-most. The raw ranking, fintech above technology, is therefore folklore, not contribution. Our contribution is to formalize the latter as a measurable construct (anchor entity / anchor effect) and to test it across engines and over time.
+
+We bridge three literatures absent from prior GEO and LLM-bias work. From marketing science, the Ehrenberg-Bass account of mental availability — brands evoked across many Category Entry Points and retrieved via Distinctive Brand Assets (Sharp, 2010; Romaniuk & Sharp, 2022) — gives a falsifiable reading of why a single brand becomes the category's anchor: it predicts that within-category citation share tracks survey-measured mental availability. "Nubank" is mental availability at its ceiling plus a clean verbal Distinctive Brand Asset. From economics, the theory of superstar firms (Autor et al., 2020) and digital winner-take-most dynamics supplies the upstream mechanism by which market concentration becomes corpus concentration. From sociology, cumulative advantage and the Matthew effect (Merton, 1968; DiPrete & Eirich, 2006), recently applied to LLM substrates such as AI programming assistants, formalizes the convex, super-linear mapping from market share to citation share that distinguishes an anchor effect from mere concentration. The anchor entity is thus not a new phenomenon in isolation but the projection of cumulative advantage onto the parametric attention of LLMs — a contribution that ports an established mechanism to a new substrate and measures it.
+
+What no prior study combines is the full design: longitudinal, multi-engine (one RAG-native and four parametric), multi-sector with formal between-vertical comparison, in a non-Anglophone emerging market, over real commercial entities rather than news domains or hypothetical brands, with decoy calibration and a public dataset. Each neighbor covers one to three of these axes; none covers them together. That intersection, together with the anchor-entity construct and its leave-one-out diagnostic, is where our contribution lives.
+
+---
+
+## References cited in this section (for the compiler)
+
+Verified references:
+
+- Aggarwal, P., Murahari, V., Rajpurohit, T., Kalyan, A., Narasimhan, K., & Deshpande, A. (2024). GEO: Generative Engine Optimization. *KDD 2024*. DOI 10.1145/3637528.3671900 (arXiv:2311.09735).
+- Autor, D., Dorn, D., Katz, L. F., Patterson, C., & Van Reenen, J. (2020). The Fall of the Labor Share and the Rise of Superstar Firms. *Quarterly Journal of Economics*, 135(2), 645-709. DOI 10.1093/qje/qjaa004.
+- Chen, M., Wang, X., Chen, K., & Koudas, N. (2025). Generative Engine Optimization: How to Dominate AI Search. arXiv:2509.08919.
+- DiPrete, T. A., & Eirich, G. M. (2006). Cumulative Advantage as a Mechanism for Inequality: A Review of Theoretical and Empirical Developments. *Annual Review of Sociology*, 32, 271-297. DOI 10.1146/annurev.soc.32.061604.123127.
+- Kamruzzaman, M., Nguyen, H. M., & Kim, G. L. (2024). "Global is Good, Local is Bad?": Understanding Brand Bias in LLMs. *EMNLP 2024*. arXiv:2406.13997.
+- Lehmann, H. H., Lee, J. H., Schockaert, S., & Wermter, S. (2026). Knowing the Facts but Choosing the Shortcut: Understanding How Large Language Models Compare Entities. *EACL 2026*. arXiv:2510.16815. [Cited in-text as Lehmann et al., 2026; arXiv preprint 2025.]
+- Lichtenberg, J. M., Buchholz, A., & Schwöbel, P. (2024). Large Language Models as Recommender Systems: A Study of Popularity Bias. *Gen-IR Workshop at SIGIR 2024*. arXiv:2406.01285.
+- Merton, R. K. (1968). The Matthew Effect in Science. *Science*, 159(3810), 56-63. DOI 10.1126/science.159.3810.56.
+- Romaniuk, J., & Sharp, B. (2022). *How Brands Grow Part 2* (rev. ed.). Oxford University Press.
+- Schockaert et al. (2026). AI Answer Engine Citation Behavior: An Empirical Analysis of the GEO-16 Framework. arXiv:2509.10762. [Authorship to confirm in compiler; cited as Schockaert et al., 2026 pending byline verification.]
+- Sharp, B. (2010). *How Brands Grow*. Oxford University Press.
+- Sun et al. (2024). Quantifying Reliance on External Information over Parametric Knowledge during Retrieval Augmented Generation (RAG) using Mechanistic Analysis. arXiv:2410.00857.
+- Vishwakarma, R., Kumar, S., & Jamidar, R. (2026). What Gets Cited: Competitive GEO in AI Answer Engines. arXiv:2605.25517.
+- Yang, K.-C. (2025). News Source Citing Patterns in AI Search Systems. arXiv:2507.05301.
+- Zhang, Y., Ye, P., Peng, ., Garimella, ., & Tyson, . (2025). Source Coverage and Citation Bias in LLM-based vs. Traditional Search Engines. arXiv:2512.09483. [Full author initials to be completed by compiler from arXiv record.]
+- Zhong et al. (2026). What Generative Search Engines Like and How to Optimize Web Content Cooperatively (AutoGEO). *ICLR 2026*. arXiv:2510.11438.
+- productbias2025investment — Exposing Product Bias in LLM Investment Recommendation. arXiv:2503.08750. [Authorship/byline to be completed by compiler.]
+
+[Verified 2026-06-11: arXiv:2509.23261 = "The Matthew Effect of AI Programming Assistants: A Hidden Bias in Software Evolution" — confirmed on arXiv; the parenthetical example stands.]
+
+Note: The in-text mention of investment-recommendation winner-take-most concentration uses the placeholder key `productbias2025investment` (arXiv:2503.08750), which is confirmed in literatura.md. No [A VERIFICAR] reference from literatura.md was cited in this section.
