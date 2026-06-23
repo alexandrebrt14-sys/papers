@@ -22,7 +22,8 @@ data/*.csv
 !data/finops_alerts.jsonl
 !data/dashboard_data.json
 !data/.gitkeep
-data/backups/             # backups físicos (usar git tags para reprodutibilidade)
+# backups físicos (usar git tags para reprodutibilidade)
+data/backups/
 
 # IDE
 .vscode/
@@ -40,6 +41,7 @@ logs/run_*.jsonl
 !logs/.gitkeep
 .logs/
 !.logs/.gitkeep
+docs/research/**/*.log
 
 # Output (track finops dashboard and reports)
 output/*.png
