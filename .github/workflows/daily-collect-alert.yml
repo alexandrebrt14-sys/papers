@@ -11,7 +11,12 @@ permissions:
 
 jobs:
   alert:
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion == 'failure' &&
+        github.event.workflow_run.event != 'pull_request' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -19,7 +24,9 @@ jobs:
         env:
           WHATSAPP_API_TOKEN: ${{ secrets.WHATSAPP_API_TOKEN }}
           WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
+          WHATSAPP_ALERT_TO: ${{ secrets.WHATSAPP_ALERT_TO }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_ALERT_TO: ${{ secrets.RESEND_ALERT_TO }}
           RUN_URL: ${{ github.event.workflow_run.html_url }}
           RUN_ID: ${{ github.event.workflow_run.id }}
           RUN_NAME: ${{ github.event.workflow_run.name }}
@@ -43,11 +50,12 @@ jobs:
           # WhatsApp
           token = os.environ.get('WHATSAPP_API_TOKEN', '')
           phone_id = os.environ.get('WHATSAPP_PHONE_ID', '')
-          if token and phone_id:
+          alert_to = os.environ.get('WHATSAPP_ALERT_TO', '')
+          if token and phone_id and alert_to:
               try:
                   payload = {
                       'messaging_product': 'whatsapp',
-                      'to': '5562998141505',
+                      'to': alert_to,
                       'type': 'text',
                       'text': {'body': msg[:4000]},
                   }
@@ -60,14 +68,17 @@ jobs:
                   print('WhatsApp alert enviado')
               except Exception as e:
                   print(f'WhatsApp falhou: {e}')
+          else:
+              print('WhatsApp alert pulado: configure WHATSAPP_API_TOKEN, WHATSAPP_PHONE_ID e WHATSAPP_ALERT_TO.')
 
           # Email via Resend
           rk = os.environ.get('RESEND_API_KEY', '')
-          if rk:
+          email_to = os.environ.get('RESEND_ALERT_TO', '')
+          if rk and email_to:
               try:
                   body = {
                       'from': 'alerts@brasilgeo.ai',
-                      'to': ['caramaschiai@caramaschiai.io'],
+                      'to': [email_to],
                       'subject': f'[papers] daily-collect FAILED - run {run_id}',
                       'html': f'<h2>papers daily-collect FAILED</h2><p>{msg}</p><p><a href={run_url!r}>{run_url}</a></p>',
                   }
@@ -80,4 +91,6 @@ jobs:
                   print('Email alert enviado')
               except Exception as e:
                   print(f'Email falhou: {e}')
+          else:
+              print('Email alert pulado: configure RESEND_API_KEY e RESEND_ALERT_TO.')
           "
