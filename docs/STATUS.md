@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-07-08 11:02 UTC
+**Gerado automaticamente em:** 2026-07-08 22:36 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 12275d307fc5770776d386bc4edff463f885c3f4 data: daily collection 2026-07-07 [skip
+**Último commit:** 9c46e1f767f94b86171f1d31efa370cc2b5668ba chore: governanca minima — LICENSE MIT 
 
 ---
 
@@ -15,17 +15,17 @@
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 63,940 | Coletando |
 | Taxa de citação | 35.2% | — |
-| Última coleta | 2026-07-08T11:02 | Ativo |
+| Última coleta | 2026-07-08T22:36 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0492 |
-| Anthropic | $0.3238 |
+| OpenAI | $0.0490 |
+| Anthropic | $0.3255 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0252 |
-| **Total** | **$0.3982** |
+| Perplexity | $0.0244 |
+| **Total** | **$0.3989** |
 
 ## Próximas Ações
 
