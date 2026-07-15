@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-07-15 10:37 UTC
+**Gerado automaticamente em:** 2026-07-15 22:14 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** fd9e0f68e7ee6e0fb9653d7d0602f59c0aea037f data: daily collection 2026-07-14 [skip
+**Último commit:** 36d8834bdd5f5232ece1c2499c354c00f153e0dd finops: monitor checkpoint 2026-07-15T1
 
 ---
 
@@ -15,17 +15,17 @@
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 63,684 | Coletando |
 | Taxa de citação | 35.3% | — |
-| Última coleta | 2026-07-15T10:37 | Ativo |
+| Última coleta | 2026-07-15T22:14 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0488 |
-| Anthropic | $0.3209 |
+| OpenAI | $0.0491 |
+| Anthropic | $0.3223 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0364 |
-| **Total** | **$0.4061** |
+| Perplexity | $0.0360 |
+| **Total** | **$0.4074** |
 
 ## Próximas Ações
 
