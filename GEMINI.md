@@ -1,0 +1,5 @@
+# GEMINI.md
+
+## Padrão editorial obrigatório
+
+Antes de produzir qualquer texto de leitura humana neste repositório (documentação, cursos, páginas, relatórios, descrições de PR, mensagens longas de commit), leia e aplique `DIRETRIZ_EDITORIAL.md` na raiz do repositório. O essencial: escrita de especialista sênior em português do Brasil com acentuação completa; cada parágrafo acrescenta uma ideia nova, sem inflar o texto; profundidade proporcional à complexidade do problema, com o porquê antes da regra; proibido travessão como recurso estilístico; proibida como padrão a construção que nega uma ideia para afirmar a oposta ("não é X, é Y"); conectivos variados, sem clichês nem cacoetes de texto gerado por IA; exemplos concretos e tom técnico preciso, sem promoção; em superfícies HTML ou PDF, parágrafos com alinhamento justificado (`text-align: justify`). O documento completo prevalece sobre este resumo, e as convenções específicas deste repositório prevalecem sobre convenções genéricas, exceto quando comprometerem segurança ou corretude.
