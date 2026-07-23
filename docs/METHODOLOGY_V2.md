@@ -309,3 +309,14 @@ print(family.summary_table())  # Tabela markdown para paper
 - ☑ Docker + reproduce.sh + SHA-256 manifest
 - ☑ COI statement + funding self-disclosed
 - ☑ Ethics: public LLM APIs, no human subjects, no PII
+
+## 12. Adendo 22-jul-2026 — alinhamento com o estado da arte (wave julho-22)
+
+Fonte: `docs/research/geo-wave-julho-22-2026/GEO_WAVE_JULHO_22_2026_CANONICAL.md` (32 papers arXiv com existência+abstract verificados). Quatro alinhamentos e uma limitação declarada:
+
+1. **Medição repetida como requisito, não diferencial.** `arXiv:2604.07585` formaliza que visibilidade em IA deve ser tratada como distribuição, com execuções repetidas e variância reportada. Nosso desenho de coleta diária multi-day JÁ implementa medição repetida (random intercepts por `day` no GLMM absorvem a variância entre execuções); ao redigir os papers, citar 2604.07585 como fundamento e enquadrar a coleta diária como resposta ao problema de reprodutibilidade.
+2. **Vetor de visibilidade em 4 camadas.** O survey `arXiv:2607.14035` decompõe visibilidade em descobribilidade, citação, absorção e resultado econômico. Nossas variáveis atuais (`cited_rate`, brand rate, posição) cobrem citação e proeminência; absorção (a resposta usa o conteúdo da fonte?) NÃO é medida — declarar como trabalho futuro e citar `arXiv:2604.25707` (framework seleção vs absorção, dataset geo-citation-lab) como referência do instrumento.
+3. **Comparáveis diretos para related work.** `arXiv:2606.20065` (Ranqo: 100k+ respostas, escada de estatura de marca 73/44/11) e `arXiv:2604.25707` (602 prompts, 21.143 citações) são os baselines em escala mais próximos do nosso desenho; `arXiv:2601.00869` (Existence Gap) é o antecedente direto da nossa H4 (PT vs EN) e da tese de lacuna geográfica.
+4. **Limitação causal declarada.** `arXiv:2606.04362` estabelece o controle on-domain (tratado vs não tratado no mesmo domínio) como padrão-ouro para separar efeito de intervenção do crescimento da plataforma. Nosso desenho é observacional (sem intervenção randomizada em conteúdo); a seção de limitações de cada paper deve declarar isso explicitamente e citar 2606.04362 como o desenho que estudos futuros devem adotar.
+
+Lacuna publicável reafirmada: nenhum dos 32 papers coletados cobre mercado brasileiro ou língua portuguesa (escopo arXiv, queries em inglês; bases fora do arXiv não varridas) — nossa cohort BR de 127 entidades permanece contribuição inédita nesse recorte.

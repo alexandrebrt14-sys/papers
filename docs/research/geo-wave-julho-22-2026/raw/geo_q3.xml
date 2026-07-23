@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/pLBJC0ELqifVOkg76ZQARJON7tI</id>
+  <title>arXiv Query: search_query=all:"AI search" AND all:"brand visibility"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-07-23T00:29:25Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22AI+search%22+AND+all:%22brand+visibility%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2606.20065v1</id>
+    <title>Generative Engine Optimization at Scale: Measuring Brand Visibility Across AI Search Engines</title>
+    <updated>2026-06-18T10:36:13Z</updated>
+    <link href="https://arxiv.org/abs/2606.20065v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.20065v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>People increasingly get answers straight from AI search engines like ChatGPT, Claude, Perplexity, and Gemini rather than scrolling search results. Brands that once focused on search engine optimization (SEO) must now optimize for how these engines represent, cite, and recommend them -- a shift variously called Generative Engine Optimization (GEO), Answer Engine Optimization (AEO), and AI Search Visibility. We treat AEO and AI Visibility as part of GEO, and study how to measure brand visibility across AI engines: what they value when they cite a brand, which sources they rely on, and what content large language models surface. The hard case is everyone outside the already-authoritative top brands -- SMEs, D2C brands, creators, and early-stage startups.
+  We analyze 100K+ prompt responses across 100+ brands tracked on Ranqo between March and May 2026. First visibility runs form a clear three-tier brand-stature ladder: global household names (e.g., Stripe, Nike) appear in 73% of relevant AI answers on their first run; established mid-market and regional brands (e.g., Olipop, Klaviyo) in 44%; niche and small brands in just 11% -- about 30 percentage points per step. When engines cite sources, about 78% go to corporate websites; among non-corporate sources YouTube leads, ahead of Reddit, editorial media, and Wikipedia. The highest-leverage page is the ranked "best-of" listicle, the most-cited content format at about 21% of all citations. Sentiment is the unstable signal: whether a brand is framed positively or negatively flips about 6.7 times more often than whether it is mentioned at all.
+  These findings provide a first large-scale baseline for measuring GEO: AI brand visibility can be measured, differs by platform, and varies strongly by brand maturity. We close by proposing seven v1.1 protocols to test whether specific recommendations can causally improve AI visibility.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-18T10:36:13Z</published>
+    <arxiv:comment>14 pages, 4 tables; v1.0 preprint</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Pratyush Kumar</name>
+      <arxiv:affiliation>Ranqo</arxiv:affiliation>
+    </author>
+  </entry>
+</feed>
