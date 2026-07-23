@@ -1,0 +1,801 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/4gyoUjmYfZLFnD2nlj2qQADHVj8</id>
+  <title>arXiv Query: search_query=all:"generative engine optimization"&amp;id_list=&amp;start=0&amp;max_results=30</title>
+  <updated>2026-07-23T00:29:23Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22generative+engine+optimization%22&amp;start=0&amp;max_results=30&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>30</opensearch:itemsPerPage>
+  <opensearch:totalResults>35</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2607.14035v1</id>
+    <title>Optimizing Visibility in Generative Engines: A Critical Survey of Generative Engine Optimization (2023-2026)</title>
+    <updated>2026-07-15T17:03:08Z</updated>
+    <link href="https://arxiv.org/abs/2607.14035v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.14035v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative Engine Optimization (GEO) seeks to increase content's presence, likelihood of citation, or influence in answers produced by generative engines. Since the foundational GEO paper, the field has expanded rapidly, but terminology, metrics, and evidence standards remain heterogeneous. This critical survey reviews 45 studies selected under a November 2023-July 2026 publication window, including one earlier preprint published at EMNLP after the window opened, plus relevant RAG and evaluation work. We argue that GEO is not a single ranking task but a stochastic, partially observable pipeline spanning search activation, crawling and indexing, retrieval, reranking and context allocation, citation, prominence, factual absorption, fidelity, and user behavior. The foundational paper's widely cited gains are valid within its experimental setting but conditional on a source already being present in a fixed context; they establish neither organic discoverability nor durable traffic effects. Reviewed work indicates that topical relevance and context position are the most reproducible levers, generic heuristics transfer poorly, competition can erode individual gains, and citation-oriented rewrites can impair retrieval. Commercial audits further reveal low source overlap, substantial run-to-run variability, and persistent fidelity gaps. We contribute a multistage formal model, a visibility vector separating discoverability, citation, absorption, and economic outcomes, an evidence hierarchy, and a reproducible protocol based on repeated measurements, paraphrases, controls, human validation, and multi-actor interference. Within this corpus, the evidence is narrow: already-retrieved content can causally alter its citation or use, but no reviewed technique shows a stable, longitudinal, cross-platform causal effect on organic discoverability or downstream behavior.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-15T17:03:08Z</published>
+    <arxiv:comment>18 pages, 8 tables, 1 figure; critical survey of 45 studies; ancillary literature matrix and search protocol included</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Olivier Martinez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.14197v1</id>
+    <title>How Artificial Intelligence LLM Engines Shape the Global Conflict Information Environment</title>
+    <updated>2026-07-15T16:42:43Z</updated>
+    <link href="https://arxiv.org/abs/2607.14197v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.14197v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Artificial Intelligence (AI) answer engines now field a growing share of the questions that analysts, scholars, and the public ask about issues of peace and conflict. Large Language Models (LLMs) are known to hallucinate under certain conditions, but do these errors have discernible patterns when they are asked about conflicts, and if so what can that teach us about the changing global conflict information environment? To answer, we first asked a battery of questions about 28 conflicts to five leading answer engines and scored their 5,460 answers against documented evidence. We found that the thinner the retrievable record around a given conflict, the more the engines invent, misattribute, and miscount. Thin records don't just encourage hallucination, but create structural exposure to mis- and disinformation, because they are the easiest records to warp through Generative Engine Optimization (GEO) to bias engine responses. Through an analysis of 1,048 websites that the AI LLMs pulled conflict facts from, we found that GEO source optimization is already happening, and while state-partisan digital capture remains incipient it is rapidly growing. We explain what these findings mean for scholarship with the rise of GEO information warfare, and for policy argue for a return to the deep local monitoring and translation-based research that AI tools cannot replicate, closing with a discussion of future research opportunities and challenges in this fast-moving space.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-15T16:42:43Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Jason Miklian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.12056v1</id>
+    <title>Designing Agent-Ready Websites for AI Web Agents: A Framework for Machine Readability, Actionability, and Decision Reliability</title>
+    <updated>2026-07-13T18:16:58Z</updated>
+    <link href="https://arxiv.org/abs/2607.12056v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.12056v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Online shopping is increasingly shifting toward a model in which AI agents independently search for products, compare options, evaluate constraints, and carry out parts of the purchasing process for users. Website design must now support both human and agent-mediated interaction. This paper introduces the agent-ready website, a design framework for enhancing the readability, interpretability, verifiability, and actionability of e-commerce platforms for AI agents. Existing web design, SEO, and generative engine optimization (GEO) metrics do not fully assess a website's capacity for agent-mediated interaction. The proposed framework is structured around three dimensions agent interpretability, agent executability, and agent decision reliability supported by features such as machine readability, semantic clarity, agent actionability, and contextual decision-reliability signals. The framework is evaluated through a controlled experiment comparing a human-oriented baseline and an agent-ready version of an identical website prototype, with identical catalogs, pricing, stock, and shopping workflows. The evaluation involved five tasks, three browser-agent models (GPT-4.1, Gemini-2.5 Flash, and Grok-4 Fast), and 300 runs, measuring PASS,PARTIAL,FAIL outcomes, strict and functional success rates, error patterns, step counts, and token consumption. The agent-ready website achieved 134 PASS runs out of 150 versus 74 out of 150 for the baseline (strict success rates of 89.3% vs. 49.3%), with the largest gains in product detail extraction, comparison, and multi-constraint selection. It also reduced PARTIAL outcomes from 43 to 3 and lowered the average step count from 9.31 to 6.49. These results provide preliminary evidence that enhanced structural clarity, action cues, evidence signals, and temporal validity indicators can substantially improve the reliability and efficiency of AI browser agents.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-13T18:16:58Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Said Elnaffar</name>
+    </author>
+    <author>
+      <name>Farzad Rashidi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.27736v1</id>
+    <title>ToE: A Hierarchical and Explainable Claim Verification Framework with Dynamic Multi-source Evidence Retrieval and Aggregation</title>
+    <updated>2026-06-26T05:35:27Z</updated>
+    <link href="https://arxiv.org/abs/2606.27736v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.27736v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rapid spread of fake news poses increasing threats to information ecosystems, especially as AI-generated misinformation under Generative Engine Optimization (GEO) poisoning allows adversarially crafted content to be systematically surfaced by retrieval systems, contaminating LLM reasoning. In this paper, we propose Tree of Evidence (ToE), a hierarchical evidence reasoning framework for automated fact-checking that models each claim as a dynamically expanding argument tree. ToE integrates a reinforcement learning-driven multi-source retrieval agent, an evidence evaluation agent, and an argument tree aggregation algorithm to iteratively decompose, retrieve, and verify claims through an explainable evidence chain. We further provide a theoretical analysis of the retrieval process, deriving a formal error bound that guarantees the learned policy converges to a neighborhood of the information-theoretically optimal policy. Experiments across multiple datasets and backbone LLMs demonstrate that ToE achieves improvements ranging from 4 to 24 percentage points over competitive baselines, with particularly pronounced gains on adversarially poisoned inputs.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-26T05:35:27Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Zhaoqi Wang</name>
+    </author>
+    <author>
+      <name>Zijian Zhang</name>
+    </author>
+    <author>
+      <name>Kun Zheng</name>
+    </author>
+    <author>
+      <name>Zhen Li</name>
+    </author>
+    <author>
+      <name>Xin Li</name>
+    </author>
+    <author>
+      <name>Chunlei Li</name>
+    </author>
+    <author>
+      <name>Jiamou Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.20065v1</id>
+    <title>Generative Engine Optimization at Scale: Measuring Brand Visibility Across AI Search Engines</title>
+    <updated>2026-06-18T10:36:13Z</updated>
+    <link href="https://arxiv.org/abs/2606.20065v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.20065v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>People increasingly get answers straight from AI search engines like ChatGPT, Claude, Perplexity, and Gemini rather than scrolling search results. Brands that once focused on search engine optimization (SEO) must now optimize for how these engines represent, cite, and recommend them -- a shift variously called Generative Engine Optimization (GEO), Answer Engine Optimization (AEO), and AI Search Visibility. We treat AEO and AI Visibility as part of GEO, and study how to measure brand visibility across AI engines: what they value when they cite a brand, which sources they rely on, and what content large language models surface. The hard case is everyone outside the already-authoritative top brands -- SMEs, D2C brands, creators, and early-stage startups.
+  We analyze 100K+ prompt responses across 100+ brands tracked on Ranqo between March and May 2026. First visibility runs form a clear three-tier brand-stature ladder: global household names (e.g., Stripe, Nike) appear in 73% of relevant AI answers on their first run; established mid-market and regional brands (e.g., Olipop, Klaviyo) in 44%; niche and small brands in just 11% -- about 30 percentage points per step. When engines cite sources, about 78% go to corporate websites; among non-corporate sources YouTube leads, ahead of Reddit, editorial media, and Wikipedia. The highest-leverage page is the ranked "best-of" listicle, the most-cited content format at about 21% of all citations. Sentiment is the unstable signal: whether a brand is framed positively or negatively flips about 6.7 times more often than whether it is mentioned at all.
+  These findings provide a first large-scale baseline for measuring GEO: AI brand visibility can be measured, differs by platform, and varies strongly by brand maturity. We close by proposing seven v1.1 protocols to test whether specific recommendations can causally improve AI visibility.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-18T10:36:13Z</published>
+    <arxiv:comment>14 pages, 4 tables; v1.0 preprint</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Pratyush Kumar</name>
+      <arxiv:affiliation>Ranqo</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.17443v1</id>
+    <title>Incumbent Advantage: Brand Bias and Cognitive Manipulation Dynamics in LLM Recommendation Systems</title>
+    <updated>2026-06-16T02:54:34Z</updated>
+    <link href="https://arxiv.org/abs/2606.17443v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.17443v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are becoming a major way for consumers to find products, but we do not yet understand how brands compete in this new channel. We study brand dynamics in LLM recommendations using skincare products -- a category where consumers cannot easily judge quality before buying and must rely on brand reputation -- across three commercial LLMs (GPT-4o-mini, Claude Sonnet, Gemini 3 Flash), with a robustness check on search goods. In three experiments, we find: (1) a Conditional Monopoly where well-known brands get recommended 100% of the time (IAI = 10.0) when all products have the same specifications, but this dominance disappears with less than a +0.1-star rating advantage for a competitor; (2) authority-style marketing language, including fabricated clinical-evidence claims, breaks this monopoly at a Bias Surplus Value equal to +0.17 rating points, with each model responding differently; and (3) a social dilemma in multi-brand GEO competition: when all brands adopt the same optimization strategy, individual payoff falls from +0.802 to +0.007 in our payoff proxy, and non-participating brands receive zero recommendations in our tests. Our results suggest that generative engine optimization (GEO) should be studied not only as a security risk, but also as an emerging marketing practice that shapes market competition.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-16T02:54:34Z</published>
+    <arxiv:comment>16 pages, 4 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Xi Chu</name>
+    </author>
+    <author>
+      <name>Yupeng Hou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.16344v1</id>
+    <title>Whose hotel does the AI recommend? An algorithm audit of reputation signals in LLM-assisted hotel selection</title>
+    <updated>2026-06-15T07:47:31Z</updated>
+    <link href="https://arxiv.org/abs/2606.16344v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.16344v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Travelers increasingly ask large language model (LLM) assistants which hotel to book, making these systems gatekeepers of property visibility -- yet what moves their recommendations is undocumented. We conduct a pre-specified algorithm audit using a randomized choice-based conjoint: across personas, prompt templates, and twelve open-weight and proprietary models, assistants choose among five hotels whose guest rating, review volume and recency, management response, chain affiliation, price, eco-certification, and list position are independently randomized. We estimate the average marginal component effect of each signal on the probability of recommendation. Guest rating and price dominate (a top rating raises selection by 31.6 percentage points; a high price lowers it by 30.0), reproducing human valence-and-price primacy but over-weighting eco-certification and ignoring management response. List position -- a content-free artifact -- shifts recommendations causally, worth about \$12 per night. Stated reasons track revealed weights imperfectly. The findings ground generative engine optimization and the accountability of AI infomediaries in causal evidence.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-15T07:47:31Z</published>
+    <arxiv:comment>32 Pages</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Mirza Samad Ahmed Baig</name>
+    </author>
+    <author>
+      <name>Syeda Anshrah Gillani</name>
+    </author>
+    <author>
+      <name>Asher Ali</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.28356v1</id>
+    <title>SafeGEO: Understanding Generative Engine Optimization Risks in Recommendation Agents</title>
+    <updated>2026-06-08T22:40:08Z</updated>
+    <link href="https://arxiv.org/abs/2606.28356v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.28356v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative Engine Optimization (GEO) lets content owners rewrite web content to increase their visibility in generative systems. In recommendation agents, this creates a risk that seller-controlled sources make flawed products appear better supported than they are. We study this risk by asking whether recommendation agents preserve utility-aligned decisions when seller-controlled sources are rewritten for GEO. To make this question measurable, we construct SafeGEO, an evaluation suite with 22 GEO attack variants across 600 recommendation cases. We empirically show that GEO attacks can promote flawed target products. On average, they increase the rate at which such flawed products enter the recommendation set by up to 83.2%. We further study whether agent-side design choices can mitigate this risk and show that simple defenses, including defensive prompting and structured evidence checks, reduce harmful target promotion by up to 39.2%. These gains are substantial but do not restore the no-GEO performance, showing that GEO remains a serious risk despite developer-side mitigation.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-08T22:40:08Z</published>
+    <arxiv:comment>41 pages,23 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Qianfeng Wen</name>
+    </author>
+    <author>
+      <name>Yifan Simon Liu</name>
+    </author>
+    <author>
+      <name>Xin Liu</name>
+    </author>
+    <author>
+      <name>Difan Jiao</name>
+    </author>
+    <author>
+      <name>Blair Yang</name>
+    </author>
+    <author>
+      <name>Junda Wu</name>
+    </author>
+    <author>
+      <name>Zhenwei Tang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.29107v2</id>
+    <title>GEO-Bench: Benchmarking Ranking Manipulation in Generative Engine Optimization</title>
+    <updated>2026-05-30T18:12:24Z</updated>
+    <link href="https://arxiv.org/abs/2605.29107v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.29107v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) increasingly rank products, documents, and recommendations for user queries, which makes manipulating these rankings a growing concern for fairness and information integrity. Research on generative engine optimization (GEO) has produced many manipulation methods, but each is evaluated on its own dataset with its own metrics, so their relative strength and detectability stay unclear. We present GEO-Bench, a benchmark that evaluates GEO ranking-manipulation attacks under one protocol. It unifies black-box prompt-based attacks (TAP, Zero-Shot), white-box gradient-based attacks (STS, RAF, StealthRank), and ten white-hat C-SEO strategies. We score every method on five datasets against a fixed open-weight ranker (Llama-3.1-8B-Instruct), using metrics for both effectiveness (NRG, Success@α, Promote@α) and stealth (keyword violation rate, perplexity ratio). Our evaluation shows that effectiveness and stealth trade off across adversarial attacks, that black-box content rewriting matches or exceeds gradient-based attacks on rank promotion while producing more fluent text and can evade both keyword- and perplexity-based detection on some domains, and that the access model does not predict attack strength. By standardizing datasets, attack implementations, and metrics, GEO-Bench enables the first direct comparison across these attack paradigms and supports the development of detection methods.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-27T21:10:43Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Ojas Nimase</name>
+    </author>
+    <author>
+      <name>Zhe Chen</name>
+    </author>
+    <author>
+      <name>Gengpei Qi</name>
+    </author>
+    <author>
+      <name>Yue Zhao</name>
+    </author>
+    <author>
+      <name>Xiyang Hu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.25517v1</id>
+    <title>What Gets Cited: Competitive GEO in AI Answer Engines</title>
+    <updated>2026-05-25T07:20:08Z</updated>
+    <link href="https://arxiv.org/abs/2605.25517v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.25517v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI answer engines generate answers from retrieved pages but cite only a few sources. This makes visibility depend not just on ranking, but on being cited. We study competitive Generative Engine Optimization (GEO): when two retrieved candidates compete, what makes one more likely to be cited first? We build a controlled two-document retrieval-augmented generation (RAG) testbed that injects exactly two candidate sources into the model context and measures which source is referenced by the first citation marker in the output. Across six LLMs we execute 252,000 trials, repeated paired comparisons under one factorial program over 18 content factors. In each trial the two sources differ in exactly one factor; we use brand anonymization and counterbalanced source order to separate content effects from position bias. Mixed-effects models show that topical relevance and list position are the biggest drivers of being cited first. Including explicit price information and a recent timestamp also helps consistently. Completeness and trust cues add smaller gains, while formatting-only edits have little impact. We release a reproducible evaluation protocol and a prioritized GEO checklist for practitioners, and we exercised it in an early internal pilot at Sprinklr, where teams reported positive qualitative feedback on workflow usability.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-25T07:20:08Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Rahul Vishwakarma</name>
+    </author>
+    <author>
+      <name>Shushant Kumar</name>
+    </author>
+    <author>
+      <name>Ratnesh Jamidar</name>
+    </author>
+    <arxiv:doi>10.1145/3805712.3808445</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3805712.3808445" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.21948v1</id>
+    <title>SCI-Defense: Defending Manipulation Attacks from Generative Engine Optimization</title>
+    <updated>2026-05-21T03:28:06Z</updated>
+    <link href="https://arxiv.org/abs/2605.21948v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.21948v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-based ranking systems are vulnerable to Generative Engine Optimization (GEO) attacks, where adversaries inject semantic signals into product descriptions to artificially boost rankings. We propose SCI-Defense, a three-component defense framework combining Perplexity detection (PPL), Semantic Integrity Scoring (SIS), and Inter-Candidate Detection (ICD). SIS evaluates four manipulation dimensions: Authority Attribution (AA), Narrative Purposiveness (NP), Comparative Claims (CA), and Temporal Claims (TC). Evaluated on 600 Amazon product descriptions across 6 categories, SCI-Defense achieves Precision=1.000 and FPR=0.000, with Recall of 1.000, 0.952, and 0.830 against String, Reasoning, and Review attacks respectively. On 600 MS MARCO web passages, String attacks are blocked with perfect recall while Review attacks yield near-zero recall, as web passages lack the persuasion-oriented signals that SIS targets in product descriptions. We demonstrate that existing defenses -- PPL-only filters, SafetyClf content classifiers, and paraphrasing -- achieve zero recall against semantic manipulation attacks. We further demonstrate new attacks such as Specification Amplification and Use-Case Saturation can expose semantic relevance manipulation as a structural defense blind spot that suggests directions for future research.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-21T03:28:06Z</published>
+    <arxiv:comment>20 pages, NeurIPS 2026 submission</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Xucheng Yu</name>
+    </author>
+    <author>
+      <name>Haibo Jin</name>
+    </author>
+    <author>
+      <name>Huimin Zeng</name>
+    </author>
+    <author>
+      <name>Haohan Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.12439v1</id>
+    <title>Position: Generative Engine Optimization Creates Underexamined Risks, Governance Must Target Concentration, Disclosure, and Academic Blind Spots</title>
+    <updated>2026-05-18T02:02:54Z</updated>
+    <link href="https://arxiv.org/abs/2606.12439v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.12439v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) answer engines are increasingly used for information seeking, shifting visibility from ranked lists to synthesized answers. This enables Generative Engine Optimization (GEO), which targets LLM answer engines' evidence pool and generation. We analyze the search engine optimization (SEO) to GEO transition to identify two risks: (i) concentrated influence from low contestability and system sensitivity, and (ii) undisclosed commercial influence embedded in evidence and reasoning. We then formalize a general GEO pipeline to locate where optimization acts and compare academic and industry practices, revealing a third risk: (iii) academic-industry blind spots driven by visibility and evaluation asymmetries between offline setups and deployed systems. This position argues the need for answer-level governance and measurement: stronger contestability, high-precision disclosure, black-box auditing of material influence, and deployment-aligned metrics for exposure persistence.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-18T02:02:54Z</published>
+    <arxiv:comment>This paper is accepted by the ICML 2026 Position Track</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <arxiv:journal_ref>https://icml.cc/virtual/2026/poster/67185</arxiv:journal_ref>
+    <author>
+      <name>Yizhu Wen</name>
+    </author>
+    <author>
+      <name>Nan Zhang</name>
+    </author>
+    <author>
+      <name>Haohan Yuan</name>
+    </author>
+    <author>
+      <name>Xun Chen</name>
+    </author>
+    <author>
+      <name>Haopeng Zhang</name>
+    </author>
+    <author>
+      <name>Hanqing Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.12887v2</id>
+    <title>EcoGEO: Trajectory-Aware Evidence Ecosystems for Web-Enabled LLM Search Agents</title>
+    <updated>2026-07-01T02:19:45Z</updated>
+    <link href="https://arxiv.org/abs/2605.12887v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.12887v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Web-enabled LLM agents are changing how online information influences search outcomes. Existing Generative Engine Optimization (GEO) studies mainly focus on individual webpages. However, agentic web search is not a single-document setting: an agent may issue queries, crawl pages, follow links, reformulate searches, and synthesize evidence across multiple browsing steps. Influence therefore depends not only on page content, but also on how pages are organized, connected, and encountered along the agent's browsing trajectory. We study this shift through Ecosystem Generative Engine Optimization (EcoGEO), which treats GEO as an environment-level influence problem for web-enabled LLM agents. To instantiate this perspective, we propose TRACE, a Trajectory-Aware Coordinated Evidence Ecosystem. Given a recommendation query and a fictional target product, our method builds a controlled evidence environment that coordinates an agent-facing navigation entry page with heterogeneous support pages. These pages use shared terminology, internal links, and consistent product attributes to introduce, verify, and reinforce the target product. We evaluate our method on OPR-Bench, a benchmark for open-ended product recommendation. Experiments show that it consistently outperforms page-level GEO baselines in final target recommendation. Trajectory-level metrics further show increased initial target-result crawls, target-specific follow-up searches, and internal-link crawls, suggesting that the gains come from shaping the agent's evidence-acquisition process rather than merely adding more target-related content. Overall, our findings support an ecosystem research paradigm for GEO, where web-enabled LLM agents are studied in relation to the broader evidence environments that guide search, browsing, and answer synthesis.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-13T02:03:18Z</published>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Hengwei Ye</name>
+    </author>
+    <author>
+      <name>Jiasheng Mao</name>
+    </author>
+    <author>
+      <name>Zhenhan Guan</name>
+    </author>
+    <author>
+      <name>Zheng Tian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.09314v1</id>
+    <title>How LLMs Are Persuaded: A Few Attention Heads, Rerouted</title>
+    <updated>2026-05-10T04:15:24Z</updated>
+    <link href="https://arxiv.org/abs/2605.09314v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.09314v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models can be persuaded to abandon factual knowledge. This vulnerability is central to AI safety, but its internal mechanism remains poorly understood. We uncover a compact causal mechanism for persuasion-induced factual errors. A small set of mid-layer attention heads almost entirely determines the model's answer. These heads write answer options into a low-dimensional polyhedron, with options occupying distinct vertices. Persuasion does not blur belief or merely reduce confidence; it causes a discrete latent jump from the correct-answer vertex to the persuasion-target vertex. We show that decision heads are not reasoning over evidence. Instead, they copy whichever option token their attention selects. Persuasion works by redirecting attention. We isolate a rank-one evidence-routing feature that controls the route. Directly modifying this feature steers the model's choice, and removing it blocks persuasion. We then trace the feature back to a band of shallower attention heads that build it from persuasive keywords in the input. Every step is validated by intervention. This mechanism appears across open-source LLMs and realistic poisoning scenarios such as Generative Engine Optimization, revealing persuasion as a narrow, monitorable circuit.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-10T04:15:24Z</published>
+    <arxiv:comment>9 pages, 9 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Xiangkun Sun</name>
+    </author>
+    <author>
+      <name>Lingkai Kong</name>
+    </author>
+    <author>
+      <name>Aoqi Zhang</name>
+    </author>
+    <author>
+      <name>Liang Zeng</name>
+    </author>
+    <author>
+      <name>Tonghan Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.27790v1</id>
+    <title>How Generative AI Disrupts Search: An Empirical Study of Google Search, Gemini, and AI Overviews</title>
+    <updated>2026-04-30T12:32:21Z</updated>
+    <link href="https://arxiv.org/abs/2604.27790v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.27790v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative AI is being increasingly integrated into web search for the convenience it provides users. In this work, we aim to understand how generative AI disrupts web search by retrieving and presenting the information and sources differently from traditional search engines. We introduce a public benchmark dataset of 11,500 user queries to support our study and future research of generative search. We compare the search results returned by Google's search engine, the accompanying AI Overview (AIO), and Gemini Flash 2.5 for each query. We have made several key findings. First, we find that for 51.5\% of representative, real-user queries, AIOs are generated, and are displayed above the organic search results. Controversial questions frequently result in an AIO. Second, we show that the retrieved sources are substantially different for each search engine (&lt;0.2 average Jaccard similarity). Traditional Google search is significantly more likely to retrieve information from popular or institutional websites in government or education, while generative search engines are significantly more likely to retrieve Google-owned content. Third, we observe that websites that block Google's AI crawler are significantly less likely to be retrieved by AIOs, despite having access to the content. Finally, AIOs are less consistent when processing two runs of the same query, and are less robust to minor query edits. Our findings have important implications for understanding how generative search impacts website visibility, the effectiveness of generative engine optimization techniques, and the information users receive. We call for revenue frameworks to foster a sustainable and mutually beneficial ecosystem for publishers and generative search providers.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-30T12:32:21Z</published>
+    <arxiv:comment>Paper Accepted to ACM SIGIR 2026 (49th International ACM SIGIR Conference on Research and Development in Information Retrieval)</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Riley Grossman</name>
+    </author>
+    <author>
+      <name>Songjiang Liu</name>
+    </author>
+    <author>
+      <name>Michael K. Chen</name>
+    </author>
+    <author>
+      <name>Mike Smith</name>
+    </author>
+    <author>
+      <name>Cristian Borcea</name>
+    </author>
+    <author>
+      <name>Yi Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.25707v2</id>
+    <title>From Citation Selection to Citation Absorption: A Measurement Framework for Generative Engine Optimization Across AI Search Platforms</title>
+    <updated>2026-04-29T13:25:28Z</updated>
+    <link href="https://arxiv.org/abs/2604.25707v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.25707v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative search engines increasingly determine whether online information is merely discoverable, cited as a source, or actually absorbed into generated answers. This paper proposes a two-stage measurement framework for Generative Engine Optimization (GEO): citation selection, where a platform triggers search and chooses sources, and citation absorption, where a cited page contributes language, evidence, structure, or factual support to the final answer. We analyze the public geo-citation-lab dataset covering 602 controlled prompts across ChatGPT, Google AI Overview/Gemini, and Perplexity; 21,143 valid search-layer citations; 23,745 citation-level feature records; 18,151 successfully fetched pages; and 72 extracted features. The central descriptive finding is that citation breadth and citation depth diverge. Perplexity and Google cite more sources on average, while ChatGPT cites fewer sources but shows substantially higher average citation influence among fetched pages. High-influence pages tend to be longer, more structured, semantically aligned, and richer in extractable evidence such as definitions, numerical facts, comparisons, and procedural steps. The results suggest that GEO should be measured beyond citation counts, with answer-level absorption treated as a separate outcome.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-28T14:34:20Z</published>
+    <arxiv:comment>27 pages, 11 figures. ACM-style layout. Updated author list and author homepage metadata. Public dataset and analysis pipeline: https://github.com/yaojingang/geo-citation-lab</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Zhang Kai</name>
+    </author>
+    <author>
+      <name>He Xinyue</name>
+    </author>
+    <author>
+      <name>Yao Jingang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.19516v1</id>
+    <title>From Experience to Skill: Multi-Agent Generative Engine Optimization via Reusable Strategy Learning</title>
+    <updated>2026-04-21T14:39:24Z</updated>
+    <link href="https://arxiv.org/abs/2604.19516v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.19516v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative engines (GEs) are reshaping information access by replacing ranked links with citation-grounded answers, yet current Generative Engine Optimization (GEO) methods optimize each instance in isolation, unable to accumulate or transfer effective strategies across tasks and engines. We reframe GEO as a strategy learning problem and propose MAGEO, a multi-agent framework in which coordinated planning, editing, and fidelity-aware evaluation serve as the execution layer, while validated editing patterns are progressively distilled into reusable, engine-specific optimization skills. To enable controlled assessment, we introduce a Twin Branch Evaluation Protocol for causal attribution of content edits and DSV-CF, a dual-axis metric that unifies semantic visibility with attribution accuracy. We further release MSME-GEO-Bench, a multi-scenario, multi-engine benchmark grounded in real-world queries. Experiments on three mainstream engines show that MAGEO substantially outperforms heuristic baselines in both visibility and citation fidelity, with ablations confirming that engine-specific preference modeling and strategy reuse are central to these gains, suggesting a scalable learning-driven paradigm for trustworthy GEO. Code is available at https://github.com/Wu-beining/MAGEO</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-21T14:39:24Z</published>
+    <arxiv:comment>ACL 2026 Findings</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Beining Wu</name>
+    </author>
+    <author>
+      <name>Fuyou Mao</name>
+    </author>
+    <author>
+      <name>Jiong Lin</name>
+    </author>
+    <author>
+      <name>Cheng Yang</name>
+    </author>
+    <author>
+      <name>Jiaxuan Lu</name>
+    </author>
+    <author>
+      <name>Yifu Guo</name>
+    </author>
+    <author>
+      <name>Siyu Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Wu</name>
+    </author>
+    <author>
+      <name>Ying Huang</name>
+    </author>
+    <author>
+      <name>Fu Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.19113v1</id>
+    <title>Think Before Writing: Feature-Level Multi-Objective Optimization for Generative Citation Visibility</title>
+    <updated>2026-04-21T05:47:04Z</updated>
+    <link href="https://arxiv.org/abs/2604.19113v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.19113v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative answer engines expose content through selective citation rather than ranked retrieval, fundamentally altering how visibility is determined. This shift calls for new optimization methods beyond traditional search engine optimization. Existing generative engine optimization (GEO) approaches primarily rely on token-level text rewriting, offering limited interpretability and weak control over the trade-off between citation visibility and content quality. We propose FeatGEO, a feature-level, multi-objective optimization framework that abstracts webpages into interpretable structural, content, and linguistic properties. Instead of directly editing text, FeatGEO optimizes over this feature space and uses a language model to realize feature configurations into natural language, decoupling high-level optimization from surface-level generation. Experiments on GEO-Bench across three generative engines demonstrate that FeatGEO consistently improves citation visibility while maintaining or improving content quality, substantially outperforming token-level baselines. Further analyses show that citation behavior is more strongly influenced by document-level content properties than by isolated lexical edits, and that the learned feature configurations generalize across language models of different scales.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-21T05:47:04Z</published>
+    <arxiv:comment>14 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Zikang Liu</name>
+    </author>
+    <author>
+      <name>Peilan Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.07585v1</id>
+    <title>Don't Measure Once: Measuring Visibility in AI Search (GEO)</title>
+    <updated>2026-04-08T20:38:05Z</updated>
+    <link href="https://arxiv.org/abs/2604.07585v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.07585v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language model-based chat systems become increasingly widely used, generative engine optimization (GEO) has emerged as an important problem for information access and retrieval. In classical search engines, results are comparatively transparent and stable: a single query often provides a representative snapshot of where a page or brand appears relative to competitors. The inherent probabilistic nature of AI search changes this paradigm. Answers can vary across runs, prompts, and time, making one-off observations unreliable. Drawing on empirical studies, our findings underscore the need for repeated measurements to assess a brand's GEO performance and to characterize visibility as a distribution rather than a single-point outcome.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-08T20:38:05Z</published>
+    <arxiv:comment>19 pages, 7 figures, 17 tables. Comments welcome!</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Julius Schulte</name>
+    </author>
+    <author>
+      <name>Malte Bleeker</name>
+    </author>
+    <author>
+      <name>Philipp Kaufmann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.03656v1</id>
+    <title>Beyond Retrieval: Modeling Confidence Decay and Deterministic Agentic Platforms in Generative Engine Optimization</title>
+    <updated>2026-04-04T09:17:37Z</updated>
+    <link href="https://arxiv.org/abs/2604.03656v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.03656v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative Engine Optimization (GEO) is rapidly reshaping digital marketing paradigms in the era of Large Language Models (LLMs). However, current GEO strategies predominantly rely on Retrieval-Augmented Generation (RAG), which inherently suffers from probabilistic hallucinations and the "zero-click" paradox, failing to establish sustainable commercial trust. In this paper, we systematically deconstruct the probabilistic flaws of existing RAG-based GEO and propose a paradigm shift towards deterministic multi-agent intent routing. First, we mathematically formulate Semantic Entropy Drift (SED) to model the dynamic decay of confidence curves in LLMs over continuous temporal and contextual perturbations. To rigorously quantify optimization value in black-box commercial engines, we introduce the Isomorphic Attribution Regression (IAR) model, leveraging a Multi-Agent System (MAS) probe with strict human-in-the-loop physical isolation to enforce hallucination penalties. Furthermore, we architect the Deterministic Agent Handoff (DAH) protocol, conceptualizing an Agentic Trust Brokerage (ATB) ecosystem where LLMs function solely as intent routers rather than final answer generators. We empirically validate this architecture using EasyNote, an industrial AI meeting minutes product by Yishu Technology. By routing the intent of "knowledge graph mapping on an infinite canvas" directly to its specialized proprietary agent via DAH, we demonstrate the reduction of vertical task hallucination rates to near zero. This work establishes a foundational theoretical framework for next-generation GEO and paves the way for a well-ordered, deterministic human-AI collaboration ecosystem.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-04T09:17:37Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>XinYu Zhao</name>
+    </author>
+    <author>
+      <name>ChengYou Li</name>
+    </author>
+    <author>
+      <name>XiangBao Meng</name>
+    </author>
+    <author>
+      <name>Kai Zhang</name>
+    </author>
+    <author>
+      <name>XiaoDong Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.29979v1</id>
+    <title>Structural Feature Engineering for Generative Engine Optimization: How Content Structure Shapes Citation Behavior</title>
+    <updated>2026-03-31T16:41:43Z</updated>
+    <link href="https://arxiv.org/abs/2603.29979v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.29979v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The proliferation of AI-powered search engines has shifted information discovery from traditional link-based retrieval to direct answer generation with selective source citation, creating new challenges for content visibility. While existing Generative Engine Optimization (GEO) approaches focus primarily on semantic content modification, the role of structural features in influencing citation behavior remains underexplored.
+  In this paper, we propose GEO-SFE, a systematic framework for structural feature engineering in generative engine optimization. Our approach decomposes content structure into three hierarchical levels: macro-structure (document architecture), meso-structure (information chunking), and micro-structure (visual emphasis), and models their impact on citation probability across different generative engine architectures. We develop architecture-aware optimization strategies and predictive models that preserve semantic integrity while improving structural effectiveness.
+  Experimental evaluation across six mainstream generative engines demonstrates consistent improvements in citation rate (17.3 percent) and subjective quality (18.5 percent), validating the effectiveness and generalizability of the proposed framework. This work establishes structural optimization as a foundational component of GEO, providing a data-driven methodology for enhancing content visibility in LLM-powered information ecosystems.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-31T16:41:43Z</published>
+    <arxiv:comment>12 pages, 5 figures. This paper proposes GEO-SFE, a structural feature engineering framework for generative engine optimization</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Junwei Yu</name>
+    </author>
+    <author>
+      <name>Mufeng Yang</name>
+    </author>
+    <author>
+      <name>Yepeng Ding</name>
+    </author>
+    <author>
+      <name>Hiroyuki Sato</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.09296v1</id>
+    <title>Diagnosing and Repairing Citation Failures in Generative Engine Optimization</title>
+    <updated>2026-03-10T07:25:34Z</updated>
+    <link href="https://arxiv.org/abs/2603.09296v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.09296v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative Engine Optimization (GEO) aims to improve content visibility in AI-generated responses. However, existing methods measure contribution-how much a document influences a response-rather than citation, the mechanism that actually drives traffic back to creators. Also, these methods apply generic rewriting rules uniformly, failing to diagnose why individual document are not cited. This paper introduces a diagnostic approach to GEO that asks why a document fails to be cited and intervenes accordingly. We develop a unified framework comprising: (1) the first taxonomy of citation failure modes spanning different stages of a citation pipeline; (2) AgentGEO, an agentic system that diagnoses failures using this taxonomy, selects targeted repairs from a corresponding tool library, and iterates until citation is achieved; and (3) a document-centric benchmark evaluating whether optimizations generalize across held-out queries. AgentGEO achieves over 40% relative improvement in citation rates while modifying only 5% of content, compared to 25% for baselines. Our analysis reveals that generic optimization can harm long-tail content and some documents face challenges that optimization alone cannot fully address-findings with implications for equitable visibility in AI-mediated information access.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-10T07:25:34Z</published>
+    <arxiv:comment>35 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Zhihua Tian</name>
+    </author>
+    <author>
+      <name>Yuhan Chen</name>
+    </author>
+    <author>
+      <name>Yao Tang</name>
+    </author>
+    <author>
+      <name>Jian Liu</name>
+    </author>
+    <author>
+      <name>Ruoxi Jia</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.12282v1</id>
+    <title>Algorithmic Trust and Compliance: Benchmarking Brand Notability for UK iGaming Entities in Generative Search Engines</title>
+    <updated>2026-03-05T09:17:12Z</updated>
+    <link href="https://arxiv.org/abs/2603.12282v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.12282v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rapid adoption of generative AI-powered search engines, such as ChatGPT, Perplexity, and Gemini, is fundamentally reshaping information retrieval. We are witnessing a critical shift from traditional ranked lists to synthesized, citation-backed answers. This paradigm shift challenges established Search Engine Optimization (SEO) practices and necessitates a new framework, termed Generative Engine Optimization (GEO). In highly regulated environments like the UK iGaming sector, visibility is no longer dictated by keyword density, but by an entity's ability to project "Algorithmic Trust". This report presents an empirical analysis of how compliance signals -- such as UK Gambling Commission (UKGC) standards -- function as authority multipliers for Large Language Models (LLMs) when properly structured. Recent large-scale experiments reveal that AI Search exhibits a systematic and overwhelming bias towards Earned media (third-party, authoritative sources) over Brand-owned content. Consequently, practitioners must engineer their content for machine scannability and justification to dominate these new AI-perceived authority metrics.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-05T09:17:12Z</published>
+    <arxiv:comment>Technical Report. Produced by Interamplify Research Division (UK)</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Julen Oruesagasti</name>
+    </author>
+    <arxiv:doi>10.13140/RG.2.2.15316.46721</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.13140/RG.2.2.15316.46721" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.20213v1</id>
+    <title>AgenticGEO: A Self-Evolving Agentic System for Generative Engine Optimization</title>
+    <updated>2026-03-02T16:13:13Z</updated>
+    <link href="https://arxiv.org/abs/2603.20213v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.20213v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative search engines represent a transition from traditional ranking-based retrieval to Large Language Model (LLM)-based synthesis, transforming optimization goals from ranking prominence towards content inclusion. Generative Engine Optimization (GEO), specifically, aims to maximize visibility and attribution in black-box summarized outputs by strategically manipulating source content. However, existing methods rely on static heuristics, single-prompt optimization, or engine preference rule distillation that is prone to overfitting. They cannot flexibly adapt to diverse content or the changing behaviors of generative engines. Moreover, effectively optimizing these strategies requires an impractical amount of interaction feedback from the engines. To address these challenges, we propose AgenticGEO, a self-evolving agentic framework formulating optimization as a content-conditioned control problem, which enhances intrinsic content quality to robustly adapt to the unpredictable behaviors of black-box engines. Unlike fixed-strategy methods, AgenticGEO employs a MAP-Elites archive to evolve diverse, compositional strategies. To mitigate interaction costs, we introduce a Co-Evolving Critic, a lightweight surrogate that approximates engine feedback for content-specific strategy selection and refinement, efficiently guiding both evolutionary search and inference-time planning. Through extensive in-domain and cross-domain experiments on two representative engines, AgenticGEO achieves state-of-the-art performance and demonstrates robust transferability, outperforming 14 baselines across 3 datasets. Our code and model are available at: https://github.com/AIcling/agentic_geo.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-02T16:13:13Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Jiaqi Yuan</name>
+    </author>
+    <author>
+      <name>Jialu Wang</name>
+    </author>
+    <author>
+      <name>Zihan Wang</name>
+    </author>
+    <author>
+      <name>Qingyun Sun</name>
+    </author>
+    <author>
+      <name>Ruijie Wang</name>
+    </author>
+    <author>
+      <name>Jianxin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.12187v1</id>
+    <title>SAGEO Arena: A Realistic Environment for Evaluating Search-Augmented Generative Engine Optimization</title>
+    <updated>2026-02-12T17:18:00Z</updated>
+    <link href="https://arxiv.org/abs/2602.12187v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.12187v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Search-Augmented Generative Engines (SAGE) have emerged as a new paradigm for information access, bridging web-scale retrieval with generative capabilities to deliver synthesized answers. This shift has fundamentally reshaped how web content gains exposure online, giving rise to Search-Augmented Generative Engine Optimization (SAGEO), the practice of optimizing web documents to improve their visibility in AI-generated responses. Despite growing interest, no evaluation environment currently supports comprehensive investigation of SAGEO. Specifically, existing benchmarks lack end-to-end visibility evaluation of optimization strategies, operating on pre-determined candidate documents that abstract away retrieval and reranking preceding generation. Moreover, existing benchmarks discard structural information (e.g., schema markup) present in real web documents, overlooking the rich signals that search systems actively leverage in practice. Motivated by these gaps, we introduce SAGEO Arena, a realistic and reproducible environment for stage-level SAGEO analysis. Our objective is to jointly target search-oriented optimization (SEO) and generation-centric optimization (GEO). To achieve this, we integrate a full generative search pipeline over a large-scale corpus of web documents with rich structural information. Our findings reveal that existing approaches remain largely impractical under realistic conditions and often degrade performance in retrieval and reranking. We also find that structural information helps mitigate these limitations, and that effective SAGEO requires tailoring optimization to each pipeline stage. Overall, our benchmark paves the way for realistic SAGEO evaluation and optimization beyond simplified settings.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-12T17:18:00Z</published>
+    <arxiv:comment>Work in Progress</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Sunghwan Kim</name>
+    </author>
+    <author>
+      <name>Wooseok Jeong</name>
+    </author>
+    <author>
+      <name>Serin Kim</name>
+    </author>
+    <author>
+      <name>Sangam Lee</name>
+    </author>
+    <author>
+      <name>Dongha Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.02961v1</id>
+    <title>Generative Engine Optimization: A VLM and Agent Framework for Pinterest Acquisition Growth</title>
+    <updated>2026-02-03T00:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2602.02961v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.02961v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models are fundamentally reshaping content discovery through AI-native search systems such as ChatGPT, Gemini, and Claude. Unlike traditional search engines that match keywords to documents, these systems infer user intent, synthesize multimodal evidence, and generate contextual answers directly on the search page, introducing a paradigm shift from Search Engine Optimization (SEO) to Generative Engine Optimization (GEO). For visual content platforms hosting billions of assets, this poses an acute challenge: individual images lack the semantic depth and authority signals that generative search prioritizes, risking disintermediation as user needs are satisfied in-place without site visits.
+  We present Pinterest GEO, a production-scale framework that pioneers reverse search design: rather than generating generic image captions describing what content is, we fine-tune Vision-Language Models (VLMs) to predict what users would actually search for, augmented this with AI agents that mine real-time internet trends to capture emerging search demand. These VLM-generated queries then drive construction of semantically coherent Collection Pages via multimodal embeddings, creating indexable aggregations optimized for generative retrieval. Finally, we employ hybrid VLM and two-tower ANN architectures to build authority-aware interlinking structures that propagate signals across billions of visual assets. Deployed at scale across billions of images and tens of millions of collections, GEO delivers 20\% organic traffic growth contributing to multi-million monthly active user (MAU) growth, demonstrating a principled pathway for visual platforms to thrive in the generative search era.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-03T00:58:50Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Faye Zhang</name>
+    </author>
+    <author>
+      <name>Qianyu Cheng</name>
+    </author>
+    <author>
+      <name>Jasmine Wan</name>
+    </author>
+    <author>
+      <name>Vishwakarma Singh</name>
+    </author>
+    <author>
+      <name>Jinfeng Rao</name>
+    </author>
+    <author>
+      <name>Kofi Boakye</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.13938v1</id>
+    <title>IF-GEO: Conflict-Aware Instruction Fusion for Multi-Query Generative Engine Optimization</title>
+    <updated>2026-01-20T13:13:39Z</updated>
+    <link href="https://arxiv.org/abs/2601.13938v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.13938v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As Generative Engines revolutionize information retrieval by synthesizing direct answers from retrieved sources, ensuring source visibility becomes a significant challenge. Improving it through targeted content revisions is a practical strategy termed Generative Engine Optimization (GEO). However, optimizing a document for diverse queries presents a constrained optimization challenge where heterogeneous queries often impose conflicting and competing revision requirements under a limited content budget. To address this challenge, we propose IF-GEO, a "diverge-then-converge" framework comprising two phases: (i) mining distinct optimization preferences from representative latent queries; (ii) synthesizing a Global Revision Blueprint for guided editing by coordinating preferences via conflict-aware instruction fusion. To explicitly quantify IF-GEO's objective of cross-query stability, we introduce risk-aware stability metrics. Experiments on multi-query benchmarks demonstrate that IF-GEO achieves substantial performance gains while maintaining robustness across diverse retrieval scenarios.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-01-20T13:13:39Z</published>
+    <arxiv:comment>9 pages, 3 figures. Submitted to ACL 2026. Corresponding author: Zhen Chen</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Heyang Zhou</name>
+      <arxiv:affiliation>School of Cyber Science and Technology, University of Science and Technology of China</arxiv:affiliation>
+    </author>
+    <author>
+      <name>JiaJia Chen</name>
+      <arxiv:affiliation>Institute of Dataspace, Hefei Comprehensive National Science Center</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Xiaolu Chen</name>
+      <arxiv:affiliation>School of Cyber Science and Technology, University of Science and Technology of China</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Jie Bao</name>
+      <arxiv:affiliation>School of Cyber Science and Technology, University of Science and Technology of China</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhen Chen</name>
+      <arxiv:affiliation>School of Cyber Science and Technology, University of Science and Technology of China</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Yong Liao</name>
+      <arxiv:affiliation>School of Cyber Science and Technology, University of Science and Technology of China</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.12263v2</id>
+    <title>Multimodal Generative Engine Optimization: Rank Manipulation for Vision-Language Model Rankers</title>
+    <updated>2026-06-07T22:07:41Z</updated>
+    <link href="https://arxiv.org/abs/2601.12263v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.12263v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language Models (VLMs) integrate visual and textual knowledge into unified representations that increasingly underpin modern retrieval and recommendation systems. However, it remains unclear how reliably these models utilize their cross-modal knowledge when ranking multimodal items, and whether their knowledge grounding can be subverted. In this paper, we expose a fundamental vulnerability in how VLMs apply multimodal knowledge for product ranking: through Multimodal Generative Engine Optimization (MGEO), we show that an adversary can manipulate a VLM's ranking decisions by jointly crafting imperceptible image perturbations and fluent textual suffixes that exploit the model's internal cross-modal knowledge coupling. Using an alternating optimization strategy, MGEO targets the deep interactions between visual and linguistic representations within the VLM, achieving rank manipulations that substantially exceed those of unimodal attacks and heuristic baselines powered by strong commercial models. Our findings reveal that surface-level content quality is insufficient for rank promotion; instead, direct alignment with the model's internal knowledge utilization mechanism is required. These results raise important questions on the faithfulness and robustness of knowledge grounding in multimodal foundation models, and motivate future work on defense mechanisms for multimodal retrieval systems. Code is available at: https://github.com/glad-lab/MGEO</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-01-18T04:58:28Z</published>
+    <arxiv:comment>Proceedings of the 4th Workshop on Towards Knowledgeable Foundation Models (KnowFM) at ACL 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yixuan Du</name>
+    </author>
+    <author>
+      <name>Chenxiao Yu</name>
+    </author>
+    <author>
+      <name>Haoyan Xu</name>
+    </author>
+    <author>
+      <name>Ziyi Wang</name>
+    </author>
+    <author>
+      <name>Yue Zhao</name>
+    </author>
+    <author>
+      <name>Xiyang Hu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.00912v1</id>
+    <title>The Discovery Gap: How Product Hunt Startups Vanish in LLM Organic Discovery Queries</title>
+    <updated>2026-01-01T04:30:54Z</updated>
+    <link href="https://arxiv.org/abs/2601.00912v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.00912v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When someone asks ChatGPT to recommend a project management tool, which products show up in the response? And more importantly for startup founders: will their newly launched product ever appear? This research set out to answer these questions.
+  I randomly selected 112 startups from the top 500 products featured on the 2025 Product Hunt leaderboard and tested each one across 2,240 queries to two different large language models: ChatGPT (gpt-4o-mini) and Perplexity (sonar with web search).
+  The results were striking. When users asked about products by name, both LLMs recognized them almost perfectly: 99.4% for ChatGPT and 94.3% for Perplexity. But when users asked discovery-style questions like "What are the best AI tools launched this year?" the success rates collapsed to 3.32% and 8.29% respectively. That's a gap of 30-to-1 for ChatGPT.
+  Perhaps the most surprising finding was that Generative Engine Optimization (GEO), the practice of optimizing website content for AI visibility, showed no correlation with actual discovery rates. Products with high GEO scores were no more likely to appear in organic queries than products with low scores.
+  What did matter? For Perplexity, traditional SEO signals like referring domains (r = +0.319, p &lt; 0.001) and Product Hunt ranking (r = -0.286, p = 0.002) predicted visibility. After cleaning the Reddit data for false positives, community presence also emerged as significant (r = +0.395, p = 0.002).
+  The practical takeaway is counterintuitive: don't optimize for AI discovery directly. Instead, build the SEO foundation first and LLM visibility will follow.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-01-01T04:30:54Z</published>
+    <arxiv:comment>20 pages, 7 figures. Based on M.Tech thesis research, Indian Institute of Technology Patna, 2025</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Amit Prakash Sharma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.00869v1</id>
+    <title>Cultural Encoding in Large Language Models: The Existence Gap in AI-Mediated Brand Discovery</title>
+    <updated>2025-12-30T13:50:14Z</updated>
+    <link href="https://arxiv.org/abs/2601.00869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.00869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As artificial intelligence systems increasingly mediate consumer information discovery,
+  brands face algorithmic invisibility. This study investigates Cultural Encoding in Large
+  Language Models (LLMs) -- systematic differences in brand recommendations arising from
+  training data composition. Analyzing 1,909 pure-English queries across 6 LLMs (GPT-4o,
+  Claude, Gemini, Qwen3, DeepSeek, Doubao) and 30 brands, we find Chinese LLMs exhibit 30.6
+  percentage points higher brand mention rates than International LLMs (88.9% vs. 58.3%,
+  p&lt;.001). This disparity persists in identical English queries, indicating training data
+  geography -- not language -- drives the effect. We introduce the Existence Gap: brands
+  absent from LLM training corpora lack "existence" in AI responses regardless of quality.
+  Through a case study of Zhizibianjie (OmniEdge), a collaboration platform with 65.6%
+  mention rate in Chinese LLMs but 0% in International models (p&lt;.001), we demonstrate how
+  Linguistic Boundary Barriers create invisible market entry obstacles. Theoretically, we
+  contribute the Data Moat Framework, conceptualizing AI-visible content as a VRIN strategic
+  resource. We operationalize Algorithmic Omnipresence -- comprehensive brand visibility
+  across LLM knowledge bases -- as the strategic objective for Generative Engine Optimization
+  (GEO). Managerially, we provide an 18-month roadmap for brands to build Data Moats
+  through semantic coverage, technical depth, and cultural localization. Our findings reveal
+  that in AI-mediated markets, the limits of a brand's "Data Boundaries" define the limits
+  of its "Market Frontiers."</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-12-30T13:50:14Z</published>
+    <arxiv:comment>19 pages, 5 tables. Dataset and code available at https://github.com/zhizibianjie-omniedge/geo-cultural-encoding</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Huang Junyao</name>
+    </author>
+    <author>
+      <name>Situ Ruimin</name>
+    </author>
+    <author>
+      <name>Ye Renqin</name>
+    </author>
+  </entry>
+</feed>

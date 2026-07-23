@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/eShdAGbfzaFHP2JRf5WzygLEaMI</id>
+  <title>arXiv Query: search_query=all:"answer engine optimization"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-07-23T00:29:24Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22answer+engine+optimization%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>3</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2606.20065v1</id>
+    <title>Generative Engine Optimization at Scale: Measuring Brand Visibility Across AI Search Engines</title>
+    <updated>2026-06-18T10:36:13Z</updated>
+    <link href="https://arxiv.org/abs/2606.20065v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.20065v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>People increasingly get answers straight from AI search engines like ChatGPT, Claude, Perplexity, and Gemini rather than scrolling search results. Brands that once focused on search engine optimization (SEO) must now optimize for how these engines represent, cite, and recommend them -- a shift variously called Generative Engine Optimization (GEO), Answer Engine Optimization (AEO), and AI Search Visibility. We treat AEO and AI Visibility as part of GEO, and study how to measure brand visibility across AI engines: what they value when they cite a brand, which sources they rely on, and what content large language models surface. The hard case is everyone outside the already-authoritative top brands -- SMEs, D2C brands, creators, and early-stage startups.
+  We analyze 100K+ prompt responses across 100+ brands tracked on Ranqo between March and May 2026. First visibility runs form a clear three-tier brand-stature ladder: global household names (e.g., Stripe, Nike) appear in 73% of relevant AI answers on their first run; established mid-market and regional brands (e.g., Olipop, Klaviyo) in 44%; niche and small brands in just 11% -- about 30 percentage points per step. When engines cite sources, about 78% go to corporate websites; among non-corporate sources YouTube leads, ahead of Reddit, editorial media, and Wikipedia. The highest-leverage page is the ranked "best-of" listicle, the most-cited content format at about 21% of all citations. Sentiment is the unstable signal: whether a brand is framed positively or negatively flips about 6.7 times more often than whether it is mentioned at all.
+  These findings provide a first large-scale baseline for measuring GEO: AI brand visibility can be measured, differs by platform, and varies strongly by brand maturity. We close by proposing seven v1.1 protocols to test whether specific recommendations can causally improve AI visibility.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-18T10:36:13Z</published>
+    <arxiv:comment>14 pages, 4 tables; v1.0 preprint</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Pratyush Kumar</name>
+      <arxiv:affiliation>Ranqo</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.04362v1</id>
+    <title>Disentangling Answer Engine Optimization from Platform Growth: A Log-Based Natural Experiment on ChatGPT Referral Traffic</title>
+    <updated>2026-06-03T02:23:03Z</updated>
+    <link href="https://arxiv.org/abs/2606.04362v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.04362v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) "answer engines" such as ChatGPT now send measurable referral traffic to the open web, and a practice analogous to search engine optimization, here called Answer Engine Optimization (AEO), has emerged. Public AEO success stories typically quote large raw growth multiples, but raw referral growth is confounded by the rapid platform-level growth of the answer engines themselves. We report a longitudinal field study on a single high-traffic domain (glasp.co) whose corpus of hundreds of thousands of YouTube question-and-answer pages received a defined bundle of AEO interventions in January 2026 (detailed in Section 4). Because the interventions were concentrated on one subset of the site, the untreated remainder of the same domain acts as a contemporaneous control that absorbs the platform tailwind. Using first-party analytics and server logs rather than probabilistic third-party estimators, we find: (1) raw growth is dominated by the platform tailwind: on monthly aggregates total ChatGPT referrals grew 5.7x while untreated pages on the same domain grew 3.5x over the same window; (2) an interrupted time-series model on the weekly treated/control ratio estimates a discrete, intervention-aligned level increase of 1.82x (95% CI 1.31-2.54, HAC p=0.001), robust across engagement-filtered traffic (2.27x) and alternative specifications; (3) however, a conservative placebo-in-time permutation test yields p=0.16, so the effect is suggestive, not conclusive, given a short and noisy pre-period; and (4) Google organic clicks to treated pages did not fall beyond the ambient site-wide trend and indexation was preserved, consistent with the SEO-protection rule. The methodological message, separating treatment from platform tailwind with an on-domain control, matters more than any single multiple, and implies that headline AEO multiples substantially overstate causal effect.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-03T02:23:03Z</published>
+    <arxiv:comment>9 pages, 4 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Keisuke Watanabe</name>
+    </author>
+    <author>
+      <name>Kazuki Nakayashiki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.16858v2</id>
+    <title>Navigating the Shift: A Comparative Analysis of Web Search and Generative AI Response Generation</title>
+    <updated>2026-05-16T04:48:18Z</updated>
+    <link href="https://arxiv.org/abs/2601.16858v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.16858v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rise of generative AI as a primary information source presents a paradigm shift from traditional web search. This paper presents a large-scale empirical study quantifying the fundamental differences between the results returned by Google Search and leading generative AI services. We analyze multiple dimensions, demonstrating that AI-generated answers and web search results diverge significantly in their consulted source domains, the typology of these domains (e.g., earned media vs. owned, social), query intent, and the freshness of the information provided. We then investigate the role of LLM pre-training as a key factor shaping these differences, analyzing how this intrinsic knowledge base interacts with and influences real-time web search when enabled. Our findings reveal the distinct mechanics of these two information ecosystems, leading to critical observations on the emergent field of Answer Engine Optimization (AEO) and its contrast with traditional Search Engine Optimization (SEO).</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-01-23T16:06:18Z</published>
+    <arxiv:comment>Accepted at EDBT/ICDT 2026 Workshops</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Mahe Chen</name>
+    </author>
+    <author>
+      <name>Xiaoxuan Wang</name>
+    </author>
+    <author>
+      <name>Kaiwen Chen</name>
+    </author>
+    <author>
+      <name>Nick Koudas</name>
+    </author>
+  </entry>
+</feed>
