@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-07-23 10:52 UTC
+**Gerado automaticamente em:** 2026-07-23 22:28 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** f7f71fee1604a315c18324c817d55f4ea62e9a53 Merge pull request #41 from alexandrebr
+**Último commit:** f2e81bcc1017483aa9ad0b31bdd0ae8478014847 finops: monitor checkpoint 2026-07-23T1
 
 ---
 
@@ -15,17 +15,17 @@
 | Tabelas no banco | 22 | OK |
 | Citações coletadas | 63,940 | Coletando |
 | Taxa de citação | 35.2% | — |
-| Última coleta | 2026-07-23T10:51 | Ativo |
+| Última coleta | 2026-07-23T22:27 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0487 |
+| OpenAI | $0.0488 |
 | Anthropic | $0.3254 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0174 |
-| **Total** | **$0.3915** |
+| Perplexity | $0.0178 |
+| **Total** | **$0.3920** |
 
 ## Próximas Ações
 
