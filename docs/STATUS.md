@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-07-22 22:12 UTC
+**Gerado automaticamente em:** 2026-07-23 10:52 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** fc5a618cfc03a2c67c0cfe5b1756f1461a9ec390 finops: monitor checkpoint 2026-07-22T1
+**Último commit:** f7f71fee1604a315c18324c817d55f4ea62e9a53 Merge pull request #41 from alexandrebr
 
 ---
 
@@ -13,19 +13,19 @@
 | Código (linhas Python) | 22,363 | OK |
 | Testes unitários | 217 | OK |
 | Tabelas no banco | 22 | OK |
-| Citações coletadas | 63,684 | Coletando |
-| Taxa de citação | 35.3% | — |
-| Última coleta | 2026-07-22T22:12 | Ativo |
+| Citações coletadas | 63,940 | Coletando |
+| Taxa de citação | 35.2% | — |
+| Última coleta | 2026-07-23T10:51 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
-| OpenAI | $0.0484 |
-| Anthropic | $0.3230 |
+| OpenAI | $0.0487 |
+| Anthropic | $0.3254 |
 | Gemini | $0.0000 |
-| Perplexity | $0.0175 |
-| **Total** | **$0.3889** |
+| Perplexity | $0.0174 |
+| **Total** | **$0.3915** |
 
 ## Próximas Ações
 
@@ -37,7 +37,7 @@
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 63,684/1.000 |
+| Dados mínimos | 1.000 citações | 63,940/1.000 |
 | Série temporal | 90 dias contínuos | Em progresso |
 | Grupo de controle | 15 concorrentes | 0 observações |
 | Análise estatística | p < 0.05 | Disponível |
