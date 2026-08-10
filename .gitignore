@@ -17,8 +17,13 @@ build/
 # Data (keep schema, ignore actual data)
 data/*.db
 data/*.csv
-!data/papers.db           # source of truth da pesquisa — commit para reprodutibilidade
+# papers.db NAO e versionado: passou de 100 MB e travava o push (ver commit
+# 3c25cbc). A excecao que existia aqui era anulada pela regra no fim do arquivo,
+# entao o comentario prometia reprodutibilidade que o repo nao entregava.
+# Source of truth real: Cloudflare R2 (papers/db/latest.db) + artifact do
+# Actions. Ver scripts/r2_sync.py e a issue #40.
 !data/finops_checkpoint.json
+!data/db_floor.json
 !data/finops_alerts.jsonl
 !data/dashboard_data.json
 !data/.gitkeep

@@ -54,85 +54,40 @@ jobs:
       # NOTA (2026-06-11): papers.db NAO vem mais do git (saiu no #20/#21).
       # Continuidade = artifact (safety net) + R2 (source of truth), adotando
       # a base MAIOR — mesmo contrato do daily-collect.
+      # Sem `workflow:`, a action so enxerga artifacts do PROPRIO workflow — foi
+      # assim que o benchmark ficou preso a uma base de 864 citations enquanto o
+      # daily-collect tinha 63.940. Aponta explicitamente para o daily, que e
+      # quem coleta, e o R2 abaixo ainda arbitra pela base maior.
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
           path: data/
-          workflow_conclusion: ""
+          workflow: daily-collect.yml
+          workflow_conclusion: success
           if_no_artifact_found: ignore
         continue-on-error: true
 
+      # ================================================================
+      # RESTORE DO R2 (source of truth) — reescrito 2026-08-10
+      # A versao anterior usava boto3 + 4 secrets S3 que NUNCA foram criados,
+      # entao caia no "skip silencioso" e o restore ficou inerte por dois meses.
+      # Resultado: os weeklies rodaram sobre uma base de 864 citations enquanto
+      # o daily tinha 63.940, e ninguem viu. Agora usa a REST API do R2, que
+      # autentica com o mesmo CLOUDFLARE_API_TOKEN do resto da automacao, e
+      # R2_REQUIRED=1 transforma secret ausente em falha visivel.
+      # ================================================================
       - name: Restore DB from Cloudflare R2 (source of truth)
         env:
-          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
-        run: |
-          if [ -z "$R2_ENDPOINT" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ]; then
-            echo "R2 secrets ausentes — usando apenas o artifact (skip silencioso)"
-            exit 0
-          fi
-          pip install -q boto3
-          python - <<'PY'
-          import os, sqlite3, boto3
-          from botocore.config import Config
-
-          local = "data/papers.db"
-          tmp = "data/_r2_latest.db"
-          key = "papers/db/latest.db"
-
-          s3 = boto3.client(
-              "s3",
-              endpoint_url=os.environ["R2_ENDPOINT"],
-              aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
-              aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
-              config=Config(signature_version="s3v4"),
-          )
-          bucket = os.environ["R2_BUCKET"]
-
-          try:
-              s3.download_file(bucket, key, tmp)
-          except Exception as e:
-              print(f"R2 latest.db indisponivel ({e}) — mantendo artifact")
-              raise SystemExit(0)
-
-          def total_rows(path):
-              if not os.path.exists(path):
-                  return -1
-              try:
-                  con = sqlite3.connect(path)
-                  cur = con.cursor()
-                  total = 0
-                  for (name,) in cur.execute(
-                      "SELECT name FROM sqlite_master WHERE type='table'"
-                  ).fetchall():
-                      try:
-                          total += cur.execute(
-                              f'SELECT COUNT(*) FROM "{name}"'
-                          ).fetchone()[0]
-                      except sqlite3.Error:
-                          pass
-                  con.close()
-                  return total
-              except sqlite3.Error:
-                  return -1
-
-          r_local = total_rows(local)
-          r_r2 = total_rows(tmp)
-          print(f"linhas artifact={r_local}  linhas R2={r_r2}")
-
-          if r_r2 > r_local:
-              os.replace(tmp, local)
-              print(f"R2 e a base maior ({r_r2} linhas) — adotada como source of truth")
-          else:
-              if os.path.exists(tmp):
-                  os.remove(tmp)
-              print(f"Artifact >= R2 ({r_local} >= {r_r2}) — artifact mantido")
-          PY
-        continue-on-error: true
-
+          R2_REQUIRED: "1"
+        run: python scripts/r2_sync.py pull
+      # Barra base degenerada ANTES de coletar/analisar. Ver incidente
+      # 2026-08-09 em scripts/db_integrity_guard.py.
+      - name: Integrity guard — dataset nao pode encolher
+        run: python scripts/db_integrity_guard.py check
       - name: Validate Python imports
         run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
 
@@ -160,14 +115,16 @@ jobs:
       - name: Update documentation
         run: python scripts/update-docs.py
 
-      - name: Upload database
+      # NAO publica papers-db-latest: este workflow so analisa, nunca coleta.
+      # Era daqui que saia o artifact de 864 citations que substituia a base de
+      # 63.940 do daily-collect (incidente 2026-08-09).
+      - name: Upload database (snapshot do benchmark, nome proprio)
         uses: actions/upload-artifact@v5
         with:
-          name: papers-db-latest
+          name: papers-db-benchmark-${{ github.run_number }}
           path: data/papers.db
-          retention-days: 365
+          retention-days: 90
           overwrite: true
-
       - name: Upload reports + dashboard
         uses: actions/upload-artifact@v5
         with:
