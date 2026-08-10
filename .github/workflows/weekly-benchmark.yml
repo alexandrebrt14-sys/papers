@@ -54,10 +54,16 @@ jobs:
       # NOTA (2026-06-11): papers.db NAO vem mais do git (saiu no #20/#21).
       # Continuidade = artifact (safety net) + R2 (source of truth), adotando
       # a base MAIOR — mesmo contrato do daily-collect.
-      # Sem `workflow:`, a action so enxerga artifacts do PROPRIO workflow — foi
-      # assim que o benchmark ficou preso a uma base de 864 citations enquanto o
-      # daily-collect tinha 63.940. Aponta explicitamente para o daily, que e
-      # quem coleta, e o R2 abaixo ainda arbitra pela base maior.
+      # CORRECAO 2026-08-09/10: mesmo defeito do daily-collect. Sem a chave
+      # `workflow:` o dawidd6 procurava no PROPRIO weekly-benchmark, e
+      # `workflow_conclusion: ""` casa runs em qualquer estado, incluindo a que
+      # esta executando e ainda nao subiu artifact. O restore nunca trazia a
+      # base viva, entao o benchmark ficou preso na propria copia degenerada:
+      # 864 citations contra as 63.940 do daily. Como este workflow COMITA
+      # analise no main (step "Commit data + docs + reports + finops"), o
+      # resultado era publicar toda semana um relatorio calculado sobre 1,4%
+      # do dataset. Aponta explicitamente para o daily, que e quem coleta, e o
+      # R2 abaixo ainda arbitra pela base maior.
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
@@ -84,10 +90,16 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_REQUIRED: "1"
         run: python scripts/r2_sync.py pull
-      # Barra base degenerada ANTES de coletar/analisar. Ver incidente
-      # 2026-08-09 em scripts/db_integrity_guard.py.
+
+      # Portao de sanidade: este workflow comita analise no main. Relatorio
+      # calculado sobre base errada nao e "resultado parcial", e numero errado
+      # com aparencia de medicao, e uma vez commitado vira historico.
+      # O guard compara contra o high-water mark em data/db_floor.json, nao
+      # apenas contra zero — a base degenerada de 09/08 tinha 864 citations, ou
+      # seja, passaria por qualquer teste de "existe dado?".
       - name: Integrity guard — dataset nao pode encolher
         run: python scripts/db_integrity_guard.py check
+
       - name: Validate Python imports
         run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
 
@@ -115,9 +127,27 @@ jobs:
       - name: Update documentation
         run: python scripts/update-docs.py
 
-      # NAO publica papers-db-latest: este workflow so analisa, nunca coleta.
-      # Era daqui que saia o artifact de 864 citations que substituia a base de
-      # 63.940 do daily-collect (incidente 2026-08-09).
+      # Este workflow COLETA (steps "collect serp/citation/competitor" acima),
+      # entao as linhas novas precisam sobreviver. O que nao pode e ele
+      # sobrescrever papers-db-latest as cegas: era dai que saia o artifact de
+      # 864 citations que substituia a base de 63.940 do daily (incidente
+      # 2026-08-09).
+      # Caminho correto: persistir no R2, que e a source of truth compartilhada
+      # e onde o push so passa depois do guard e se a base nao encolheu. O daily
+      # e a calibration leem de la no proximo run.
+      - name: Persistir coleta do benchmark no R2 (guard + push)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_REQUIRED: "1"
+        run: |
+          python scripts/db_integrity_guard.py check
+          python scripts/r2_sync.py push
+
+      # Artifact sob nome proprio, apenas como registro auditavel do run. O
+      # ponteiro compartilhado papers-db-latest continua sendo escrito so por
+      # quem tem a base completa.
       - name: Upload database (snapshot do benchmark, nome proprio)
         uses: actions/upload-artifact@v5
         with:
@@ -125,6 +155,7 @@ jobs:
           path: data/papers.db
           retention-days: 90
           overwrite: true
+
       - name: Upload reports + dashboard
         uses: actions/upload-artifact@v5
         with:

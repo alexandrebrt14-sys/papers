@@ -474,8 +474,17 @@ def main():
     WINDOW_START = date(2026, 4, 23)
     WINDOW_END = WINDOW_START + timedelta(days=89)
     today_utc = datetime.now(timezone.utc).date()
-    day_number = max(1, (today_utc - WINDOW_START).days + 1)
-    day_number = min(day_number, 90)  # cap em 90
+
+    # CORRECAO 2026-08-10: dayNumber contava dias de CALENDARIO desde o inicio
+    # da janela, entao publicava "dia 90 de 90" enquanto o banco tinha 41 dias
+    # com dado e um buraco de 59 dias (10/06 a 07/08) causado pelo restore que
+    # nunca restaurava. Progresso de coleta e numero de dias EFETIVAMENTE
+    # coletados; dia de calendario mede outra coisa e nao pertence ao paper.
+    collected_days = con.execute(
+        "SELECT COUNT(DISTINCT date(timestamp)) FROM citations"
+    ).fetchone()[0]
+    day_number = min(max(1, collected_days), 90)
+    calendar_day = min(max(1, (today_utc - WINDOW_START).days + 1), 90)
     data = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "lastCollection": last_coll,
@@ -485,6 +494,10 @@ def main():
         "windowEnd": WINDOW_END.isoformat(),
         "dayNumber": day_number,
         "windowTotalDays": 90,
+        # Dias de calendario decorridos, exposto separado para que a diferenca
+        # entre os dois numeros fique visivel em vez de silenciosa.
+        "calendarDay": calendar_day,
+        "collectedDays": collected_days,
         "methodologyVersion": "v2",
         "totalQueries": total_queries,
         "totalCited": total_cited,

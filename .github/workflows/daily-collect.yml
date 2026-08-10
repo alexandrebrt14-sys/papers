@@ -85,12 +85,28 @@ jobs:
       # O step "Restore DB from Cloudflare R2" adota a MAIOR das duas bases como
       # papers.db (forward-only, nunca encolhe), defendendo contra o incidente
       # 2026-04-16 (artifact "not found" -> reset para 0 linhas).
+      # CORRECAO 2026-08-09: este step nunca restaurou nada. Sem a chave
+      # `workflow:` o dawidd6 procura no PROPRIO workflow, o que estava certo,
+      # mas `workflow_conclusion: ""` casa runs em QUALQUER estado, inclusive a
+      # que esta executando agora — que e a mais recente e ainda nao subiu
+      # artifact nenhum. O log de toda run mostrava a resolucao literal:
+      #   ==> (found) Run ID: <a propria run>
+      #   ==> (not found) Artifact: papers-db-latest
+      # Com `if_no_artifact_found: ignore` o step seguia verde, e o "Adopt
+      # richer base" registrava `artifact daily=-1`, adotando sempre a base do
+      # recover de 11/06/2026. Resultado medido: 108 runs verdes desde 11/06 e
+      # zero dias de coleta persistidos; o dashboard publicava dayNumber 90/90
+      # com 41 pontos reais e 60 dias de buraco.
+      # `workflow_conclusion: success` exclui a run em curso (que esta
+      # in_progress) e pega a ultima diaria concluida com exito, que subiu o
+      # artifact nas linhas "Upload database" mais abaixo, com overwrite.
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
           path: data/
-          workflow_conclusion: ""
+          workflow: daily-collect.yml
+          workflow_conclusion: success
           if_no_artifact_found: ignore
         continue-on-error: true
 
@@ -114,7 +130,35 @@ jobs:
           if_no_artifact_found: ignore
         continue-on-error: true
 
-      - name: Adopt richer base (recovered vs artifact)
+      # ================================================================
+      # RESTORE DO ARTIFACT DA CALIBRACAO — fix 2026-08-09
+      #
+      # O weekly-calibration nao e um job de relatorio: ele RODA COLETA
+      # (`src.cli --vertical <v> collect citation` com
+      # INCLUDE_FICTIONAL_ENTITIES=true) e grava linhas novas na tabela
+      # `citations`, marcadas pela coluna `fictional_hit` da Migration 0004. E o
+      # grupo de controle do estudo: `src/analysis/statistical.py` calcula taxa
+      # de falso-positivo e especificidade a partir exatamente dessas linhas.
+      #
+      # Essas linhas estavam sendo JOGADAS FORA toda semana. A calibracao subia
+      # o resultado como artifact proprio, com retencao de 7 dias, e nenhum
+      # workflow o lia. Chamada paga a LLM, dado cientifico do braco de
+      # controle, e vida util de uma semana ate expirar sem uso.
+      #
+      # Entra na mesma logica forward-only ja usada para o recover: adota a base
+      # com MAIS linhas de citations, nunca encolhe.
+      # ================================================================
+      - name: Download calibration DB (weekly-calibration artifact)
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: papers-db-latest
+          path: data/_calib/
+          workflow: weekly-calibration.yml
+          workflow_conclusion: success
+          if_no_artifact_found: ignore
+        continue-on-error: true
+
+      - name: Adopt richer base (daily vs recover vs calibration)
         run: |
           python - <<'PY'
           import os, shutil, sqlite3
@@ -134,15 +178,33 @@ jobs:
                   return -1
 
           cur = "data/papers.db"
-          rec = "data/_recover/papers.db"
-          r_cur, r_rec = citation_rows(cur), citation_rows(rec)
-          print(f"citations: artifact daily={r_cur}  artifact recover={r_rec}")
-          if r_rec > r_cur:
-              shutil.copyfile(rec, cur)
-              print(f"Base do recover adotada ({r_rec} > {r_cur} linhas)")
+          candidatos = {
+              "recover": "data/_recover/papers.db",
+              "calibration": "data/_calib/papers.db",
+          }
+
+          r_cur = citation_rows(cur)
+          medidas = {nome: citation_rows(p) for nome, p in candidatos.items()}
+          print(
+              "citations: artifact daily={} ".format(r_cur)
+              + " ".join(f"artifact {n}={v}" for n, v in medidas.items())
+          )
+
+          # Forward-only: vence quem tem mais linhas. Empate mantem a base atual,
+          # que e a mais barata de justificar.
+          melhor_nome, melhor_valor = None, r_cur
+          for nome, valor in medidas.items():
+              if valor > melhor_valor:
+                  melhor_nome, melhor_valor = nome, valor
+
+          if melhor_nome:
+              shutil.copyfile(candidatos[melhor_nome], cur)
+              print(f"Base do {melhor_nome} adotada ({melhor_valor} > {r_cur} linhas)")
           else:
-              print("Base do daily mantida (>= recover ou recover ausente)")
-          shutil.rmtree("data/_recover", ignore_errors=True)
+              print("Base do daily mantida (>= todos os candidatos)")
+
+          for p in ("data/_recover", "data/_calib"):
+              shutil.rmtree(p, ignore_errors=True)
           PY
 
       # ================================================================
@@ -171,10 +233,12 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_REQUIRED: "1"
         run: python scripts/r2_sync.py pull
+
       # Barra base degenerada ANTES de coletar/analisar. Ver incidente
       # 2026-08-09 em scripts/db_integrity_guard.py.
       - name: Integrity guard — dataset nao pode encolher
         run: python scripts/db_integrity_guard.py check
+
       - name: Validate Python imports
         run: python -c "from src.collectors.citation_tracker import CitationTracker; from src.finops.tracker import get_tracker; print('Import chain OK')"
 
@@ -299,6 +363,18 @@ jobs:
       # permite detectar, no run seguinte, que a base restaurada encolheu.
       - name: Elevar piso de integridade
         run: python scripts/db_integrity_guard.py update
+
+      # METHODOLOGY_V2, "Politica de imputacao": gaps totais entram em
+      # collection_runs como status='aborted' e o intervalo sai da janela
+      # analitica formal. O protocolo estava escrito desde abril e nunca rodou —
+      # em 10/08 a tabela tinha 240 linhas, todas 'success', e os 67 dias sem
+      # coleta simplesmente nao existiam. Ausencia nao e registro: quem
+      # consultasse a tabela veria um pipeline impecavel.
+      # O script e idempotente e nao escreve em `citations`. Rodando a cada
+      # coleta, qualquer gap futuro fica documentado sozinho.
+      - name: Registrar gaps de coleta (METHODOLOGY_V2)
+        run: python scripts/mark_collection_gaps.py --apply
+        continue-on-error: true
 
       - name: Upload database (intermediate safety net)
         uses: actions/upload-artifact@v5
@@ -444,6 +520,7 @@ jobs:
         run: |
           python scripts/db_integrity_guard.py check
           python scripts/r2_sync.py push
+
       - name: Upload structured collection logs
         if: always()
         uses: actions/upload-artifact@v5
@@ -460,16 +537,37 @@ jobs:
       - name: Revalidate Vercel pages
         if: success()
         run: |
-          if [ -n "${{ secrets.VERCEL_REVALIDATE_SECRET }}" ]; then
+          # CORRECAO 2026-08-09: a falha era engolida DUAS vezes. `curl -s` sem
+          # `-f` devolve exit 0 mesmo em HTTP 401, entao o `|| echo` nunca
+          # disparava, e o `continue-on-error: true` abaixo apagava o resto. Nos
+          # logs, as tres chamadas respondiam {"error":"Unauthorized"} em
+          # sequencia e o step ficava verde. Consequencia: a coleta rodava, o
+          # dado era commitado, e a pagina publica /research seguia servindo
+          # cache antigo por tempo indeterminado. Dado produzido e nao publicado
+          # e trabalho jogado fora do lado de fora do funil.
+          if [ -n "$REVALIDATE_SECRET" ]; then
+            FALHOU=0
             for P in /research /papers-roadmap /roadmap; do
-              curl -s -X POST "https://alexandrecaramaschi.com/api/revalidate" \
+              RESP=$(curl -s -w '\n%{http_code}' -X POST "https://alexandrecaramaschi.com/api/revalidate" \
                 -H "Content-Type: application/json" \
-                -d "{\"secret\":\"${{ secrets.VERCEL_REVALIDATE_SECRET }}\",\"path\":\"$P\"}" \
-                || echo "revalidate $P falhou (nao bloqueia)"
+                -d "{\"secret\":\"$REVALIDATE_SECRET\",\"path\":\"$P\"}")
+              HTTP=$(printf '%s' "$RESP" | tail -n1)
+              CORPO=$(printf '%s' "$RESP" | sed '$d')
+              if [ "$HTTP" != "200" ]; then
+                echo "::warning::revalidate $P respondeu HTTP $HTTP: $(printf '%s' "$CORPO" | head -c 200)"
+                FALHOU=1
+              else
+                echo "revalidate $P OK"
+              fi
             done
+            if [ "$FALHOU" -eq 1 ]; then
+              echo "::warning::A pagina publica NAO foi revalidada e vai continuar servindo cache antigo. Se o status for 401, o VERCEL_REVALIDATE_SECRET deste repo divergiu do que a rota /api/revalidate espera no landing-page-geo."
+            fi
           else
-            echo "VERCEL_REVALIDATE_SECRET nao configurado — pulando revalidate"
+            echo "::warning::VERCEL_REVALIDATE_SECRET nao configurado — a pagina publica nunca sera atualizada por este pipeline."
           fi
+        env:
+          REVALIDATE_SECRET: ${{ secrets.VERCEL_REVALIDATE_SECRET }}
         continue-on-error: true
 
       # Enviar relatorio por email (antes do health check para que o
@@ -497,45 +595,80 @@ jobs:
       # Alerta por email (Resend) em caso de falha de coleta ou health check.
       # Cria issue + envia email. Objetivo: publicacao cientifica julho/2026
       # exige pipeline 100% confiavel — zero tolerancia a falha silenciosa.
+      # CORRECAO 2026-08-09, duas partes.
+      #
+      # (a) A recusa do Resend era engolida. A saida do curl ia para
+      #     `head -c 200` e ninguem olhava o status, entao um canal de alerta
+      #     morto se comportava igual a um canal saudavel. Nos logs das runs que
+      #     falharam aparecia "email falhou: HTTP Error 403" vindo do
+      #     health_check.py, e ninguem ligou os pontos. Agora o status vira
+      #     ::warning:: visivel no resumo do run.
+      #
+      # (b) A issue era criada SEM deduplicacao, uma por falha. Em 09/08/2026
+      #     havia 5 issues `pipeline-failure` abertas, duas identicas do mesmo
+      #     dia. Alerta que se repete sozinho deixa de ser alerta e vira ruido,
+      #     que e como o pipeline conseguiu ficar dois meses quebrado a vista de
+      #     todos. Enquanto houver uma issue aberta, as falhas seguintes viram
+      #     COMENTARIO nela; issue nova so quando nao ha nenhuma aberta.
+      #
+      # Nota sobre o daily-collect-alert.yml: aquele workflow, que dispara por
+      # `workflow_run`, tem ZERO execucoes em toda a vida do repo
+      # (`gh api .../workflows/257642156/runs` devolve total_count 0) apesar de
+      # pelo menos 4 falhas do daily. O caminho de alerta que de fato funciona e
+      # este bloco aqui, e e nele que vale investir.
       - name: Alert on failure (Resend + Issue)
         if: steps.health.outcome == 'failure' || failure()
         run: |
           set +e
-          if [ -n "${{ secrets.RESEND_API_KEY }}" ] && [ -n "${{ secrets.FINOPS_ALERT_EMAIL }}" ]; then
-            curl -s -X POST "https://api.resend.com/emails" \
-              -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
+          RUN_URL="https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}"
+
+          if [ -n "$RESEND_API_KEY" ] && [ -n "$ALERT_EMAIL" ]; then
+            RESP=$(curl -s -w '\n%{http_code}' -X POST "https://api.resend.com/emails" \
+              -H "Authorization: Bearer $RESEND_API_KEY" \
               -H "Content-Type: application/json" \
               -d "{
                 \"from\": \"papers-alerts@mail.brasilgeo.ai\",
-                \"to\": \"${{ secrets.FINOPS_ALERT_EMAIL }}\",
+                \"to\": \"$ALERT_EMAIL\",
                 \"subject\": \"[ALERTA] Papers daily-collect falhou em $(date -u '+%Y-%m-%d %H:%M')\",
-                \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto na publicacao cientifica (julho/2026):</strong> gap de dados compromete serie temporal longitudinal.</p><p><strong>Acao imediata:</strong> abrir o run e ler o LOG DO JOB para achar o step vermelho — pode ser coleta (vertical/LLM), push (papers.db &gt; 100MB), health check ou Supabase/R2. NAO basta re-executar.</p>\"
-              }" | head -c 200
+                \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='$RUN_URL'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto:</strong> gap de dados compromete a serie temporal longitudinal.</p><p><strong>Acao imediata:</strong> abrir o run e ler o LOG DO JOB para achar o step vermelho. Pode ser coleta (vertical/LLM), push, health check ou Supabase. NAO basta re-executar.</p>\"
+              }")
+            HTTP=$(printf '%s' "$RESP" | tail -n1)
+            if [ "$HTTP" != "200" ]; then
+              echo "::warning::Resend recusou o alerta (HTTP $HTTP). O canal de email esta morto e nenhuma falha futura sera notificada por ele. Verificar o dominio mail.brasilgeo.ai no Resend."
+              printf '%s' "$RESP" | head -c 300
+            else
+              echo "Alerta por email aceito pelo Resend."
+            fi
+          else
+            echo "::warning::RESEND_API_KEY ou FINOPS_ALERT_EMAIL ausentes; o alerta por email nao foi nem tentado."
           fi
-          # Rastreamento por issue. Ate 10/08 cada falha abria uma issue nova:
-          # a mesma causa (saldo da OpenAI) gerou sete issues abertas em duas
-          # semanas, o que enterra o sinal em vez de destaca-lo. Agora comenta
-          # na issue de falha ja aberta, se houver, e so cria uma nova quando
-          # nao existe nenhuma.
-          EXISTING=$(gh issue list --repo alexandrebrt14-sys/papers \
-            --label "pipeline-failure" --state open \
-            --json number --jq '.[0].number' 2>/dev/null || echo "")
-          RUN_LINK="https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}"
-          if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" --repo alexandrebrt14-sys/papers \
-              --body "Run #${{ github.run_number }} falhou tambem ($(date -u +%Y-%m-%d\ %H:%M) UTC). Link: $RUN_LINK" \
-              || echo "issue comment failed"
-            echo "Falha registrada na issue #$EXISTING (nenhuma issue nova criada)."
+
+          # Deduplicacao: enquanto houver issue aberta, comenta nela.
+          # A mesma causa (saldo da OpenAI) gerou sete issues abertas em duas
+          # semanas antes disso, o que enterra o sinal em vez de destaca-lo.
+          ABERTA=$(gh issue list \
+            --repo alexandrebrt14-sys/papers \
+            --state open --label "pipeline-failure" --limit 1 \
+            --json number --jq '.[0].number // empty')
+
+          if [ -n "$ABERTA" ]; then
+            gh issue comment "$ABERTA" \
+              --repo alexandrebrt14-sys/papers \
+              --body "Falhou de novo em $(date -u '+%Y-%m-%d %H:%M') UTC. Run #${{ github.run_number }}: $RUN_URL" \
+              || echo "::warning::nao consegui comentar na issue #$ABERTA"
+            echo "Falha registrada como comentario na issue #$ABERTA (sem duplicar)."
           else
             gh issue create \
               --repo alexandrebrt14-sys/papers \
               --title "daily-collect falhou em $(date -u +%Y-%m-%d)" \
-              --body "Run #${{ github.run_number }} falhou. Link: $RUN_LINK -- Abrir o log do job e identificar o step vermelho ANTES de re-executar. HTTP 429 credit_balance_exhausted e saldo do provider, nao chave invalida: rotacionar nao resolve." \
+              --body "Run #${{ github.run_number }} falhou. Link: $RUN_URL. Abrir o log do job e identificar o step vermelho ANTES de re-executar. HTTP 429 credit_balance_exhausted e saldo do provider, nao chave invalida: rotacionar nao resolve. Enquanto esta issue estiver aberta, novas falhas viram comentario aqui em vez de issue nova." \
               --label "pipeline-failure" \
-              || echo "issue creation failed"
+              || echo "::warning::nao consegui criar a issue de falha"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
         continue-on-error: true
 
       # Falha o workflow DE PROPOSITO se health check falhou, para aparecer

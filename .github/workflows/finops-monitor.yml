@@ -37,13 +37,56 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
+      # CORRECAO 2026-08-09: sem a chave `workflow:` o dawidd6 procura o
+      # artifact no PROPRIO workflow, e o finops-monitor nunca sobe
+      # `papers-db-latest` — quem sobe e o daily-collect. O download entao
+      # falhava sempre, `if_no_artifact_found: warn` mantinha o step verde, e o
+      # monitor rodava contra um data/papers.db inexistente. O efeito era pior
+      # que nao rodar: o step "Commit FinOps state" abaixo COMITAVA o resultado
+      # vazio direto no main. Medido por `gh api contents` commit a commit, o
+      # finops_checkpoint.json alternava 63.095 B (commit do daily) e 1.775 B
+      # (commit do monitor), e o finops_alerts.jsonl alternava 54.151 B e 0 B.
+      # O main de 09/08 declarava monthly_spend 0 para os quatro provedores.
       - name: Download DB
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
           path: data/
+          workflow: daily-collect.yml
+          workflow_conclusion: success
           if_no_artifact_found: warn
         continue-on-error: true
+
+      # Portao de sanidade: sem base, o monitor gera um retrato de zeros que o
+      # step de commit publica como se fosse medicao. Zero de gasto e uma
+      # afirmacao forte, e afirmacao forte sem dado precisa derrubar o job em
+      # vez de virar commit. Falhar aqui preserva o ultimo checkpoint bom.
+      - name: Sanity gate — a base existe e tem chamadas registradas?
+        run: |
+          python - <<'PY'
+          import os, sqlite3, sys
+
+          db = "data/papers.db"
+          if not os.path.exists(db):
+              sys.exit("ABORTADO: data/papers.db nao foi restaurado. "
+                       "Sem base nao ha o que medir, e publicar zeros apagaria "
+                       "o ultimo checkpoint valido. Verifique o step Download DB.")
+
+          con = sqlite3.connect(db)
+          try:
+              n = con.execute("SELECT COUNT(*) FROM llm_calls").fetchone()[0]
+          except sqlite3.Error as e:
+              con.close()
+              sys.exit(f"ABORTADO: nao consegui ler llm_calls em {db}: {e}")
+          con.close()
+
+          if n == 0:
+              sys.exit("ABORTADO: llm_calls esta vazia. O monitor produziria "
+                       "monthly_spend=0 para todos os provedores e o commit "
+                       "sobrescreveria o checkpoint bom.")
+
+          print(f"Base restaurada com {n} chamadas em llm_calls. Seguindo.")
+          PY
 
       - name: Validate Python imports
         run: python -c "from src.finops.tracker import get_tracker; from src.finops.monitor import run_monitor; print('Import chain OK')"
