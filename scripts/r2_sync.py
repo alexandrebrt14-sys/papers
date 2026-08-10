@@ -40,6 +40,7 @@ import httpx
 
 API = "https://api.cloudflare.com/client/v4"
 KEY_LATEST = "papers/db/latest.db"
+PREFIX_HISTORY = "papers/db/history/"
 TIMEOUT = httpx.Timeout(900.0, connect=30.0)
 
 # Acima disso o upload single-part da REST API fica arriscado. O banco cresce
@@ -215,7 +216,10 @@ def cmd_push(args: argparse.Namespace) -> int:
 
     digest = sha256_file(local)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")
-    keys = [KEY_LATEST, f"papers/db/{stamp}-{digest[:8]}.db"]
+    # As copias datadas ficam sob history/ para que a lifecycle rule do bucket
+    # possa expira-las sem tocar em latest.db, que precisa viver para sempre.
+    # Sao ~105 MB por run e dois runs por dia; sem expiracao isso vira 6 GB/mes.
+    keys = [KEY_LATEST, f"{PREFIX_HISTORY}{stamp}-{digest[:8]}.db"]
 
     with httpx.Client(timeout=TIMEOUT) as client:
         for key in keys:
