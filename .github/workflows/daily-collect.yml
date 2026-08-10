@@ -85,12 +85,28 @@ jobs:
       # O step "Restore DB from Cloudflare R2" adota a MAIOR das duas bases como
       # papers.db (forward-only, nunca encolhe), defendendo contra o incidente
       # 2026-04-16 (artifact "not found" -> reset para 0 linhas).
+      # CORRECAO 2026-08-09: este step nunca restaurou nada. Sem a chave
+      # `workflow:` o dawidd6 procura no PROPRIO workflow, o que estava certo,
+      # mas `workflow_conclusion: ""` casa runs em QUALQUER estado, inclusive a
+      # que esta executando agora — que e a mais recente e ainda nao subiu
+      # artifact nenhum. O log de toda run mostrava a resolucao literal:
+      #   ==> (found) Run ID: <a propria run>
+      #   ==> (not found) Artifact: papers-db-latest
+      # Com `if_no_artifact_found: ignore` o step seguia verde, e o "Adopt
+      # richer base" registrava `artifact daily=-1`, adotando sempre a base do
+      # recover de 11/06/2026. Resultado medido: 108 runs verdes desde 11/06 e
+      # zero dias de coleta persistidos; o dashboard publicava dayNumber 90/90
+      # com 41 pontos reais e 60 dias de buraco.
+      # `workflow_conclusion: success` exclui a run em curso (que esta
+      # in_progress) e pega a ultima diaria concluida com exito, que subiu o
+      # artifact nas linhas "Upload database" mais abaixo, com overwrite.
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
           name: papers-db-latest
           path: data/
-          workflow_conclusion: ""
+          workflow: daily-collect.yml
+          workflow_conclusion: success
           if_no_artifact_found: ignore
         continue-on-error: true
 
