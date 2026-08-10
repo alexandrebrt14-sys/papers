@@ -1,9 +1,9 @@
 {
   "_comment": "High-water mark do dataset. Gerado por scripts/db_integrity_guard.py. Nunca editar a mao: se precisar baixar o piso, apague o arquivo e rode 'update' sobre um banco reconhecidamente integro.",
   "floor": {
-    "citations": 63940,
-    "citation_context": 25128,
-    "collection_runs": 240,
-    "finops_usage": 63940
+    "citations": 65060,
+    "citation_context": 25574,
+    "collection_runs": 516,
+    "finops_usage": 65060
   }
 }
