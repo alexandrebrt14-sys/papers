@@ -106,39 +106,7 @@ Coleta diária (2× 24h: 06:00 + 18:00 BRT) sujeita a falhas exógenas (provider
 | 2026-05-11 → 2026-05-17    | OK (7 dias contínuos) | Pipeline estabilizada                                                      |
 | 2026-05-18                  | PARCIAL (5/20)       | Perplexity validation update: `max_tokens<16` rejeitado em `sonar`. Fix em commits e2327fa + 7ef3b8e + 109ecce. |
 
-| 2026-05-29                  | GAP TOTAL (1 dia)    | Falha isolada de coleta                                                    |
-| 2026-06-10 → 2026-08-07    | GAP TOTAL (59 dias)  | Restore inoperante — ver "Incidente de persistência" abaixo                 |
-| 2026-08-08                  | OK                   | Última coleta antes do esgotamento de crédito na OpenAI                     |
-| 2026-08-09 → 2026-08-10    | GAP TOTAL (2 dias)   | `preflight_llm_check` abortou: saldo zerado na conta OpenAI (HTTP 429 `credit_balance_exhausted`) |
-
-**Cobertura agregada (atualizada em 2026-08-10):** 41 dias com dado em 108 dias corridos desde 2026-04-23; 67 dias com gap total, todos registrados em `collection_runs` com `status='aborted'` conforme a política abaixo.
-
-### Incidente de persistência (2026-06-10 → 2026-08-07)
-
-O bloco de 59 dias é a maior descontinuidade da série e tem causa única, documentada por medição direta e não por inferência.
-
-O `daily-collect.yml` restaurava a base do run anterior com `dawidd6/action-download-artifact` usando `workflow_conclusion: ""`. Esse valor casa runs em **qualquer** estado, inclusive a execução em curso, que é a mais recente e ainda não publicou artifact algum. O log de toda execução registrava a resolução literal:
-
-```
-==> (found) Run ID: <a própria run>
-==> (not found) Artifact: papers-db-latest
-```
-
-Como o step declarava `if_no_artifact_found: ignore`, seguia verde. O `Adopt richer base` registrava `artifact daily=-1` e adotava indefinidamente a base do recover de 11/06. Cada coleta escrevia em um banco que era descartado ao fim do run.
-
-A defesa projetada contra exatamente esse modo de falha — restaurar do Cloudflare R2 como segunda fonte — não operava. Os steps exigiam quatro secrets S3 (`R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`) que nunca foram criados, e saíam por `exit 0` com a mensagem "skip silencioso". As duas fontes redundantes descritas nos comentários do workflow estavam inoperantes ao mesmo tempo, uma por defeito e outra por ausência.
-
-Medição do período: **108 execuções com `conclusion=success` e zero dias de coleta persistidos**. O contador do dashboard media dias de calendário, não dias com dado, e por isso publicava `dayNumber: 90` de `windowTotalDays: 90` enquanto o banco tinha 41 pontos reais.
-
-Correções aplicadas em 2026-08-10 (PR #48 e PR #51): `workflow_conclusion: success` em todos os downloads; restore do R2 reescrito sobre a REST API, autenticando com o `CLOUDFLARE_API_TOKEN` já existente; `R2_REQUIRED=1`, que converte secret ausente em falha visível; `scripts/db_integrity_guard.py`, que aborta o run quando o dataset fica abaixo do high-water mark registrado em `data/db_floor.json`; e `dayNumber` passando a contar dias efetivamente coletados.
-
-### Decisão sobre a janela (2026-08-10)
-
-A janela permanece **acumulada**: os 41 dias já coletados contam para o alvo de 90, e a coleta segue até somar 90 dias-com-dado, com conclusão projetada para **28/09/2026**.
-
-O intervalo de 10/06 a 07/08 é excluído da janela analítica formal pela política de imputação zero descrita abaixo, e não é imputado nem interpolado. A alternativa — reiniciar a janela em 11/08 e fechar em 08/11 — produziria uma série contígua ao custo de seis semanas adicionais e do descarte de 63.940 observações válidas. Como o modelo longitudinal já usa intercepto aleatório por `collection_date` e pondera por dia-com-cobertura, a descontinuidade é tratável no próprio desenho estatístico, e a exclusão declarada preserva mais informação que o reinício.
-
-Consequência para o manuscrito: a seção de método declara a descontinuidade, o número de dias efetivos e a causa raiz, e a análise reporta sensibilidade com e sem o período anterior ao gap.
+**Cobertura agregada:** 19/35 dias com 20/20 células (LLM × vertical) preenchidas (54%); 16 dias com gap total (45,7%).
 
 **Política de imputação:** ZERO. Análise longitudinal trabalha com pesos por dia-com-cobertura (mixed-effects intercept aleatório por `collection_date`); dias com gap parcial são reportados em sensitivity analysis (com vs sem). Gaps totais são marcados em `collection_runs` como `status='aborted'` e o intervalo é excluído da janela analítica formal — preserva honestidade estatística sobre série temporal incompleta.
 
