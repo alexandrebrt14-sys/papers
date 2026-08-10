@@ -512,13 +512,28 @@ jobs:
                 \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto na publicacao cientifica (julho/2026):</strong> gap de dados compromete serie temporal longitudinal.</p><p><strong>Acao imediata:</strong> abrir o run e ler o LOG DO JOB para achar o step vermelho — pode ser coleta (vertical/LLM), push (papers.db &gt; 100MB), health check ou Supabase/R2. NAO basta re-executar.</p>\"
               }" | head -c 200
           fi
-          # Tambem cria uma issue para rastreamento
-          gh issue create \
-            --repo alexandrebrt14-sys/papers \
-            --title "daily-collect falhou em $(date -u +%Y-%m-%d)" \
-            --body "Run #${{ github.run_number }} falhou. Link: https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}. Abrir o log do job e identificar o step vermelho ANTES de re-executar." \
-            --label "pipeline-failure" \
-            || echo "issue creation failed"
+          # Rastreamento por issue. Ate 10/08 cada falha abria uma issue nova:
+          # a mesma causa (saldo da OpenAI) gerou sete issues abertas em duas
+          # semanas, o que enterra o sinal em vez de destaca-lo. Agora comenta
+          # na issue de falha ja aberta, se houver, e so cria uma nova quando
+          # nao existe nenhuma.
+          EXISTING=$(gh issue list --repo alexandrebrt14-sys/papers \
+            --label "pipeline-failure" --state open \
+            --json number --jq '.[0].number' 2>/dev/null || echo "")
+          RUN_LINK="https://github.com/alexandrebrt14-sys/papers/actions/runs/${{ github.run_id }}"
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo alexandrebrt14-sys/papers \
+              --body "Run #${{ github.run_number }} falhou tambem ($(date -u +%Y-%m-%d\ %H:%M) UTC). Link: $RUN_LINK" \
+              || echo "issue comment failed"
+            echo "Falha registrada na issue #$EXISTING (nenhuma issue nova criada)."
+          else
+            gh issue create \
+              --repo alexandrebrt14-sys/papers \
+              --title "daily-collect falhou em $(date -u +%Y-%m-%d)" \
+              --body "Run #${{ github.run_number }} falhou. Link: $RUN_LINK -- Abrir o log do job e identificar o step vermelho ANTES de re-executar. HTTP 429 credit_balance_exhausted e saldo do provider, nao chave invalida: rotacionar nao resolve." \
+              --label "pipeline-failure" \
+              || echo "issue creation failed"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true

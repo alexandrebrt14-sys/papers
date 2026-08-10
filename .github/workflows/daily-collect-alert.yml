@@ -33,11 +33,15 @@ jobs:
               'ALERTA papers daily-collect FALHOU\n\n'
               f'Run: {run_id}\n'
               f'URL: {run_url}\n\n'
-              'Acao: verificar GitHub Secrets (API keys) e logs.\n'
-              'Se 401: rotacionar OPENAI_API_KEY, ANTHROPIC_API_KEY, '
-              'GOOGLE_AI_API_KEY, PERPLEXITY_API_KEY, GROQ_API_KEY '
-              'no repo papers via:\n'
-              'gh secret set <NAME> --repo alexandrebrt14-sys/papers --body <value>'
+              'Acao: abrir o log do job e achar o step vermelho.\n\n'
+              'HTTP 429 credit_balance_exhausted = SALDO acabou no provider. '
+              'A chave esta valida; rotacionar nao resolve. Recarregar em '
+              'platform.openai.com/settings/organization/billing (ou o '
+              'equivalente do provider que falhou).\n\n'
+              'HTTP 401 = chave invalida ou revogada. Ai sim rotacionar:\n'
+              'gh secret set <NAME> --repo alexandrebrt14-sys/papers --body <value>\n\n'
+              'BANCO DEGENERADO no integrity guard = o dataset encolheu. NAO '
+              're-executar: investigar de onde veio o restore antes.'
           )
 
           # WhatsApp
