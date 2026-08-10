@@ -364,6 +364,18 @@ jobs:
       - name: Elevar piso de integridade
         run: python scripts/db_integrity_guard.py update
 
+      # METHODOLOGY_V2, "Politica de imputacao": gaps totais entram em
+      # collection_runs como status='aborted' e o intervalo sai da janela
+      # analitica formal. O protocolo estava escrito desde abril e nunca rodou —
+      # em 10/08 a tabela tinha 240 linhas, todas 'success', e os 67 dias sem
+      # coleta simplesmente nao existiam. Ausencia nao e registro: quem
+      # consultasse a tabela veria um pipeline impecavel.
+      # O script e idempotente e nao escreve em `citations`. Rodando a cada
+      # coleta, qualquer gap futuro fica documentado sozinho.
+      - name: Registrar gaps de coleta (METHODOLOGY_V2)
+        run: python scripts/mark_collection_gaps.py --apply
+        continue-on-error: true
+
       - name: Upload database (intermediate safety net)
         uses: actions/upload-artifact@v5
         with:
