@@ -1,0 +1,88 @@
+name: tests
+
+# Criado em 2026-08-09. Ate esta data o repositorio tinha 217 testes em 17
+# arquivos e NENHUM deles rodava no CI: `grep -rn pytest .github/workflows/`
+# devolvia duas linhas, ambas em test-sync-supabase.yml, que executa um unico
+# arquivo e teve 3 execucoes na historia do repo, a ultima em 17/05/2026. O
+# daily-collect se limitava a um "Validate Python imports".
+#
+# Isso significa que o pipeline que sustenta a publicacao cientifica podia
+# receber qualquer regressao sem que nada acusasse. Este workflow e uma copia
+# adaptada do test.yml do curso-factory, que e o unico modelo verde e validado
+# do ecossistema.
+#
+# Medido nesta arvore antes de ligar o gate: 217 passed em 45,41s, sem rede e
+# sem chave de API real.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: pytest (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest pytest-asyncio
+
+      - name: Run pytest
+        # Chaves de teste: a bateria nao faz chamada de rede, mas alguns modulos
+        # leem a variavel na importacao. Valor obviamente falso, de proposito.
+        env:
+          OPENAI_API_KEY: "test-key-for-import-only"
+          ANTHROPIC_API_KEY: "test-key-for-import-only"
+          GOOGLE_AI_API_KEY: "test-key-for-import-only"
+          GROQ_API_KEY: "test-key-for-import-only"
+          PERPLEXITY_API_KEY: "test-key-for-import-only"
+        run: pytest --tb=short -q
+
+      - name: Sentinela de bateria (>= 217 testes)
+        # Mesmo padrao do curso-factory: teste apagado e regressao silenciosa,
+        # e a contagem e a unica coisa que a suite nao consegue esconder.
+        run: |
+          python - <<'EOF'
+          import re
+          import subprocess
+
+          out = subprocess.run(
+              ["pytest", "--collect-only", "-q"],
+              capture_output=True,
+              text=True,
+              check=False,
+          ).stdout
+          match = re.search(r"(\d+) tests? collected", out)
+          assert match, f"nao consegui ler a contagem de testes:\n{out[-500:]}"
+          total = int(match.group(1))
+          assert total >= 217, f"FAIL: bateria encolheu para {total} testes (minimo 217)"
+          print(f"OK: {total} testes coletados (minimo 217)")
+          EOF

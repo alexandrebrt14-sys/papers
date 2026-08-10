@@ -63,9 +63,14 @@ jobs:
       # abaixo sobrescrevia o artifact papers-db-latest COMPARTILHADO, zerando a
       # serie historica para o proximo daily-collect. Mesmo contrato do daily:
       # artifact (safety net) + R2 (source of truth), adotando a base MAIOR.
-      # Ver nota identica em weekly-benchmark.yml: sem `workflow:` a action le
-      # o artifact do proprio workflow, que aqui era a base degenerada que ele
-      # mesmo havia publicado no ciclo anterior — um laco fechado.
+      # CORRECAO 2026-08-09/10: a intencao descrita no comentario acima estava
+      # certa, a implementacao nao. Sem a chave `workflow:` o dawidd6 procurava
+      # o artifact no PROPRIO weekly-calibration, e `workflow_conclusion: ""`
+      # casa runs em qualquer estado, inclusive a que esta executando e ainda
+      # nao subiu nada. O restore nunca trouxe a base viva do daily, entao a
+      # calibracao seguiu rodando sobre base defasada desde junho e republicando
+      # a propria copia degenerada no ciclo seguinte — um laco fechado, medido
+      # em 864 citations contra as 63.940 do daily.
       - name: Download previous DB (safety net)
         uses: dawidd6/action-download-artifact@v6
         with:
@@ -92,10 +97,12 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_REQUIRED: "1"
         run: python scripts/r2_sync.py pull
+
       # Barra base degenerada ANTES de coletar/analisar. Ver incidente
       # 2026-08-09 em scripts/db_integrity_guard.py.
       - name: Integrity guard — dataset nao pode encolher
         run: python scripts/db_integrity_guard.py check
+
       - name: Run calibration across verticals
         run: |
           for V in fintech varejo saude tecnologia; do
@@ -104,7 +111,43 @@ jobs:
             python -m src.cli --vertical "$V" collect citation || true
           done
 
-      - name: Persist calibration DB (guard + R2 + artifact)
+      # Portao de sanidade (2026-08-09): so publica se a calibracao de fato
+      # acrescentou linha. O `|| true` no loop acima engole falha de provedor,
+      # entao sem esta conferencia um run em que todos os quatro verticais
+      # falharam subiria um artifact identico ao de entrada, competindo a toa na
+      # adocao forward-only do daily.
+      - name: Sanity gate — a calibração acrescentou linhas?
+        run: |
+          python - <<'PY'
+          import os, sqlite3, sys
+
+          db = "data/papers.db"
+          if not os.path.exists(db):
+              sys.exit("ABORTADO: data/papers.db ausente. A calibracao rodou sem "
+                       "base e nao ha o que persistir.")
+
+          con = sqlite3.connect(db)
+          try:
+              total = con.execute("SELECT COUNT(*) FROM citations").fetchone()[0]
+              ficticias = con.execute(
+                  "SELECT COUNT(*) FROM citations WHERE fictional_hit = 1"
+              ).fetchone()[0]
+          except sqlite3.Error as e:
+              con.close()
+              sys.exit(f"ABORTADO: nao consegui ler citations em {db}: {e}")
+          con.close()
+
+          if total == 0:
+              sys.exit("ABORTADO: citations vazia depois da calibracao.")
+
+          print(f"citations={total}, das quais fictional_hit=1: {ficticias}")
+          PY
+
+      # Persistencia no R2, que e a source of truth compartilhada pelos tres
+      # workflows. O guard roda antes: push so acontece se a base nao encolheu,
+      # e r2_sync recusa sobrescrever um remoto maior. O artifact abaixo
+      # continua existindo como segunda via — as duas redundancias se somam.
+      - name: Persistir calibracao no R2 (guard + push)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -115,9 +158,26 @@ jobs:
           python scripts/r2_sync.py push
 
       - name: Persist calibration DB as artifact
-        uses: actions/upload-artifact@v5
+        # Substitui git push do data/papers.db (binario >100MB nao versionavel em git).
+        # Esse artifact passa a ser a fonte de verdade entre weekly-calibration e o
+        # proximo daily-collect, que faz "Download previous DB (safety net)" lendo
+        # exatamente este nome.
+        #
+        # CORRECAO 2026-08-09: a intencao acima nunca se realizou. O daily lia
+        # `papers-db-latest` sem declarar `workflow:`, entao so enxergava os
+        # artifacts do proprio daily; o desta calibracao nunca era lido por
+        # ninguem. Somado a retencao de 7 dias, o resultado era coleta paga com
+        # entidades ficticias — o BRACO DE CONTROLE do estudo, de onde
+        # src/analysis/statistical.py tira taxa de falso-positivo e
+        # especificidade — expirando sem uso toda semana.
+        #
+        # O daily agora tem um step "Download calibration DB" que le este
+        # artifact e o compara na adocao forward-only. A retencao sobe de 7 para
+        # 90 dias, alinhada com a do daily e do recover: 7 dias nao cobre nem
+        # duas semanas de intervalo entre calibracoes.
+        uses: actions/upload-artifact@v4
         with:
           name: papers-db-latest
           path: data/papers.db
-          retention-days: 365
+          retention-days: 90
           overwrite: true

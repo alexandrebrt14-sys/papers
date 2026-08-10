@@ -25,6 +25,16 @@ on:
 permissions:
   contents: read
   security-events: write
+  # Em evento pull_request o gitleaks-action@v2 lista os commits do PR
+  # (GET /repos/{owner}/{repo}/pulls/{n}/commits) para delimitar o range do
+  # scan. O GITHUB_TOKEN so carrega o que este bloco declara, e sem
+  # `pull-requests: read` a chamada volta 403 "Resource not accessible by
+  # integration": o job morre por excecao ANTES de escanear a primeira linha.
+  # Vermelho de permissao com cara de achado de segredo, que e o pior tipo,
+  # porque manda procurar credencial vazada onde nao ha nenhuma. Defeito
+  # herdado do workflow padrao do ecossistema, corrigido em todas as copias
+  # em 09-08-2026.
+  pull-requests: read
 
 jobs:
   bandit:
