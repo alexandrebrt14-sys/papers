@@ -6,6 +6,8 @@ Documento mestre de publicação acadêmica para a linha de pesquisa sobre Gener
 **Responsável:** Alexandre Caramaschi (ORCID 0009-0004-9150-485X)
 **Primeiro paper publicado:** SSRN DOI [10.2139/ssrn.6460680](https://doi.org/10.2139/ssrn.6460680)
 
+Todo texto em português que sai deste playbook, do resumo de divulgação ao post de anúncio em `drafts/`, segue a doutrina editorial v4 (11/08/2026): `DIRETRIZ_EDITORIAL.md` como regra, `GUIA_ESCRITA_HUMANIZADA.md` como exemplo e `DOUTRINA_EDITORIAL_NESTE_REPO.md` como tradução para este pipeline, os três na raiz do repositório. Antes de divulgar resultado, confira as quatro conferências de toda porcentagem (amostra, período, método, denominador) e abra cada identificador citado, porque DOI, arXiv ID e nome de arquivo errados se propagam sozinhos para o depósito, para a página pública e para o post.
+
 ---
 
 ## 1. Canais-alvo — Matriz Comparativa
@@ -232,7 +234,8 @@ Entradas futuras devem seguir o mesmo formato e serem adicionadas aqui no ato da
 
 ## 6. Checklist Pré-Submissão (universal)
 
-- [ ] Manuscript revisado por voice_guard.py (se aplicável) — sem emojis, sem hype.
+- [ ] Manuscript revisado por `C:/Sandyboxclaude/scripts/python/voice_guard.py check` (quando houver texto em português) — sem emojis, sem hype. O guard mede forma, nunca substância, e nunca deve rodar em modo de correção em lote sobre manuscrito.
+- [ ] Revisão em três passadas da seção 13 da `DIRETRIZ_EDITORIAL.md` feita por quem assina: substância, estrutura, linguagem, nessa ordem.
 - [ ] ORCID iD em cada autor.
 - [ ] Afiliação canônica.
 - [ ] DOI de preprints anteriores disclosed.

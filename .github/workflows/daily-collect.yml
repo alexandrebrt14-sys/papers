@@ -616,6 +616,13 @@ jobs:
       # (`gh api .../workflows/257642156/runs` devolve total_count 0) apesar de
       # pelo menos 4 falhas do daily. O caminho de alerta que de fato funciona e
       # este bloco aqui, e e nele que vale investir.
+      # Doutrina editorial v4 (11/08/2026): o email e a issue abaixo são texto
+      # que uma pessoa lê sob pressão, e seguem a cadeia da raiz do repo
+      # (DIRETRIZ_EDITORIAL.md, GUIA_ESCRITA_HUMANIZADA.md e
+      # DOUTRINA_EDITORIAL_NESTE_REPO.md). Três regras se aplicam aqui: o sujeito
+      # da frase de falha é o artefato ou o processo, nunca a pessoa; o movimento
+      # de saída vem na mesma mensagem que descreve o problema; e todo número
+      # citado vem com a base. Português com acentuação completa, sem emoji.
       - name: Alert on failure (Resend + Issue)
         if: steps.health.outcome == 'failure' || failure()
         run: |
@@ -630,7 +637,7 @@ jobs:
                 \"from\": \"papers-alerts@mail.brasilgeo.ai\",
                 \"to\": \"$ALERT_EMAIL\",
                 \"subject\": \"[ALERTA] Papers daily-collect falhou em $(date -u '+%Y-%m-%d %H:%M')\",
-                \"html\": \"<h2>Falha no pipeline Papers</h2><p>Run <a href='$RUN_URL'>#${{ github.run_number }}</a> teve falha de coleta ou health check.</p><p><strong>Impacto:</strong> gap de dados compromete a serie temporal longitudinal.</p><p><strong>Acao imediata:</strong> abrir o run e ler o LOG DO JOB para achar o step vermelho. Pode ser coleta (vertical/LLM), push, health check ou Supabase. NAO basta re-executar.</p>\"
+                \"html\": \"<h2>Falha no pipeline Papers</h2><p>A run <a href='$RUN_URL'>#${{ github.run_number }}</a> falhou na coleta ou no health check.</p><p><strong>Impacto:</strong> o dia sem linha vira gap na série longitudinal, e gap não se recupera depois porque a resposta do modelo daquele dia não existe mais.</p><p><strong>Ação imediata:</strong> abrir a run e ler o log do job para achar o step vermelho. Pode ser coleta (vertical ou LLM), push, health check ou Supabase. Re-executar sem ler o log não resolve.</p>\"
               }")
             HTTP=$(printf '%s' "$RESP" | tail -n1)
             if [ "$HTTP" != "200" ]; then
@@ -661,7 +668,7 @@ jobs:
             gh issue create \
               --repo alexandrebrt14-sys/papers \
               --title "daily-collect falhou em $(date -u +%Y-%m-%d)" \
-              --body "Run #${{ github.run_number }} falhou. Link: $RUN_URL. Abrir o log do job e identificar o step vermelho ANTES de re-executar. HTTP 429 credit_balance_exhausted e saldo do provider, nao chave invalida: rotacionar nao resolve. Enquanto esta issue estiver aberta, novas falhas viram comentario aqui em vez de issue nova." \
+              --body "A run #${{ github.run_number }} falhou. Link: $RUN_URL. Abrir o log do job e identificar o step vermelho antes de re-executar. HTTP 429 credit_balance_exhausted é saldo do provedor, não chave inválida: rotacionar a chave não resolve. Enquanto esta issue estiver aberta, as falhas seguintes viram comentário aqui em vez de issue nova." \
               --label "pipeline-failure" \
               || echo "::warning::nao consegui criar a issue de falha"
           fi

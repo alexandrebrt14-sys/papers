@@ -5,6 +5,17 @@ a partir do papers.db.
 Roda no GitHub Actions após cada coleta diária.
 Output é consumido por alexandrecaramaschi.com/research via fetch
 GitHub raw com ISR (revalidate 24h).
+
+Doutrina editorial (v4, 11/08/2026): DIRETRIZ_EDITORIAL.md (regra),
+GUIA_ESCRITA_HUMANIZADA.md (exemplo) e DOUTRINA_EDITORIAL_NESTE_REPO.md
+(tradução para este pipeline), na raiz do repo. Este arquivo alimenta página
+pública, o que torna as quatro conferências do símbolo de porcentagem
+obrigatórias na origem: cada métrica exportada carrega amostra, período, método
+e denominador em campo próprio, para que a página não precise inventar a base.
+Contagem de entidade, de vertical ou de dia vem do banco e do cohort canônico de
+src/config_v2.py, nunca de constante escrita à mão. Foi contagem de calendário
+tratada como contagem de dado que fez o painel publicar "dia 90 de 90" com 41
+dias reais em 10/08/2026 (ver scripts/window_progress.py).
 """
 
 import sqlite3

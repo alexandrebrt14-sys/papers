@@ -3,6 +3,12 @@
 Valida 15 dimensoes e dispara alerta WhatsApp + email se qualquer uma falhar.
 Roda local, no CI (apos coleta) ou via cron paralelo.
 
+Doutrina editorial (v4, 11/08/2026): DIRETRIZ_EDITORIAL.md,
+GUIA_ESCRITA_HUMANIZADA.md e DOUTRINA_EDITORIAL_NESTE_REPO.md, na raiz. Mensagem
+de alerta e de falha descreve o artefato que quebrou e o movimento de saída na
+mesma linha, sem cobrar nada de ninguém: "a etiqueta de origem não chegou ao
+cadastro" em vez de "você configurou errado". Número em alerta vem com a base.
+
 Uso:
     python scripts/health_check.py                              # full check
     python scripts/health_check.py --no-alert                   # sem disparar alertas

@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Generate comprehensive HTML test + statistics report."""
+"""Generate comprehensive HTML test + statistics report.
+
+Doutrina editorial (v4, 11/08/2026): o HTML gerado aqui é lido por humano, então
+segue DIRETRIZ_EDITORIAL.md, GUIA_ESCRITA_HUMANIZADA.md e
+DOUTRINA_EDITORIAL_NESTE_REPO.md, na raiz do repo. Em relatório de teste a trava
+que importa é a das quatro conferências: cada porcentagem impressa mostra a
+amostra, o período, o método e o denominador que a produziram, e resultado com
+base curta aparece em unidades.
+"""
 import sqlite3
 import json
 import sys

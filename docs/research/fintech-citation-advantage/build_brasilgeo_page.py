@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Gera a pagina do paper para brasilgeo.ai (worker assets)."""
+"""Gera a página do paper para brasilgeo.ai (worker assets).
+
+Doutrina editorial v4 (11/08/2026), cadeia na raiz do repo: DIRETRIZ_EDITORIAL.md,
+GUIA_ESCRITA_HUMANIZADA.md e DOUTRINA_EDITORIAL_NESTE_REPO.md. Esta é a
+superfície mais exposta do repositório, porque o texto sai do banco e vai direto
+para uma página pública indexável. Antes de publicar, confira as quatro
+conferências em cada porcentagem da descrição, do resumo e do corpo (amostra,
+período, método, denominador), e confira o identificador de tudo o que é citado,
+inclusive o nome do PDF e o canonical.
+"""
 import io, os, re, shutil
 
 SRC = r"C:/Sandyboxclaude/papers/docs/research/fintech-citation-advantage"

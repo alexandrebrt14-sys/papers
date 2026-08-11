@@ -4,6 +4,15 @@ send-report.py — Envia relatório diário por email após coleta.
 Gera um resumo HTML com métricas do dia e envia via Resend API.
 Roda como step final do GitHub Actions após coleta + FinOps.
 
+Doutrina editorial (v4, 11/08/2026): este arquivo produz texto que um humano lê,
+então segue a cadeia DIRETRIZ_EDITORIAL.md (regra), GUIA_ESCRITA_HUMANIZADA.md
+(exemplo) e DOUTRINA_EDITORIAL_NESTE_REPO.md (tradução para este pipeline), na
+raiz do repo. Duas travas valem aqui em particular: toda taxa aparece ao lado da
+fração que a origina (as quatro conferências do símbolo de porcentagem), e
+nenhuma contagem de LLM, vertical ou entidade fica fixa no código, porque número
+escrito à mão envelhece calado e o painel já publicou "dia 90 de 90" com 41 dias
+no banco. Rótulo sem title case: "Taxa de citação", não "Taxa de Citação".
+
 Uso:
   python scripts/send-report.py                    # Envia relatório do dia
   python scripts/send-report.py --dry-run          # Gera sem enviar
@@ -135,25 +144,31 @@ def render_html(report: dict) -> str:
             {alert_rows}
         </table>"""
 
+    # Proveniência do cabeçalho: a contagem de LLMs sai da própria consulta do
+    # dia. Estava fixa em "4 LLMs" enquanto a coleta rodava com cinco, e rótulo
+    # que contradiz o dado ao lado destrói a confiança no resto do relatório.
+    llms_hoje = len(citations)
+    plural_llm = "LLM" if llms_hoje == 1 else "LLMs"
+
     return f"""
     <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e0e0e0;padding:24px;border-radius:8px">
-        <h2 style="color:#0176d3;margin:0 0 4px">Papers GEO — Relatório Diário</h2>
-        <p style="color:#888;font-size:13px;margin:0 0 20px">{date} | Coleta automatizada | 4 LLMs</p>
+        <h2 style="color:#0176d3;margin:0 0 4px">Papers GEO — Relatório diário</h2>
+        <p style="color:#888;font-size:13px;margin:0 0 20px">{date} | Coleta automatizada | {llms_hoje} {plural_llm} com dado hoje</p>
 
         <div style="display:flex;gap:12px;margin-bottom:20px">
             <div style="flex:1;background:#141414;border-radius:8px;padding:16px;text-align:center">
                 <div style="font-size:28px;font-weight:700;color:#fff">{overall_rate}%</div>
-                <div style="font-size:11px;color:#888;text-transform:uppercase">Taxa de Citação</div>
+                <div style="font-size:11px;color:#888;text-transform:uppercase">Taxa de citação</div>
                 <div style="font-size:12px;color:#666">{total_cited_today}/{total_queries} hoje</div>
             </div>
             <div style="flex:1;background:#141414;border-radius:8px;padding:16px;text-align:center">
                 <div style="font-size:28px;font-weight:700;color:#fff">${total_cost:.4f}</div>
-                <div style="font-size:11px;color:#888;text-transform:uppercase">Custo do Dia</div>
+                <div style="font-size:11px;color:#888;text-transform:uppercase">Custo do dia</div>
                 <div style="font-size:12px;color:#666">{total_tokens:,} tokens</div>
             </div>
             <div style="flex:1;background:#141414;border-radius:8px;padding:16px;text-align:center">
                 <div style="font-size:28px;font-weight:700;color:#fff">{report['overall_rate']}%</div>
-                <div style="font-size:11px;color:#888;text-transform:uppercase">Taxa Acumulada</div>
+                <div style="font-size:11px;color:#888;text-transform:uppercase">Taxa acumulada</div>
                 <div style="font-size:12px;color:#666">{report['total_cited']}/{report['total_citations']} total</div>
             </div>
         </div>
@@ -164,7 +179,7 @@ def render_html(report: dict) -> str:
             {citation_rows}
         </table>
 
-        <h3 style="color:#0176d3;margin-top:20px">FinOps — Custo por Plataforma</h3>
+        <h3 style="color:#0176d3;margin-top:20px">FinOps: custo por plataforma</h3>
         <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:13px">
             <tr style="background:#1a1a1a"><th style="text-align:left">Plataforma</th><th>Custo</th><th>Queries</th><th>Tokens</th></tr>
             {finops_rows}
@@ -228,7 +243,13 @@ def main():
 
     report = build_report()
     html = render_html(report)
-    subject = f"Papers GEO — Relatório {report['date']} | {report['overall_rate']}% citação acumulada"
+    # Assunto carrega a fração junto da taxa: porcentagem sem denominador no
+    # assunto do email é o trecho que mais viaja recortado.
+    subject = (
+        f"Papers GEO — Relatório {report['date']} | "
+        f"{report['overall_rate']}% de citação acumulada "
+        f"({report['total_cited']}/{report['total_citations']})"
+    )
 
     if DRY_RUN:
         output = Path("output/reports") / f"email-report-{report['date']}.html"

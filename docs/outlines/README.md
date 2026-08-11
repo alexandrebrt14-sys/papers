@@ -93,7 +93,8 @@ Legenda: ◉ marco de dados · ▲ marco editorial / submissão.
 - **Pré-registro comum.** Ambos Paper 1 (H1–H6) e Paper 3 (H1–H6) são pré-registrados no OSF em abril/2026 antes do fechamento da janela. Paper 2 pré-registra no SIGIR / WWW conforme calendário de submissão da workshop.
 - **Zenodo DOI único.** Um único deposit Zenodo versiona o dataset que alimenta os três papers; o DOI é citado em todos.
 - **Pipeline único.** Nenhum fork do código de coleta. Todo o pipeline em `src/collectors/*`, versionado em `alexandrebrt14-sys/papers`.
-- **Voice guard.** Antes de submeter qualquer um dos três, rodar `voice_guard.py` do repositório `curso-factory` (padrão editorial Alexandre — arco HBR, credenciais canônicas, naming canônico).
+- **Doutrina editorial.** Os três outlines e todo texto em português derivado deles seguem a cadeia da raiz do repositório: `DIRETRIZ_EDITORIAL.md` (regra, versão 4 de 11/08/2026), `GUIA_ESCRITA_HUMANIZADA.md` (exemplo prático) e `DOUTRINA_EDITORIAL_NESTE_REPO.md` (tradução para este pipeline, com as quatro conferências de toda porcentagem e a validação de identificador antes de citar).
+- **Voice guard.** Antes de submeter qualquer um dos três, rodar `python C:/Sandyboxclaude/scripts/python/voice_guard.py check --file <arquivo>`. Esse é o caminho canônico do script: ele não existe dentro de `curso-factory`, e a referência antiga a esse repositório apontava para arquivo inexistente. O guard cobre naming canônico, credencial e acentuação, mede forma e nunca substância, e não deve ser executado em modo de correção em lote.
 
 ---
 
@@ -111,7 +112,7 @@ Aplicável individualmente a cada paper antes da submissão:
 - [ ] Power analysis e N efetivo reportados em §Methods.
 - [ ] Threats to validity explicitamente listadas e mitigações discutidas.
 - [ ] Ethics: no-IRB statement (public data only, no human subjects) em §5.6 ou equivalente.
-- [ ] Voice guard passou (naming canônico, sem emojis, acentuação completa em PT-BR quando aplicável).
+- [ ] Voice guard passou (naming canônico, sem emojis, acentuação completa em PT-BR quando aplicável). Passar no guard não é aprovação editorial: a revisão em três passadas da seção 13 da diretriz continua obrigatória.
 - [ ] Commit final com mensagem `paper(N): submission draft vX` e tag `paper-N-submission-vX`.
 
 ---

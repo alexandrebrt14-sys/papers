@@ -239,39 +239,23 @@ MCP server `resend-mcp` lê `RESEND_API_KEY` do env (configurado em `~/.claude/.
 
 Helper Python canônico para precheck sandbox: `C:/Sandyboxclaude/scripts/python/resend_precheck.py` (porta `landing-page-geo/src/lib/resend-precheck.ts`).
 
-## Padrão editorial — escrita humanizada (17/07/2026)
+## Padrão editorial obrigatório (doutrina v4, 11/08/2026)
 
-Todo conteúdo de leitura humana produzido neste repo (artigo, curso, página, post,
-e-mail, relatório, parecer, resposta ao usuário) segue o padrão editorial global do
-Alexandre. Qualidade vence velocidade; profundidade proporcional ao problema;
-escrever como especialista sênior conversando com outro profissional experiente.
-Fonte de verdade completa: `docs/ESTILO_EDITORIAL.md` do repo GEO-Pesquisador
-(clone local em `C:/Sandyboxclaude/GEO-Pesquisador`).
+Antes de produzir qualquer texto de leitura humana neste repositório (documentação, onda de pesquisa, síntese, relatório, rascunho de divulgação, descrição de PR, mensagem longa de commit), leia e aplique a cadeia que vive na raiz: `DIRETRIZ_EDITORIAL.md` é a regra (versão 4, de 11 de agosto de 2026), `GUIA_ESCRITA_HUMANIZADA.md` é o anexo prático com exemplos antes e depois, heurísticas mensuráveis e fontes, e `DOUTRINA_EDITORIAL_NESTE_REPO.md` é a tradução da doutrina para o escopo deste pipeline de pesquisa. Os três documentos prevalecem sobre este resumo.
 
-Proibidos como padrão recorrente (uso pontual e consciente é tolerado):
+A v4 substituiu a v2, de 23 de julho de 2026, que era construída quase só de proibições e cujo efeito medido foi texto curto e sem argumento aprovado em todos os gates. O que mudou:
 
-- Antítese em série: "não se trata de X, trata-se de Y", "não é apenas X, é Y",
-  "não basta X, é preciso Y", "mais do que X, Y". Afirmar direto o que a evidência
-  sustenta.
-- Conectivos batidos repetidos: "além disso", "por outro lado", "nesse contexto",
-  "vale destacar", "é importante ressaltar", "nesse sentido", "por fim".
-- Parágrafos vizinhos abrindo com a mesma construção sintática; blocos com ritmo
-  idêntico; excesso de paralelismo; perguntas retóricas em série; conclusões
-  idênticas fechando tópicos sucessivos.
-- Travessão e hífen como recurso estilístico no conteúdo final: preferir vírgula,
-  dois-pontos ou ponto.
-- Clichês, frases genéricas que serviriam para qualquer assunto, tom promocional,
-  superlativo sem número ao lado, adjetivo decorativo, negrito por hábito.
+- **Piso de substância** (seção 2.1). Toda peça precisa ter tese identificável com a qual daria para discordar, evidência ligada a essa tese, ganho de informação, critério de decisão explícito quando houver alternativas, arco de leitura e consequência prática para quem lê. Peça que falha em um dos seis itens é reescrita, não aparada. Aprovação em gate automático nunca é aprovação editorial.
+- **Prova antes da escrita** (seção 2.2). A evidência se levanta antes da primeira frase e limita o tamanho da peça: blocos que afirmam resultado não passam do número de provas datadas disponíveis. Na falta de prova, quatro saídas antes do marcador (pesquisar, reduzir a afirmação, restringir o uso, segurar a publicação), com teto de cinco marcadores abertos por documento.
+- **Narrativa obrigatória** (seção 3). Abertura em situação e não em definição, tensão antes da solução, caso condutor com rótulo de tipo, promessa paga no desenvolvimento, fechamento com callback em vez de recapitulação, mostrar em vez de qualificar, e um pedido por peça.
+- **Estrutura visual como ferramenta legítima** (seção 6). Tabela comparativa, matriz de decisão e checklist entram sempre que ajudarem de verdade. Sai a lista que faz o trabalho de argumentar.
+- **Revisão em três passadas com travas verificáveis** (seção 13), entre elas as quatro conferências que todo símbolo de porcentagem dispara: origem, data, método e denominador na mesma frase. Base pequena se conta em unidades.
+- **Nenhuma cota mecânica de ritmo, em direção alguma** (seção 4, item 8). A amplitude num bloco de dez frases é diagnóstico do texto pronto, com defeito abaixo de 15 palavras e conforto acima de 30, e nunca fórmula de produção nem contagem durante a escrita.
 
-Obrigatório: linha de raciocínio lógica; cada parágrafo acrescenta uma ideia nova;
-alternar períodos curtos, médios e longos; recomendação sempre acompanhada do
-porquê; conceito técnico coberto com contexto, motivação, funcionamento,
-limitações e critérios de decisão quando relevantes; material educacional abre
-pelo problema e fecha com síntese prática. Antes de entregar, reler procurando
-esses padrões e reescrever o que soar texto de máquina. Sub-agentes que geram
-copy recebem o bloco de `C:/Sandyboxclaude/scripts/prompts/COPY_PROMPT_PREFIX.md`
-carimbado no prompt.
+Permanecem valendo: português do Brasil com acentuação completa, tipografia à brasileira (sem title case, números de zero a dez por extenso, vírgula decimal), travessão vetado em prosa, atribuição nomeada em vez de "estudos mostram", zero emoji, parágrafos justificados em HTML e PDF, e nada de dado inventado.
 
-## Padrão editorial obrigatório
+Aplicação específica deste repositório, detalhada em `DOUTRINA_EDITORIAL_NESTE_REPO.md`: os prompts de coleta em `src/config.py`, `src/shared/llm_utils.py`, `src/config_v2.py` e `src/collectors/prompt_sensitivity.py` são instrumento de medição da série longitudinal e não recebem regra editorial, porque mudá-los altera o tratamento experimental. Prompt que redige texto em português carrega o bloco condensado de `scripts/prompts/BLOCO_EDITORIAL_PROMPT.md` dentro da própria demanda, já que instrução vista só no contexto não sobrevive a geração longa.
 
-Antes de produzir qualquer texto de leitura humana neste repositório (documentação, cursos, páginas, relatórios, descrições de PR, mensagens longas de commit), leia e aplique `DIRETRIZ_EDITORIAL.md` na raiz do repositório (versão 2, 23/07/2026) e consulte o anexo prático `GUIA_ESCRITA_HUMANIZADA.md`, que traz exemplos antes e depois, heurísticas mensuráveis e fontes. O essencial: escrita de especialista sênior em português do Brasil com acentuação completa e tipografia brasileira (sem title case, numerais à brasileira); conclusão antes da sustentação e cada parágrafo acrescentando uma ideia nova; ritmo variado de verdade (num bloco de dez frases, amplitude acima de 30 palavras entre a mais longa e a mais curta); proibido travessão como recurso estilístico; proibidas como padrão as construções que negam para afirmar ("não é X, é Y"), a regra de três mecânica, as conclusões-espelho e a atribuição vaga sem fonte nomeada; conectivos cortados por subtração, sem clichês nem vícios de português de LLM (gerundismo, "endereçar", "suportar", "eventualmente" como eventually); dado sem fonte e data não entra, e o que só o autor humano sabe vira marcador `[PREENCHER-HUMANO]`, nunca invenção; em superfícies HTML ou PDF, parágrafos com alinhamento justificado (`text-align: justify`); revisão final em três passadas (substância, estrutura, linguagem) com leitura em voz alta. Os documentos completos prevalecem sobre este resumo, e as convenções específicas deste repositório prevalecem sobre convenções genéricas, exceto quando comprometerem segurança ou corretude.
+Convenção explícita deste repositório prevalece sobre convenção genérica, com a única ressalva de segurança e corretude.
+
+Sub-agentes que geram texto longo em português recebem o bloco de `scripts/prompts/BLOCO_EDITORIAL_PROMPT.md` carimbado no início do prompt, que é a versão condensada desta cadeia. O prefixo genérico do ecossistema (`C:/Sandyboxclaude/scripts/prompts/COPY_PROMPT_PREFIX.md`) continua servindo para copy de marketing fora deste repositório; aqui a fonte de verdade é a cadeia da raiz, e a passagem anterior que apontava `docs/ESTILO_EDITORIAL.md` do repo GEO-Pesquisador como fonte completa está revogada, porque duas fontes de verdade para a mesma regra é o mesmo que nenhuma.

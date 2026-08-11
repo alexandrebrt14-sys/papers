@@ -1,4 +1,12 @@
-"""Papers CLI — Command-line interface for GEO research data collection."""
+"""Papers CLI — Command-line interface for GEO research data collection.
+
+Console output is Brazilian Portuguese prose and therefore governed by the
+editorial chain in the repo root: DIRETRIZ_EDITORIAL.md (rule),
+GUIA_ESCRITA_HUMANIZADA.md (worked examples) and
+DOUTRINA_EDITORIAL_NESTE_REPO.md (local translation for this pipeline). Two
+rules bite here: every printed rate carries the fraction that produced it, and
+Portuguese labels never use English title case.
+"""
 
 from __future__ import annotations
 
@@ -395,11 +403,18 @@ def analyze_report(ctx: click.Context) -> None:
         analyzer = StatisticalAnalyzer()
         report = analyzer.generate_summary_report(df)
 
-        console.print(f"\n[bold]Relatório Estatístico — GEO Papers ({vert})[/bold]\n")
+        # Doutrina editorial v4 (DOUTRINA_EDITORIAL_NESTE_REPO.md): toda taxa
+        # impressa mostra a fração que a origina, e rótulo em português não usa
+        # title case.
+        total_cited = int(df["cited"].sum())
+        console.print(f"\n[bold]Relatório estatístico — GEO Papers ({vert})[/bold]\n")
         console.print(f"Total de observações: {report['total_observations']}")
-        console.print(f"Taxa de citação geral: {report['overall_citation_rate']:.1%}\n")
+        console.print(
+            f"Taxa de citação geral: {report['overall_citation_rate']:.1%} "
+            f"({total_cited}/{report['total_observations']})\n"
+        )
 
-        table = Table(title=f"Taxa de Citação por LLM ({vert})")
+        table = Table(title=f"Taxa de citação por LLM ({vert})")
         table.add_column("LLM", style="cyan")
         table.add_column("Taxa", justify="right")
         table.add_column("Citações", justify="right")

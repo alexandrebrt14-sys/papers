@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Integra as 5 secoes do manuscrito em paper_final.html (A4, print-ready)."""
+"""Integra as cinco seções do manuscrito em paper_final.html (A4, print-ready).
+
+Doutrina editorial v4 (11/08/2026), cadeia na raiz do repo: DIRETRIZ_EDITORIAL.md
+(regra), GUIA_ESCRITA_HUMANIZADA.md (exemplo) e
+DOUTRINA_EDITORIAL_NESTE_REPO.md (tradução para este pipeline). O que este
+builder precisa preservar: parágrafo justificado (já no CSS), legenda de figura e
+de tabela autossuficiente, e nenhum resultado sem amostra, período, método e
+denominador na mesma frase. Se uma seção chegar com porcentagem solta, o conserto
+é no arquivo paper_sec_*.md, não no CSS.
+"""
 import io, re
 import markdown
 

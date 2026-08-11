@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """window_progress.py — quanto falta para fechar a janela de 90 dias.
 
-Decisao do operador em 10/08/2026: a janela e ACUMULADA. Os 41 dias ja
+Decisão do operador em 10/08/2026: a janela é ACUMULADA. Os 41 dias já
 coletados contam, o bloco de 10/06 a 07/08 fica registrado como gap e sai da
-janela analitica formal (METHODOLOGY_V2, "Politica de imputacao"), e a coleta
-segue ate somar 90 dias-com-dado.
+janela analítica formal (METHODOLOGY_V2, "Política de imputação"), e a coleta
+segue até somar 90 dias-com-dado.
 
-Progresso e medido em dias que produziram linha, nunca em dias de calendario.
-Foi exatamente essa confusao que fez o dashboard publicar "dia 90 de 90"
-enquanto o banco tinha 41 dias reais e um buraco de 59.
+Progresso é medido em dias que produziram linha, nunca em dias de calendário.
+Foi exatamente essa confusão que fez o dashboard publicar "dia 90 de 90"
+enquanto o banco tinha 41 dias reais e um buraco de 59. Esse episódio é o caso
+condutor de DOUTRINA_EDITORIAL_NESTE_REPO.md, a tradução local da doutrina
+editorial v4 (regra em DIRETRIZ_EDITORIAL.md, exemplo em
+GUIA_ESCRITA_HUMANIZADA.md): número publicado sem a definição do denominador
+mede outra coisa que não o que o rótulo promete.
 
 Uso:
     python scripts/window_progress.py

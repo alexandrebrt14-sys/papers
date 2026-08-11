@@ -58,7 +58,8 @@ papers.db SQLite, sync Supabase, dashboard probes marcados, balanceamento batter
 Toda mudança neste repo passa pelos gates transversais aplicáveis:
 
 - **Quality gate canônico** (Next.js/TS): `tsc` + `lint` + `vitest` + `next build` antes de push.
-- **Voice Guard** (conteúdo Alexandre): `python scripts/python/voice_guard.py check --file ...` antes de publicar.
+- **Doutrina editorial** (todo texto de leitura humana): `DIRETRIZ_EDITORIAL.md` (regra, v4 de 11/08/2026), `GUIA_ESCRITA_HUMANIZADA.md` (exemplo) e `DOUTRINA_EDITORIAL_NESTE_REPO.md` (tradução para este pipeline), na raiz. A revisão em três passadas da seção 13 é obrigatória e não tem substituto automático: verde no CI mede código, não substância.
+- **Voice Guard** (conteúdo Alexandre): `python C:/Sandyboxclaude/scripts/python/voice_guard.py check --file ...` antes de publicar. Caminho absoluto porque o script vive no monorepo de scripts, não neste repositório; mede forma e nunca roda em correção em lote.
 - **Migration gate pt_br** (SQL): grep de acentos obrigatório antes de `apply` via Management API.
 - **Pre-commit hook** (todo repo cliente): `secret_guard` ativo via `git config core.hooksPath .githooks`.
 - **Snapshot Shopify** (mutations produto/variant): JSON em `data/raw/shopify-audit-logs/` antes de `productUpdate`/`variantsBulkUpdate`.

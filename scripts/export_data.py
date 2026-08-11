@@ -1,5 +1,11 @@
 """export_data.py — consolidador de exports (Onda 4 — Refactor 2026-04-19).
 
+Doutrina editorial (v4, 11/08/2026): DIRETRIZ_EDITORIAL.md,
+GUIA_ESCRITA_HUMANIZADA.md e DOUTRINA_EDITORIAL_NESTE_REPO.md, na raiz. O que
+vale para saída de terminal e HTML daqui: rótulo em português sem title case,
+taxa sempre com a fração ao lado (`cited=/total=`), base pequena reportada em
+unidades em vez de porcentagem.
+
 Substitui os 3 scripts duplicados que existiam em `data/`:
     - data/extract_dashboard.py     (text dump)
     - data/extract_json_dashboard.py (JSON)

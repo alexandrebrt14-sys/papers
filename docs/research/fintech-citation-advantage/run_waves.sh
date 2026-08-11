@@ -3,15 +3,39 @@
 # "Fintech Citation Advantage". Saidas em wave_N.json/log neste diretorio.
 set -u
 DIR="C:/Sandyboxclaude/papers/docs/research/fintech-citation-advantage"
+REPO="C:/Sandyboxclaude/papers"
 BRIDGE="C:/Sandyboxclaude/scripts/bin/geo-bridge.sh"
+
+# Doutrina editorial v4 (11/08/2026): regra em DIRETRIZ_EDITORIAL.md, exemplo em
+# GUIA_ESCRITA_HUMANIZADA.md, tradução para este repo em
+# DOUTRINA_EDITORIAL_NESTE_REPO.md, todos na raiz. Prompt não recebe link: as
+# regras viajam DENTRO da demanda, porque instrução carregada só no contexto do
+# agente não sobrevive a geração longa. O arquivo abaixo é a versão condensada.
+BLOCO_FILE="$REPO/scripts/prompts/BLOCO_EDITORIAL_PROMPT.md"
+if [ ! -s "$BLOCO_FILE" ]; then
+  echo "ERRO: $BLOCO_FILE ausente ou vazio. Sem ele as waves geram texto fora do padrão editorial; abortando em vez de rodar sem a regra." >&2
+  exit 1
+fi
+BLOCO="$(cat "$BLOCO_FILE")"
 
 DATA="Dataset: 62.820 observacoes (queries a 5 LLMs: ChatGPT gpt-4o-mini, Claude haiku-4.5, Gemini 2.5-pro, Perplexity sonar, Groq llama-3.3-70b), 23/abr a 09/jun de 2026, 4 verticais brasileiras (fintech, varejo, tecnologia, saude), cohort de 127 entidades (79 BR reais + 32 ancoras internacionais + 16 decoys ficticios), 2 coletas/dia via GitHub Actions, NER v2, probes adversariais e calibracao com decoys. Nucleo sem probes/calibracao: n=50.453, taxa global de citacao espontanea 20,3%. Taxas por vertical: fintech 28,15% (IC95 27,38-28,95), varejo 24,94%, tecnologia 14,50%, saude 13,35% — qui-quadrado fintech vs varejo p=7e-9, vs tecnologia e saude p<1e-15. Interacao vertical x LLM: Claude cita fintech em 51,0% vs 10,4% tecnologia; Perplexity 86,5% fintech vs 54,3% tecnologia; Gemini quase zero fora de fintech (4,9% fintech, 0,0% varejo/saude). Concentracao de mencoes: Nubank sozinho = 3.533 de 7.112 mencoes fintech (49,7%); top3 fintech = 70,9% (HHI 0,283, o mais alto); tecnologia HHI 0,110. Roster: fintech 19 entidades vs 15 nas demais. FPR dos decoys baixo (calibracao ok)."
 
 run_wave () {
   local n="$1"; shift
   local demanda="$1"
-  echo "=== WAVE $n start $(date -u +%H:%M:%S) ==="
-  bash "$BRIDGE" board "$demanda" > "$DIR/wave_${n}.log" 2>&1
+  local demanda_full
+  demanda_full="$demanda
+
+$BLOCO"
+  # Teto de 5 KB de input do orchestrator (ROADMAP_2026Q2-Q4.md, "Política de
+  # qualidade"). Aviso visível em vez de truncamento silencioso.
+  local tam
+  tam=$(printf '%s' "$demanda_full" | wc -c)
+  if [ "$tam" -gt 5000 ]; then
+    echo "AVISO: demanda da wave $n tem $tam bytes, acima do teto de 5000 do orchestrator. Encurte o contexto da wave, não o bloco editorial." >&2
+  fi
+  echo "=== WAVE $n start $(date -u +%H:%M:%S) (demanda $tam bytes) ==="
+  bash "$BRIDGE" board "$demanda_full" > "$DIR/wave_${n}.log" 2>&1
   echo "=== WAVE $n exit=$? end $(date -u +%H:%M:%S) ==="
 }
 

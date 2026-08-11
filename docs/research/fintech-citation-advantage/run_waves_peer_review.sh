@@ -3,15 +3,36 @@
 # Saidas em pr_wave_N.log neste diretorio.
 set -u
 DIR="C:/Sandyboxclaude/papers/docs/research/fintech-citation-advantage"
+REPO="C:/Sandyboxclaude/papers"
 BRIDGE="C:/Sandyboxclaude/scripts/bin/geo-bridge.sh"
+
+# Doutrina editorial v4 (11/08/2026): DIRETRIZ_EDITORIAL.md (regra),
+# GUIA_ESCRITA_HUMANIZADA.md (exemplo) e DOUTRINA_EDITORIAL_NESTE_REPO.md
+# (tradução para este pipeline), na raiz do repo. O prompt carrega as regras em
+# vez de apontar para elas; memória de contexto não sobrevive a geração longa.
+BLOCO_FILE="$REPO/scripts/prompts/BLOCO_EDITORIAL_PROMPT.md"
+if [ ! -s "$BLOCO_FILE" ]; then
+  echo "ERRO: $BLOCO_FILE ausente ou vazio. Abortando: revisão por pares gerada sem a regra editorial volta como retrabalho." >&2
+  exit 1
+fi
+BLOCO="$(cat "$BLOCO_FILE")"
 
 CTX="Estudo: citacao espontanea de marcas brasileiras por 5 LLMs (ChatGPT gpt-4o-mini, Claude haiku-4.5, Gemini 2.5-pro, Perplexity sonar, Groq llama-3.3-70b), 4 verticais (fintech, varejo, tecnologia, saude), 62.820 observacoes (23/abr-09/jun/2026, dia 50 de 90 da janela), 48 queries template-paralelas por vertical (0/48 mencionam marca), nucleo n=50.453. Resultados: fintech 28,15% > varejo 24,94% > tecnologia 14,50% > saude 13,35% (p<1e-8). PORENS verificados: (1) Nubank = 49,68% das mencoes fintech; excluindo respostas so-Nubank a taxa fintech cai para 11,46% (ultimo lugar) e a OR vs saude inverte de 4,13 para 0,77; (2) apenas 2 de 5 engines mostram fintech>varejo (Claude +20pp e Gemini; ChatGPT, Groq e Perplexity mostram o contrario); (3) ARTEFATO: response_text truncado em 200 chars em 4 dos 5 coletores (so Perplexity integro) - o NER mede citacao na ABERTURA da resposta (front-loading), nao citacao plena; (4) decoys ficticios com especificidade quase nula (FPR ~97-99%); (5) dependencia estatistica: 48 queries x ~293 repeticoes = n efetivo ~240 clusters, exige GLMM cluster-robusto. Tese pivotada do paper: Anchor-Entity Concentration in LLM Brand Citations - a visibilidade setorial em LLMs e dominada por entidades-ancora (caso Nubank), com heterogeneidade radical por engine e licoes de medicao. Janela v2 aberta ate ~21/jul permite re-coleta sem truncamento."
 
 run_wave () {
   local n="$1"; shift
   local demanda="$1"
-  echo "=== PR_WAVE $n start $(date -u +%H:%M:%S) ==="
-  bash "$BRIDGE" board "$demanda" > "$DIR/pr_wave_${n}.log" 2>&1
+  local demanda_full
+  demanda_full="$demanda
+
+$BLOCO"
+  local tam
+  tam=$(printf '%s' "$demanda_full" | wc -c)
+  if [ "$tam" -gt 5000 ]; then
+    echo "AVISO: demanda da PR_WAVE $n tem $tam bytes, acima do teto de 5000 do orchestrator. Encurte o CTX, não o bloco editorial." >&2
+  fi
+  echo "=== PR_WAVE $n start $(date -u +%H:%M:%S) (demanda $tam bytes) ==="
+  bash "$BRIDGE" board "$demanda_full" > "$DIR/pr_wave_${n}.log" 2>&1
   echo "=== PR_WAVE $n exit=$? end $(date -u +%H:%M:%S) ==="
 }
 

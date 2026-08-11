@@ -2,6 +2,14 @@
 update-docs.py -- Atualização automática de documentação evolutiva
 Roda após cada coleta para manter docs sincronizados com o estado real.
 
+Doutrina editorial (v4, 11/08/2026): o texto escrito aqui entra em documento que
+gente lê, então vale a mesma cadeia do texto escrito à mão, DIRETRIZ_EDITORIAL.md
+(regra), GUIA_ESCRITA_HUMANIZADA.md (exemplo) e DOUTRINA_EDITORIAL_NESTE_REPO.md
+(tradução para este pipeline), na raiz do repo. O que morde num gerador: toda
+métrica sai do banco e nunca de constante escrita à mão; toda taxa aparece com o
+denominador ao lado; rótulo em português sem title case; nenhuma frase promete
+resultado que a consulta não devolveu.
+
 Atualiza:
   - docs/CHANGELOG.md (métricas auto-geradas)
   - docs/GOVERNANCE.md (resumo FinOps)

@@ -6,6 +6,10 @@ Guia de escrita científica para a linha de pesquisa GEO/LLM. Foca no que é esp
 **Público-alvo:** Alexandre Caramaschi e co-autores futuros preparando submissões SSRN, ArXiv, Q1 journals.
 **Linguagem:** manuscripts em inglês acadêmico. Este guia em PT-BR com exemplos bilíngues.
 
+## 0. Relação com a doutrina editorial
+
+Este guia trata do manuscrito em inglês acadêmico. Tudo o que for escrito em português neste repositório, incluindo abstract traduzido, resumo para divulgação, onda de pesquisa, relatório e página pública, obedece à cadeia da raiz: `DIRETRIZ_EDITORIAL.md` como regra, `GUIA_ESCRITA_HUMANIZADA.md` como exemplo prático e `DOUTRINA_EDITORIAL_NESTE_REPO.md` como tradução para o trabalho deste pipeline. Três exigências atravessam os dois idiomas e não são negociáveis nem em inglês: proveniência completa por número (amostra, período, método e denominador na mesma frase), atribuição nomeada em vez de "studies show", e identificador conferido antes de citar.
+
 ---
 
 ## 1. Estrutura IMRAD e Variações
@@ -312,15 +316,17 @@ Dedicar uma subseção por categoria em Discussion.
 
 ### 8.7 Evitar hype vocabulary
 
-Listas negras para GEO papers:
+A lista abaixo sozinha não melhora manuscrito nenhum, e vale registrar o motivo: doutrina feita só de palavra proibida produz texto limpo e vazio, que passa em qualquer verificação automática. A regra de composição vem primeiro, a lista vem depois como lembrete.
+
+Regra de composição: substitua o adjetivo pelo número, pela comparação ou pela consequência que o justificaria. "The framework achieved unprecedented improvement" não se conserta trocando "unprecedented" por "notable"; conserta-se escrevendo "citation rate rose from 14.5% to 28.2% (n = 50,453; April 23 to June 9, 2026)". Quando não existe número para pôr no lugar, a afirmação era adjetivo e sai.
+
+Lembrete das expressões que reviewer marca em GEO papers:
 
 - "revolutionary", "groundbreaking", "game-changing"
 - "AI-powered" (todo paper de AI é AI-powered)
 - "novel approach" (deixe o reviewer decidir)
 - "state-of-the-art" (só se batido benchmark público)
 - "unprecedented"
-
-Substituir por descrição factual.
 
 ---
 
