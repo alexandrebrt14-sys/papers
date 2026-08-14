@@ -72,20 +72,23 @@ jobs:
                        "Sem base nao ha o que medir, e publicar zeros apagaria "
                        "o ultimo checkpoint valido. Verifique o step Download DB.")
 
+          # O FinOps grava em finops_usage (schema real da base); a tabela
+          # llm_calls consultada aqui entre 10/08 e 14/08 nunca existiu no
+          # schema e derrubou o monitor em toda execucao desde o merge do gate.
           con = sqlite3.connect(db)
           try:
-              n = con.execute("SELECT COUNT(*) FROM llm_calls").fetchone()[0]
+              n = con.execute("SELECT COUNT(*) FROM finops_usage").fetchone()[0]
           except sqlite3.Error as e:
               con.close()
-              sys.exit(f"ABORTADO: nao consegui ler llm_calls em {db}: {e}")
+              sys.exit(f"ABORTADO: nao consegui ler finops_usage em {db}: {e}")
           con.close()
 
           if n == 0:
-              sys.exit("ABORTADO: llm_calls esta vazia. O monitor produziria "
+              sys.exit("ABORTADO: finops_usage esta vazia. O monitor produziria "
                        "monthly_spend=0 para todos os provedores e o commit "
                        "sobrescreveria o checkpoint bom.")
 
-          print(f"Base restaurada com {n} chamadas em llm_calls. Seguindo.")
+          print(f"Base restaurada com {n} chamadas em finops_usage. Seguindo.")
           PY
 
       - name: Validate Python imports
