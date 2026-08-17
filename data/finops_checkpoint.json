@@ -1,53 +1,53 @@
 {
-  "generated_at": "2026-08-16T22:06:05.785595+00:00",
+  "generated_at": "2026-08-17T12:10:03.939700+00:00",
   "budgets": [
     {
       "platform": "openai",
       "monthly_spend": 0.7329,
       "monthly_limit": 30.0,
       "monthly_pct": 2.4,
-      "daily_spend": 0.1947,
+      "daily_spend": 0,
       "daily_limit": 2.0,
-      "daily_pct": 9.7,
+      "daily_pct": 0.0,
       "is_blocked": false,
-      "queries_today": 1024,
-      "tokens_today": 341118
+      "queries_today": 0,
+      "tokens_today": 0
     },
     {
       "platform": "anthropic",
       "monthly_spend": 4.8444,
       "monthly_limit": 40.0,
       "monthly_pct": 12.1,
-      "daily_spend": 1.2918,
+      "daily_spend": 0,
       "daily_limit": 3.0,
-      "daily_pct": 43.1,
+      "daily_pct": 0.0,
       "is_blocked": false,
-      "queries_today": 1024,
-      "tokens_today": 343267
+      "queries_today": 0,
+      "tokens_today": 0
     },
     {
       "platform": "google",
       "monthly_spend": 5.9831,
       "monthly_limit": 90.0,
       "monthly_pct": 6.6,
-      "daily_spend": 0.9564,
+      "daily_spend": 0,
       "daily_limit": 3.0,
-      "daily_pct": 31.9,
+      "daily_pct": 0.0,
       "is_blocked": false,
-      "queries_today": 1024,
-      "tokens_today": 397908
+      "queries_today": 0,
+      "tokens_today": 0
     },
     {
       "platform": "perplexity",
       "monthly_spend": 0.2669,
       "monthly_limit": 30.0,
       "monthly_pct": 0.9,
-      "daily_spend": 0.0741,
+      "daily_spend": 0,
       "daily_limit": 2.0,
-      "daily_pct": 3.7,
+      "daily_pct": 0.0,
       "is_blocked": false,
-      "queries_today": 384,
-      "tokens_today": 74071
+      "queries_today": 0,
+      "tokens_today": 0
     }
   ],
   "alerts_recent": [
@@ -2120,22 +2120,22 @@
     "platforms": {
       "openai": {
         "last_activity": "2026-08-16T22:05:51.034446+00:00",
-        "hours_ago": 0.0,
+        "hours_ago": 14.1,
         "stale": false
       },
       "anthropic": {
         "last_activity": "2026-08-16T22:05:53.128788+00:00",
-        "hours_ago": 0.0,
+        "hours_ago": 14.1,
         "stale": false
       },
       "google": {
         "last_activity": "2026-08-16T22:05:54.187513+00:00",
-        "hours_ago": 0.0,
+        "hours_ago": 14.1,
         "stale": false
       },
       "perplexity": {
         "last_activity": "2026-08-16T22:01:28.255725+00:00",
-        "hours_ago": 0.1,
+        "hours_ago": 14.1,
         "stale": false
       }
     }
