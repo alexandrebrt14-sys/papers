@@ -496,7 +496,7 @@ def mandatory_llms() -> set[str]:
     Override em dev:
         MANDATORY_LLMS=ChatGPT,Claude  (só esses dois obrigatórios)
     """
-    raw = os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Groq")
+    raw = os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Grok")
     return {n.strip() for n in raw.split(",") if n.strip()}
 
 
@@ -604,12 +604,22 @@ class CollectionConfig:
             supports_batch=False,
         ),
         LLMConfig(
-            name="Groq",
-            provider="groq",
-            model="llama-3.3-70b-versatile",  # Open-weight, ultra-fast inference, diversifica amostra
-            api_key=os.getenv("GROQ_API_KEY"),
-            input_cost_per_mtok=0.59,
-            output_cost_per_mtok=0.79,
+            name="Grok",
+            provider="xai",
+            # 2026-08-19: braço Groq SUBSTITUÍDO por xAI Grok (decisão do
+            # Alexandre). Motivo imediato: a Groq aposentou o
+            # llama-3.3-70b-versatile (404 model_not_found desde ~17/08,
+            # 5 coletas abortadas). Motivo de fundo: Grok é motor de resposta
+            # REAL de consumidor (X/standalone) — para um estudo de citação
+            # generativa vale mais que um host de inferência open-weight.
+            # Id LITERAL fixado: grok-latest aponta para modelo velho, nunca
+            # usar. grok-4.6 raciocina por padrão (reasoning_tokens cobrados
+            # como output; max_tokens não corta o raciocínio, o content vem
+            # inteiro). Troca de braço = EVENTO DE SÉRIE (ver CHANGELOG).
+            model="grok-4.6",
+            api_key=os.getenv("XAI_API_KEY"),
+            input_cost_per_mtok=2.00,   # tabela oficial xAI (sondagem 12/08/2026)
+            output_cost_per_mtok=6.00,
             max_output_tokens=800,
             supports_json_mode=True,
             supports_batch=False,

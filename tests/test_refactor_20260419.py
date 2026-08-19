@@ -116,7 +116,7 @@ def test_get_queries_respects_include_fictional_flag():
 
 def test_mandatory_llms_default_all_five(monkeypatch):
     monkeypatch.delenv("MANDATORY_LLMS", raising=False)
-    assert mandatory_llms() == {"ChatGPT", "Claude", "Gemini", "Perplexity", "Groq"}
+    assert mandatory_llms() == {"ChatGPT", "Claude", "Gemini", "Perplexity", "Grok"}
 
 
 def test_mandatory_llms_override(monkeypatch):

@@ -61,9 +61,17 @@ PRICING: dict[str, dict[str, dict[str, float]]] = {
         "_default":                               {"input": 1.00,  "output": 1.00},
     },
     "groq": {
+        # Braço aposentado em 2026-08-19 (modelo retirado pela Groq); tabela
+        # mantida para recomputo de custo das observações históricas.
         "llama-3.3-70b-versatile":                {"input": 0.59,  "output": 0.79},
         "llama-3.1-8b-instant":                   {"input": 0.05,  "output": 0.08},
         "_default":                               {"input": 0.59,  "output": 0.79},
+    },
+    "xai": {
+        # grok-4.6 raciocina por padrão; reasoning_tokens são cobrados como
+        # output (tabela oficial xAI, sondagem 12/08/2026).
+        "grok-4.6":                               {"input": 2.00,  "output": 6.00},
+        "_default":                               {"input": 2.00,  "output": 6.00},
     },
 }
 
@@ -83,6 +91,9 @@ DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
     "google":     {"monthly": 90.0, "daily": 3.00, "alert_pct": 0.80, "hard_stop_pct": 1.00},
     "perplexity": {"monthly": 25.0, "daily": 1.20, "alert_pct": 0.70, "hard_stop_pct": 0.95},
     "groq":       {"monthly": 10.0, "daily": 0.50, "alert_pct": 0.80, "hard_stop_pct": 1.00},
+    # xai: braço Grok desde 2026-08-19. 70 chamadas/dia × (~1k in + ~1k out com
+    # reasoning) ≈ $0.56/dia — teto com folga ~2x.
+    "xai":        {"monthly": 25.0, "daily": 1.20, "alert_pct": 0.75, "hard_stop_pct": 0.95},
     "global":     {"monthly": 100.0, "daily": 5.00, "alert_pct": 0.70, "hard_stop_pct": 0.95},
 }
 

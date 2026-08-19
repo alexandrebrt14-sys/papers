@@ -4,6 +4,39 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [ops] — 2026-08-19 (robustez TLS + braço Groq restaurado)
+
+Duas mudanças operacionais para destravar a coleta neste desktop; **uma delas é
+evento de série** e deve ser considerada em qualquer análise longitudinal.
+
+### Fixed
+
+- **TLS delegado ao cert store do SO** (`src/__init__.py` + dep `truststore`):
+  antivírus MITM (Avast) derruba a coleta com `CERTIFICATE_VERIFY_FAILED` de
+  forma intermitente; no Python 3.13 o `VERIFY_X509_STRICT` torna o conserto
+  clássico de `SSL_CERT_FILE` inócuo. Kill-switch: `PAPERS_NO_TRUSTSTORE=1`.
+  Nenhum efeito sobre o dado coletado.
+
+### Changed
+
+- **⚠️ EVENTO DE SÉRIE — braço Groq SUBSTITUÍDO por xAI Grok**: a Groq aposentou
+  o `llama-3.3-70b-versatile` (404 `model_not_found`) em ~17-08 e **5 coletas
+  consecutivas abortaram no preflight** (última observação Groq: 16-08 21h BRT;
+  runs #294–#298, issue #52). Decisão do Alexandre: Groq deixa de ser
+  necessário; entra o **Grok da xAI** (`grok-4.6`, id literal — `grok-latest`
+  aponta para modelo velho), que é motor de resposta real de consumidor e por
+  isso mais alinhado ao objeto do estudo do que um host de inferência.
+  Mudanças: `provider="xai"` + `_query_xai` no client, preflight `check_grok`,
+  `MANDATORY_LLMS` → `...,Grok` (default, workflow e **variável do repo**),
+  secret `XAI_API_KEY` no Actions, FinOps com tabela xai ($2/$6 por Mtok;
+  grok-4.6 raciocina por padrão e o reasoning é cobrado como output; teto
+  mensal $25) e cor do Grok no dashboard. Tabelas e metadados do braço Groq
+  permanecem para as observações históricas. Observações pré (Groq/Llama) e
+  pós (xAI/Grok) **não são comparáveis** no 5º braço; `drift_detector` e
+  cortes temporais devem tratar **2026-08-17→19 como lacuna + fronteira**.
+
+---
+
 ## [docs] — 2026-06-01 (estado da arte GEO · documental, sem tocar coleta)
 
 Atualização **exclusivamente documental** rumo ao Paper 5. Nenhuma mudança na mecânica de coleta: pipeline, `config*.py`, cohort/battery, schema do `papers.db`, workflows e geradores de saída (`generate_dashboard_json.py`, `compute_weekly_deltas.py`) permanecem congelados. Reprodutibilidade bit-a-bit preservada.

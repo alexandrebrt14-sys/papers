@@ -54,6 +54,7 @@ LLM_META = {
     "ChatGPT": {"provider": "OpenAI", "model": "gpt-4o-mini-2024-07-18", "color": "#10a37f"},
     "Gemini": {"provider": "Google", "model": "gemini-2.5-pro", "color": "#4285f4"},
     "Groq": {"provider": "Groq", "model": "llama-3.3-70b-versatile", "color": "#f55036"},
+    "Grok": {"provider": "xAI", "model": "grok-4.6", "color": "#0f1419"},
 }
 
 VERT_META = {

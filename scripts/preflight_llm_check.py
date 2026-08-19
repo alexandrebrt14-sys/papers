@@ -137,19 +137,21 @@ def check_perplexity(key: str) -> ProviderCheck:
     ))
 
 
-def check_groq(key: str) -> ProviderCheck:
+def check_grok(key: str) -> ProviderCheck:
+    # grok-4.6 raciocina por padrão: max_tokens baixo não corta o content,
+    # mas 16 dá folga e o custo do probe segue desprezível.
     if not key:
-        return ProviderCheck("groq", False, 0, "GROQ_API_KEY ausente")
-    return _post_with_retry("groq", lambda: httpx.post(
-        "https://api.groq.com/openai/v1/chat/completions",
+        return ProviderCheck("grok", False, 0, "XAI_API_KEY ausente")
+    return _post_with_retry("grok", lambda: httpx.post(
+        "https://api.x.ai/v1/chat/completions",
         headers={"Authorization": f"Bearer {key}"},
         json={
-            "model": "llama-3.3-70b-versatile",
+            "model": "grok-4.6",
             "messages": [{"role": "user", "content": "ok"}],
-            "max_tokens": 1,
+            "max_tokens": 16,
             "temperature": 0,
         },
-        timeout=15,
+        timeout=30,
     ))
 
 
@@ -162,7 +164,7 @@ def main() -> int:
         check_anthropic(os.environ.get("ANTHROPIC_API_KEY", "")),
         check_google(os.environ.get("GOOGLE_AI_API_KEY", "")),
         check_perplexity(os.environ.get("PERPLEXITY_API_KEY", "")),
-        check_groq(os.environ.get("GROQ_API_KEY", "")),
+        check_grok(os.environ.get("XAI_API_KEY", "")),
     ]
 
     # Mandatory vs opcional: so providers em MANDATORY_LLMS bloqueiam a coleta.
@@ -173,7 +175,7 @@ def main() -> int:
     # Default mantem todos os 5 obrigatorios — o workflow e quem marca opcionais.
     mandatory = {
         n.strip().lower()
-        for n in os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Groq").split(",")
+        for n in os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Grok").split(",")
         if n.strip()
     }
 

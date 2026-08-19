@@ -26,6 +26,10 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "pydantic>=2.0",
+    # TLS pelo cert store do SO (src/__init__.py): sem ele, antivírus MITM
+    # (Avast) derruba a coleta com CERTIFICATE_VERIFY_FAILED de forma
+    # intermitente, e no Python 3.13 nem SSL_CERT_FILE salva (strict check).
+    "truststore>=0.9",
 ]
 
 [project.optional-dependencies]

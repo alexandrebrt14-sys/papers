@@ -232,6 +232,7 @@ class LLMClient:
             "google": self._query_google,
             "perplexity": self._query_perplexity,
             "groq": self._query_groq,
+            "xai": self._query_xai,
         }
         fn = dispatch.get(llm.provider)
         if not fn:
@@ -419,6 +420,42 @@ class LLMClient:
 
         resp = self._http.post(
             "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {llm.api_key}"},
+            json=body,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["choices"][0]["message"]["content"]
+        usage = data.get("usage", {})
+
+        parsed = self._parse_json_response(text) if self._json_mode else self._analyze_response_posthoc(text)
+
+        return self._build_response(
+            llm, prompt, start, text, parsed,
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
+            raw=data,
+        )
+
+    def _query_xai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """xAI Grok (endpoint OpenAI-compatible). Motor de resposta de consumidor;
+        grok-4.6 raciocina por padrão e o reasoning é cobrado como output."""
+        messages: list[dict[str, str]] = []
+        if self._json_mode:
+            messages.append({"role": "system", "content": SYSTEM_PROMPT})
+        messages.append({"role": "user", "content": prompt})
+
+        body: dict[str, Any] = {
+            "model": llm.model,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": llm.max_output_tokens,
+        }
+        if self._json_mode and llm.supports_json_mode:
+            body["response_format"] = {"type": "json_object"}
+
+        resp = self._http.post(
+            "https://api.x.ai/v1/chat/completions",
             headers={"Authorization": f"Bearer {llm.api_key}"},
             json=body,
         )
