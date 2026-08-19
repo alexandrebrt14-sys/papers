@@ -63,6 +63,7 @@ jobs:
           ANTHROPIC_API_KEY: "test-key-for-import-only"
           GOOGLE_AI_API_KEY: "test-key-for-import-only"
           GROQ_API_KEY: "test-key-for-import-only"
+          XAI_API_KEY: "test-key-for-import-only"
           PERPLEXITY_API_KEY: "test-key-for-import-only"
         run: pytest --tb=short -q
 

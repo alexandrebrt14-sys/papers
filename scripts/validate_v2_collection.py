@@ -63,7 +63,7 @@ def main() -> int:
 
     # 2. Per-LLM coverage
     print(f"\n2. Per-LLM coverage:")
-    MANDATORY = {"chatgpt", "claude", "gemini", "perplexity", "groq"}
+    MANDATORY = {"chatgpt", "claude", "gemini", "perplexity", "grok"}
     rows = conn.execute(
         "SELECT LOWER(llm) AS llm, COUNT(*) AS n FROM citations WHERE timestamp >= ? GROUP BY llm",
         (since_iso,)

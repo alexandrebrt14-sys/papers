@@ -342,6 +342,62 @@ def query_perplexity(query: str, api_key: str) -> dict | None:
         return None
 
 
+def query_grok(query: str, api_key: str) -> dict | None:
+    """xAI Grok 4.6 — motor de resposta de consumidor, endpoint OpenAI-compatible.
+
+    Substituiu query_groq em 2026-08-19 (Groq aposentou o
+    llama-3.3-70b-versatile e o braço saiu do painel). grok-4.6 raciocina
+    por padrão; max_tokens não corta o content."""
+    cached = _cache_get("grok", query)
+    if cached:
+        return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
+
+    def _do():
+        r = requests.post(
+            "https://api.x.ai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": "grok-4.6",
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": query},
+                ],
+                "temperature": 0.0,
+                "max_tokens": 250,
+            },
+            timeout=45,
+        )
+        r.raise_for_status()
+        return r
+
+    start = time.time()
+    try:
+        r = _retry_request(_do)
+        if r is None:
+            return None
+        data = r.json()
+        latency = int((time.time() - start) * 1000)
+        text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        parsed = _parse_json(text)
+        usage = data.get("usage", {})
+        result = {
+            "content": parsed.get("summary", text[:200]),
+            "model": "grok-4.6",
+            "latency_ms": latency,
+            "tokens": usage.get("total_tokens", 0),
+            "input_tokens": usage.get("prompt_tokens", 0),
+            "output_tokens": usage.get("completion_tokens", 0),
+            "sources": parsed.get("sources", []),
+            "cited_entities": parsed.get("cited", []),
+            "from_cache": False,
+        }
+        _cache_put("grok", query, result)
+        return result
+    except Exception as e:
+        print(f"    [FAIL] Grok: {e}")
+        return None
+
+
 def query_groq(query: str, api_key: str) -> dict | None:
     """Groq Llama 3.3 70B — ultra-fast inference via OpenAI-compatible API."""
     cached = _cache_get("groq", query)
@@ -401,7 +457,10 @@ LLM_ADAPTERS = {
     "anthropic": {"fn": query_anthropic, "env_key": "ANTHROPIC_API_KEY", "label": "Claude/Anthropic"},
     "gemini":    {"fn": query_gemini,    "env_key": "GEMINI_API_KEY",    "label": "Gemini/Google"},
     "perplexity":{"fn": query_perplexity,"env_key": "PERPLEXITY_API_KEY","label": "Perplexity"},
-    "groq":      {"fn": query_groq,      "env_key": "GROQ_API_KEY",     "label": "Groq/Llama"},
+    # "groq" saiu do registry em 2026-08-19: o modelo fixado foi aposentado
+    # pela Groq e o braço foi substituído pelo Grok da xAI (query_groq fica
+    # no arquivo só como referência histórica do que coletou até 16/08).
+    "grok":      {"fn": query_grok,      "env_key": "XAI_API_KEY",      "label": "Grok/xAI"},
 }
 
 
