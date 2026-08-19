@@ -67,7 +67,14 @@ Invariantes:
 | Claude | `claude-haiku-4-5-20251001` | parametric |
 | Gemini | `gemini-2.5-pro` | parametric |
 | Perplexity | `sonar` | RAG (single native) |
-| Groq | `llama-3.3-70b-versatile` | parametric (open-weight) |
+| Grok | `grok-4.6` | parametric (motor de consumidor; reasoning nativo) |
+
+> **Evento de série (2026-08-19):** até 16-08-2026 o 5º braço era Groq
+> `llama-3.3-70b-versatile` (parametric, open-weight). A Groq aposentou o
+> modelo (~17-08) e o braço foi substituído pelo Grok da xAI; lacuna de
+> coleta no 5º braço em 17→19-08. Observações pré e pós-fronteira **não são
+> comparáveis** nesse braço; análises longitudinais devem estratificar ou
+> truncar o 5º braço nessa data. Detalhes no CHANGELOG (`[ops] 2026-08-19`).
 
 **Scaling observation** (Kaplan): trimestral, cohort ampliado para incluir `gemini-2.5-flash`, `gpt-4o` full, `claude-sonnet-4-6` em rotação.
 

@@ -39,7 +39,7 @@ Canonical pillars:
 |---|---|
 | Verticals | 4 (Fintech, Retail, Healthcare, Technology) |
 | Entities | 127 (79 Brazilian real + 32 international anchors + 16 fictional decoys) |
-| LLM Models | 5 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Pro, Perplexity Sonar, Groq Llama 3.3 70B) |
+| LLM Models | 5 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Pro, Perplexity Sonar, xAI Grok 4.6 — até 16-08-2026 o 5º braço era Groq Llama 3.3 70B; ver CHANGELOG 2026-08-19) |
 | Queries per vertical | 48 balanced (battery v2 = 192 canonical) |
 | Daily observations | ~1,420/day measured (5 models x query battery x 4 verticals) |
 | Observations collected | 63,940 queries, 22,527 citations, 25,134 contexts, 240 runs (as of 2026-06-23; live: [alexandrecaramaschi.com/research](https://alexandrecaramaschi.com/research)) |
