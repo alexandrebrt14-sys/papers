@@ -8,7 +8,7 @@
 
 ## 0. Sumário executivo (TL;DR) — o que é NOVO em relação à Wave Julho (14-jul)
 
-A novidade estrutural desta wave não é mais um número de mercado: é a **maturação do corpus científico de GEO**. Em 22-jul-2026 existem **32 papers únicos relevantes no arXiv** (31 com ID de 2026; 1 submetido em 30-dez-2025 e anunciado em jan/2026), todos com existência e abstract verificados via API nesta coleta — incluindo um survey crítico do campo (jul/2026), frameworks de medição em dois estágios (seleção vs absorção de citação), o primeiro baseline de visibilidade de marca em escala que localizamos (100k+ respostas), benchmarks de manipulação e defesas propostas, e a fronteira "agent-ready". A ciência de 2026 valida parte do nosso corpus, corrige exageros do mercado e entrega protocolos de medição prontos para adoção. Profundidade de verificação: existência + abstract; os números citados derivam dos abstracts; PDFs completos NÃO foram lidos nesta wave (ler antes de citar em paper ou copy).
+A novidade estrutural desta wave não é mais um número de mercado: é a **maturação do corpus científico de GEO**. Em 22-jul-2026 existem **32 papers únicos relevantes no arXiv** (todos com ID de anúncio de 2026; um deles, `2601.00869`, submetido em 30-dez-2025), todos com existência e abstract verificados via API nesta coleta — incluindo um survey crítico do campo (jul/2026), frameworks de medição em dois estágios (seleção vs absorção de citação), o primeiro baseline de visibilidade de marca em escala que localizamos (100k+ respostas), benchmarks de manipulação e defesas propostas, e a fronteira "agent-ready". A ciência de 2026 valida parte do nosso corpus, corrige exageros do mercado e entrega protocolos de medição prontos para adoção. Profundidade de verificação: existência + abstract; os números citados derivam dos abstracts; PDFs completos NÃO foram lidos nesta wave (ler antes de citar em paper ou copy).
 
 | Achado NOVO (não estava na Wave Julho) | Número-chave / fonte primária | Impacto canônico |
 |---|---|---|
@@ -153,7 +153,7 @@ Conflito entre fontes da mesma wave resolve-se por esta escala, da mais forte pa
 - **Literatura pronta:** a lista-mestre do §1 é a revisão de literatura viva dos 4 papers em produção; 2606.20065 (Ranqo) e 2604.25707 (geo-citation-lab) são os comparáveis diretos do nosso desenho (cohort de 5 LLMs, 127 entidades). Citar o survey 2607.14035 no related work de todos.
 - **METHODOLOGY_V2:** incorporar formalmente (a) visibilidade como distribuição com N execuções e IC (2604.07585); (b) vetor de 4 camadas como variáveis dependentes distintas; (c) discutir controle on-domain (2606.04362) como padrão-ouro de causalidade que nosso desenho observacional não alcança — limitação declarada e agenda futura.
 - **Oportunidade de contribuição:** nenhum dos 32 papers coletados nas 3 queries cobre mercado brasileiro/língua portuguesa (escopo: arXiv apenas; bases fora do arXiv não foram varridas nesta wave); nosso dataset de 127 entidades BR segue como lacuna publicável (conversa com Existence Gap 2601.00869).
-- **Anti-GhostCite:** os 33 IDs deste doc foram verificados via API em 22-jul-2026; qualquer citação futura reabre o `abs` antes de canonizar.
+- **Anti-GhostCite:** os 32 IDs deste doc foram verificados via API em 22-jul-2026; qualquer citação futura reabre o `abs` antes de canonizar.
 
 ### 8.2. `landing-page-geo` (site alexandrecaramaschi.com)
 - **MEASUREMENT_ARCHITECTURE:** evoluir o funil de medição para as 4 camadas (descobribilidade, citação, absorção, resultado); nos 25 prompts canônicos (docs/geo/llm-mention-rate-canonical-25-prompts.md), registrar N≥5 execuções por prompt com variância e repetibilidade, e rodar a rubrica mensal de absorção do §2.4.
@@ -165,7 +165,7 @@ Conflito entre fontes da mesma wave resolve-se por esta escala, da mais forte pa
 - **Aulas candidatas novas (spine):** "Medição como distribuição" (2604.07585 + 2606.04362), "Seleção vs absorção de citação" (2604.25707), "Diagnóstico antes de reescrita" (2603.09296), "Sites agent-ready" (2607.12056), "Defesas dos motores e GEO ético" (2605.21948/2605.09314).
 - **Prompts do pipeline:** `research.md` passa a exigir arXiv ID verificado para claim acadêmico; o Checklist de Citabilidade GEO em `draft.md` ganha os itens do §3 (evidência extraível, preço/data explícitos, estrutura 3 níveis, portfólio de queries).
 - **Gates:** `content_checker.py` (bloco `geo_2026` do client.yaml): considerar contadores para "definição citável" e "data visível" além de Cite Sources/Statistics/Quotation; `reviewer.py` pune autoridade fabricada e comparativo sem fonte (alinha com SCI-Defense).
-- **Corrigir ponteiro obsoleto no CLAUDE.md:** a linha que referencia `docs/knowledge/geo-aeo/` aponta para pasta inexistente; substituir pela trilha de waves.
+- **Ponteiro obsoleto no CLAUDE.md:** a linha que referenciava `docs/knowledge/geo-aeo/` (pasta inexistente) foi corrigida no commit desta própria wave — a trilha canônica é a sequência de waves em `docs/research/`. Nada a fazer; registro mantido para histórico.
 
 ---
 
@@ -180,7 +180,7 @@ Conflito entre fontes da mesma wave resolve-se por esta escala, da mais forte pa
 4. Lições operacionais registradas: `sonar-deep-research` trunca em 8.192 tokens e perde a lista de referências — pedir relatórios mais curtos por tema ou usar `sonar-pro` em fatias; Grok recusa períodos futuros ("2026" no prompt) — formular "mais recentes disponíveis"; redirecionamento de shell precisa de caminho absoluto (falha silenciosa em `/`).
 
 ### Referências principais (verificadas nesta wave)
-- arXiv: os 33 IDs do §1 (abs verificados em 22-jul-2026).
+- arXiv: os 32 IDs do §1 (abs verificados em 22-jul-2026).
 - ahrefs.com/blog/ai-overviews-reduce-clicks-update/ (04-fev-2026) · ahrefs.com/brand-radar (jul/2026) · blog.timsoulo.com/geo-tool-market-analysis-47-vendors-one-commodity-and-the-data-problem/ (05-mar-2026) · ahrefs.com/blog/ai-brand-visibility-correlations/ · ahrefs.com/blog/chatgpts-most-cited-pages/
 - semrush.com/news/463141 (26-jun-2026) · news.adobe.com/news/2026/04/adobe-completes-semrush-acquisition (28-abr-2026) · experienceleague.adobe.com/en/docs/llm-optimizer/using/home
 - seoclarity.net/chatgpt-citation-decline-analysis (mar/2026) · seoclarity.net/resources/news/seoclarity-launches-livewire-seo-and-aeo-intelligence (jul/2026) · conductor.com/academy/aeo-geo-benchmarks-report/
