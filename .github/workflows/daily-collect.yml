@@ -362,6 +362,20 @@ jobs:
         run: python scripts/validate_v2_collection.py --since-minutes 120 --verbose
         continue-on-error: true
 
+      # Guard distribucional (2026-08-31). Os validadores acima conferem que o
+      # dado ESTA LA: cobertura por LLM e vertical, colunas v2 populadas, drift
+      # de versao. Nenhum deles pergunta se a variavel medida tem forma
+      # plausivel, e foi exatamente por ai que a janela de observacao ficou
+      # assimetrica entre bracos por meses com o pipeline verde e 223 testes
+      # passando. Este step olha a DISTRIBUICAO: massa empilhada num unico
+      # comprimento, variavel sem variancia, janela divergente entre bracos, e
+      # integra declarada mas nao gravada.
+      # Sem continue-on-error: assimetria de janela invalida a comparacao entre
+      # motores, que e o objeto do estudo, e um dia gravado assim entra na serie
+      # parecendo bom.
+      - name: Guard distribucional (forma da variavel medida)
+        run: python scripts/distribution_guard.py check --since-days 2 --verbose
+
       # ================================================================
       # ARTIFACT UPLOAD INTERMEDIARIO — safety net antes do finalize.
       # Se qualquer step de finalize falhar, o DB com dados coletados

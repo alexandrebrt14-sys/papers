@@ -13,10 +13,11 @@ o índice está lendo a parte menos informativa da medição.
     P  proeminência   1 menos o offset relativo da primeira menção, na média
     B  amplitude      fração dos motores do painel que citam a entidade
 
-A média geométrica é escolha substantiva, não conveniência: ela é
-não-compensatória. Ser invisível num motor não pode ser compensado por força em
-outro, porque a entidade ausente de um motor está ausente para todo usuário
-daquele motor. Média aritmética deixaria um braço forte mascarar ausência.
+A média geométrica é invariante a reescalonamento dos componentes e penaliza
+desequilíbrio entre eles mais que a aritmética. Ela é às vezes descrita como
+não-compensatória, o que só vale no limite: zera apenas quando um componente é
+exatamente zero, e uma entidade ausente de um motor entre seis mantém B = 5/6,
+que uma cobertura maior compensa sem dificuldade. A penalização é gradual.
 
 USO
 
@@ -47,10 +48,18 @@ from src.config_v2 import get_v2_cohort
 
 VERTICAIS = ("fintech", "varejo", "saude", "tecnologia")
 JANELA_PADRAO = 200
-# Um motor entra no painel quando tem observações suficientes para que a
-# amplitude signifique algo. Abaixo disso, um braço recém-incluído derrubaria o
-# B de toda a coorte por ainda não ter coletado, não por não citar.
-MIN_OBS_PARA_ENTRAR_NO_PAINEL = 500
+# O painel é definido por ATIVIDADE, não por volume acumulado.
+#
+# Qualquer limiar de contagem, absoluto ou fracionário, favorece o braço
+# aposentado contra o braço novo: em 31/08/2026 o painel de referência incluía
+# o Groq, encerrado em 16/08 com meses de volume histórico, e excluía o Grok,
+# que o substituiu em 23/08 e ainda tinha poucas observações. O índice rodava
+# sobre um painel com um motor morto e sem um motor vivo, e a amplitude B —
+# um terço do índice — era calculada contra esse painel errado.
+#
+# Um motor está no painel quando produziu observações na janela recente do
+# período analisado. Braço que parou de coletar sai; braço que entrou, entra.
+DIAS_PARA_CONSIDERAR_ATIVO = 14
 
 
 def _extrator(vertical: str) -> EntityExtractor:
@@ -61,10 +70,33 @@ def _extrator(vertical: str) -> EntityExtractor:
     )
 
 
-def componentes(con: sqlite3.Connection, vertical: str, janela: int) -> tuple[list[dict], list[str], int]:
+def motores_ativos(con: sqlite3.Connection, vertical: str,
+                   dias: int = DIAS_PARA_CONSIDERAR_ATIVO) -> set[str]:
+    """Motores que coletaram na janela recente do período disponível.
+
+    Ancorado no último timestamp DO DADO, não em `now`: o script precisa dar o
+    mesmo painel ao rodar hoje ou daqui a seis meses sobre o mesmo banco.
+    """
+    fim = con.execute(
+        "SELECT MAX(timestamp) FROM citations WHERE vertical = ?", (vertical,)
+    ).fetchone()[0]
+    if not fim:
+        return set()
+    linhas = con.execute(
+        "SELECT DISTINCT llm FROM citations WHERE vertical = ? "
+        "AND timestamp >= datetime(?, ?)",
+        (vertical, fim, f"-{int(dias)} days"),
+    ).fetchall()
+    return {r[0] for r in linhas}
+
+
+def componentes(con: sqlite3.Connection, vertical: str, janela: int,
+                dias_ativo: int = DIAS_PARA_CONSIDERAR_ATIVO,
+                ) -> tuple[list[dict], list[str], int]:
     """Devolve (linhas, motores do painel, n de observações)."""
     ext = _extrator(vertical)
     con.row_factory = sqlite3.Row
+    ativos = motores_ativos(con, vertical, dias_ativo)
     rows = con.execute(
         "SELECT llm, response_text FROM citations "
         "WHERE is_probe = 0 AND vertical = ? AND response_text IS NOT NULL",
@@ -78,7 +110,16 @@ def componentes(con: sqlite3.Connection, vertical: str, janela: int) -> tuple[li
     for r in rows:
         obs_por_motor[r["llm"]] += 1
         texto = r["response_text"][:janela] if janela else r["response_text"]
-        comprimento = max(len(texto), 1)
+        # A proeminencia normaliza pela JANELA DECLARADA, nao pelo comprimento
+        # da resposta. Com o comprimento no denominador, a mesma entidade no
+        # mesmo offset absoluto recebe P diferente conforme o modelo tenha
+        # respondido curto ou longo, e o componente deixa de ser comparavel
+        # entre motores — que e exatamente a comparacao que o indice faz.
+        # Sob janela fixa os dois denominadores coincidem para quase toda
+        # resposta, entao a correcao nao move os numeros ja publicados; ela
+        # importa quando a janela e desligada (--window 0) e os comprimentos
+        # passam a variar por ordens de grandeza entre bracos.
+        comprimento = janela if janela else max(len(texto), 1)
         # Primeira ocorrência de cada entidade, não só da primeira entidade:
         # sem isso a proeminência de quem nunca abre a resposta vira zero e o
         # índice a elimina por um motivo que não existe.
@@ -89,7 +130,7 @@ def componentes(con: sqlite3.Connection, vertical: str, janela: int) -> tuple[li
             citacoes[entidade][r["llm"]] += 1
             proeminencias[entidade].append(1.0 - min(1.0, offset / comprimento))
 
-    painel = [m for m, n in obs_por_motor.items() if n >= MIN_OBS_PARA_ENTRAR_NO_PAINEL]
+    painel = sorted(ativos) if ativos else sorted(obs_por_motor)
     total = sum(obs_por_motor[m] for m in painel)
 
     saida = []

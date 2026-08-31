@@ -4,6 +4,39 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [robustez] — 2026-08-31 (três guards, um por etapa do pipeline)
+
+Resposta ao defeito de janela: os validadores existentes conferiam que o dado
+estava lá, e nenhum perguntava se a variável medida tinha forma plausível.
+
+### Added
+
+- `scripts/distribution_guard.py`, ligado no `daily-collect.yml` sem
+  `continue-on-error`. Detecta massa empilhada num único comprimento, variável
+  sem variância, janela divergente entre braços e íntegra declarada e não
+  gravada. Distingue corte deliberado de corte destrutivo pela presença de
+  `response_full_text`, sem o que reprovaria toda coleta futura.
+- `scripts/manuscript_guard.py`. Integridade de referência nos dois sentidos,
+  forma de DOI e arXiv, numeração e citação de tabela, âncoras de seção,
+  aritmética de delta e extensão do abstract. Pegou o abstract com 205 palavras
+  contra o limite de 200 na primeira execução.
+- 21 testes novos, incluindo os que fixam as fronteiras: o guard distribucional
+  precisa aprovar a configuração corrigida, e o guard do manuscrito não avalia
+  argumento.
+
+### Fixed
+
+- **Normalização da proeminência** no índice, que usava o comprimento do texto
+  observado em vez da janela declarada. Sob janela fixa os denominadores
+  coincidem, então nenhum número publicado se move; importa com `--window 0`.
+- **Definição do painel**, que por contagem de observações incluía o Groq
+  (aposentado em 16/08) e excluía o Grok (ativo desde 23/08). Passa a ser por
+  atividade na janela recente, ancorada no último timestamp do dado.
+- Retirada a justificativa de que a média geométrica é não-compensatória, que
+  só vale no limite.
+
+---
+
 ## [governança] — 2026-08-31 (health-check e revisão externa registrados)
 
 Os achados do dia entram na pasta `governance/`, com o que foi medido, o que foi

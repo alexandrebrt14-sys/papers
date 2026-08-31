@@ -28,3 +28,5 @@ Três regras que a casa aprendeu na prática:
 - `CHANGELOG.md` (raiz): mudança de código, formato Keep a Changelog. Eventos de série ficam marcados lá como tal.
 - `docs/METHODOLOGY_V2.md`: metodologia canônica. As fronteiras de estrato vivem em §3.1 e a janela de observação em §4.1-bis.
 - `data/finops_alerts.jsonl` e issues com label `pipeline-failure`: trilha de auditoria operacional das falhas de coleta.
+
+- [`ASSINATURA-DISTRIBUCIONAL-20260831.md`](ASSINATURA-DISTRIBUCIONAL-20260831.md) — por que um limite de instrumento é invisível para teste funcional e evidente numa distribuição, e os três guards instalados em resposta. Consultar antes de confiar em suíte verde como evidência de que a medição está correta.
