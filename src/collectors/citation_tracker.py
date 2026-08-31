@@ -262,6 +262,12 @@ class CitationTracker(BaseCollector):
             "all_cited_entities": response.cited_entities,
             "fictional_hit": fictional_hit,
             "fictional_names": fictional_names,
+            # Migration 0010: a integra vai para o banco ao lado da janela sob a
+            # qual esta linha foi extraida. Sem isso nenhuma resposta e
+            # auditavel — a extracao roda sobre `text`, que e a janela, e ate
+            # 31/08/2026 o resto da resposta era descartado no cliente.
+            "response_full_text": response.raw_text or None,
+            "citation_window_chars": len(text),
             # --- v2 fields (Onda 2/3/6/7) ---
             "extraction_version": "v2" if use_v2 else "v1",
             "extracted_at_v2": response.timestamp if use_v2 else None,

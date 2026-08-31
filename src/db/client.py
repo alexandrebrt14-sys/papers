@@ -53,6 +53,11 @@ class DatabaseClient:
         self._migrate_add_ner_v2_columns()
         self._migrate_add_response_hash_column()
         self._migrate_add_probe_fictitious_columns()
+        # 0010 entra aqui pelo mesmo motivo das tres acima: chamada de dentro
+        # de _migrate_add_vertical ela roda antes do executescript e morre em
+        # 'no such table: citations', que o except transforma em log DEBUG —
+        # o skip fica invisivel e a coluna nunca aparece num DB novo.
+        self._migrate_add_full_response_columns()
 
     def _migrate_add_vertical(self) -> None:
         """Add vertical column to existing tables if not present."""
@@ -81,6 +86,23 @@ class DatabaseClient:
         self._migrate_add_fictional_columns()
         self._migrate_snapshot_composite_unique()
         self._migrate_add_citation_absorption_columns()
+
+    def _migrate_add_full_response_columns(self) -> None:
+        """Adiciona response_full_text + citation_window_chars (Migration 0010 inline).
+
+        Health-check 2026-08-31: a extracao sempre rodou sobre `response_text`,
+        que nunca foi a resposta do modelo — era `text[:200]` em cinco dos seis
+        bracos, e a resposta inteira na Perplexity. Estas duas colunas passam a
+        guardar a integra e a janela sob a qual cada linha foi extraida.
+        Idempotente — delega a migration que detecta colunas via PRAGMA.
+        """
+        try:
+            from src.db import migrate_0010_full_response
+            added = migrate_0010_full_response.apply(self._conn)
+            if added:
+                logger.info("Migracao 0010 (full response) aplicada: %s", added)
+        except Exception as exc:
+            logger.debug("full_response migration skipped: %s", exc)
 
     def _migrate_add_query_type(self) -> None:
         """Adiciona citations.query_type (Migration 0003 inline).
@@ -266,13 +288,16 @@ class DatabaseClient:
                 is_probe, probe_type, adversarial_framing,
                 fictitious_target, is_calibration,
                 -- Migration 0009 (citation selection vs absorption + failure)
-                selection_status, absorption_status, failure_type
+                selection_status, absorption_status, failure_type,
+                -- Migration 0010 (integra auditavel + janela de observacao)
+                response_full_text, citation_window_chars
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                       ?, ?,
                       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                       ?,
                       ?, ?, ?, ?, ?,
-                      ?, ?, ?)
+                      ?, ?, ?,
+                      ?, ?)
         """
         rows = []
         for r in records:
@@ -317,6 +342,12 @@ class DatabaseClient:
                 r.get("selection_status"),
                 r.get("absorption_status"),
                 r.get("failure_type"),
+                # Migration 0010: integra auditavel + janela de observacao.
+                # response_full_text e a resposta ANTES de qualquer corte;
+                # citation_window_chars diz sob quantos caracteres a extracao
+                # daquela linha rodou, deixando a fronteira legivel na tabela.
+                r.get("response_full_text"),
+                r.get("citation_window_chars"),
             ))
         self._conn.executemany(sql, rows)
         self._conn.commit()

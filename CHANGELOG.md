@@ -4,6 +4,59 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [metodologia] — 2026-08-31 (janela de observação uniforme + íntegra auditável)
+
+Health-check da coleta. O achado não estava no pipeline, estava no instrumento.
+
+### Fixed
+
+- **⚠️ EVENTO DE SÉRIE — janela de observação era assimétrica entre os braços.**
+  A extração sempre rodou sobre `response_text`, e `response_text` nunca foi a
+  resposta do modelo: cinco dos seis braços gravavam `text[:200]`; a Perplexity,
+  por percorrer outro caminho em `llm_client`, gravava a resposta inteira (até
+  2.502 caracteres). A comparação entre motores — o objeto do estudo — estava
+  confundida com o tamanho da janela. Medida na mesma janela dos demais, a taxa
+  de citação da Perplexity cai de **75,8% para 52,0%**: 23,8 pontos eram
+  instrumento. Os outros cinco braços não se movem um décimo sob o mesmo
+  recorte, o que verifica que a harmonização reproduz o instrumento em vez de
+  inventar número novo. A janela agora é decisão única
+  (`apply_citation_window`), vale para os seis braços e é configurável por
+  `PAPERS_CITATION_WINDOW_CHARS` (200 por padrão; 0 = resposta inteira, que é
+  como a análise de sensibilidade roda).
+
+- **Nenhuma das 80.638 observações era auditável.** O texto além da janela era
+  descartado no cliente e nunca chegou ao banco — um revisor não tinha como
+  reproduzir a extração. `response_full_text` passa a guardar a íntegra.
+
+- **H2 excluía o único braço RAG do painel.** A Perplexity tinha zero linhas com
+  `is_probe=1`: `PERPLEXITY_CATEGORIES` nunca incluiu `calibracao_fp`, então o
+  baseline de falso-positivo media só os cinco braços paramétricos. Corrigido;
+  custo ~US$0,64/dia. Abre o contraste que motiva a hipótese: um motor que
+  busca na web antes de responder deveria recusar entidade inexistente mais que
+  um paramétrico.
+
+- **Migration 0010 caiu no skip silencioso ao ser escrita.** Chamada de dentro
+  de `_migrate_add_vertical`, rodava antes do `executescript` que cria
+  `citations`, morria em "no such table" e o `except` virava log DEBUG — a
+  coluna nunca apareceria num banco novo. Mesmo padrão do restore R2 que ficou
+  dois meses inerte. Movida para junto das migrations 0005/0006/0007, com teste
+  de regressão que falha se um banco novo nascer sem as colunas.
+
+### Added
+
+- `src/db/migrate_0010_full_response.py` — `response_full_text` +
+  `citation_window_chars`, com backfill que anota a janela efetiva de cada
+  linha histórica (não é estimativa: `length(response_text)` é exatamente o que
+  o extrator viu).
+- `scripts/harmonize_citation_window.py` — produz `cited_win`,
+  `cited_count_win`, `first_entity_win` e `window_applied` sem destruir as
+  colunas originais. Backup SHA-256 com manifest antes de qualquer `--apply`.
+- `docs/METHODOLOGY_V2.md` §4.1-bis — a janela como parâmetro declarado do
+  desenho, com medida principal e sensibilidade separadas.
+- 10 testes novos (`test_citation_window.py`, `test_migration_0010.py`).
+
+---
+
 ## [ops] — 2026-08-31 (coleta destravada: o Grok estourava o timeout)
 
 A série ficou **8 dias parada** (último dia persistido: 23-08). Duas causas

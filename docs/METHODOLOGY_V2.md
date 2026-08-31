@@ -156,6 +156,43 @@ Trilha de auditoria: `data/finops_alerts.jsonl` + GitHub issues label `pipeline-
 | Aliases não reconhecidos (BTG → BTG Pactual) | `ENTITY_ALIASES` dict single-source-of-truth |
 | Colisões contextuais (99 vs 99%) | `ENTITY_STOP_CONTEXTS` dict |
 
+### 4.1-bis Janela de observação da citação (2026-08-31)
+
+A extração de entidades roda sobre `citations.response_text`. Até 31/08/2026
+esse campo não era a resposta do modelo: cinco dos seis braços gravavam
+`text[:200]` e a Perplexity, por percorrer outro caminho no cliente, gravava a
+resposta inteira — até 2.502 caracteres. A janela de observação era, portanto,
+**assimétrica entre os braços**, e a comparação entre motores ficou confundida
+com o tamanho da janela. O efeito é grande e mensurável: recortada nos mesmos
+200 caracteres, a taxa de citação da Perplexity cai de **75,8% para 52,0%**.
+Os outros cinco braços não se movem um décimo, porque para eles a janela já era
+essa — o que serve de verificação de que o recorte reproduz o instrumento.
+
+A partir desta data a janela é **explícita, uniforme e versionada por linha**:
+
+| Coluna | Significado |
+|---|---|
+| `response_text` | a janela sob a qual a extração rodou |
+| `response_full_text` | a resposta completa, antes de qualquer corte (novo) |
+| `citation_window_chars` | tamanho da janela naquela linha (novo) |
+| `cited_win`, `cited_count_win`, `first_entity_win` | a medida sob janela canônica, produzida por `scripts/harmonize_citation_window.py` |
+
+**Medida principal:** janela de 200 caracteres, os seis braços — preserva a
+comparabilidade com os 49 dias já coletados e é a única definição sob a qual a
+série inteira é homogênea. A leitura substantiva é a de *head-of-response
+citation*: se a marca aparece na abertura da resposta, a parte que o usuário lê
+antes de decidir continuar lendo.
+
+**Análise de sensibilidade:** resposta inteira, onde ela existe
+(`PAPERS_CITATION_WINDOW_CHARS=0`). A diferença entre as duas medidas é
+reportada por braço, não escondida numa nota.
+
+O tamanho da janela deixa de ser detalhe de implementação e passa a ser
+parâmetro declarado do desenho. A literatura de GEO publica taxas de citação
+sem informar sob que janela a citação foi contada; os 23,8 pontos acima mostram
+que a omissão não é inócua, sobretudo ao comparar um motor RAG (que abre com
+preâmbulo antes de nomear entidades) com modelos paramétricos.
+
 ### 4.2 Pipeline de extração
 ```python
 from src.analysis.entity_extraction import EntityExtractor

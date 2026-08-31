@@ -39,6 +39,35 @@ from src.finops.tracker import get_tracker
 logger = logging.getLogger(__name__)
 
 
+# ── Janela de observação da citação ──────────────────────────────────────────
+# Health-check 2026-08-31: a extração de entidades sempre rodou sobre
+# `response_text`, e `response_text` nunca foi a resposta do modelo. Cinco dos
+# seis braços gravavam `text[:200]`; a Perplexity, por usar outro caminho neste
+# arquivo, gravava a resposta inteira (até 2.502 caracteres). A janela ficou
+# assimétrica ENTRE OS BRAÇOS, que é exatamente a comparação que o estudo faz:
+# recortada nos mesmos 200 caracteres, a Perplexity cai de 75,8% para 52,0% de
+# taxa de citação — 23,8 pontos eram instrumento, não comportamento do modelo.
+#
+# A janela agora é explícita, uniforme e versionada por linha
+# (`citations.citation_window_chars`). 200 preserva a comparabilidade com os 49
+# dias já coletados; `PAPERS_CITATION_WINDOW_CHARS=0` desliga o corte e mede a
+# resposta inteira, que é como a análise de sensibilidade do paper roda.
+def citation_window_chars() -> int:
+    """Tamanho da janela de extração, em caracteres. 0 = resposta inteira."""
+    raw = os.getenv("PAPERS_CITATION_WINDOW_CHARS", "200").strip()
+    try:
+        return max(0, int(raw))
+    except ValueError:
+        logger.warning("PAPERS_CITATION_WINDOW_CHARS=%r invalido; usando 200", raw)
+        return 200
+
+
+def apply_citation_window(text: str) -> str:
+    """Recorta o texto na janela de observação canônica."""
+    w = citation_window_chars()
+    return text[:w] if w else text
+
+
 @dataclass
 class LLMResponse:
     """Structured response from an LLM query."""
@@ -88,6 +117,15 @@ class LLMClient:
         "comparativo",   # Comparativos diretos — Perplexity traz fontes reais
         "reputacao",     # Cross-vertical reputação — busca web essencial
         "mercado",       # Dados de mercado — requer fontes atualizadas
+        # 2026-08-31: probes adversariais passam a incluir a Perplexity. Até
+        # aqui o braço tinha ZERO linhas com is_probe=1, então H2 — o baseline
+        # de falso-positivo — media só os cinco braços paramétricos e deixava
+        # de fora justamente o único motor RAG do painel. É o caso mais
+        # interessante da hipótese: um motor que busca na web antes de
+        # responder deveria recusar entidade inexistente com mais frequência
+        # do que um paramétrico, e ninguém publicou esse contraste. Custo:
+        # 64 probes × 2 coletas/dia × US$0,005 ≈ US$0,64/dia.
+        "calibracao_fp",
     }
 
     def __init__(self, cohort: list[str] | None = None, vertical: str = "",
@@ -516,7 +554,9 @@ class LLMClient:
 
         return LLMResponse(
             model=llm.model, provider=llm.provider, query=prompt,
-            response_text=text,
+            # Até 31/08/2026 este braço gravava `text` inteiro enquanto os
+            # outros cinco gravavam text[:200] — a origem da assimetria.
+            response_text=apply_citation_window(text),
             sources=sources,
             cited_entities=self._extract_entity_mentions(text),
             timestamp=start.isoformat(),
@@ -538,7 +578,9 @@ class LLMClient:
         """Build LLMResponse from parsed output (JSON or post-hoc)."""
         return LLMResponse(
             model=llm.model, provider=llm.provider, query=prompt,
-            response_text=parsed.get("summary", text[:200]),
+            # A janela é aplicada aqui, num ponto só, para TODOS os provedores.
+            # Antes cada handler decidia sozinho e a Perplexity ficava de fora.
+            response_text=apply_citation_window(parsed.get("summary") or text),
             sources=parsed.get("sources", self._extract_urls(text)),
             cited_entities=parsed.get("cited", self._extract_entity_mentions(text)),
             timestamp=start.isoformat(),
@@ -599,7 +641,9 @@ class LLMClient:
         return {
             "cited": cited,
             "sources": sources,
-            "summary": text[:200],
+            # Sem corte aqui: quem recorta é apply_citation_window em
+            # _build_response, para que a janela seja uma decisão única.
+            "summary": text,
         }
 
     def _log_drift(self, response: LLMResponse) -> None:
