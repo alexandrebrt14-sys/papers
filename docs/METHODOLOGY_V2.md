@@ -156,6 +156,60 @@ Trilha de auditoria: `data/finops_alerts.jsonl` + GitHub issues label `pipeline-
 | Aliases não reconhecidos (BTG → BTG Pactual) | `ENTITY_ALIASES` dict single-source-of-truth |
 | Colisões contextuais (99 vs 99%) | `ENTITY_STOP_CONTEXTS` dict |
 
+### 4.1-bis A janela de observação como parâmetro declarado
+
+A extração roda sobre uma string, e essa string não é a resposta do modelo: é o que o pipeline guardou. O comprimento dela é a **janela de observação**, e passa a ser parâmetro declarado do desenho.
+
+Até 31-08-2026 a janela era assimétrica entre os braços. Cinco adaptadores gravavam `text[:200]`; a Perplexity, por percorrer outro caminho no cliente, gravava a resposta inteira, até 2.502 caracteres. A assimetria caía exatamente sobre o eixo da comparação que o estudo faz.
+
+A decisão agora é única (`apply_citation_window`), vale para os seis braços e é configurável por `PAPERS_CITATION_WINDOW_CHARS` (200 por padrão; 0 aplica a resposta inteira, que é como a análise de sensibilidade roda). A íntegra passa a ser gravada em `response_full_text` (migration 0010), de modo que terceiros possam re-extrair.
+
+**Medida principal**: janela de 200 caracteres, uniforme, declarada junto de todo número publicado.
+**Sensibilidade**: mesma medida sob janela completa, reportada por braço, disponível apenas a partir de 31-08-2026 nos braços paramétricos, porque antes disso a íntegra nunca chegou ao banco.
+
+Magnitude do efeito, série até 31-08-2026, 50 dias, 66.399 observações canônicas: a taxa de citação da Perplexity cai de 75,7% para 51,9% sob janela uniforme, uma diferença de 23,8 pontos percentuais. Os outros cinco braços não se movem, o que é esperado por construção (aplicar `texto[:200]` a uma string de 200 caracteres é a identidade) e serve como verificação de que o script de harmonização não introduziu efeito colateral, não como confirmação independente.
+
+#### 4.1-bis.1 A direção do viés da janela NÃO é identificada pelos dados coletados sob janela assimétrica
+
+Esta subseção corrige uma afirmação metodológica anterior. O texto do manuscrito sustentava que a janela estreita penaliza motores RAG porque eles abrem com prosa de enquadramento antes de nomear entidades. A verificação empírica de 31-08 contradiz essa explicação.
+
+**Offset relativo da primeira menção**, calculado por observação como offset dividido pelo comprimento do texto observado:
+
+| Braço | n | Offset absoluto | Comprimento | Relativo médio | Relativo mediano |
+|---|---:|---:|---:|---:|---:|
+| Grok | 113 | 33 | 200 | 0,164 | 0,000 |
+| Perplexity | 5.631 | 158 | 662 | 0,228 | 0,169 |
+| Gemini | 265 | 97 | 197 | 0,493 | 0,375 |
+| Groq | 1.210 | 108 | 200 | 0,539 | 0,530 |
+| ChatGPT | 2.571 | 116 | 200 | 0,582 | 0,600 |
+| Claude | 3.823 | 124 | 200 | 0,621 | 0,645 |
+
+**Teste de uniformidade na Perplexity**: se as menções fossem distribuídas uniformemente ao longo da resposta, a fração além do caractere 200 seria 1 − 200/662 = 69,8%. O observado é 28,8%. O braço RAG concentra menções na abertura relativa da própria resposta e nomeia mais cedo que qualquer paramétrico exceto o Grok.
+
+**Estilo de abertura contra taxa de citação**, mesma série, sobre `response_text` das linhas canônicas:
+
+| Braço | n | Abre com preâmbulo | Taxa de citação |
+|---|---:|---:|---:|
+| Gemini | 14.587 | 79,6% | 1,8% |
+| Perplexity | 7.436 | 9,2% | 75,7% |
+| Grok | 350 | 4,0% | 32,3% |
+| ChatGPT | 14.976 | 2,1% | 17,2% |
+| Groq | 14.208 | 1,1% | 8,5% |
+| Claude | 14.842 | 0,0% | 25,8% |
+
+Critério de medição, declarado porque é parte do resultado: preâmbulo é definido por expressão regular ancorada no início da resposta (`^`), casando saudação, hedge, reformulação da pergunta e auto-referência de modelo. O braço com mais preâmbulo do painel é paramétrico (Gemini, 79,6%) e o braço RAG tem pouco (Perplexity, 9,2%). O estilo de abertura que faz a janela morder é propriedade do modelo e não da classe arquitetural, e não é dedutível da arquitetura.
+
+**Ressalvas que acompanham obrigatoriamente estas tabelas:**
+
+1. Os denominadores dos braços paramétricos estão censurados em 200 caracteres. Os offsets relativos de 0,49 a 0,62 são **limites superiores** do valor verdadeiro, e a inversão em relação ao braço RAG não pode ser afirmada como fato.
+2. A conclusão defensável é a de não identificação: sob janela assimétrica, os dados não identificam a direção do viés. Afirmar a direção antiga era erro; afirmar a direção oposta seria o mesmo erro com o sinal trocado.
+3. O mecanismo mais simples e provavelmente correto é quantidade de texto lido, não estrutura retórica. Ler 662 caracteres em vez de 200 encontra mais menções, e encontraria em qualquer motor cuja resposta completa tivesse sido guardada. Isso torna o achado mais geral: o problema é propriedade de qualquer comparação entre janelas de leitura desiguais.
+4. A taxa de 1,8% do Gemini não significa "o Gemini cita pouco", e sim "o Gemini cita pouco nos primeiros 200 caracteres". O comportamento fora da janela é desconhecido, porque o texto além dela nunca foi gravado. Toda taxa é condicional à janela e vai reportada com a janela declarada junto.
+
+**Controle a favor da leitura acima**: entre as observações em que o Gemini efetivamente cita, 23,0% das primeiras menções caem depois do caractere 150, proporção parecida com a do ChatGPT (24,5%) e menor que a do Claude (36,1%). Quando o Gemini chega a nomear dentro da janela, a posição não é anômala; o anômalo é ele raramente chegar lá.
+
+Trilha completa: `governance/HEALTH-CHECK-COLETA-20260831.md` e `governance/REVISAO-EXTERNA-PAPER-20260831.md`.
+
 ### 4.2 Pipeline de extração
 ```python
 from src.analysis.entity_extraction import EntityExtractor

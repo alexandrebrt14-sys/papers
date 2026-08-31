@@ -4,6 +4,41 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [governança] — 2026-08-31 (health-check e revisão externa registrados)
+
+Os achados do dia entram na pasta `governance/`, com o que foi medido, o que foi
+corrigido e o que continua em aberto.
+
+### Added
+
+- `governance/HEALTH-CHECK-COLETA-20260831.md` — os oito dias de série parada
+  (timeout do braço Grok e saldo Anthropic esgotado), o defeito de janela de
+  observação, a íntegra não auditável, a migration 0010 em skip silencioso e a
+  recusa contada como alucinação. Inclui a previsão de tempo de coleta que eu
+  errei e a medição que a corrigiu.
+- `governance/REVISAO-EXTERNA-PAPER-20260831.md` — revisão adversarial do
+  manuscrito BRGEO-1: quatro bloqueadores de submissão, sete correções de
+  substância, a citação fundadora do campo corrigida e o estado da arte de
+  março a julho de 2026, com seis referências verificadas.
+- `governance/README.md` — índice dos documentos de governança e a convenção de
+  escrita da casa.
+
+### Fixed
+
+- **Duas afirmações publicadas foram refutadas por medição própria e precisam
+  sair do manuscrito.** A §4.4 explica o viés da janela por estrutura retórica
+  de motores RAG; o offset relativo e a taxa de preâmbulo por braço mostram o
+  contrário, e a conclusão defensável é a de que **a direção do viés não é
+  identificada** pelos dados coletados sob janela assimétrica. A §7.2 sustenta
+  que agregações defensáveis produzem quase a mesma ordenação; entre fórmulas
+  alternativas o rho de Spearman desce a 0,706, contra os 0,982 entre índice e
+  cobertura que o paper oferecia como evidência.
+- `docs/METHODOLOGY_V2.md` §4.1-bis — a janela como parâmetro declarado, com a
+  tabela de offset relativo, o teste de uniformidade, a tabela de preâmbulo por
+  braço e as quatro ressalvas de não identificação.
+
+---
+
 ## [metodologia] — 2026-08-31 (janela de observação uniforme + íntegra auditável)
 
 Health-check da coleta. O achado não estava no pipeline, estava no instrumento.
