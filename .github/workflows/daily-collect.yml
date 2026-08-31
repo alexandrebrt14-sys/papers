@@ -57,6 +57,13 @@ env:
   # dele — desligar e a maior economia. Mudanca forward-only; cada linha grava
   # citation.model_version. Ajustavel por repo var sem mexer em codigo.
   GEMINI_THINKING_BUDGET: ${{ vars.GEMINI_THINKING_BUDGET || '0' }}
+  # FinOps + timeout (2026-08-31): grok-4.6 raciocina por padrao e o reasoning e
+  # cobrado como output. Medido contra a API com a query de citacao da coleta:
+  # sem o parametro 73,7s e 2.746 reasoning tokens; com "low", 19,7s e 419. O
+  # default derrubou 5 runs seguidas (24-30/08) por estourar o timeout de 180min
+  # — o Grok sozinho consumia 129 dos 179 minutos. "none" nao e aceito pelo
+  # modelo (HTTP 400); "low" e o piso. Vazio restaura o comportamento anterior.
+  XAI_REASONING_EFFORT: ${{ vars.XAI_REASONING_EFFORT || 'low' }}
 
 jobs:
   collect-and-finalize:

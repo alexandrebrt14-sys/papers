@@ -210,7 +210,7 @@ Após cada coleta (diária e semanal), um relatório HTML é enviado automaticam
 | OPENAI_API_KEY | Sim | ChatGPT gpt-4o-mini ($0,15/$0,60 MTok) |
 | ANTHROPIC_API_KEY | Sim | Claude haiku-4.5 ($1/$5 MTok, $55 crédito) |
 | GOOGLE_AI_API_KEY | Sim | Gemini 2.5 Flash ($0,15/$0,60 MTok, billing Cloud ativo) |
-| PERPLEXITY_API_KEY | Sim | Perplexity sonar ($1/$1 MTok + $0,005/busca, $89 crédito) |
+| PERPLEXITY_API_KEY | Sim | Perplexity sonar ($1/$1 MTok + $0,005/busca). Rotacionada em 14/08/2026: conta canônica `alexandre.brt14@gmail.com`, chave `brasilgeo-ops-20260814` (prefixo `pplx-CkiH...`), US$ 100 de créditos, auto-recarga desligada; a conta antiga (`ti@brasilgeo.ai`/hevtau) esgotou em 13/08 e foi desativada |
 | RESEND_API_KEY | Sim | Envio de relatórios diários por email |
 | FINOPS_ALERT_EMAIL | Sim | Destino dos relatórios (caramaschiai@caramaschiai.io) |
 | SERPAPI_KEY | Opcional | Google SERP data (substituído por Brave Search grátis) |

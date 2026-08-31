@@ -451,6 +451,24 @@ class LLMClient:
             "temperature": 0.0,
             "max_tokens": llm.max_output_tokens,
         }
+
+        # FinOps + timeout (2026-08-31): grok-4.6 raciocina por padrao e o
+        # reasoning e cobrado como output. Medicao contra a API em 31/08/2026,
+        # mesma query de citacao usada na coleta:
+        #   sem reasoning_effort : 73,7s  reasoning=2746 tokens
+        #   reasoning_effort=low : 19,7s  reasoning= 419 tokens
+        # Com o default o Grok consumia 129 dos 179 minutos da coleta (72% do
+        # wall-clock, medido na run 33303260035), estourando o timeout de 180min
+        # do job: 5 runs consecutivas canceladas entre 24 e 30/08 sem persistir
+        # um unico dia. "none" NAO e aceito pelo modelo (HTTP 400), "low" e o
+        # piso. Mesma doutrina do GEMINI_THINKING_BUDGET=0: limita so o
+        # raciocinio interno, nao troca o modelo (grok-4.6 segue pinado em
+        # model_version) e e forward-only. Ajustavel por repo var sem tocar em
+        # codigo; vazio desliga o parametro e restaura o comportamento anterior.
+        _re = os.getenv("XAI_REASONING_EFFORT", "low").strip()
+        if _re:
+            body["reasoning_effort"] = _re
+
         if self._json_mode and llm.supports_json_mode:
             body["response_format"] = {"type": "json_object"}
 

@@ -76,6 +76,21 @@ Invariantes:
 > comparáveis** nesse braço; análises longitudinais devem estratificar ou
 > truncar o 5º braço nessa data. Detalhes no CHANGELOG (`[ops] 2026-08-19`).
 
+> **Evento de série (2026-08-31):** o braço Grok passa a rodar com
+> `reasoning_effort=low` (env `XAI_REASONING_EFFORT`). O grok-4.6 raciocina por
+> padrão e o reasoning entra como output: medido contra a API com a query de
+> citação da coleta, 73,7 s e 2.746 reasoning tokens sem o parâmetro contra
+> 19,7 s e 419 com `low`. Sozinho, o braço consumia 129 dos 179 minutos de
+> wall-clock e derrubou cinco coletas seguidas no timeout de 180 min entre 24 e
+> 30-08, sem persistir um único dia. O modelo pinado não muda (`grok-4.6` segue
+> em `model_version`) e a mudança é forward-only, mas o esforço de raciocínio é
+> parâmetro de geração: as 206 observações do braço coletadas em 23-08 ficam
+> sob configuração distinta e devem ser tratadas como estrato próprio. A
+> fronteira cai cedo o bastante (206 de ~18.000 observações por braço) para que
+> a alternativa honesta seja **descartar o dia 23-08 no braço Grok** em vez de
+> estratificar. Mesma doutrina aplicada ao `GEMINI_THINKING_BUDGET=0` em
+> 17-06-2026.
+
 **Scaling observation** (Kaplan): trimestral, cohort ampliado para incluir `gemini-2.5-flash`, `gpt-4o` full, `claude-sonnet-4-6` em rotação.
 
 ### 3.2 Fail-loud garantias

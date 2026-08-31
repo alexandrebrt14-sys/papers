@@ -4,6 +4,43 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [ops] — 2026-08-31 (coleta destravada: o Grok estourava o timeout)
+
+A série ficou **8 dias parada** (último dia persistido: 23-08). Duas causas
+independentes, ambas visíveis só no log do job — o painel de runs mostrava
+`cancelled` e `failure` sem dizer onde.
+
+### Fixed
+
+- **⚠️ EVENTO DE SÉRIE — Grok passa a rodar com `reasoning_effort=low`**
+  (`XAI_REASONING_EFFORT`, default `low`). O grok-4.6 raciocina por padrão e o
+  reasoning é cobrado como output. Medição contra a API em 31-08 com a mesma
+  query de citação da coleta: **73,7 s e 2.746 reasoning tokens** sem o
+  parâmetro contra **19,7 s e 419** com `low` (`none` não é aceito: HTTP 400).
+  Na run 33303260035 o braço consumiu **129 dos 179 minutos** de wall-clock —
+  72% do total, contra 17 min do Gemini, 15 do Claude, 12 do ChatGPT e 5 da
+  Perplexity — e o job morreu no `timeout-minutes: 180` com a quarta vertical
+  pela metade. Cinco runs canceladas assim entre 24 e 30-08 queimaram ~900
+  minutos de GitHub Actions sem persistir um dia sequer, enquanto o orçamento de
+  Actions já estava em 514%. Efeito colateral do fix: ~US$ 3,2 por run a menos
+  em reasoning token. Modelo pinado intacto (`grok-4.6`); mudança forward-only.
+  Ver a nota de estrato em `docs/METHODOLOGY_V2.md` §3.1.
+
+- **Saldo Anthropic esgotado** derrubou o preflight nas runs de 1 minuto
+  (23-08 21h, 24, 27, 28, 30-08 21h e 31-08 09h): `HTTP 400 credit balance is
+  too low`. A chave é a canônica do projeto (fingerprint `cfcc92e901a33d04`,
+  registrado desde 07-04) e voltou a responder 200 em 31-08 — recarga de saldo,
+  não rotação. O preflight fez o trabalho dele: barrou a coleta em vez de
+  gravar um dia com 4 dos 5 braços.
+
+### Added
+
+- `tests/test_xai_reasoning_effort.py` (4 testes): fixa o contrato do body
+  enviado à xAI — default `low`, repo var sobrescreve, env vazia restaura o
+  comportamento anterior, e o fix não pode trocar o modelo pinado.
+
+---
+
 ## [ops] — 2026-08-19 (robustez TLS + braço Groq restaurado)
 
 Duas mudanças operacionais para destravar a coleta neste desktop; **uma delas é

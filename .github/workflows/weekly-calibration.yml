@@ -34,6 +34,9 @@ env:
   PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+  # Ver daily-collect.yml: grok-4.6 raciocina por padrao e o reasoning e cobrado
+  # como output (73,7s/2.746 tokens sem o parametro; 19,7s/419 com "low").
+  XAI_REASONING_EFFORT: ${{ vars.XAI_REASONING_EFFORT || 'low' }}
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
   INCLUDE_FICTIONAL_ENTITIES: "true"     # ativa coorte fictícia no cohort
   PAPERS_DB_PATH: data/papers.db
