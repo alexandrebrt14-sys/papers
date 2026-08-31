@@ -275,6 +275,29 @@ def montar_html(hoje: str) -> str:
 </body></html>"""
 
 
+def desktop() -> Path:
+    """Área de trabalho REAL do usuário, não ~/Desktop.
+
+    Com o OneDrive ligado, o Windows redireciona a área de trabalho para
+    `OneDrive\Área de Trabalho` e `~/Desktop` vira uma pasta órfã que continua
+    existindo e que o Explorer não mostra. Salvar lá entrega um arquivo que o
+    usuário não encontra. O caminho verdadeiro está no registro, em User Shell
+    Folders, que é o que o próprio Explorer lê.
+    """
+    if os.name == "nt":
+        try:
+            import winreg
+            chave = r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders"
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, chave) as k:
+                bruto, _ = winreg.QueryValueEx(k, "Desktop")
+            caminho = Path(os.path.expandvars(bruto))
+            if caminho.is_dir():
+                return caminho
+        except OSError:
+            pass
+    return Path(os.path.expanduser("~")) / "Desktop"
+
+
 def achar_chrome() -> str | None:
     for c in CHROMES:
         if Path(c).exists():
@@ -284,8 +307,7 @@ def achar_chrome() -> str | None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    padrao = (Path(os.path.expanduser("~")) / "Desktop" /
-              f"BRGEO-1-dossie-reuniao-{date.today():%Y-%m-%d}.pdf")
+    padrao = desktop() / f"BRGEO-1-dossie-reuniao-{date.today():%Y-%m-%d}.pdf"
     ap.add_argument("--out", default=str(padrao))
     a = ap.parse_args()
 
