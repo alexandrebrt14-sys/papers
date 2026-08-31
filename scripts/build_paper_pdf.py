@@ -139,9 +139,10 @@ thead th{
 tbody td{border-bottom:.4pt solid #E2E6EC}
 tbody tr:last-child td{border-bottom:1pt solid #111418}
 td:nth-child(n+2){font-variant-numeric:tabular-nums}
-.legenda{
-  font-size:8.6pt; color:#3C4450; margin:0 0 2mm; line-height:1.45;
-  page-break-after:avoid;
+caption.legenda{
+  caption-side:top; text-align:left;
+  font-size:9pt; color:#111418; line-height:1.45;
+  padding:0 0 1.8mm; margin:0;
 }
 .legenda b{font-family:"Archivo",sans-serif; font-weight:600; color:#111418}
 
@@ -164,6 +165,40 @@ a{color:#0F4B57; text-decoration:none}
   font-size:8.4pt; color:#6B7480; text-align:center;
 }
 """
+
+
+def promover_legendas(html: str) -> str:
+    """Move a legenda para dentro da propria tabela, como <caption>.
+
+    O markdown transforma "**Table 4.** ..." num <p> comum, e o motor de
+    impressao o trata como paragrafo qualquer: a legenda fica no pe de uma
+    pagina e a tabela comeca na seguinte. Emparelhar por posicao com um par
+    de expressoes regulares e fragil — foi o que dessincronizou legenda e
+    tabela na primeira tentativa. Como <caption> e filho de <table>, a
+    separacao passa a ser impossivel por construcao, sem depender de
+    page-break.
+
+    So promove a legenda quando ela e imediatamente seguida por uma tabela;
+    uma legenda solta permanece paragrafo, em vez de ser silenciosamente
+    anexada a tabela errada.
+    """
+    padrao = re.compile(
+        r"<p>(<strong>Table \d+\.</strong>.*?)</p>\s*(<table>)",
+        re.S,
+    )
+
+    def troca(m: re.Match) -> str:
+        return f'{m.group(2)}<caption class="legenda">{m.group(1)}</caption>'
+
+    html, n = padrao.subn(troca, html)
+    esperadas = len(re.findall(r"<strong>Table \d+\.</strong>", html))
+    if n != esperadas:
+        raise SystemExit(
+            f"legendas promovidas: {n}, encontradas: {esperadas}. Alguma "
+            "legenda nao esta seguida de tabela — conferir o manuscrito antes "
+            "de gerar o PDF."
+        )
+    return html
 
 
 def desktop() -> Path:
@@ -203,6 +238,8 @@ def main() -> int:
 
     corpo = markdown.markdown(fonte.read_text(encoding="utf-8"),
                               extensions=EXTENSOES)
+
+    corpo = promover_legendas(corpo)
     html = MOLDE.replace("<!--CORPO-->", corpo).replace("<!--CSS-->", CSS)
 
     tmp = Path(tempfile.mkdtemp()) / "paper.html"
