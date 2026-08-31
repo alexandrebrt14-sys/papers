@@ -100,7 +100,8 @@ def _garantir_colunas(con: sqlite3.Connection) -> None:
     con.commit()
 
 
-def rodar(db_path: Path, janela: int, aplicar: bool) -> int:
+def rodar(db_path: Path, janela: int, aplicar: bool,
+          apenas_canonical: bool = False) -> int:
     con = sqlite3.connect(db_path)
     con.row_factory = sqlite3.Row
     ext = _extratores()
@@ -109,9 +110,10 @@ def rodar(db_path: Path, janela: int, aplicar: bool) -> int:
         _backup(db_path)
         _garantir_colunas(con)
 
+    filtro = "AND is_probe = 0" if apenas_canonical else ""
     linhas = con.execute(
         "SELECT id, vertical, llm, response_text, cited FROM citations "
-        "WHERE response_text IS NOT NULL"
+        f"WHERE response_text IS NOT NULL {filtro}"
     ).fetchall()
 
     por_llm: dict[str, dict[str, int]] = {}
@@ -161,6 +163,8 @@ def main() -> int:
     ap.add_argument("--db", default=os.getenv("PAPERS_DB_PATH", "data/papers.db"))
     ap.add_argument("--window", type=int, default=DEFAULT_WINDOW,
                     help="janela em caracteres; 0 = resposta inteira")
+    ap.add_argument("--canonical-only", action="store_true",
+                    help="exclui os probes adversariais (is_probe=1) do relatorio")
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--check", action="store_true", help="so relata, nao grava")
     g.add_argument("--apply", action="store_true", help="grava as colunas harmonizadas")
@@ -170,7 +174,7 @@ def main() -> int:
     if not db.exists():
         print(f"banco nao encontrado: {db}", file=sys.stderr)
         return 1
-    rodar(db, a.window, aplicar=a.apply)
+    rodar(db, a.window, aplicar=a.apply, apenas_canonical=a.canonical_only)
     return 0
 
 
