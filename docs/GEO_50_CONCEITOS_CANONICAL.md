@@ -4,7 +4,7 @@
 >
 > Última revisão: 2026-05-17
 > Mantenedor: Alexandre Caramaschi (CEO Brasil GEO)
-> Fonte: Framework canônico Brasil GEO 2026 (consolida Aggarwal SIGIR 2023, AutoGEO ICLR 2026, AgenticGEO, Profound, Ahrefs Brand Radar, iPullRank, Google AI Optim Guide 15-mai-2026)
+> Fonte: Framework canônico Brasil GEO 2026 (consolida Aggarwal KDD 2024, AutoGEO ICLR 2026, AgenticGEO, Profound, Ahrefs Brand Radar, iPullRank, Google AI Optim Guide 15-mai-2026)
 
 ## Aplicação em papers
 
@@ -296,7 +296,7 @@ Classifica problemas por impacto, urgência, dificuldade e potencial de ganho.
 
 ## Referências canônicas Brasil GEO 2026
 
-- Papers: Aggarwal SIGIR 2023 ("Generative Engine Optimization"), AutoGEO ICLR 2026, AgenticGEO 2025, Bui et al. AISO 2026.
+- Papers: Aggarwal KDD 2024 ("GEO: Generative Engine Optimization"), AutoGEO ICLR 2026, AgenticGEO 2025, Bui et al. AISO 2026.
 - Ferramentas: Profound (Series C US$ 96M fev/2026), Ahrefs Brand Radar, Peec.ai, Otterly, iPullRank Generative Visibility Score.
 - Guias oficiais: Google AI Optimization Guide (15-mai-2026), Schema.org v30 (mai/2026), llms.txt spec.
 - KPIs internos: SoV-AI, AECR, RTAS, Anchor Coverage, CTAM (ver `CITATION_METRICS.md`).

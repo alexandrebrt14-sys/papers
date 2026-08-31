@@ -1,5 +1,18 @@
 # Perplexity sonar-pro
 
+> **AVISO DE CORREÇÃO (31/08/2026).** Este arquivo é output bruto de pesquisa e
+> contém pelo menos uma referência confabulada. A primeira entrada abaixo cita
+> "Aggarwal et al., SIGIR 2023" com título "Generative Engine Optimization: Brand
+> Visibility in LLMs" e DOI 10.1145/3539618.3594249. Venue, ano, título e DOI
+> estão errados, e o DOI não resolve para este trabalho. O registro correto é:
+> Aggarwal, P., Murahari, V., Rajpurohit, T., Kalyan, A., Narasimhan, K. &
+> Deshpande, A. (2024). *GEO: Generative Engine Optimization.* KDD '24, pp. 5-16.
+> DOI 10.1145/3637528.3671900. Preprint arXiv:2311.09735.
+>
+> Não reutilizar referência deste arquivo sem abrir a página e conferir. Mantido
+> como está para preservar o registro do que a ferramenta devolveu.
+
+
 **Date:** 2026-05-13T14:00:31.579Z
 
 ## Response

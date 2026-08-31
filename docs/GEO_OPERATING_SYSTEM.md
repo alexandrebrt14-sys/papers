@@ -103,7 +103,7 @@ weekly_report:
   % Contribution: 6-month longitudinal dataset, n>20k queries, 5 LLMs
   
 \section{Related Work}
-  % Aggarwal et al. 2023 - foundational GEO
+  % Aggarwal et al. 2024 (KDD) - foundational GEO
   % Chen et al. 2025 - earned media framework
   % Yao et al. 2025 - extraction biases
   % Gap: non-English markets, multi-LLM comparison

@@ -49,9 +49,12 @@ Apêndice B. Referência às pesquisas Perplexity deste repo
 
 ## 1. O que é GEO em 2026 — papers fundadores para pesquisa empírica
 
-### 1.1 Paper seminal Aggarwal et al. (2023)
+### 1.1 Paper seminal Aggarwal et al. (2024)
 
-- **Citação completa:** Aggarwal et al., "Generative Engine Optimization", SIGIR 2023, DOI: 10.1145/3539618.3594249
+- **Citação completa:** Aggarwal, P., Murahari, V., Rajpurohit, T., Kalyan, A., Narasimhan, K., & Deshpande, A. (2024). GEO: Generative Engine Optimization. KDD '24, pp. 5-16. DOI 10.1145/3637528.3671900. Preprint arXiv:2311.09735
+  <!-- Corrigido em 31/08/2026: a citação anterior dizia SIGIR 2023 com DOI
+       10.1145/3539618.3594249. Venue, ano e DOI estavam errados; o DOI não
+       resolve para este paper. Verificado contra arXiv e dblp. -->
 - **URL:** https://dl.acm.org/doi/10.1145/3539618.3594249
 - **Relevância para papers:**
   - Primeiro estudo empírico com 10k queries cross-vertical
@@ -439,7 +442,7 @@ Layer 5: Paper Generation
 
 1. **Escolha de conferences:** SIGIR para primer paper (foco IR), EMNLP para análise linguística, KDD para statistical modeling
 2. **Métricas primárias:** Mention rate + Position bias (mais estabelecidas na literatura)
-3. **Verticais:** manter 4 atuais (comparabilidade com Aggarwal 2023)
+3. **Verticais:** manter 4 atuais (comparabilidade com Aggarwal 2024)
 4. **LLMs:** focar nos 5 principais (coverage > completude)
 
 ### 11.5 Diferencial acadêmico
@@ -514,7 +517,7 @@ Layer 5: Paper Generation
 ## Apêndice A. Citações canônicas com URLs reais
 
 ### Papers fundamentais
-- Aggarwal et al. 2023: https://arxiv.org/abs/2311.09735
+- Aggarwal et al. 2024 (KDD '24): https://arxiv.org/abs/2311.09735
 - Chen et al. 2025: https://arxiv.org/abs/2509.08919
 - Yao et al. 2025: https://aclanthology.org/2025.emnlp-main.456
 - Ray & King WWW 2025: https://dl.acm.org/doi/10.1145/3616855.3634241
