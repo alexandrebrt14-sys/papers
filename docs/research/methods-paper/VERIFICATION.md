@@ -92,6 +92,54 @@ PY
 
 Esperado: 15.993 marcadas, 10.775 com recusa (67,4%).
 
+## §7.2 — O índice contra a cobertura simples
+
+O resultado que sustenta o rebaixamento do índice a conveniência de reporte.
+
+```bash
+python scripts/brgeo1_index.py --db "$DB" --vertical fintech --compare
+```
+
+Para o rho da coorte completa (66 entidades nas quatro verticais) e os recortes
+por faixa, salvar como `/tmp/rho.py` e rodar com `python /tmp/rho.py`:
+
+```python
+import sqlite3, os, sys
+sys.path.insert(0, ".")
+from scipy.stats import spearmanr
+from scripts.brgeo1_index import componentes
+
+con = sqlite3.connect(os.environ["DB"]); todos = []
+for v in ("fintech", "varejo", "saude", "tecnologia"):
+    linhas, _, _ = componentes(con, v, 200)
+    todos += [d for d in linhas if d["cobertura"] > 0]
+
+def rho(sub):
+    oc = sorted(sub, key=lambda d: -d["cobertura"])
+    oi = sorted(sub, key=lambda d: -d["gci"])
+    return spearmanr([oc.index(d) for d in sub], [oi.index(d) for d in sub]).statistic, len(sub)
+
+lider = {d["vertical"]: 0.0 for d in todos}
+for d in todos:
+    lider[d["vertical"]] = max(lider[d["vertical"]], d["cobertura"])
+
+for rotulo, sub in [
+    ("todas", todos),
+    ("sem o lider de cada vertical", [d for d in todos if d["cobertura"] < lider[d["vertical"]]]),
+    ("faixa media 0,1%-5%", [d for d in todos if 0.001 <= d["cobertura"] <= 0.05]),
+    ("cauda abaixo de 1%", [d for d in todos if d["cobertura"] < 0.01]),
+]:
+    r, n = rho(sub)
+    print(f"{rotulo:<32} rho={r:.3f}  n={n}")
+```
+
+Esperado: 0,980 (n=66) · 0,977 (n=62) · 0,945 (n=42) · 0,957 (n=44).
+
+O argumento do §7.2 depende de o rho continuar alto **depois** de remover o
+líder e de recortar a faixa média. Se algum desses recortes derrubasse a
+correlação, a conclusão do paper mudaria: o índice separaria onde importa e
+mereceria papel central. Conferir os quatro, não só o primeiro.
+
 ## §3.1 e §3.2 — Coorte e bateria
 
 ```bash
