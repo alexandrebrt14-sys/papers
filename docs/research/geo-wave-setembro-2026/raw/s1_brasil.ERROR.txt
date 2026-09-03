@@ -1,0 +1,2 @@
+HTTPStatusError("Client error '401 Unauthorized' for url 'https://api.perplexity.ai/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401")
+{"error":{"message":"You exceeded your current quota, please check your plan and billing details. For more information, visit https://www.perplexity.ai/settings/api.","type":"insufficient_quota","code":401}}
