@@ -41,7 +41,7 @@ Um run conta em mais de uma linha quando dois provedores falharam juntos.
 
 ### 1.2 Efeito no banco
 
-Consulta ao `papers.db` do R2 em 08-09 (`GROUP BY date(created_at), llm`, sem probes): dos 35 dias entre 05-08 e 08-09, **13 têm dado**. Os dias 06-09, 07-09 e 08-09 têm só Gemini, Grok e Perplexity, produto de coletas locais com a variável degradada; são dias metodologicamente incompletos e a análise por braço precisa tratá-los como tal. A janela acumulada está em **53 de 90 dias, 85.359 observações, 1.611 por dia coletado**, com fechamento projetado para **15-10-2026** se as duas coletas diárias voltarem a persistir sem interrupção.
+Consulta ao `papers.db` do R2 em 08-09 (`GROUP BY date(created_at), llm`, sem probes): dos 35 dias entre 05-08 e 08-09, **13 têm dado**. Os dias 06-09 e 07-09 têm só Gemini, Grok e Perplexity, produto de coletas locais com a variável degradada; são dias metodologicamente incompletos e a análise por braço precisa tratá-los como tal. O dia 08-09 começou assim e foi completado pela run manual das 17:16 UTC com os cinco braços. A janela acumulada está em **53 de 90 dias, 85.359 observações, 1.611 por dia coletado**, com fechamento projetado para **15-10-2026** se as duas coletas diárias voltarem a persistir sem interrupção.
 
 A previsão anterior, registrada em 10-08, era 28-09-2026 com 49 dias por coletar. Entre 10-08 e 08-09 passaram 29 dias e só 12 entraram na série; a diferença de 17 dias é o custo da falta de crédito.
 
@@ -97,4 +97,4 @@ Issue #54 `pipeline-failure` fechada com o link para este registro.
 1. **Decisão de virar a chave antes de 27-09.** `gh variable set PAPERS_PPLX_AGENT_API -R alexandrebrt14-sys/papers -b "1"` seguido de uma coleta manual de validação. É troca de transporte do braço Perplexity com o modelo preservado; a linha grava `model` e `raw`, então a fronteira fica auditável. Sem a virada, a série para em 27-09 com 37 dias faltando.
 2. **Saldos em dólar não lidos nesta verificação.** A regra de alerta (Anthropic abaixo de US$ 100, OpenAI abaixo de US$ 50, Perplexity abaixo de US$ 40) só pode ser aplicada com leitura de console. No ritmo dos 30 dias anteriores (Perplexity US$ 206, xAI US$ 184, lidos pela sessão do orquestrador) o saldo de hoje cobre cerca de duas semanas.
 3. **O workflow não fecha a issue `pipeline-failure` quando volta ao verde.** A #54 foi fechada à mão em 08-09; a próxima falha abre outra. Vale um step de fechamento automático em sucesso.
-4. **Dias 06-09 a 08-09 com três braços.** Marcar na análise como incompletos ou excluir da comparação entre motores; a decisão é do desenho, não do pipeline.
+4. **Dias 06-09 e 07-09 com três braços.** Marcar na análise como incompletos ou excluir da comparação entre motores; a decisão é do desenho, não do pipeline.
