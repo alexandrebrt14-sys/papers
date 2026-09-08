@@ -64,6 +64,12 @@ env:
   # — o Grok sozinho consumia 129 dos 179 minutos. "none" nao e aceito pelo
   # modelo (HTTP 400); "low" e o piso. Vazio restaura o comportamento anterior.
   XAI_REASONING_EFFORT: ${{ vars.XAI_REASONING_EFFORT || 'low' }}
+  # Perplexity (2026-09-08): a Sonar Chat Completions (/chat/completions) e
+  # retirada em 27/09/2026, 18 dias antes do fim da janela. Com "1" o coletor
+  # e o preflight passam a usar a Agent API (POST /v1/agent) com o MESMO
+  # modelo (perplexity/sonar; model_version intacto). Virar por repo var:
+  #   gh variable set PAPERS_PPLX_AGENT_API -R alexandrebrt14-sys/papers -b "1"
+  PAPERS_PPLX_AGENT_API: ${{ vars.PAPERS_PPLX_AGENT_API || '0' }}
 
 jobs:
   collect-and-finalize:
