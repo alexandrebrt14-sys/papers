@@ -122,9 +122,19 @@ def coletar_perfil(con: sqlite3.Connection, desde_dias: int | None) -> list[dict
 
 
 def avaliar(perfil: list[dict], con: sqlite3.Connection,
-            verbose: bool = False) -> list[str]:
+            verbose: bool = False, desde_dias: int | None = None) -> list[str]:
     falhas: list[str] = []
     cols = _colunas(con)
+
+    # A janela temporal das checagens de íntegra acompanha a do perfil: no
+    # workflow é --since-days 2; nos testes, sem filtro, é a tabela inteira.
+    # Antes era um "-2 days" fixo, e um teste com timestamps fixos em 31/08
+    # passava no dia em que foi escrito e reprovava dois dias depois (CI
+    # vermelho desde 03/09/2026 sem defeito algum no instrumento).
+    filtro = ""
+    if desde_dias:
+        filtro = f"AND timestamp >= datetime('now', '-{int(desde_dias)} days')"
+    periodo = f"dos últimos {desde_dias} dias" if desde_dias else "da base"
 
     # Corte DELIBERADO e corte DESTRUTIVO produzem a mesma distribuição em
     # response_text: massa empilhada no valor da janela. O que os separa é se a
@@ -135,13 +145,13 @@ def avaliar(perfil: list[dict], con: sqlite3.Connection,
     # guard que sempre reprova é indistinguível de um guard desligado.
     integra_retida = False
     if "response_full_text" in cols:
-        r = con.execute("""
+        r = con.execute(f"""
             SELECT COUNT(*) n,
                    SUM(CASE WHEN response_full_text IS NOT NULL
                              AND length(response_full_text) >= length(response_text)
                         THEN 1 ELSE 0 END) c
             FROM citations
-            WHERE timestamp >= datetime('now', '-2 days') AND is_probe = 0
+            WHERE is_probe = 0 {filtro}
         """).fetchone()
         integra_retida = bool(r["n"]) and r["c"] / r["n"] > 0.5
 
@@ -203,15 +213,15 @@ def avaliar(perfil: list[dict], con: sqlite3.Connection,
     # 5. A íntegra precisa estar sendo gravada. Sem ela nenhuma observação é
     #    auditável, e essa perda é irreversível: texto não gravado não volta.
     if "response_full_text" in cols:
-        recente = con.execute("""
+        recente = con.execute(f"""
             SELECT COUNT(*) n,
                    SUM(CASE WHEN response_full_text IS NOT NULL THEN 1 ELSE 0 END) c
             FROM citations
-            WHERE timestamp >= datetime('now', '-2 days')
+            WHERE 1 = 1 {filtro}
         """).fetchone()
         if recente["n"] > 0 and recente["c"] == 0:
             falhas.append(
-                f"nenhuma das {recente['n']} observações dos últimos 2 dias tem "
+                f"nenhuma das {recente['n']} observações {periodo} tem "
                 f"response_full_text. A coluna existe e não está sendo populada; "
                 f"essas observações não serão auditáveis e o texto não é recuperável."
             )
@@ -240,7 +250,7 @@ def main() -> int:
         print("  nenhum braço com observações suficientes para avaliar.")
         return 0
 
-    falhas = avaliar(perfil, con, a.verbose)
+    falhas = avaliar(perfil, con, a.verbose, a.since_days)
     con.close()
 
     if falhas:
