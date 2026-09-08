@@ -123,6 +123,20 @@ def check_google(key: str) -> ProviderCheck:
 def check_perplexity(key: str) -> ProviderCheck:
     if not key:
         return ProviderCheck("perplexity", False, 0, "PERPLEXITY_API_KEY ausente")
+    # Mesma chave do coletor: com PAPERS_PPLX_AGENT_API=1 o preflight sonda a
+    # rota que a coleta vai usar (POST /v1/agent, modelo perplexity/sonar).
+    # A rota legada /chat/completions e retirada em 27/09/2026.
+    if os.getenv("PAPERS_PPLX_AGENT_API", "0").strip() == "1":
+        return _post_with_retry("perplexity", lambda: httpx.post(
+            "https://api.perplexity.ai/v1/agent",
+            headers={"Authorization": f"Bearer {key}"},
+            json={
+                "model": "perplexity/sonar",
+                "input": "ok",
+                "max_output_tokens": 16,
+            },
+            timeout=30,
+        ))
     # Perplexity sonar exige max_tokens>=16 desde validação 2026-05-18
     # (incidente run #26033337487: HTTP 400 invalid_parameter com max_tokens=1).
     return _post_with_retry("perplexity", lambda: httpx.post(

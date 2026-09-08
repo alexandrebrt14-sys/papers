@@ -62,6 +62,20 @@ def citation_window_chars() -> int:
         return 200
 
 
+def pplx_agent_api_enabled() -> bool:
+    """Gate da Agent API da Perplexity (POST /v1/agent). Default DESLIGADO.
+
+    A Sonar Chat Completions (/chat/completions) e retirada em 27/09/2026
+    (anuncio oficial da Perplexity em 13/08/2026), 18 dias antes do fim da
+    janela de 90 dias. O braco Perplexity continua sendo o MESMO modelo
+    (`perplexity/sonar`; o `model` gravado por linha segue "sonar"); o que
+    muda e o transporte e onde as fontes chegam. Lido a cada chamada para que
+    a repo var PAPERS_PPLX_AGENT_API vire a chave sem tocar em codigo.
+    Forward-only: `raw` guarda o payload de origem de cada observacao.
+    """
+    return os.getenv("PAPERS_PPLX_AGENT_API", "0").strip() == "1"
+
+
 def apply_citation_window(text: str) -> str:
     """Recorta o texto na janela de observação canônica."""
     w = citation_window_chars()
@@ -531,6 +545,8 @@ class LLMClient:
 
     def _query_perplexity(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """Perplexity with built-in citations (no JSON mode needed)."""
+        if pplx_agent_api_enabled():
+            return self._query_perplexity_agent(llm, prompt, start)
         resp = self._http.post(
             "https://api.perplexity.ai/chat/completions",
             headers={"Authorization": f"Bearer {llm.api_key}"},
@@ -567,6 +583,106 @@ class LLMClient:
             raw_text=text,
             engine_type="rag",
         )
+
+    def _query_perplexity_agent(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
+        """Perplexity Agent API (POST /v1/agent) — sucessora do /chat/completions.
+
+        Sondado ao vivo em 08/09/2026 com a chave do projeto:
+          * `model` recebe "perplexity/sonar" — o mesmo sonar da rota legada
+            ("perplexity/sonar-pro" devolve 400 "not supported"). Os presets
+            (fast/low/medium/high) roteiam para modelos de TERCEIROS — "fast"
+            veio como openai/gpt-5.6-luna — e por isso nao sao usados aqui:
+            trocariam o braco do estudo sem aviso.
+          * `instructions` e o system; `input` e o prompt; `temperature` e
+            `max_output_tokens` existem com a mesma semantica da rota legada.
+          * SEM a tool web_search o sonar responde sem fonte alguma (nem
+            search_results nem annotations). Com ela, as fontes vem no item
+            output[].type == "search_results" (results[].url) e, quando o
+            modelo cita de fato, em content[].annotations type == "url_citation".
+            A rota legada trazia `citations` no topo por padrao.
+          * usage.cost.total_cost e o custo FATURADO: search_web US$ 0,0025
+            por chamada, contra US$ 0,005 de request_cost na rota legada.
+        """
+        body = {
+            "model": f"perplexity/{llm.model}",
+            "instructions": PERPLEXITY_SYSTEM,
+            "input": prompt,
+            "temperature": 0.0,
+            "max_output_tokens": llm.max_output_tokens,
+            "tools": [{"type": "web_search"}],
+        }
+        resp = self._http.post(
+            "https://api.perplexity.ai/v1/agent",
+            headers={"Authorization": f"Bearer {llm.api_key}"},
+            json=body,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        if data.get("error") or data.get("status") == "error":
+            raise RuntimeError(
+                f"Perplexity /v1/agent status=error: {str(data.get('error'))[:200]}"
+            )
+        text, cited, hits = self._parse_pplx_agent_output(data.get("output") or [])
+        if not text:
+            raise RuntimeError(
+                f"Perplexity /v1/agent sem item message (status={data.get('status')!r})"
+            )
+        # Fontes de fato citadas primeiro, depois os hits brutos da busca,
+        # dedupe estavel — mesma list[str] que a rota legada devolvia.
+        sources = list(dict.fromkeys(cited + hits)) or self._extract_urls(text)
+        usage = data.get("usage", {}) or {}
+
+        return LLMResponse(
+            model=llm.model, provider=llm.provider, query=prompt,
+            response_text=apply_citation_window(text),
+            sources=sources,
+            cited_entities=self._extract_entity_mentions(text),
+            timestamp=start.isoformat(),
+            latency_ms=int((datetime.now(timezone.utc) - start).total_seconds() * 1000),
+            input_tokens=usage.get("input_tokens", 0) or 0,
+            output_tokens=usage.get("output_tokens", 0) or 0,
+            raw=data,
+            raw_text=text,
+            engine_type="rag",
+        )
+
+    @staticmethod
+    def _parse_pplx_agent_output(output: list) -> tuple[str, list[str], list[str]]:
+        """Normaliza a lista tipada `output` do /v1/agent.
+
+        Devolve (texto, urls citadas em annotations, urls dos search_results).
+        """
+        text_parts: list[str] = []
+        cited: list[str] = []
+        hits: list[str] = []
+        for item in output:
+            if not isinstance(item, dict):
+                continue
+            itype = item.get("type")
+            if itype == "message":
+                content = item.get("content")
+                if isinstance(content, list):
+                    for c in content:
+                        if not isinstance(c, dict):
+                            continue
+                        if c.get("text"):
+                            text_parts.append(c["text"])
+                        for ann in c.get("annotations") or []:
+                            if (
+                                isinstance(ann, dict)
+                                and ann.get("type") == "url_citation"
+                                and ann.get("url")
+                            ):
+                                cited.append(ann["url"])
+                elif content:
+                    text_parts.append(str(content))
+            elif itype == "search_results":
+                for r in item.get("results") or item.get("search_results") or []:
+                    if isinstance(r, dict):
+                        u = r.get("url") or r.get("link")
+                        if u:
+                            hits.append(u)
+        return "".join(text_parts), cited, hits
 
     # ── Helpers compartilhados ───────────────────────────────────────────
 
