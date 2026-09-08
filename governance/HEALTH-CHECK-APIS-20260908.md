@@ -41,7 +41,7 @@ Um run conta em mais de uma linha quando dois provedores falharam juntos.
 
 ### 1.2 Efeito no banco
 
-Consulta ao `papers.db` do R2 em 08-09 (`GROUP BY date(created_at), llm`, sem probes): dos 35 dias entre 05-08 e 08-09, **13 têm dado**. Os dias 06-09, 07-09 e 08-09 têm só Gemini, Grok e Perplexity, produto de coletas locais com a variável degradada; são dias metodologicamente incompletos e a análise por braço precisa tratá-los como tal. A janela acumulada está em **53 de 90 dias, 85.359 observações, 1.611 por dia coletado**, com fechamento projetado para **15-10-2026** se as duas coletas diárias voltarem a persistir sem interrupção.
+Consulta ao `papers.db` do R2 em 08-09 (`GROUP BY date(created_at), llm`, sem probes): dos 35 dias entre 05-08 e 08-09, **13 têm dado**. Os dias 06-09 e 07-09 têm só Gemini, Grok e Perplexity, produto de coletas locais com a variável degradada; são dias metodologicamente incompletos e a análise por braço precisa tratá-los como tal. O dia 08-09 começou assim e foi completado pela run manual das 17:16 UTC com os cinco braços. A janela acumulada está em **53 de 90 dias, 85.359 observações, 1.611 por dia coletado**, com fechamento projetado para **15-10-2026** se as duas coletas diárias voltarem a persistir sem interrupção.
 
 A previsão anterior, registrada em 10-08, era 28-09-2026 com 49 dias por coletar. Entre 10-08 e 08-09 passaram 29 dias e só 12 entraram na série; a diferença de 17 dias é o custo da falta de crédito.
 
@@ -49,7 +49,7 @@ A previsão anterior, registrada em 10-08, era 28-09-2026 com 49 dias por coleta
 
 - Recarga manual de OpenAI, Anthropic e Perplexity pelo Alexandre em 08-09 (ação de console, não de API). Recarga automática segue desligada nas três por decisão de 24-07-2026.
 - `MANDATORY_LLMS` removida como variável de repositório em 08-09; vale de novo o padrão do workflow, `ChatGPT,Claude,Gemini,Perplexity,Grok`.
-- Coleta manual `workflow_dispatch` disparada às 17:16 UTC com os cinco obrigatórios (run 34256141784) para recuperar a rodada da manhã e validar os secrets do CI. O resultado fica registrado no fim deste documento quando a run terminar.
+- Coleta manual `workflow_dispatch` disparada às 17:16 UTC com os cinco obrigatórios (run 34256141784) para recuperar a rodada da manhã e validar os secrets do CI. Terminou verde às 19:32 UTC; detalhe na seção Verificação.
 
 ## Parte 2. O clone local mentia sobre a janela
 
@@ -76,9 +76,25 @@ Sem a tool `web_search` o sonar respondeu sem fonte alguma; com ela as URLs vêm
 
 **Correção**: PR #58 (commit `87ac7a2`) adiciona `LLMClient._query_perplexity_agent` e o mesmo caminho no preflight, atrás da variável de repositório `PAPERS_PPLX_AGENT_API` (padrão `0`). Mesmo modelo, mesma janela de citação, mesma íntegra em `response_full_text`, `raw` com o payload novo por linha. Cinco testes novos; suíte com 268 verde. Smoke real com a chave do projeto: preflight OK em 1.415 ms; uma query do coletor devolveu 832 caracteres, 15 fontes, 3 entidades da coorte, US$ 0,00442.
 
+## Verificação: a run manual terminou verde
+
+Run 34256141784, `workflow_dispatch` com `vertical=all`, de 17:16 a 19:32 UTC (135 minutos, dentro do timeout de 180). Todos os steps verdes, inclusive os que costumam esconder problema atrás de `continue-on-error`.
+
+| Braço | Linhas na run | Taxa de citação na run |
+|---|---:|---:|
+| ChatGPT | 233 | 38,6% |
+| Claude | 233 | 42,5% |
+| Gemini | 233 | 25,8% |
+| Grok | 233 | 44,6% |
+| Perplexity | 144 | 62,5% |
+
+A Perplexity tem menos linhas por desenho (só categorias de alto valor e probes). Probes adversariais: 320 linhas marcadas, 0 acertos espontâneos em 756 respostas. Guard distribucional aprovado com íntegra retida. Piso de integridade elevado: `citations` de 65.060 para 86.543, `collection_runs` de 516 para 672. Banco publicado no R2 e adotado localmente pelo `pull` forward-only (208.975 linhas totais). A janela segue em 53 de 90 dias porque 08-09 já contava; a previsão de fechamento permanece 15-10-2026.
+
+Issue #54 `pipeline-failure` fechada com o link para este registro.
+
 ## O que continua em aberto
 
 1. **Decisão de virar a chave antes de 27-09.** `gh variable set PAPERS_PPLX_AGENT_API -R alexandrebrt14-sys/papers -b "1"` seguido de uma coleta manual de validação. É troca de transporte do braço Perplexity com o modelo preservado; a linha grava `model` e `raw`, então a fronteira fica auditável. Sem a virada, a série para em 27-09 com 37 dias faltando.
 2. **Saldos em dólar não lidos nesta verificação.** A regra de alerta (Anthropic abaixo de US$ 100, OpenAI abaixo de US$ 50, Perplexity abaixo de US$ 40) só pode ser aplicada com leitura de console. No ritmo dos 30 dias anteriores (Perplexity US$ 206, xAI US$ 184, lidos pela sessão do orquestrador) o saldo de hoje cobre cerca de duas semanas.
-3. **Issue #54 `pipeline-failure`** aberta desde 23-08 acumulando comentários; o workflow comenta e cria, nunca fecha. Fechar depois da primeira run verde com os cinco braços.
-4. **Dias 06-09 a 08-09 com três braços.** Marcar na análise como incompletos ou excluir da comparação entre motores; a decisão é do desenho, não do pipeline.
+3. **O workflow não fecha a issue `pipeline-failure` quando volta ao verde.** A #54 foi fechada à mão em 08-09; a próxima falha abre outra. Vale um step de fechamento automático em sucesso.
+4. **Dias 06-09 e 07-09 com três braços.** Marcar na análise como incompletos ou excluir da comparação entre motores; a decisão é do desenho, não do pipeline.
