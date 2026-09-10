@@ -4,6 +4,46 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [integridade] — 2026-09-09 (dashboard público, preflight degradável, Agent API documentada)
+
+Resposta ao levantamento de 09/09: o `dashboard_data.json` publicado misturava
+decoys de calibração com marcas reais, anunciava uma janela fechada em julho e
+a série perdia dias inteiros quando um provedor ficava sem saldo.
+
+### Added
+
+- `src/analysis/dashboard_public.py`: regras puras de integridade do arquivo
+  público. Fictícias de `calibration.fictitiousEntities` saem de `topEntities`,
+  `weeklyDeltas`, `verticalsFull[*].citedEntities` e `crossVerticalEntities`;
+  `coverage` passa a ser marcas do roster com citação sobre o roster (teto
+  100%, campo `rosterCited` e `coverageDefinition`); `windowEnd` vira o
+  fechamento projetado (última coleta mais dias que faltam), com
+  `windowEndCalendar`, `windowRemainingDays` e `windowEndSemantics`.
+- `scripts/generate_dashboard_json.py --from-json`: reaplica o pós-processamento
+  ao JSON publicado sem banco (o `papers.db` vive no R2).
+- `data/partial_days.json` e campo `partialDays` no dashboard, com marca
+  `partial: true` nos pontos de `dailySeries`. Semeado com 06/09 e 07/09
+  (só Gemini, Grok e Perplexity, conforme `HEALTH-CHECK-APIS-20260908.md`).
+- Preflight com `PAPERS_PREFLIGHT_MODE=degrade` (padrão) e `PAPERS_MIN_LLMS`:
+  provedor obrigatório sem crédito/quota sai de `MANDATORY_LLMS` via
+  `GITHUB_ENV`, o dia é gravado como parcial e a coleta segue com os demais.
+  `strict` restaura o abortar antigo. Falha que não é de saldo continua
+  bloqueando.
+- `docs/PERPLEXITY_AGENT_API.md`: como e quando virar `PAPERS_PPLX_AGENT_API`.
+- `governance/CHAVES-COMPARTILHADAS-ENTRE-INSTRUMENTOS-20260909.md`.
+- 37 testes novos (`test_dashboard_public.py`, `test_preflight_degradacao.py`,
+  dois em `test_perplexity_agent_api.py`), incluindo o que reprova o arquivo
+  publicado se uma fictícia voltar a `topEntities`.
+
+### Fixed
+
+- `topEntities` exclui fictícias antes do `LIMIT 30` (em 09/09 eram 8 de 30).
+- `data/dashboard_data.json` regenerado por `--from-json`: 22 entidades reais
+  em `topEntities` (o ranking volta a 30 na próxima coleta com banco),
+  coverage fintech 118,8% para 75,0%, `windowEnd` 2026-07-21 para 2026-10-15.
+
+---
+
 ## [robustez] — 2026-08-31 (três guards, um por etapa do pipeline)
 
 Resposta ao defeito de janela: os validadores existentes conferiam que o dado

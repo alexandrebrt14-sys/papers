@@ -70,6 +70,15 @@ env:
   # modelo (perplexity/sonar; model_version intacto). Virar por repo var:
   #   gh variable set PAPERS_PPLX_AGENT_API -R alexandrebrt14-sys/papers -b "1"
   PAPERS_PPLX_AGENT_API: ${{ vars.PAPERS_PPLX_AGENT_API || '0' }}
+  # Preflight (2026-09-09): entre 16/08 e 08/09 o preflight abortou 28 runs por
+  # saldo de UM provedor e a serie perdeu 17 dias inteiros. Em "degrade" o
+  # provedor sem credito/quota sai de MANDATORY_LLMS para os passos seguintes
+  # (GITHUB_ENV) e o dia entra em data/partial_days.json -> dashboard
+  # `partialDays`. Minimo de provedores OK para coletar: PAPERS_MIN_LLMS.
+  # "strict" restaura o comportamento antigo (qualquer obrigatorio falhando
+  # aborta o dia). Doc: scripts/preflight_llm_check.py.
+  PAPERS_PREFLIGHT_MODE: ${{ vars.PAPERS_PREFLIGHT_MODE || 'degrade' }}
+  PAPERS_MIN_LLMS: ${{ vars.PAPERS_MIN_LLMS || '2' }}
 
 jobs:
   collect-and-finalize:
@@ -471,6 +480,7 @@ jobs:
 
           TMPDIR=$(mktemp -d)
           for p in data/dashboard_data.json data/db_floor.json \
+                   data/partial_days.json \
                    data/finops_checkpoint.json data/finops_alerts.jsonl \
                    output/finops_dashboard.html docs data/daily_*.csv; do
             [ -e "$p" ] || continue
@@ -484,7 +494,7 @@ jobs:
 
             cp -r "$TMPDIR"/. .
 
-            git add data/dashboard_data.json \
+            git add data/dashboard_data.json data/partial_days.json \
                     data/finops_checkpoint.json data/finops_alerts.jsonl \
                     output/finops_dashboard.html docs/ 2>/dev/null || true
             git add data/daily_*.csv 2>/dev/null || true
