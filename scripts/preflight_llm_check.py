@@ -1,19 +1,34 @@
 #!/usr/bin/env python3
-"""preflight_llm_check.py — valida que TODAS as 5 LLMs respondem antes da coleta.
+"""preflight_llm_check.py — sonda os 5 provedores antes da coleta e decide
+se o dia roda completo, parcial ou nao roda.
 
 Motivacao (incidente 2026-04-24): Anthropic credit balance esgotado fez 30min
 de fintech rodar sem Claude antes do FAILED_VERTICALS abortar. Resultado: gap
 seletivo no vertical fintech para Claude na janela confirmatoria v2.
 
-Comportamento: faz 1 chamada minima (1 token) para cada provider em
-mandatory_llms(). Se qualquer provider falhar com 4xx (auth, quota, credit),
-exit 2 ANTES da coleta comecar. Se todas responderem, exit 0.
+Degradacao graciosa (2026-09-09): entre 16/08 e 08/09 o preflight abortou 28
+runs por saldo de UM provedor e a serie perdeu 17 dias inteiros — os outros
+quatro bracos tinham credito e nao coletaram nada. Um dia com 4 de 5 bracos,
+marcado como parcial, vale mais para a serie longitudinal do que um dia vazio.
+Comportamento, controlado por variavel:
+
+  PAPERS_PREFLIGHT_MODE=degrade (padrao)
+      Provedor obrigatorio que falha por CREDITO/QUOTA/AUTH (HTTP 400 com
+      "credit"/"quota", 401, 402, 403, 429, ou chave ausente) vira "degradado":
+      sai de MANDATORY_LLMS para os passos seguintes (via GITHUB_ENV) e o dia e
+      registrado em data/partial_days.json, que o dashboard publica como
+      `partialDays`. A coleta so prossegue se sobrarem >= PAPERS_MIN_LLMS
+      (padrao 2) provedores OK; abaixo disso, exit 2 como antes.
+      Falha que NAO e de saldo (5xx persistente, rede, payload) continua
+      bloqueando: e defeito de instrumento, nao decisao de billing.
+  PAPERS_PREFLIGHT_MODE=strict
+      Comportamento anterior: qualquer obrigatorio falhando = exit 2.
 
 Custo: ~5 chamadas de ~1 token = praticamente zero (<US$0.0001/run).
 
 Exit codes:
-    0 = todas as 5 LLMs OK
-    2 = pelo menos 1 LLM falhou (failure critico — bloqueia coleta)
+    0 = coleta pode prosseguir (completa, ou parcial em modo degrade)
+    2 = coleta bloqueada
 """
 from __future__ import annotations
 
@@ -169,7 +184,127 @@ def check_grok(key: str) -> ProviderCheck:
     ))
 
 
+# Nomes como aparecem em MANDATORY_LLMS (src/config.mandatory_llms), indexados
+# pelo nome minusculo que os checks usam.
+CANONICAL_NAMES = {
+    "chatgpt": "ChatGPT",
+    "claude": "Claude",
+    "gemini": "Gemini",
+    "perplexity": "Perplexity",
+    "grok": "Grok",
+}
+
+# Erros que significam "conta sem saldo/quota/permissao": degradaveis. O resto
+# (5xx, rede, payload invalido) e defeito de instrumento e continua bloqueando.
+_BILLING_STATUS = ("http 401", "http 402", "http 403", "http 429")
+_BILLING_HINTS = ("credit", "quota", "billing", "prepayment", "insufficient")
+
+
+def _canon(name: str) -> str:
+    return CANONICAL_NAMES.get(name.lower(), name)
+
+
+def is_billing_failure(error: Optional[str]) -> bool:
+    """True quando o erro e de saldo/quota/permissao, nao de instrumento."""
+    if not error:
+        return False
+    e = error.lower()
+    if e.startswith(_BILLING_STATUS):
+        return True
+    if e.startswith("http 400") and any(h in e for h in _BILLING_HINTS):
+        return True
+    # Chave ausente no ambiente ("OPENAI_API_KEY ausente"): sem chave nao ha
+    # como o braco responder — indisponibilidade do provedor, nao bug nosso.
+    return e.endswith("ausente")
+
+
+@dataclass
+class Decision:
+    exit_code: int
+    degraded: list[str]          # nomes canonicos removidos de MANDATORY_LLMS
+    remaining_mandatory: list[str]
+    blocked_by: list[str]        # obrigatorios com falha nao degradavel
+    reason: str
+
+
+def decide(
+    checks: list[ProviderCheck],
+    mandatory: set[str],
+    mode: str = "degrade",
+    min_llms: int = 2,
+) -> Decision:
+    """Regra pura, sem rede, para o teste cobrir as saidas.
+
+    `mandatory` e o conjunto em minusculas (ex.: {"chatgpt", "claude"}).
+    """
+    ok = [c for c in checks if c.ok]
+    failed_mandatory = [c for c in checks if not c.ok and c.name.lower() in mandatory]
+    failed_names = {c.name.lower() for c in failed_mandatory}
+    remaining = sorted(_canon(n) for n in mandatory if n not in failed_names)
+    if not failed_mandatory:
+        return Decision(0, [], remaining, [], "todos os obrigatorios OK")
+
+    if mode != "degrade":
+        return Decision(2, [], remaining, [_canon(c.name) for c in failed_mandatory],
+                        "modo strict: obrigatorio falhou")
+
+    billing = [c for c in failed_mandatory if is_billing_failure(c.error)]
+    hard = [c for c in failed_mandatory if not is_billing_failure(c.error)]
+    if hard:
+        return Decision(2, [], remaining, [_canon(c.name) for c in hard],
+                        "falha nao e de saldo (defeito de instrumento)")
+    if len(ok) < min_llms:
+        return Decision(2, [], remaining, [_canon(c.name) for c in billing],
+                        f"restaram {len(ok)} provedores OK, minimo {min_llms}")
+    degraded = sorted(_canon(c.name) for c in billing)
+    return Decision(0, degraded, remaining, [],
+                    "coleta parcial: provedores sem saldo removidos")
+
+
+def record_partial_day(path: str, day: str, degraded: list[str], reason: str,
+                       source: str) -> None:
+    """Acrescenta a entrada do dia em data/partial_days.json (lista JSON)."""
+    entries: list[dict] = []
+    if os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                entries = json.load(fh) or []
+        except (OSError, json.JSONDecodeError):
+            entries = []
+    entries.append({
+        "date": day,
+        "missingLLMs": degraded,
+        "reason": reason,
+        "source": source,
+    })
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(entries, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
+
+
+def export_env(remaining_mandatory: list[str], degraded: list[str]) -> None:
+    """Propaga a decisao aos passos seguintes do job via GITHUB_ENV.
+
+    GITHUB_ENV sobrepoe o `env:` do workflow para os passos seguintes, entao
+    `collect`, `validate-run` e `validate_v2_collection` passam a exigir so os
+    bracos que responderam. Fora do Actions, so imprime.
+    """
+    lines = [
+        f"MANDATORY_LLMS={','.join(remaining_mandatory)}",
+        f"PAPERS_DEGRADED_LLMS={','.join(degraded)}",
+    ]
+    env_file = os.environ.get("GITHUB_ENV")
+    if env_file:
+        with open(env_file, "a", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+    for ln in lines:
+        print(f"  export {ln}")
+
+
 def main() -> int:
+    from datetime import datetime, timezone
+
     print("=== preflight LLM check ===")
     print()
 
@@ -181,25 +316,22 @@ def main() -> int:
         check_grok(os.environ.get("XAI_API_KEY", "")),
     ]
 
-    # Mandatory vs opcional: so providers em MANDATORY_LLMS bloqueiam a coleta.
-    # Um provider opcional (ex.: Gemini quando o billing prepay esgota) e
-    # degradavel — a coleta prossegue com os demais e a lacuna fica logada,
-    # em vez de zerar a coleta diaria de TODAS as verticais. O circuit breaker
-    # em llm_client ja pula o provider degradado apos o 1o 429 (sem crash).
-    # Default mantem todos os 5 obrigatorios — o workflow e quem marca opcionais.
     mandatory = {
         n.strip().lower()
         for n in os.getenv("MANDATORY_LLMS", "ChatGPT,Claude,Gemini,Perplexity,Grok").split(",")
         if n.strip()
     }
+    mode = os.getenv("PAPERS_PREFLIGHT_MODE", "degrade").strip().lower()
+    min_llms = int(os.getenv("PAPERS_MIN_LLMS", "2") or 2)
 
+    decision = decide(checks, mandatory, mode, min_llms)
     failed = [c for c in checks if not c.ok]
-    hard_failed = [c for c in failed if c.name.lower() in mandatory]
-    soft_failed = [c for c in failed if c.name.lower() not in mandatory]
 
     for c in checks:
         if c.ok:
             print(f"  [OK]      {c.name:<11} {c.latency_ms}ms")
+        elif _canon(c.name) in decision.degraded:
+            print(f"  [DEGRAD]  {c.name:<11} (sem saldo; removido deste dia) {c.error}")
         elif c.name.lower() in mandatory:
             print(f"  [FAIL]    {c.name:<11} {c.error}")
         else:
@@ -209,30 +341,54 @@ def main() -> int:
 
     if failed:
         # Telemetria estruturada para parsing por monitoring/alerting.
-        # preflight_failed=True so quando ha falha MANDATORY (bloqueante).
         print(json.dumps({
-            "preflight_failed": bool(hard_failed),
-            "failed_providers": [c.name for c in hard_failed],
-            "optional_degraded": [c.name for c in soft_failed],
+            "preflight_failed": decision.exit_code != 0,
+            "preflight_mode": mode,
+            "failed_providers": decision.blocked_by,
+            "degraded_providers": decision.degraded,
+            "remaining_mandatory": decision.remaining_mandatory,
+            "optional_degraded": [
+                c.name for c in failed if c.name.lower() not in mandatory
+            ],
             "errors": {c.name: c.error for c in failed},
         }))
         print()
 
-    if hard_failed:
-        names = ", ".join(c.name for c in hard_failed)
-        print(f"CRITICO: {len(hard_failed)} LLM(s) mandatory falharam: {names}")
-        print("Coleta abortada para evitar dataset enviesado na janela confirmatoria v2.")
+    if decision.exit_code != 0:
+        print(f"CRITICO: coleta bloqueada — {decision.reason}: {', '.join(decision.blocked_by)}")
         print("Acoes possiveis:")
         print("  1. Verificar credit balance em cada provider (especialmente Anthropic)")
         print("  2. Confirmar que API keys nao foram rotacionadas")
         print("  3. Checar status pages: status.openai.com, status.anthropic.com, etc.")
+        print("  4. Se a falha for de saldo e PAPERS_PREFLIGHT_MODE=strict, considere degrade.")
         return 2
 
-    if soft_failed:
-        names = ", ".join(c.name for c in soft_failed)
-        print(f"AVISO: provider(s) OPCIONAL(is) degradado(s): {names} — coleta prossegue com cobertura parcial.")
-        print("  Gemini 'prepayment credits depleted'? Reabasteca em https://ai.studio/projects")
-        print("  para restaurar a cobertura 5/5. A lacuna deste run fica registrada no dataset.")
+    if decision.degraded:
+        today = datetime.now(timezone.utc).date().isoformat()
+        reasons = "; ".join(
+            f"{_canon(c.name)}: {c.error}" for c in failed
+            if _canon(c.name) in decision.degraded
+        )
+        run_url = ""
+        if os.getenv("GITHUB_SERVER_URL"):
+            run_url = (
+                f"{os.getenv('GITHUB_SERVER_URL')}/{os.getenv('GITHUB_REPOSITORY')}"
+                f"/actions/runs/{os.getenv('GITHUB_RUN_ID')}"
+            )
+        record_partial_day(
+            os.getenv("PAPERS_PARTIAL_DAYS_PATH", "data/partial_days.json"),
+            today, decision.degraded, reasons, run_url or "preflight local",
+        )
+        export_env(decision.remaining_mandatory, decision.degraded)
+        print(f"AVISO: dia {today} marcado como PARCIAL sem {', '.join(decision.degraded)}.")
+        print("  Coleta prossegue com os provedores restantes; reabasteca o saldo para")
+        print("  restaurar a cobertura completa. O dashboard publica o dia em partialDays.")
+        return 0
+
+    optional_failed = [c for c in failed if c.name.lower() not in mandatory]
+    if optional_failed:
+        names = ", ".join(c.name for c in optional_failed)
+        print(f"AVISO: provider(s) OPCIONAL(is) degradado(s): {names} — coleta prossegue.")
         return 0
 
     print("Todas as LLMs mandatory OK — prosseguindo com coleta.")

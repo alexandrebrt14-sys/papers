@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-09-06",
+    "missingLLMs": ["ChatGPT", "Claude"],
+    "reason": "Coleta local com MANDATORY_LLMS rebaixada para Gemini,Perplexity,Grok; ChatGPT 429 'no credits remaining' e Claude 400 'credit balance is too low'.",
+    "source": "governance/HEALTH-CHECK-APIS-20260908.md (semeado a mao em 2026-09-09)"
+  },
+  {
+    "date": "2026-09-07",
+    "missingLLMs": ["ChatGPT", "Claude"],
+    "reason": "Coleta local com MANDATORY_LLMS rebaixada para Gemini,Perplexity,Grok; ChatGPT 429 'no credits remaining' e Claude 400 'credit balance is too low'.",
+    "source": "governance/HEALTH-CHECK-APIS-20260908.md (semeado a mao em 2026-09-09)"
+  }
+]

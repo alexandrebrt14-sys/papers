@@ -29,10 +29,13 @@ if str(_REPO_ROOT) not in sys.path:
 
 DB_PATH = _REPO_ROOT / "data" / "papers.db"
 OUT_PATH = _REPO_ROOT / "data" / "dashboard_data.json"
+# Dias com coleta parcial (preflight degradado, ver scripts/preflight_llm_check.py).
+PARTIAL_DAYS_PATH = _REPO_ROOT / "data" / "partial_days.json"
 
 # Cohort canônico v2 — fonte de verdade é src/config_v2.py, NÃO a tabela
 # `verticals` (legado v1, congelada em 61 entidades). Importar daqui garante
 # que o headline do site reflita o cohort realmente consultado.
+from src.analysis.dashboard_public import postprocess  # noqa: E402
 from src.config_v2 import (  # noqa: E402
     COHORT_FINTECH_REAL, COHORT_RETAIL_REAL, COHORT_HEALTH_REAL, COHORT_TECHNOLOGY_REAL,
     COHORT_FINTECH_ANCHORS, COHORT_RETAIL_ANCHORS, COHORT_HEALTH_ANCHORS, COHORT_TECHNOLOGY_ANCHORS,
@@ -262,14 +265,19 @@ def main():
         }
 
     # === Top entities globally ===
+    # Fictícias saem AQUI, antes do LIMIT, senão o ranking público perde vagas
+    # para decoys de probe (em 09/09/2026 eram 8 dos 30). O pós-processamento
+    # em dashboard_public.py repete o filtro por segurança.
     top_ents = []
-    for r in con.execute("""
+    _fict_marks = ",".join("?" for _ in FICTITIOUS_ENTITIES)
+    for r in con.execute(f"""
         SELECT entity, COUNT(*) AS cnt
         FROM citation_context
+        WHERE entity NOT IN ({_fict_marks})
         GROUP BY entity
         ORDER BY cnt DESC
         LIMIT 30
-    """):
+    """, FICTITIOUS_ENTITIES):
         top_ents.append({"name": r["entity"], "citations": r["cnt"]})
 
     # === Sentiment ===
@@ -306,7 +314,7 @@ def main():
 
     # Roster legado por vertical (tabela `verticals`, v1) — mantido só para o
     # detalhamento per-vertical da UI. O headline usa o cohort v2 (constantes acima).
-    entities_real_legacy = sum(v["rosterCount"] for v in verticals_full.values())
+    # (o total legado por roster nao e mais exportado)
 
     # === ENRIQUECIMENTO ANALITICO (2026-04-16) ================================
 
@@ -325,7 +333,8 @@ def main():
 
     # --- Bootstrap CI 95% da taxa global via Wilson score (sem deps externas) ---
     def wilson_ci(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
-        if n == 0: return (0.0, 0.0)
+        if n == 0:
+            return (0.0, 0.0)
         p = k / n
         z2 = z * z
         denom = 1 + z2 / n
@@ -551,6 +560,12 @@ def main():
         "weeklyDeltas": weekly_deltas,
     }
 
+    # Integridade do arquivo público (2026-09-09): fictícias fora dos rankings,
+    # coverage limitada ao roster, windowEnd projetado e dias parciais. As
+    # regras vivem em src/analysis/dashboard_public.py para serem testadas sem
+    # banco e reaplicadas ao JSON publicado com --from-json.
+    postprocess(data, PARTIAL_DAYS_PATH)
+
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"OK — {OUT_PATH.relative_to(DB_PATH.parent.parent)}")
@@ -566,5 +581,23 @@ def main():
         print(f"  {v['name']}: {v['queries']} queries, {v['cited']} citadas ({v['rate']}%) — {vf['rosterCount']} no roster, {vf['citedCount']} com citação detectada")
 
 
+def main_from_json() -> None:
+    """Reaplica só o pós-processamento ao dashboard_data.json existente.
+
+    Uso: python scripts/generate_dashboard_json.py --from-json
+    Serve quando o papers.db não está local (ele vive no R2 desde 11/06/2026):
+    corrige o arquivo publicado sem nova coleta. Não recalcula contagens que
+    exigem o banco; só filtra, recalcula coverage e reescreve a janela.
+    """
+    data = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+    postprocess(data, PARTIAL_DAYS_PATH)
+    OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"OK — pós-processado {OUT_PATH.name}: windowEnd={data['windowEnd']}, "
+          f"topEntities={len(data['topEntities'])}, partialDays={len(data.get('partialDays', []))}")
+
+
 if __name__ == "__main__":
-    main()
+    if "--from-json" in sys.argv[1:]:
+        main_from_json()
+    else:
+        main()

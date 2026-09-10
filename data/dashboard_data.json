@@ -3,7 +3,7 @@
   "lastCollection": "2026-09-09 11:22:29",
   "dbVersion": "papers.db (88911 queries dataset)",
   "windowStart": "2026-04-23",
-  "windowEnd": "2026-07-21",
+  "windowEnd": "2026-10-15",
   "dayNumber": 54,
   "windowTotalDays": 90,
   "calendarDay": 90,
@@ -331,14 +331,6 @@
           "count": 5137
         },
         {
-          "entity": "Banco Floresta Digital",
-          "count": 1146
-        },
-        {
-          "entity": "FinPay Solutions",
-          "count": 1137
-        },
-        {
           "entity": "PicPay",
           "count": 1112
         },
@@ -403,8 +395,10 @@
           "count": 2
         }
       ],
-      "citedCount": 19,
-      "coverage": 118.8
+      "citedCount": 17,
+      "coverage": 75.0,
+      "rosterCited": 12,
+      "coverageDefinition": "rosterCited / rosterCount: marcas do roster com ao menos uma citação detectada, casamento por substring; teto 100%."
     },
     "varejo": {
       "slug": "varejo",
@@ -435,14 +429,6 @@
         {
           "entity": "Magazine Luiza",
           "count": 2684
-        },
-        {
-          "entity": "ShopNova Digital",
-          "count": 1119
-        },
-        {
-          "entity": "MegaStore Brasil",
-          "count": 1076
         },
         {
           "entity": "Americanas",
@@ -477,8 +463,10 @@
           "count": 1
         }
       ],
-      "citedCount": 12,
-      "coverage": 80.0
+      "citedCount": 10,
+      "coverage": 53.3,
+      "rosterCited": 8,
+      "coverageDefinition": "rosterCited / rosterCount: marcas do roster com ao menos uma citação detectada, casamento por substring; teto 100%."
     },
     "saude": {
       "slug": "saude",
@@ -505,14 +493,6 @@
         {
           "entity": "EMS",
           "count": 1204
-        },
-        {
-          "entity": "Clínica Horizonte Digital",
-          "count": 1080
-        },
-        {
-          "entity": "HealthTech Brasil",
-          "count": 1071
         },
         {
           "entity": "Hypera Pharma",
@@ -567,8 +547,10 @@
           "count": 8
         }
       ],
-      "citedCount": 16,
-      "coverage": 106.7
+      "citedCount": 14,
+      "coverage": 93.3,
+      "rosterCited": 14,
+      "coverageDefinition": "rosterCited / rosterCount: marcas do roster com ao menos uma citação detectada, casamento por substring; teto 100%."
     },
     "tecnologia": {
       "slug": "tecnologia",
@@ -595,14 +577,6 @@
         {
           "entity": "Totvs",
           "count": 1364
-        },
-        {
-          "entity": "DataBridge Brasil",
-          "count": 1093
-        },
-        {
-          "entity": "TechNova Solutions",
-          "count": 1059
         },
         {
           "entity": "Involves",
@@ -653,8 +627,10 @@
           "count": 5
         }
       ],
-      "citedCount": 15,
-      "coverage": 100.0
+      "citedCount": 13,
+      "coverage": 60.0,
+      "rosterCited": 9,
+      "coverageDefinition": "rosterCited / rosterCount: marcas do roster com ao menos uma citação detectada, casamento por substring; teto 100%."
     }
   },
   "topEntities": [
@@ -679,44 +655,12 @@
       "citations": 1204
     },
     {
-      "name": "Banco Floresta Digital",
-      "citations": 1146
-    },
-    {
-      "name": "FinPay Solutions",
-      "citations": 1137
-    },
-    {
-      "name": "ShopNova Digital",
-      "citations": 1119
-    },
-    {
       "name": "PicPay",
       "citations": 1112
     },
     {
-      "name": "DataBridge Brasil",
-      "citations": 1093
-    },
-    {
-      "name": "Clínica Horizonte Digital",
-      "citations": 1080
-    },
-    {
-      "name": "MegaStore Brasil",
-      "citations": 1076
-    },
-    {
-      "name": "HealthTech Brasil",
-      "citations": 1071
-    },
-    {
       "name": "Americanas",
       "citations": 1070
-    },
-    {
-      "name": "TechNova Solutions",
-      "citations": 1059
     },
     {
       "name": "C6 Bank",
@@ -1098,13 +1042,23 @@
       "date": "2026-09-06",
       "queries": 1344,
       "cited": 533,
-      "rate": 39.7
+      "rate": 39.7,
+      "partial": true,
+      "missingLLMs": [
+        "ChatGPT",
+        "Claude"
+      ]
     },
     {
       "date": "2026-09-07",
       "queries": 253,
       "cited": 110,
-      "rate": 43.5
+      "rate": 43.5,
+      "partial": true,
+      "missingLLMs": [
+        "ChatGPT",
+        "Claude"
+      ]
     },
     {
       "date": "2026-09-08",
@@ -1333,22 +1287,6 @@
       },
       "risers": [
         {
-          "entity": "Banco Floresta Digital",
-          "currentWeek": 91,
-          "previousWeek": 16,
-          "deltaAbs": 75,
-          "deltaPct": 468.8,
-          "direction": "up"
-        },
-        {
-          "entity": "FinPay Solutions",
-          "currentWeek": 83,
-          "previousWeek": 15,
-          "deltaAbs": 68,
-          "deltaPct": 453.3,
-          "direction": "up"
-        },
-        {
           "entity": "Nubank",
           "currentWeek": 409,
           "previousWeek": 89,
@@ -1377,14 +1315,6 @@
           "previousWeek": 1,
           "deltaAbs": 9,
           "deltaPct": 900.0,
-          "direction": "up"
-        },
-        {
-          "entity": "HealthTech Brasil",
-          "currentWeek": 83,
-          "previousWeek": 15,
-          "deltaAbs": 68,
-          "deltaPct": 453.3,
           "direction": "up"
         },
         {
@@ -1428,22 +1358,6 @@
       },
       "risers": [
         {
-          "entity": "DataBridge Brasil",
-          "currentWeek": 81,
-          "previousWeek": 15,
-          "deltaAbs": 66,
-          "deltaPct": 440.0,
-          "direction": "up"
-        },
-        {
-          "entity": "TechNova Solutions",
-          "currentWeek": 78,
-          "previousWeek": 15,
-          "deltaAbs": 63,
-          "deltaPct": 420.0,
-          "direction": "up"
-        },
-        {
           "entity": "iFood",
           "currentWeek": 13,
           "previousWeek": 3,
@@ -1467,22 +1381,6 @@
       },
       "risers": [
         {
-          "entity": "MegaStore Brasil",
-          "currentWeek": 82,
-          "previousWeek": 14,
-          "deltaAbs": 68,
-          "deltaPct": 485.7,
-          "direction": "up"
-        },
-        {
-          "entity": "ShopNova Digital",
-          "currentWeek": 81,
-          "previousWeek": 15,
-          "deltaAbs": 66,
-          "deltaPct": 440.0,
-          "direction": "up"
-        },
-        {
           "entity": "Via Varejo",
           "currentWeek": 5,
           "previousWeek": 1,
@@ -1494,5 +1392,31 @@
       "fallers": [],
       "newEntrants": []
     }
-  }
+  },
+  "publicRankingsNote": "Rankings públicos (topEntities, weeklyDeltas, verticalsFull.citedEntities, crossVerticalEntities) excluem os decoys fictícios de calibração listados em calibration.fictitiousEntities. Eles aparecem em citation_context porque o probe adversarial injeta o nome na pergunta; não são citação orgânica.",
+  "windowEndProjected": "2026-10-15",
+  "windowEndCalendar": "2026-07-21",
+  "windowRemainingDays": 36,
+  "windowEndSemantics": "Janela de 90 dias COLETADOS (collectedDays), não de calendário. windowEnd é o fechamento projetado: última coleta mais os dias que faltam, assumindo uma coleta persistida por dia. windowEndCalendar é o 90º dia corrido desde windowStart e só serve de referência histórica.",
+  "partialDays": [
+    {
+      "date": "2026-09-06",
+      "missingLLMs": [
+        "ChatGPT",
+        "Claude"
+      ],
+      "reason": "Coleta local com MANDATORY_LLMS rebaixada para Gemini,Perplexity,Grok; ChatGPT 429 'no credits remaining' e Claude 400 'credit balance is too low'.",
+      "source": "governance/HEALTH-CHECK-APIS-20260908.md (semeado a mao em 2026-09-09)"
+    },
+    {
+      "date": "2026-09-07",
+      "missingLLMs": [
+        "ChatGPT",
+        "Claude"
+      ],
+      "reason": "Coleta local com MANDATORY_LLMS rebaixada para Gemini,Perplexity,Grok; ChatGPT 429 'no credits remaining' e Claude 400 'credit balance is too low'.",
+      "source": "governance/HEALTH-CHECK-APIS-20260908.md (semeado a mao em 2026-09-09)"
+    }
+  ],
+  "partialDaysNote": "Dia parcial: coleta persistida com menos braços que MANDATORY_LLMS (provedor sem crédito ou quota no preflight). Entra em collectedDays, mas a comparação entre motores deve excluí-lo ou tratá-lo como incompleto."
 }

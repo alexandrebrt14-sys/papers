@@ -157,3 +157,56 @@ def test_resposta_sem_message_falha_alto(monkeypatch: pytest.MonkeyPatch) -> Non
     client._http = _Http({"status": "completed", "output": [], "usage": {}})  # type: ignore[assignment]
     with pytest.raises(RuntimeError, match="sem item message"):
         client._query_perplexity(_llm(), "q", datetime.now(timezone.utc))
+
+
+class _HttpErro(_Http):
+    class _RespErro(_Resp):
+        def raise_for_status(self) -> None:
+            raise RuntimeError("HTTP 401 insufficient_quota")
+
+    def post(self, url: str, headers: dict, json: dict) -> _Resp:
+        self.calls.append({"url": url, "headers": headers, "json": json})
+        return self._RespErro(self.payload)
+
+
+def test_erro_http_do_v1_agent_propaga_para_o_circuit_breaker(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Sem saldo, a nova rota falha alto como a legada: quem trata e o chamador."""
+    monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "1")
+    client = LLMClient(cohort=["Nubank"])
+    client._http = _HttpErro({})  # type: ignore[assignment]
+    with pytest.raises(RuntimeError, match="insufficient_quota"):
+        client._query_perplexity(_llm(), "q", datetime.now(timezone.utc))
+
+
+def test_preflight_sonda_a_rota_que_a_coleta_vai_usar(monkeypatch: pytest.MonkeyPatch) -> None:
+    import importlib.util
+    import sys
+    from pathlib import Path
+
+    import httpx
+
+    spec = importlib.util.spec_from_file_location(
+        "preflight_llm_check_pplx",
+        Path(__file__).resolve().parent.parent / "scripts" / "preflight_llm_check.py",
+    )
+    pf = importlib.util.module_from_spec(spec)
+    sys.modules["preflight_llm_check_pplx"] = pf
+    spec.loader.exec_module(pf)
+
+    calls: list[str] = []
+
+    def fake_post(url, **kwargs):
+        calls.append(url)
+        r = httpx.Response(200, request=httpx.Request("POST", url))
+        r.elapsed = __import__("datetime").timedelta(milliseconds=5)
+        return r
+
+    monkeypatch.setattr(pf.httpx, "post", fake_post)
+    monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "1")
+    assert pf.check_perplexity("pplx-test").ok
+    monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "0")
+    assert pf.check_perplexity("pplx-test").ok
+    assert calls == [
+        "https://api.perplexity.ai/v1/agent",
+        "https://api.perplexity.ai/chat/completions",
+    ]

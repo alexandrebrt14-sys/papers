@@ -51,6 +51,18 @@ Canonical pillars:
 
 ---
 
+## Integridade do dashboard público e dias parciais (2026-09-09)
+
+`data/dashboard_data.json` passa pelas regras de `src/analysis/dashboard_public.py`:
+decoys de calibração ficam só em `calibration`, `coverage` é limitada ao roster,
+`windowEnd` é o fechamento projetado da janela de 90 dias coletados e
+`partialDays` lista os dias coletados com menos braços que `MANDATORY_LLMS`.
+Para reaplicar sem banco: `python scripts/generate_dashboard_json.py --from-json`.
+
+O preflight roda em modo `degrade` por padrão (`PAPERS_PREFLIGHT_MODE`): provedor
+sem saldo vira dia parcial em vez de dia perdido. Virada da Perplexity para a
+Agent API: `docs/PERPLEXITY_AGENT_API.md`.
+
 ## Verticals and Cohorts
 
 Cohort canonical source: [`src/config_v2.py`](src/config_v2.py). Each vertical = real Brazilian entities + international anchors + 4 fictional decoys.
