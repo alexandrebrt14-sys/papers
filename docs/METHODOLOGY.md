@@ -1,5 +1,7 @@
 # Metodologia Estatistica — GEO Papers Research
 
+> Referência histórica do instrumento anterior. A [metodologia v2](METHODOLOGY_V2.md) rege a série atual; a seção 13 incorpora os limites de interpretação de SEO e IA em 10/09/2026. Não usar os parâmetros, contagens ou recomendações deste documento para substituir o protocolo vigente.
+
 Documento tecnico detalhando os metodos matematicos, testes estatisticos, pressupostos, limitacoes e criterios de validacao utilizados na pesquisa empirica multi-vertical sobre citacoes de empresas brasileiras em LLMs.
 
 **Versao:** 2.0 (26/03/2026)

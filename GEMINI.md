@@ -18,3 +18,13 @@ Permanecem valendo: português do Brasil com acentuação completa, tipografia �
 Aplicação específica deste repositório, detalhada em `DOUTRINA_EDITORIAL_NESTE_REPO.md`: os prompts de coleta em `src/config.py`, `src/shared/llm_utils.py`, `src/config_v2.py` e `src/collectors/prompt_sensitivity.py` são instrumento de medição da série longitudinal e não recebem regra editorial, porque mudá-los altera o tratamento experimental. Prompt que redige texto em português carrega o bloco condensado de `scripts/prompts/BLOCO_EDITORIAL_PROMPT.md` dentro da própria demanda, já que instrução vista só no contexto não sobrevive a geração longa.
 
 Convenção explícita deste repositório prevalece sobre convenção genérica, com a única ressalva de segurança e corretude.
+
+## Conhecimento científico vigente de SEO e IA
+
+Atualização de 10/09/2026: antes de interpretar métricas, desenhar estudos ou integrar literatura de SEO e busca com IA, ler a [base de conhecimento](docs/GEO_KNOWLEDGE_BASE_2026.md), o [sistema operacional](docs/GEO_OPERATING_SYSTEM.md) e o [canônico de setembro-10](docs/research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md). O [guia científico](docs/research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md) explica operacionalização, denominadores e ameaças à validade.
+
+A taxonomia contém **63 conceitos**, preservando os IDs de 1 a 50. Classificar somente os conceitos pertinentes. Não exigir cobertura dos 14 eixos nos prompts experimentais nem inserir regras de SEO/editoriais no estímulo longitudinal. A [metodologia v2, seção 13](docs/METHODOLOGY_V2.md) esclarece as proxies locais sem mudar H1 a H5 ou o instrumento.
+
+Survey não é peso de ranking; associação não é efeito; menção não é sustentação semântica; fonte exposta não é log de recuperação. O comparador opcional usa Brave e domínios, não Google e ranking de entidades. Coluna existente não comprova métrica calculada. P-SEO-01 a P-SEO-05 são propostas, sem execução ou pré-registro concluído nesta integração.
+
+Em conflito conceitual, setembro-10 prevalece sobre ondas anteriores. Protocolos e estratos históricos continuam regidos pela versão em que foram executados. Não sobrescrever dados, reformular prompts, alterar cache, iniciar coleta paga ou trocar parâmetros como consequência de uma atualização de conhecimento.

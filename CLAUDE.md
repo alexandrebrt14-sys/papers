@@ -7,9 +7,13 @@ Todo conteúdo em PT-BR com acentuação completa. Exceção: código, commits, 
 
 Em **toda** decisão metodológica (escolha de dataset, framing de paper, definição de métrica estatística, escolha de conference de submissão, prompt portfolio de validação): ler primeiro [`docs/GEO_KNOWLEDGE_BASE_2026.md`](docs/GEO_KNOWLEDGE_BASE_2026.md) e [`docs/GEO_OPERATING_SYSTEM.md`](docs/GEO_OPERATING_SYSTEM.md).
 
-- **KB (~21 KB)** consolida estado da arte 2025-2026 adaptado ao repo papers: papers fundadores GEO (Aggarwal KDD 2024 arXiv:2311.09735, Chen arXiv:2509.08919, Yao EMNLP 2025), datasets benchmark (GEO-bench, AI-citation-bench, MentionGen), metodologias estatísticas canônicas (n mínimo, IC, replicação inter-LLM), top conferences (SIGIR, ACL, EMNLP, KDD, WWW, ECIR), tooling open source (AthenaHQ public, Peec API). **§11 é a aplicação específica deste repo.**
-- **OS (~24 KB)** é o playbook operacional alinhado a calendário de submissões: cadência diária (coleta + cache), semanal (review estatístico), mensal (preprint draft), trimestral (submission window). KPIs estatísticos (n por vertical, intervalo de confiança, pré-registro OSF). Prompt portfolio para validar replicabilidade do dataset.
+- **KB revisada em 10/09/2026**: definições observacionais, hierarquia de evidência, limites de inferência e aplicação científica. A seção 11 liga os conceitos a propostas próprias deste repositório.
+- **OS revisado em 10/09/2026**: investigação com fontes, auditoria de métricas, preservação da série, desenho de estudos e redação verificável. Não contém resultados pré-fabricados, amostra mínima universal ou prompts para otimizar o desfecho.
 - **Pesquisa bruta** em [`docs/research/geo-knowledge-2026/`](docs/research/geo-knowledge-2026/) (Perplexity sonar-pro com citações reais).
+
+**Integração de 10/09/2026, leitura vigente:** [canônico](docs/research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md), [guia científico](docs/research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md), [relatório com 30 fontes](docs/research/geo-wave-setembro-10-2026/relatorio-seo-ia-query-fan-out.md) e [registro de 24 consultas](docs/research/geo-wave-setembro-10-2026/registro-query-fan-out.md). Reconcilia survey e evidência empírica, amplia o dicionário para 63 conceitos, descreve as proxies locais de seleção/absorção e corrige o escopo do Paper 2. Cinco propostas P-SEO ficam separadas de H1 a H5.
+
+**Precedência:** setembro-10 governa interpretação conceitual em conflito com ondas anteriores. A metodologia v2, seus estratos e seu novo adendo 13 regem a série. Os resumos de ondas abaixo conservam o histórico de descoberta; números, referências e entregas neles citados não recebem nova validação por serem listados aqui. Antes de reutilizar uma afirmação, conferir a fonte primária e o estado de implementação.
 
 **Incremento Q2 2026 (17-05-2026)** — adiciona ao KB/OS sem substituir:
 - [`docs/research/geo-q2-2026/GEO_KNOWLEDGE_2026_Q2_INCREMENT.md`](docs/research/geo-q2-2026/GEO_KNOWLEDGE_2026_Q2_INCREMENT.md) — doc canônico específico deste repo de pesquisa (sumário executivo, mudanças metodológicas Q1-Q2 2026, novos papers a integrar no pipeline arXiv, novos critérios de scoring, preregistration, 7 artefatos a produzir). Gerado por Claude Opus 4.7 sobre síntese Gemini 2.5 Pro de 5 Perplexity sonar-pro + 5 sonar-deep-research + 1 GPT-4o web_search.
@@ -46,18 +50,15 @@ Em **toda** decisão metodológica (escolha de dataset, framing de paper, defini
 
 Citar `§X.Y` do KB/OS/INCREMENT/WAVE ao tomar decisões. **Em conflito de fato datado, prevalece a wave mais recente nos itens explicitamente marcados como correção (Setembro (§8 — spam update terminou 21-ago, AI Mode exige modelo declarado, regra de parada substitui N fixo, Reddit é insumo invisível, `search_queries` sumiu, Sonar morre 27-set, feed antes de página) > Agosto (§8 — `llms.txt` rebaixado, AI Mode 1 bi MAU × 0,13% visitas não se compõem, Reddit fora dos exemplos, core update de agosto inexistente, API xAI) > Julho §7 > Junho-19 §7 > 15B §8); fora desses itens, o corpus anterior permanece válido.** Atualizar trimestralmente (ciclo de submissão).
 
-## REGRA #2 — Taxonomia canônica de 50 conceitos GEO/SEO 2026 (classificação obrigatória)
+## REGRA #2: taxonomia canônica de 63 conceitos
 
-[`docs/GEO_50_CONCEITOS_CANONICAL.md`](docs/GEO_50_CONCEITOS_CANONICAL.md) é o **dicionário obrigatório de classificação** ao catalogar paper acadêmico, análise de fonte, ou produção de research neste repo. 14 eixos, 50 conceitos numerados, anti-padrões proibidos (pseudo-GEO, schema inflado, llms.txt como talismã).
+O [dicionário](docs/GEO_50_CONCEITOS_CANONICAL.md) preserva os conceitos de 1 a 50 nos 14 eixos originais e acrescenta os conceitos transversais de 51 a 63. Usar os IDs e nomes ao classificar literatura, métricas e hipóteses.
 
-**Mapeamento obrigatório:**
+Ao resumir um estudo, indicar quais conceitos pertinentes ele testa, mede, discute ou contesta. Não aplicar todas as tags nem tratar ausência fora do escopo como defeito. Nas pesquisas de literatura, expandir a pergunta pelos conceitos relevantes e registrar as consultas realmente executadas.
 
-- **Ao resumir um paper** (entrada em `docs/research/` ou ingestão arXiv): tagueá-lo contra os Conceitos **11** (Answer capsules), **13** (Schema.org), **15** (Clareza de entidade), **21** (Referências externas), **22** (Autoria), **24** (Citabilidade GEO), **25** (Recuperabilidade generativa), **30** (llms.txt). Anotar quais o paper cobre, quais ignora, e quais ele desafia.
-- **Em pesquisa nova com Perplexity sonar-deep-research**: usar os 50 conceitos como template de checklist da query — incorporar conceitos pertinentes ao tópico para evitar lacunas estruturais comuns em reviews ad hoc.
-- **Em prompt portfolio de validação**: garantir que cobertura por vertical toca os 14 eixos (não só os de citação direta).
-- **Em pré-registro OSF**: declarar quais conceitos a hipótese testa explicitamente.
+Nos portfólios experimentais, preservar o estímulo e sua versão. A taxonomia não exige cobrir todos os eixos, não muda H1 a H5 e não autoriza instruções de cápsula, schema ou citação nos prompts. Novos estudos devem declarar estimando, unidade, mensuração, amostra, exclusões e análise antes da execução. P-SEO-01 a P-SEO-05 são propostas documentadas, não pré-registros concluídos.
 
-Citar `Conceito N — Nome` ao referenciar (ex.: "Conceito 24 — Citabilidade GEO"). Documento revisado trimestralmente em sincronia com KB/OS.
+Não chamar as proxies locais de CSR/CAR de prova de recuperação ou absorção semântica; consultar o guia e a seção 13 da metodologia. Não inferir convergência científica a partir de uma cota de repetições ou significância desejada.
 
 ## Propósito
 
@@ -68,7 +69,7 @@ Pesquisa empírica multi-vertical sobre como LLMs citam empresas brasileiras em 
 ```
 papers/
 ├── data/
-│   ├── papers.db                  # SQLite — source of truth no git (protege pós-incidente 08/04)
+│   ├── papers.db                  # cópia de trabalho; fonte canônica no R2 desde junho/2026
 │   ├── dashboard_data.json        # artefato para UIs externas
 │   └── cache/                     # cache SHA-256 de respostas (não versionado)
 ├── src/
