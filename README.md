@@ -12,6 +12,17 @@ Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation 
 
 ---
 
+## Aprendizados de SEO e busca com IA (10/09/2026)
+
+A [integração científica de setembro-10](docs/research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md) adapta a pesquisa da Zyppy e as evidências recentes ao que este pipeline realmente observa.
+
+- [Guia científico aprofundado](docs/research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md): seleção, absorção, fidelidade, fan-out, amostra, causalidade e desenhos novos.
+- [Dicionário de 63 conceitos](docs/GEO_50_CONCEITOS_CANONICAL.md), [base de conhecimento](docs/GEO_KNOWLEDGE_BASE_2026.md) e [sistema operacional](docs/GEO_OPERATING_SYSTEM.md): referências vigentes para agentes e pesquisadores.
+- [Relatório com 30 fontes](docs/research/geo-wave-setembro-10-2026/relatorio-seo-ia-query-fan-out.md) e [24 consultas da investigação original](docs/research/geo-wave-setembro-10-2026/registro-query-fan-out.md): evidências, datas e limites.
+- [Paper 2 revisado](docs/outlines/PAPER_2_GEO_VS_SEO.md): comparação de domínios de Brave e fontes de APIs, com extensões ainda propostas.
+
+A seção 13 da [metodologia v2](docs/METHODOLOGY_V2.md) esclarece as proxies locais e preserva H1 a H5, prompts, janela e dados. Nenhuma coleta, integração de GSC ou novo experimento foi executado nesta atualização. Os números datados nas seções históricas abaixo permanecem retratos das respectivas datas; não representam progresso recalculado em setembro.
+
 ## v2.0.0-reboot (2026-04-23)
 
 Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 127-entity cohort (79 Brazilian + 32 international anchors + 16 fictional decoys), a 192-query balanced battery, and a pre-registered decision rule. **217/217 tests passing.**

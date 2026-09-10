@@ -1,547 +1,129 @@
-# GEO Knowledge Base 2026 — papers
+# Base de conhecimento de SEO e busca com IA para pesquisa empírica
 
-> **Fonte da verdade** consolidando o estado da arte 2025-2026 em Generative Engine Optimization (GEO) para uso como **contexto enriquecido em pesquisas empíricas sobre citações de marcas brasileiras em LLMs**.
->
-> Síntese adaptada ao repositório **papers** — pesquisa multi-vertical sobre como ChatGPT, Claude, Gemini, Perplexity e Copilot citam empresas brasileiras em respostas generativas.
->
-> **Versão:** 1.0 · 2026-05-13 · Repo: papers
->
-> **Como usar este documento:** anexe como contexto em decisões metodológicas, definição de métricas, escolha de conferences, framing de papers. Cite trechos por seção (`§X.Y`).
->
-> **Snapshot mais recente — 20-mai-2026:** consulte primeiro `docs/research/state-of-art-2026-05/GEO_STATE_OF_ART_2026_05_MASTER.md` (sumário executivo + 6 tracks, ~50.800 palavras) que enriquece este documento com 18 papers Q2 2026 validados arXiv (FeatGEO, selection/absorption, GhostCite, CiteAudit, CiteTracer, urlhealth, ResRank, PyRAG, ReaLM-Retrieve, SoK Agentic RAG, Causal Memory Intervention, Tabular Chunking), 22 KPIs operacionais novos, estado da arte RAG/vector/agentic, 17 vendors atualizados, ranking factors em 10 surfaces e 30+ AI crawlers. Use Track A como referência bibliográfica para próximos papers (5+).
+**Revisão:** 10/09/2026. **Escopo:** definições e decisões científicas do `papers`. **Fonte do instrumento:** [metodologia v2](METHODOLOGY_V2.md). O protocolo executado e seus estratos prevalecem sobre recomendações gerais deste documento.
 
----
+A base agora distingue o que o código mede, o que a documentação dos motores afirma e o que novos estudos poderiam testar. Afirmações antigas sobre ganhos universais, amostras mágicas e resultados esperados foram retiradas da orientação ativa. O [estado anterior em 249f548](https://github.com/alexandrebrt14-sys/papers/blob/249f548/docs/GEO_KNOWLEDGE_BASE_2026.md) conserva o histórico; esta revisão não declara que todas as referências antigas são falsas.
 
-## Índice
+## 0. Qual pergunta governa o trabalho?
 
-0. Sumário executivo
-1. O que é GEO em 2026 — papers fundadores para pesquisa empírica
-2. KPIs e measurement canônico para estudos de citação
-3. Vendor stack — ferramentas de coleta e análise
-4. Como cada LLM extrai e cita fontes — diferenças empíricas
-5. Semantic search, vetores, RAG — implicações metodológicas
-6. SEO ↔ GEO — diferenças para pesquisa de citações
-7. Discovery files canônicos — relevância para coleta de dados
-8. Schema.org como variável independente
-9. Framework operacional para pesquisa longitudinal
-10. Top 30 artigos/colunas/podcasts 2026
-11. Aplicação no contexto papers
-12. Anti-padrões metodológicos a evitar
-13. Checklist trimestral de revisão
-Apêndice A. Citações canônicas com URLs reais
-Apêndice B. Referência às pesquisas Perplexity deste repo
+O `papers` estuda como entidades brasileiras aparecem em respostas de modelos sob condições controladas de consulta e observação. Seu objetivo científico é produzir estimativas interpretáveis, inclusive efeitos nulos e resultados inconclusivos. Melhorar a taxa de citação por reformulação de prompts seria mudar o instrumento, não melhorar sua qualidade.
 
----
+A atualização de setembro conecta os [63 conceitos canônicos](GEO_50_CONCEITOS_CANONICAL.md) ao [guia de operacionalização](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md). Os IDs classificam literatura e hipóteses; não são pesos de um algoritmo nem campos já implementados.
 
-## 0. Sumário executivo
+## 1. Como usar a literatura fundadora e o survey recente?
 
-**Pesquisa empírica de GEO exige rigor estatístico inédito.** O repositório **papers** foca em medir objetivamente como LLMs citam marcas brasileiras, com n≥5k queries por vertical/LLM para IC 95% confiável. KPI principal: **mention rate** com significância p<0.01.
+A referência fundadora confirmada é [Aggarwal et al., GEO: Generative Engine Optimization](https://arxiv.org/abs/2311.09735), aceito no KDD 2024, com versão v3 de 28/06/2024. Seu desenho deve ser examinado antes de transferir métricas ou intervenções para outro sistema. A KB anterior mantinha um DOI incompatível com essa referência; esta versão usa o identificador primário aberto.
 
-**3 conclusões não-negociáveis das pesquisas 2025-2026 adaptadas ao contexto papers:**
+O [survey da Zyppy, de 09/09/2026](https://signal.zyppy.com/p/google-ranking-factors-expert-survey), reúne 131 especialistas e 103 fatores. É evidência sobre julgamento profissional em ranking do Google. Os percentuais da pergunta “três fatores principais” contam participantes que escolheram uma categoria; não medem contribuição causal ao ranking. A pesquisa inspira variáveis e hipóteses, sem definir o desfecho da coleta de APIs.
 
-1. **Replicabilidade inter-LLM é essencial mas difícil:** Ray & King (WWW 2025) mostram que apenas 20% dos estudos conseguem Kappa >0.8 entre anotadores. Protocolo rigoroso com seed fixo, temperature=0 é mandatório.
-2. **Variáveis E-E-A-T/Schema explicam 65% da variância em mention rate** (Solis KDD 2026). Sem controlar essas variáveis em regressões, papers são rejeitados em top conferences.
-3. **Dataset longitudinal mínimo viável: 6 meses com coleta semanal.** Estudos com <3 meses falham em capturar drift de comportamento dos LLMs (Soulo arXiv 2026).
+A ficha de leitura de qualquer artigo deve registrar título, autores, versão, população, superfície, unidade, intervenção ou exposição, método, desfecho e limites. Links de agregadores e sínteses de LLM são caminhos de descoberta; afirmações acadêmicas remetem à publicação primária verificada.
 
-**Posicionamento papers:** infraestrutura robusta (`papers.db` versionado, SHA-256 cache, Docker), mas falta automação de coleta em escala. Próximos passos críticos em §11.
+## 2. Quais métricas o projeto pode interpretar?
 
----
-
-## 1. O que é GEO em 2026 — papers fundadores para pesquisa empírica
-
-### 1.1 Paper seminal Aggarwal et al. (2024)
-
-- **Citação completa:** Aggarwal, P., Murahari, V., Rajpurohit, T., Kalyan, A., Narasimhan, K., & Deshpande, A. (2024). GEO: Generative Engine Optimization. KDD '24, pp. 5-16. DOI 10.1145/3637528.3671900. Preprint arXiv:2311.09735
-  <!-- Corrigido em 31/08/2026: a citação anterior dizia SIGIR 2023 com DOI
-       10.1145/3539618.3594249. Venue, ano e DOI estavam errados; o DOI não
-       resolve para este paper. Verificado contra arXiv e dblp. -->
-- **URL:** https://dl.acm.org/doi/10.1145/3539618.3594249
-- **Relevância para papers:**
-  - Primeiro estudo empírico com 10k queries cross-vertical
-  - Estabelece metodologia de black-box measurement
-  - Define as 5 métricas canônicas que usamos: Visibility Score, Citation Frequency, Position Bias, Justification Depth, Domain Authority Lift
-  - **Limitação:** focou em marcas americanas — gap que papers preenche para Brasil
-
-### 1.2 Chen et al. (2025) — framework de earned media
-
-- **Citação:** Chen et al., "GEO: Dominate AI Search", arXiv:2509.08919
-- **URL:** https://arxiv.org/abs/2509.08919
-- **Contribuições metodológicas:**
-  - Dataset de 500k sessões LLM com gold labels
-  - Regressão mostra E-E-A-T impulsiona mention rate em 23%
-  - **Insight crítico:** earned media pesa 2.3-3.1× mais que brand-owned
-  - Metodologia de extração via prompt engineering que adaptamos
-
-### 1.3 Yao et al. (2025) — vieses em extração
-
-- **Citação:** Yao et al., "Hidden Biases in LLM Citation Extraction", EMNLP 2025 Findings
-- **URL:** https://aclanthology.org/2025.emnlp-main.456
-- **Aplicação direta:**
-  - Dataset de 100k extrações com bias annotations
-  - Revela bias de 15% para marcas com Wikidata forte
-  - **Protocolo LLM-as-judge** para validação que implementamos em `citation_tracker`
-
-### 1.4 Papers específicos ao contexto brasileiro (gaps)
-
-**Nenhum paper peer-reviewed sobre citações de marcas brasileiras em LLMs até 2026.** Papers identificados focam em:
-- Mercados US/EU (Ray WWW 2025, Solis KDD 2026)
-- Análises single-LLM (não cross-platform)
-- Snapshots únicos (não longitudinais)
-
-**Oportunidade clara:** primeiro estudo longitudinal multi-LLM de marcas brasileiras. Target conferences: SIGIR 2027 (short paper), EMNLP 2027 (findings), KDD 2027 (applied track).
-
----
-
-## 2. KPIs e measurement canônico para estudos de citação
-
-### 2.1 KPIs primários com benchmarks empíricos
-
-| KPI | Definição operacional | Benchmark 2026 (global) | Medição no repo papers |
-|---|---|---|---|
-| **Mention Rate** | % queries onde marca aparece na resposta | 15-25% top brands US | `citation_tracker.extract_mentions()` |
-| **Position Bias Score** | Posição média normalizada (0-1) | 0.7+ para líderes | `context_analyzer.position_score()` |
-| **Attribution Confidence** | Score de certeza na atribuição (hedging) | >0.8 marcas estabelecidas | `context_analyzer.hedging_detector()` |
-| **Cross-LLM Consistency** | Desvio padrão entre LLMs | <0.15 para marcas fortes | `competitor_benchmark.consistency()` |
-| **SERP Overlap** | Correlação com Google top 10 | 0.4-0.6 (Soulo 2026) | `serp_overlap.calculate()` |
-
-### 2.2 Métricas estatísticas para papers
-
-- **Tamanho amostral mínimo:** n=1000 queries/vertical para erro ≤5% (Ray WWW 2025)
-- **Poder estatístico:** 0.8 para detectar diferença de 5% em mention rate
-- **Testes recomendados:**
-  - Chi-quadrado para diferenças categóricas entre LLMs
-  - Mann-Whitney U para position bias (não-paramétrico)
-  - Regressão Poisson/Negative Binomial para mention counts
-  - Mixed-effects models para dados longitudinais
-
-### 2.3 Protocolo de coleta papers
-
-```python
-# Exemplo operacional do papers.db
-PROTOCOL = {
-    "queries_per_vertical": 1000,
-    "llms": ["gpt-4", "claude-3", "gemini-2", "perplexity", "copilot"],
-    "temperature": 0,
-    "seed": 42,
-    "collection_frequency": "weekly",
-    "validation": "20% manual annotation"
-}
-
----
-
-## 3. Vendor stack — ferramentas de coleta e análise
-
-### 3.1 Ferramentas de coleta em escala
-
-| Tool | Uso no contexto papers | Custo | Integração |
-|---|---|---|---|
-| **BraveSearch API** | SERP baseline para overlap | $5/1k queries | `serp_overlap` module |
-| **Perplexity API** | Coleta direta de citações | $0.20/1k tokens | Native em `citation_tracker` |
-| **Anthropic/OpenAI APIs** | Multi-LLM queries | ~$30/1k queries complexas | Batch processing |
-| **Profound API** (quando lançar) | Tracking automatizado | $999/mo starter | Validação cruzada |
-
-### 3.2 Análise e visualização
-
-| Tool | Função | Relevância papers |
+| Objeto | Unidade e denominador necessários | Limite atual |
 |---|---|---|
-| **Pandas + Statsmodels** | Regressões, time series | Core da análise estatística |
-| **spaCy/Transformers** | NER para brand extraction | `citation_tracker` base |
-| **Plotly/Altair** | Visualizações paper-ready | Figures para submissions |
-| **DVC** | Versionamento de datasets | Replicabilidade |
+| Menção de entidade | Respostas elegíveis, por provedor, consulta e janela | O NER v2 detecta ocorrência; a janela principal é a da metodologia |
+| Proeminência | Posição da menção na parte observada da resposta | Não equivale à posição em SERP nem à relevância da recomendação |
+| Seleção de fonte | Correspondência em URLs expostas | Proxy local; não observa o conjunto interno recuperado |
+| Absorção local | Indicador derivado de `cited` | Não valida sustentação semântica de uma afirmação |
+| Overlap | Interseção e união de conjuntos explicitamente definidos | O módulo opcional usa domínios de Brave e fontes de API |
+| Persistência | Presença por oportunidade repetida e comparável | Precisa distinguir execução nova, cache e falha de captura |
+| Fidelidade | Pares afirmação/fonte avaliáveis | Proposta de anotação; não inferir da coluna de absorção |
+| Resultado comercial | Eventos de visita ou ação com regra de atribuição | Não medido pela simples contagem de menções do painel |
 
-### 3.3 Infraestrutura papers
+O [guia científico](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md) detalha falsos positivos de URL, candidatos restritos às entidades mencionadas e zeros ambíguos. A existência de colunas CSR/CAR agregadas e `semantic_entropy_drift` não comprova valores calculados ou validados.
 
-- **SQLite** (`papers.db`): adequado para ~1M registros
-- **Docker**: replicabilidade total do ambiente
-- **GitHub Actions**: coleta automatizada semanal
-- **SHA-256 cache**: evita re-queries desnecessárias
+## 3. Qual stack sustenta essas observações?
 
----
+O inventário é o dos arquivos do repositório, não uma lista de ferramentas para contratar. [pyproject.toml](../pyproject.toml) e [requirements-lock.txt](../requirements-lock.txt) governam dependências; [config.py](../src/config.py) e [config_v2.py](../src/config_v2.py) definem braços, coortes e estímulos.
 
-## 4. Como cada LLM extrai e cita fontes — diferenças empíricas
+A extração de entidades está em [entity_extraction.py](../src/analysis/entity_extraction.py), as observações em [citation_tracker.py](../src/collectors/citation_tracker.py), as heurísticas de seleção/absorção em [failure_classifier.py](../src/collectors/failure_classifier.py), a análise de hipóteses em [hypothesis_engine.py](../src/analysis/hypothesis_engine.py) e a persistência em [client.py](../src/db/client.py). Bibliotecas instaladas não demonstram que todo método de uma publicação esteja implementado.
 
-### 4.1 Padrões observados (2025-2026)
+Conforme o [incidente de 08/09](../governance/HEALTH-CHECK-APIS-20260908.md), a base canônica fica no R2; o banco do clone é uma cópia de trabalho. Esta integração não consultou o banco remoto nem atualizou números da série.
 
-| LLM | Viés principal | Taxa citação | Fonte preferencial |
-|---|---|---|---|
-| **ChatGPT** | Wikidata/Wikipedia | 18-22% | Sites com schema rico |
-| **Claude** | Academic/news | 12-15% | Publicações respeitáveis |
-| **Gemini** | Google ecosystem | 25-30% | YouTube, Maps, Reviews |
-| **Perplexity** | Real-time search | 35-40% | Mix agregado |
-| **Copilot** | Microsoft properties | 20-25% | LinkedIn, GitHub |
+## 4. Como comparar modelos e produtos?
 
-### 4.2 Implicações metodológicas
+Registrar provedor, produto, endpoint, modelo solicitado e devolvido, ferramentas de busca, parâmetros disponíveis, idioma, data e versão do protocolo. Um nome de interface de consumidor não identifica a configuração de uma API.
 
-- **Estratificação obrigatória:** não agregar resultados cross-LLM sem weights
-- **Normalização:** Perplexity cita 2× mais — ajustar baselines
-- **Temporal drift:** re-medir mensalmente (comportamento muda com updates)
+Nem todo provedor aceita os mesmos parâmetros. Fixar seed e temperatura quando disponíveis pode ajudar a controlar variação, mas não garante determinismo ou equivalência entre produtos. Não alterar parâmetros da série para satisfazer uma receita genérica.
 
-### 4.3 Protocolo de prompt papers
+RAG e geração paramétrica são dimensões do desenho, não sinônimos permanentes de marcas. Quando um único provedor representa uma arquitetura, a comparação também carrega diferenças desse provedor; não identifica isoladamente o efeito de RAG. Mudança de rota, modelo, raciocínio ou ferramenta exige avaliar um novo estrato, como documentado na metodologia e em [PERPLEXITY_AGENT_API.md](PERPLEXITY_AGENT_API.md).
 
-```python
-EXTRACTION_PROMPT = """Liste as 5 melhores {category} no Brasil em 2026.
-Para cada uma, inclua:
-- Nome da empresa
-- Por que é relevante
-- Site oficial"""
-```
+## 5. O que RAG e fan-out permitem observar?
 
-Consistência: mesmo prompt, zero variação. Temperature=0 sempre.
+RAG combina recuperação e geração, mas a visibilidade de seus passos depende do sistema. Fontes expostas, documentos recuperados, trechos usados e afirmações sustentadas são conjuntos diferentes. Sem logs, não estimar “presença da marca no índice vetorial público” como se esse índice estivesse disponível.
 
----
+Uma revisão de literatura pode executar fan-out investigativo com consultas registradas. Um experimento com motor comercial só chama de fan-out observado as subconsultas efetivamente expostas. Subtarefas propostas pelo pesquisador continuam um referencial externo.
 
-## 5. Semantic search, vetores, RAG — implicações metodológicas
+Em RAG controlado, o pesquisador pode registrar corpus, consultas, recuperação e saída. A validade interna desse desenho não transforma o sistema experimental em réplica do Google. O tamanho dos blocos pertence ao sistema e à tarefa estudados, sem cota universal de palavras.
 
-### 5.1 Como RAG impacta citações
+## 6. Como relacionar SEO, fontes e resultado?
 
-- **Chunking:** respostas favorecem conteúdo em chunks de 200-500 tokens
-- **Embedding similarity:** marcas com content clusters densos = maior recall
-- **Knowledge cutoff:** dados pós-training aparecem via RAG em tempo real
+Os fundamentos de busca continuam relevantes ao Google generativo segundo seu [guia oficial](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide). Isso não implica que a SERP original contenha todas as fontes possíveis de uma resposta, nem que uma citação leve a clique.
 
-### 5.2 Variáveis de controle
+A [Ahrefs, em março de 2026](https://ahrefs.com/blog/ai-overview-citations-top-10/), comparou URLs citadas em AIO com resultados do Google; o `papers` possui um módulo de Jaccard entre domínios do Brave e fontes de APIs. São perguntas diferentes. Não transportar o número de um como baseline do outro.
 
-Para papers robustos, controlar:
-- **Vector density:** quantos embeddings a marca tem em índices públicos
-- **Semantic coherence:** consistência de messaging (medido via cosine similarity)
-- **Freshness signals:** última atualização de conteúdo
+CTR, citação, impressão e conversão exigem denominadores próprios. O [relatório de pesquisa](research/geo-wave-setembro-10-2026/relatorio-seo-ia-query-fan-out.md) compara Ahrefs, Seer e Pew sem tratar populações e períodos diferentes como um único efeito de IA sobre tráfego.
 
-### 5.3 Ferramentas de análise
+## 7. Arquivos de descoberta são variáveis ou requisitos?
 
-- **Sentence Transformers:** gerar embeddings para análise
-- **FAISS:** busca de vizinhos para medir densidade
-- **Pinecone/Weaviate APIs:** verificar presença em índices comerciais
+Depende da superfície. Separar acesso por crawler, indexação, elegibilidade de snippet, inclusão em recurso generativo e treinamento. Uma configuração não responde automaticamente às outras perguntas.
 
----
+Para Google Search, o guia oficial diz que `llms.txt` não ajuda nem prejudica visibilidade e ranking, pois é ignorado para esse fim. Um estudo sobre outro consumidor pode avaliar o arquivo se houver mecanismo ou uso verificável. Não presumir ganho universal nem reprovar um site pela ausência.
 
-## 6. SEO ↔ GEO — diferenças para pesquisa de citações
+Robots e sitemap ajudam a investigar acesso e descoberta, mas nenhuma lista de arquivos garante que a página seja exibida. Métricas técnicas não podem ser substituídas por contagem de arquivos presentes.
 
-### 6.1 Divergências fundamentais
+## 8. Como estudar schema e E-E-A-T?
 
-| Dimensão | SEO tradicional | GEO (answer engines) |
+Schema pode ser uma variável de presença, validade ou coerência factual. Essas dimensões não são intercambiáveis. Uma intervenção precisa isolar a alteração de markup das mudanças em conteúdo, autoria, links e distribuição.
+
+E-E-A-T é uma estrutura de avaliação de experiência e confiança; o Google explica que não é um fator específico de ranking em [Creating helpful, reliable, people-first content](https://developers.google.com/search/docs/fundamentals/creating-helpful-content). Um escore construído pelo pesquisador exige definição e validação; não deve receber um peso universal ou uma proporção de variância pré-fixada.
+
+O conceito 61, Schema Authority Stack, é nome interno para organização coerente de entidades e relações. Não é markup especial exigido por Google Search. Hipóteses sobre seu efeito devem poder produzir resultado nulo.
+
+## 9. Como proteger a pesquisa longitudinal?
+
+A série exige versão de estímulo, janela, extrator e configuração. O texto integral preservado a partir da migração 0010 permite análises futuras, mas não recompõe o que se perdeu antes. Uma análise principal em 200 caracteres e uma sensibilidade em texto integral usam populações observáveis distintas.
+
+Registrar dias coletados, dias parciais, braços ausentes, cache e mudanças de modelo. Não converter um dia sem coleta em taxa zero, nem somar réplicas idênticas como independentes. Relatórios de progresso precisam de banco canônico e extração datada.
+
+A regra confirmatória segue a metodologia v2. Recomendações de convergência para monitoramento não autorizam parada opcional ou substituição retrospectiva da regra de análise.
+
+## 10. Qual hierarquia de evidência adotar?
+
+| Classe | Uso adequado | Limite |
 |---|---|---|
-| **KPI principal** | Rankings, tráfego | Mention rate, attribution |
-| **Conteúdo ideal** | Long-form, keyword-rich | Conciso, fact-dense |
-| **Link building** | Backlinks para autoridade | Citações em earned media |
-| **Technical** | Core Web Vitals | Schema, discovery files |
+| Documentação oficial | Requisitos, funcionamento público e disponibilidade de recursos | Não publica todos os pesos nem prova resultado de um site |
+| Estudo com intervenção | Estimar efeito no desenho e população estudados | Tratamento composto não identifica cada componente |
+| Painel observacional | Associações, distribuição, evolução e hipóteses | Seleção, sazonalidade, versão e confundimento restringem causalidade |
+| Survey de especialistas | Prioridades percebidas e divergências profissionais | Opinião não é mecanismo demonstrado |
+| Patente, hipótese ou teoria interna | Formular mecanismos e previsões | Existência do texto não comprova implantação |
+| Material bruto de pesquisa | Rastrear descoberta e síntese | Não substitui a fonte que sustenta a afirmação |
 
-### 6.2 Convergências exploráveis
+A escolha da evidência depende da pergunta. Um documento oficial é a origem apropriada para um requisito do produto; um experimento adequado é mais informativo sobre uma intervenção específica. “Mais recente” não significa desenho melhor ou dados mais atuais.
 
-- **E-E-A-T** vale para ambos (mas peso 3× maior em GEO)
-- **Structured data** migrou de "nice-to-have" para crítico
-- **Crawlability** continua fundamental
+## 11. O que muda especificamente no papers?
 
-### 6.3 Estratégia papers
+Os 63 conceitos passam a orientar classificação e desenho, preservando a coorte e a bateria v2. A [onda de setembro-10](research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md) apresenta cinco propostas novas, P-SEO-01 a P-SEO-05, fora das hipóteses H1 a H5. P-SEO-05 valida as proxies antes que sustentem alegações semânticas.
 
-Focar nas **divergências** para contribuição acadêmica original. SEO bem estudado; GEO tem gaps enormes.
+O [Paper 2](outlines/PAPER_2_GEO_VS_SEO.md) foi reconciliado com Brave, domínios e os campos realmente disponíveis. Seu planejamento deixa de anunciar resultados preliminares não demonstrados ou capacidades de ranking ausentes.
 
----
+A contribuição brasileira deve ser expressa pelo recorte efetivamente estudado. Uma busca limitada sem resultados semelhantes não demonstra que o trabalho é o primeiro do mundo. Calendários, venues e pré-registros precisam de confirmação específica antes de serem apresentados como compromissos concluídos.
 
-## 7. Discovery files canônicos — relevância para coleta de dados
+## 12. Quais erros científicos a base deixa de recomendar?
 
-### 7.1 Impacto mensurável em mention rate
+Não existe N mínimo que assegure significância, validade ou publicação. Dimensionar pelo estimando, efeito relevante, variabilidade e dependência; não usar p-valor como KPI de sucesso.
 
-Segundo Haynes (ECIR 2025), sites com discovery files completos têm:
-- **+47% mention rate** vs. sites sem
-- **+2.1× brand name accuracy** (menos typos/variações)
-- **+31% link attribution** (cite com URL)
+Ausência de significância não comprova equivalência. A classificação heurística de efeito provavelmente nulo da regra atual permanece com seu nome e seus limites. Estudos de equivalência precisam de margens e procedimento próprios.
 
-### 7.2 Arquivos prioritários papers
+Concordância entre fontes pode refletir republicação. Popularidade e citações podem compartilhar causas. Comparações entre produtos misturam arquitetura, dados, interface e políticas. “Controlar todas as variáveis” não resolve automaticamente esses problemas.
 
-| Arquivo | Impacto | Presença Brasil 2026 |
-|---|---|---|
-| `robots.txt` com 23+ bots | Baseline | ~60% sites |
-| `llms.txt` | +15% visibility | <5% sites |
-| `llms-full.txt` | +8% adicional | <1% sites |
-| `ai-plugin.json` | ChatGPT plugins | <0.1% sites |
+Nenhuma atualização editorial muda prompts medidos. Nenhuma correção de interpretação sobrescreve dados históricos. Exemplos de tabelas devem conter campos a preencher e definições, nunca coeficientes desejados apresentados como resultados.
 
-### 7.3 Oportunidade de pesquisa
+## 13. Como revisar esta base?
 
-**Hipótese:** correlação entre presença de discovery files e mention rate no Brasil. Variável binária simples para regressão.
+Revisar quando uma fonte primária mudar um contrato, uma nova evidência alterar uma conclusão ou a instrumentação ganhar versão. Registrar data da publicação e janela dos dados separadamente.
 
----
+A cada revisão, conferir se um conceito tem definição operacional, se a métrica citada existe e é preenchida, se o resultado corresponde ao método, se as fontes foram abertas e se limitações viajam com os números. Fazer os ajustes em KB, OS, dicionário e instruções dos agentes quando houver conflito ativo; preservar documentos históricos com nota de precedência.
 
-## 8. Schema.org como variável independente
-
-### 8.1 Tipos com maior impacto (Solis KDD 2026)
-
-| Schema Type | Impacto mention rate | Uso Brasil |
-|---|---|---|
-| `Organization` + `sameAs` | +34% | 15% |
-| `LocalBusiness` + ratings | +28% | 8% |
-| `Product` + offers | +22% | 12% |
-| `Person` (founders) | +19% | 2% |
-| `FAQPage` | +17% | 25% |
-
-### 8.2 Protocolo de medição
-
-```python
-def schema_score(domain):
-    """Calcula schema completeness score 0-100"""
-    schemas = extract_jsonld(domain)
-    score = 0
-    score += 20 if 'Organization' in schemas
-    score += 15 if 'sameAs' in schemas.get('Organization', {})
-    score += 10 if len(schemas.get('sameAs', [])) >= 5
-    # ... mais 10 checks
-    return min(score, 100)
-```
-
-### 8.3 Integração papers
-
-Schema score como variável contínua em todas regressões. Hypothesis: β > 0.20.
-
----
-
-## 9. Framework operacional para pesquisa longitudinal
-
-### 9.1 Arquitetura 5 camadas papers
-
-```
-Layer 1: Data Collection
-├── citation_tracker.py (core extraction)
-├── competitor_benchmark.py (SOV calc)
-└── serp_overlap.py (correlation)
-
-Layer 2: Storage & Version Control  
-├── papers.db (SQLite + migrations)
-├── SHA-256 cache (dedup)
-└── DVC for large datasets
-
-Layer 3: Analysis Pipeline
-├── context_analyzer.py (sentiment, hedging)
-├── statistical_models.py (regressions)
-└── intervention_ab.py (experiments)
-
-Layer 4: Validation & QA
-├── 20% manual annotation
-├── Inter-rater reliability (Kappa)
-└── LLM-as-judge protocols
-
-Layer 5: Paper Generation
-├── LaTeX templates (SIGIR/ACL style)
-├── Automated figures
-└── Significance testing
-```
-
-### 9.2 Cronograma 12 meses
-
-- **M1-2:** Infrastructure setup, pilot 1k queries
-- **M3-6:** Full data collection (5k queries/vertical/month)
-- **M7-9:** Analysis, first paper draft
-- **M10-11:** Peer review, revision
-- **M12:** Conference submission
-
-### 9.3 Recursos necessários
-
-- **Compute:** ~$500/mês em APIs
-- **Human:** 2 anotadores part-time para validação
-- **Storage:** ~10GB/mês crescimento dataset
-
----
-
-## 10. Top 30 artigos/colunas/podcasts 2026
-
-### 10.1 Leitura obrigatória papers researchers
-
-1. **Lily Ray** - "The Death of Traditional SEO" (Search Engine Land, Jan 2026)
-2. **Mike King (iPullRank)** - Newsletter semanal GEO Forensics
-3. **Aleyda Solis** - "SISTRIX GEO Report 2026" (maior dataset público)
-4. **Britney Muller** - "ML for SEOs: RAG Edition" (Moz blog)
-5. **Marie Haynes** - Podcast "E-E-A-T in the Age of AI" ep. 47-52
-6. **Tim Soulo (Ahrefs)** - "Perplexity vs Google: 2M Query Study"
-7. **Cyrus Shepard** - "Whiteboard Friday: GEO Fundamentals" série
-8. **Kevin Indig** - Growth Memo edições #89-92 sobre GEO
-9. **Mordy Oberstein** - "SERP's Up Podcast" episódios LLM-focused
-10. **Crystal Carter** - Webinar WordLift "Entity SEO for GEO"
-
-### 10.2 Papers acadêmicos must-read
-
-11. Ray & King (WWW 2025) - "Cross-LLM Brand Salience"
-12. Solis et al. (KDD 2026) - "Statistical Modeling of Brand Mentions"
-13. Zhang et al. (SIGIR 2026) - "Temporal Drift in LLM Behavior"
-14. Patel et al. (EMNLP 2026) - "Multilingual Brand Recognition"
-15. Liu et al. (ACL 2026) - "Prompt Engineering for Citation Extraction"
-
-### 10.3 Industry reports
-
-16. **Conductor** - "State of GEO 2026" (n=10k brands)
-17. **BrightEdge** - "AI Search Revolution Report"
-18. **Semrush** - "From Keywords to Intents: GEO Transition"
-19. **Perplexity** - "How We Rank Content" (rare transparency)
-20. **Anthropic** - "Claude Citation Principles" whitepaper
-
-### 10.4 Newsletters especializadas
-
-21. **#SEOFOMO** - seção GEO semanal por Aleyda
-22. **Women in Tech SEO** newsletter - GEO edition mensal
-23. **The Information** - AI search market analysis
-24. **Stratechery** - Ben Thompson on search disruption
-25. **Not Boring** - Packy McCormick on AI native brands
-
-### 10.5 Comunidades e eventos
-
-26. **GEO Slack** (invite-only, 5k+ members)
-27. **r/bigseo** Reddit - threads GEO quinzenais
-28. **SearchLove 2026** - 50% talks sobre GEO
-29. **MozCon 2026** - GEO track dedicado
-30. **AI Search Summit** NYC - primeiro evento 100% GEO
-
----
-
-## 11. Aplicação no contexto papers
-
-### 11.1 Estado atual do repositório
-
-**Pontos fortes:**
-- Arquitetura modular bem definida (`citation_tracker`, `context_analyzer`, etc.)
-- Versionamento robusto (`papers.db` no git, SHA-256 cache)
-- 4 verticais definidas para análise cross-market
-- Infraestrutura Docker para replicabilidade
-
-**Gaps críticos:**
-- Coleta ainda manual (falta automação via GitHub Actions)
-- Sem baseline estabelecido (0 queries coletadas)
-- Protocolo de annotation não definido
-- Falta integração com ferramentas vendor
-
-### 11.2 Roadmap P0/P1/P2
-
-**P0 (próximas 2 semanas):**
-1. Implementar coleta automatizada de 100 queries/dia/LLM
-2. Definir protocolo de annotation com guideline de 20 páginas
-3. Rodar pilot com 1k queries para calibrar metodologia
-4. Setup Profound API quando lançar tier acadêmico
-
-**P1 (próximo mês):**
-1. Escalar para 5k queries/vertical/LLM
-2. Contratar 2 anotadores part-time
-3. Implementar statistical_models.py com regressões base
-4. Gerar primeiro relatório de SOV brasileiro
-
-**P2 (próximo quarter):**
-1. Lançar dashboard público com insights
-2. Submeter abstract para SIGIR 2027
-3. Parceria com empresa grande para case study
-4. Open source de ferramentas genéricas
-
-### 11.3 Integração com outros surfaces
-
-**alexandrecaramaschi.com:**
-- Publicar insights quinzenais do dataset
-- Widget mostrando "GEO Score" de marcas brasileiras
-
-**Brasil GEO consultoria:**
-- Dataset papers como diferencial competitivo
-- Benchmarks proprietários para clientes
-
-**Herreira:**
-- Cross-polinização de discovery files
-- A/B tests usando Herreira como laboratório
-
-### 11.4 Decisões metodológicas usando este KB
-
-1. **Escolha de conferences:** SIGIR para primer paper (foco IR), EMNLP para análise linguística, KDD para statistical modeling
-2. **Métricas primárias:** Mention rate + Position bias (mais estabelecidas na literatura)
-3. **Verticais:** manter 4 atuais (comparabilidade com Aggarwal 2024)
-4. **LLMs:** focar nos 5 principais (coverage > completude)
-
-### 11.5 Diferencial acadêmico
-
-**Primeira pesquisa longitudinal multi-LLM de marcas não-anglófonas.** Gaps preenchidos:
-- Mercado brasileiro (150M+ população online)
-- Coleta longitudinal 6+ meses
-- 5 LLMs simultâneos
-- Open dataset (diferencial para citações)
-
----
-
-## 12. Anti-padrões metodológicos a evitar
-
-### 12.1 Erros fatais em papers rejeitados
-
-1. **Aggregação ingênua cross-LLM:** média simples ignora vieses sistêmicos
-2. **N insuficiente:** <1k queries/vertical = insignificância estatística
-3. **Ignorar temporal drift:** LLMs mudam comportamento mensalmente
-4. **Prompt variation:** mínima mudança = resultados incomparáveis
-5. **Cherry-picking:** mostrar só verticais que confirmam hipótese
-
-### 12.2 Problemas de validade
-
-- **Construct validity:** "mention" deve ter definição operacional clara
-- **External validity:** resultados Brasil ≠ generalizáveis globalmente
-- **Internal validity:** controlar TODAS variáveis confounding (schema, idade domínio, etc.)
-
-### 12.3 Ethical considerations
-
-- **Transparency:** revelar qualquer conflito de interesse
-- **Data privacy:** não coletar PII em queries
-- **Reproducibility:** disponibilizar TODOS scripts e dados
-
-### 12.4 Peer review killers
-
-- Falta de related work adequado (citar TODOS papers de 2025-2026)
-- Overclaiming ("revolucionário", "primeiro")
-- Estatística fraca (sem confidence intervals, p-values)
-- Figures ilegíveis ou não-informativas
-
----
-
-## 13. Checklist trimestral de revisão
-
-### Q1 2027
-- [ ] Atualizar benchmarks com Q4 2026 industry data
-- [ ] Adicionar novos LLMs (Grok-3, Llama-4)
-- [ ] Revisar schema types emergentes
-- [ ] Sync com descobertas MozCon/SearchLove
-
-### Q2 2027
-- [ ] Preparar SIGIR camera-ready
-- [ ] Lançar v2 do dataset público
-- [ ] Implementar novo context_analyzer com LLama-4
-- [ ] Benchmark contra Profound brasileiro quando lançar
-
-### Q3 2027
-- [ ] Análise de 12 meses completos
-- [ ] Submission EMNLP/COLING
-- [ ] Atualizar vendor stack com ferramentas 2027
-- [ ] Workshop em conferência brasileira
-
-### Q4 2027
-- [ ] Year in review: publicação major findings
-- [ ] Planejar expansão LATAM
-- [ ] Grant applications para 2028
-- [ ] Contratar doutorando dedicado
-
----
-
-## Apêndice A. Citações canônicas com URLs reais
-
-### Papers fundamentais
-- Aggarwal et al. 2024 (KDD '24): https://arxiv.org/abs/2311.09735
-- Chen et al. 2025: https://arxiv.org/abs/2509.08919
-- Yao et al. 2025: https://aclanthology.org/2025.emnlp-main.456
-- Ray & King WWW 2025: https://dl.acm.org/doi/10.1145/3616855.3634241
-- Solis KDD 2026: https://dl.acm.org/doi/10.1145/3696486.3699123
-
-### Ferramentas
-- Profound: https://tryprofound.com
-- Ahrefs Brand Radar: https://ahrefs.com/brand-monitoring
-- Semrush AI Toolkit: https://www.semrush.com/features/ai-overviews/
-- BraveSearch API: https://brave.com/search-api/
-
-### Recursos metodológicos
-- GEO-bench dataset: https://github.com/geo-bench/dataset
-- Schema.org validator: https://validator.schema.org
-- Inter-rater reliability calculator: https://www.real-statistics.com/reliability/
-
----
-
-## Apêndice B. Referência às pesquisas Perplexity deste repo
-
-As pesquisas brutas Perplexity que fundamentam este KB estão disponíveis em:
-- `docs/research/geo-2026/01-perplexity-estado-arte-papers.md` - papers e metodologias
-- `docs/research/geo-2026/02-perplexity-vendor-stack.md` - ferramentas práticas
-- `docs/research/geo-2026/03-perplexity-llm-specifics.md` - comportamentos por LLM
-- `docs/research/geo-2026/04-perplexity-brasil-gaps.md` - oportunidades mercado brasileiro
-
-Total: ~45KB de research primária específica ao contexto deste repositório papers.
+A decisão desta revisão e suas pendências ficam em [APRENDIZADOS-SEO-IA-20260910.md](../governance/APRENDIZADOS-SEO-IA-20260910.md). O [sistema operacional](GEO_OPERATING_SYSTEM.md) transforma essas exigências em sequência de trabalho.

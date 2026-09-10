@@ -1,5 +1,7 @@
 # Methodology v2 — Paper Reboot Pipeline
 
+> Atualização de interpretação em 10/09/2026: consultar a seção 13 e o [guia científico de SEO e IA](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md). Os protocolos e resultados históricos abaixo permanecem registrados; o adendo não modifica o instrumento executado.
+
 **Versão**: 2.0 · **Data**: 2026-04-23 · **Autor**: Alexandre Caramaschi (ORCID 0009-0004-9150-485X)
 
 Este documento descreve a metodologia rigorosa de coleta e análise implementada pós-auditoria do Paper 4 (Null-Triad). A versão v1 teve 3 falhas estruturais (underpower H1, design H2, instrumentação H3) que motivaram o reboot.
@@ -396,3 +398,47 @@ Fonte: `docs/research/geo-wave-julho-22-2026/GEO_WAVE_JULHO_22_2026_CANONICAL.md
 4. **Limitação causal declarada.** `arXiv:2606.04362` estabelece o controle on-domain (tratado vs não tratado no mesmo domínio) como padrão-ouro para separar efeito de intervenção do crescimento da plataforma. Nosso desenho é observacional (sem intervenção randomizada em conteúdo); a seção de limitações de cada paper deve declarar isso explicitamente e citar 2606.04362 como o desenho que estudos futuros devem adotar.
 
 Lacuna publicável reafirmada: nenhum dos 32 papers coletados cobre mercado brasileiro ou língua portuguesa (escopo arXiv, queries em inglês; bases fora do arXiv não varridas) — nossa cohort BR de 127 entidades permanece contribuição inédita nesse recorte.
+
+## 13. Adendo de 10/09/2026: validade dos conceitos e propostas novas
+
+**Natureza deste adendo:** esclarecimento semântico e delimitação de futuras pesquisas. Não altera o instrumento executado, H1 a H5, a regra de decisão da seção 5.4, o extrator, o cache, os prompts ou os dados históricos. A [onda de setembro-10](research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md) prevalece sobre recomendações conceituais conflitantes de ondas anteriores, preservando a versão metodológica de cada observação.
+
+### 13.1. O que a série mede e o que continua sem medir?
+
+No caminho v2 de [citation_tracker.py](../src/collectors/citation_tracker.py), `cited` indica menção detectada por NER na janela observada. A análise principal segue a janela uniforme de 200 caracteres da seção 4.1bis; isso não é uma taxa de sustentação de afirmações nem de citação na resposta inteira. A íntegra armazenada desde a migração 0010 permite sensibilidades apenas onde existe.
+
+A distinção conceitual entre seleção e absorção, registrada em julho na seção 12, permanece útil. Há campos locais com esses nomes, mas eles são proxies:
+
+- `absorption_status` é derivado de `cited`; não verifica se o conteúdo de uma fonte foi usado com fidelidade.
+- `selection_status` busca slugs de entidades na string inteira das URLs expostas. Usa entidades mencionadas quando a lista não está vazia, e a coorte como alternativa. Não equivale a observação de recuperação nem a inventário completo de domínios institucionais.
+- Falta de fontes resulta em zero no helper atual. Esse valor bruto não prova ausência de recuperação interna; disponibilidade da superfície precisa ser descrita.
+- Campos agregados CSR/CAR presentes na migração 0009 não bastam para afirmar que as taxas foram calculadas e preenchidas. A integração documental não verificou valores do banco nem identificou produtor dessas agregações na busca em `src/` e `scripts/`.
+- `failure_type` é uma heurística. Um erro 403, quando fornecido ao helper, não demonstra sozinho robots.txt; a chamada do citation tracker inspecionada não fornece os argumentos `response_error` ou `expected`.
+
+A [análise do código e dos limites](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md) documenta as consequências e a proposta P-SEO-05. Uma correção futura dessas proxies deve ter versão e avaliação de compatibilidade, sem reclassificação silenciosa do passado.
+
+### 13.2. Como interpretar suficiência de amostra e resultado nulo?
+
+As receitas genéricas de N mínimo da KB/OS anteriores foram retiradas. Para estudos novos, justificar tamanho pelo estimando, efeito relevante, variação e dependência. Linhas do banco, consultas distintas, dias e gerações independentes são contagens diferentes.
+
+A convergência de um painel exploratório de visibilidade não substitui a regra de parada confirmatória já declarada. Novas regras sequenciais exigem plano próprio antes da coleta. Esta atualização não antecipa o encerramento da janela nem altera o cálculo executado.
+
+O rótulo heurístico `null effect likely` da seção 5.4 não é teste formal de equivalência. Estudos que pretendam equivalência precisam definir margens relevantes e método apropriado, conforme [Lakens, Equivalence Testing and Interval Hypotheses](https://lakens.github.io/statistical_inferences/09-equivalencetest.html). Ao publicar intervalos, distinguir intervalo de confiança e intervalo posterior de acordo com o estimador usado; uma etiqueta genérica “IC” não transforma inferência bayesiana em frequentista.
+
+As marcações históricas de pré-registro e compliance nas seções 7 e 11 não comprovam registro público concluído. Antes de afirmar pré-registro em um manuscrito, apresentar endereço, versão e data verificáveis, preservando a distinção entre análise exploratória e confirmatória.
+
+### 13.3. Que comparações exigem outra instrumentação?
+
+O módulo [serp_overlap.py](../src/collectors/serp_overlap.py) usa Brave, consultas EN e conjuntos de domínios, com ativação opcional. Não observa o top 10 do Google nem ranking de entidades. O [Paper 2](outlines/PAPER_2_GEO_VS_SEO.md) revisado delimita essa comparação e os campos adicionais para estudos de URLs, posição e idioma.
+
+Respostas de APIs, interfaces de consumidor e relatórios do Google são superfícies distintas. O [relatório generativo de GSC](https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports) acrescenta impressões observadas pelo Google; sua disponibilidade não demonstra integração ao painel atual, cliques atribuíveis ou causalidade.
+
+Ter um controle no mesmo domínio, como sugerido na seção 12, não garante identificação causal por si só. Seleção de páginas, tendências anteriores e interferência precisam ser tratadas pelo desenho. Quando RAG coincide com um único provedor, um contraste entre braços não isola o efeito da arquitetura.
+
+### 13.4. Como incorporar os conceitos novos sem mudar o estímulo?
+
+Os [63 conceitos](GEO_50_CONCEITOS_CANONICAL.md) classificam questões e literatura. Não se exige cobertura dos 14 eixos em cada portfólio experimental. Regras editoriais, formatos de cápsula, schema e pedidos de citação não entram nos prompts da série por causa desta onda.
+
+P-SEO-01 a P-SEO-05 são propostas, com namespace distinto de H1 a H5. A [ficha de protocolo](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md) exige estimando, unidade, mensuração, amostra, exclusões, análise e critério de conclusão. Nenhuma proposta foi pré-registrada, coletada ou implementada por esta integração.
+
+O [registro de governança](../governance/APRENDIZADOS-SEO-IA-20260910.md) preserva o motivo da mudança documental e a ordem sugerida de trabalho.

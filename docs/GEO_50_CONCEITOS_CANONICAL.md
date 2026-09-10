@@ -1,27 +1,16 @@
-# Os 50 Conceitos Canônicos de GEO/SEO 2026
+# Conceitos canônicos de GEO e SEO: 63 conceitos para pesquisa
 
-> Documento canônico interno — referência obrigatória para qualquer trabalho de SEO, GEO (Generative Engine Optimization) ou AISO (Answer Engine Optimization) nos repos da Brasil GEO.
->
-> Última revisão: 2026-05-17
-> Mantenedor: Alexandre Caramaschi (CEO Brasil GEO)
-> Fonte: Framework canônico Brasil GEO 2026 (consolida Aggarwal KDD 2024, AutoGEO ICLR 2026, AgenticGEO, Profound, Ahrefs Brand Radar, iPullRank, Google AI Optim Guide 15-mai-2026)
+**Revisão:** 10/09/2026. **Mantenedor:** Alexandre Caramaschi. O nome histórico do arquivo permanece para preservar links. Os IDs de 1 a 50 foram mantidos; os conceitos de 51 a 63 correspondem aos mesmos IDs do `landing-page-geo`.
 
 ## Aplicação em papers
 
-Estes 50 conceitos são **taxonomia de classificação** ao catalogar paper acadêmico de GEO/AISO/SEO — todo paper indexado neste repo deve ser tagueado contra os eixos relevantes. Em particular:
+Este dicionário é uma taxonomia para classificar literatura, construtos e hipóteses. Os 14 eixos originais organizam a base; a extensão reúne conceitos transversais. Nenhum item representa, por sua presença no dicionário, um fator oficial de ranking, uma métrica implementada ou uma dimensão independente de um escore.
 
-- **Ao resumir um paper** (abstract, contribuição, metodologia), aplicar tags contra os Conceitos 11 (Answer capsules), 13 (Schema.org), 15 (Clareza de entidade), 21 (Referências externas), 22 (Autoria), 24 (Citabilidade GEO), 25 (Recuperabilidade generativa) e 30 (llms.txt).
-- **Ao desenhar nova vertical de pesquisa** (citation tracker, intervention, context_analyzer), validar que os prompts do portfólio cobrem os 14 eixos.
-- **Em revisão de literatura** (`docs/research/` e `docs/research/geo-q2-2026/`), usar a Tabela síntese (auditoria técnica, conteúdo, GEO/AISO, local, autoridade, conversão, governança, priorização) como checklist obrigatório antes de declarar a revisão completa.
-- **Em pipeline Perplexity sonar-deep-research**, gerar a query incorporando os conceitos pertinentes ao tópico — evita lacunas estruturais comuns em reviews ad hoc.
+Ao catalogar um estudo, registrar apenas os conceitos pertinentes e explicar se ele os testa, mede, discute ou contesta. Ausência de um tema fora do escopo não é falha do estudo. IDs sugeridos não são tags já persistidas pelo coletor.
 
-## Como usar este documento
+Ao desenhar uma pesquisa, usar a [ficha de protocolo](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md). A classificação não autoriza inserir SEO, schema, cápsulas ou pedidos de citação nos prompts da série longitudinal. Não se exige que cada portfólio experimental cubra todos os eixos. Uma mudança de estímulo exige versão e justificativa na [metodologia v2](METHODOLOGY_V2.md).
 
-- Use estes 50 conceitos como **checklist de auditoria** ao avaliar qualquer página, site ou conteúdo gerado para mecanismos de busca tradicionais e generativos.
-- Em diagnósticos, **sempre referencie o conceito pelo número e nome canônico** (ex.: "Conceito 24 — Citabilidade GEO").
-- Em geração de conteúdo (HBR, FAQs, pillars), os conceitos 8, 10, 11, 12, 22, 23, 24, 25 são prioridade absoluta.
-- Em auditorias técnicas, os conceitos 1, 2, 13, 14, 28, 29, 30, 34, 35, 36 são prioridade.
-- Em planos de Trust/E-E-A-T, os conceitos 17, 18, 22, 23, 43, 47, 48 são prioridade.
+Nas definições históricas abaixo, “mede” deve ser lido como “dimensão a avaliar”: a medição efetiva depende de rubrica, fonte e validação. Os limites acrescentados prevalecem sobre a interpretação antiga.
 
 ---
 
@@ -55,6 +44,8 @@ Avalia tamanho, promessa, intenção de busca, diferenciação, CTA e duplicidad
 Mede se cada página possui um título principal claro.
 Avalia ausência de H1, múltiplos H1, H1 genérico, H1 desalinhado com title e intenção da página.
 
+**Limite de interpretação (10/09/2026):** H1 único é uma convenção de clareza deste checklist, não um fator isolado demonstrado de ranking.
+
 ### 7. Hierarquia H2/H3
 Mede se o conteúdo está organizado em blocos compreensíveis.
 Avalia subtítulos, sequência lógica, escaneabilidade, tópicos, perguntas e estrutura editorial.
@@ -79,9 +70,13 @@ Avalia termos relacionados, perguntas frequentes, variações de serviço, dores
 Mede se a página possui blocos curtos e claros que podem ser extraídos como resposta.
 Avalia definições, listas objetivas, perguntas e respostas, comparativos e explicações diretas.
 
+**Limite de interpretação (10/09/2026):** Bloco de resposta direta é uma escolha editorial. Não há tamanho obrigatório para citação; o conceito 52 desenvolve o teste da forma sem alterar os fatos.
+
 ### 12. FAQ visível
 Mede se há perguntas reais respondidas no HTML visível.
 Avalia qualidade das perguntas, clareza das respostas, intenção do usuário e potencial de recuperação por IA.
+
+**Limite de interpretação (10/09/2026):** FAQ visível continua sendo conteúdo útil quando resolve perguntas reais. O Google encerrou a exibição de rich results de FAQ em maio de 2026; não confundir a seção editorial com benefício de markup.
 
 ---
 
@@ -90,6 +85,8 @@ Avalia qualidade das perguntas, clareza das respostas, intenção do usuário e 
 ### 13. Schema.org
 Mede se os dados estruturados estão presentes, válidos e coerentes.
 Avalia Organization, LocalBusiness, Service, WebPage, Article, FAQPage, BreadcrumbList, Person, ImageObject e ContactPoint.
+
+**Limite de interpretação (10/09/2026):** Separar validade sintática, coerência factual e resultado observado. O Google não exige schema especial para busca generativa. Estudar schema como variável não pressupõe efeito positivo.
 
 ### 14. Coerência entre schema e conteúdo
 Mede se o JSON-LD reflete o que aparece na página.
@@ -139,6 +136,8 @@ Avalia nome do autor, biografia, cargo, especialidade, página de autor, data de
 Mede sinais de experiência, especialidade, autoridade e confiança.
 Avalia provas reais, cases, equipe, credenciais, histórico, avaliações, fotos, documentos e reputação externa.
 
+**Limite de interpretação (10/09/2026):** E-E-A-T organiza sinais de experiência e confiança; não é um fator único nem um peso conhecido. Desagregar os indicadores usados na análise.
+
 ---
 
 ## Eixo 7 — GEO/AISO (núcleo da prática Brasil GEO)
@@ -147,9 +146,13 @@ Avalia provas reais, cases, equipe, credenciais, histórico, avaliações, fotos
 Mede se a página tem potencial de ser usada como fonte por sistemas generativos.
 Avalia conteúdo visível, clareza, fontes, autoria, resposta direta, baixa linguagem promocional e estrutura editorial.
 
+**Limite de interpretação (10/09/2026):** Distinguir potencial editorial, menção de entidade, fonte exposta e apoio de uma afirmação. O campo local de citação não mede sozinho todas essas etapas.
+
 ### 25. Recuperabilidade generativa
 Mede se a página pode ser encontrada e usada por answer engines e IAs com busca.
 Avalia tema, entidade, fragmentos citáveis, perguntas, referências, atualidade e autoridade.
+
+**Limite de interpretação (10/09/2026):** Sem logs do motor, observar apenas evidências externas de recuperação. Não afirmar presença ou distância no índice vetorial interno de terceiros.
 
 ### 26. Risco de pseudo-GEO
 Mede se o site usa discurso exagerado ou promessas sem evidência.
@@ -158,6 +161,8 @@ Avalia frases como "apareça garantido na IA", "schema garante citação", "llms
 ### 27. Governança de IA
 Mede se o site está preparado para buscadores, LLMs, answer engines e agentes.
 Avalia robots.txt, llms.txt, sitemap, dados estruturados, páginas institucionais e políticas claras de acesso.
+
+**Limite de interpretação (10/09/2026):** Tratar permissões por superfície: rastreamento, indexação, exibição generativa e treinamento são decisões distintas. Não deduzir todas de um único arquivo.
 
 ---
 
@@ -174,6 +179,8 @@ Avalia URLs listadas, status das páginas, última modificação, páginas impor
 ### 30. llms.txt
 Mede se o site possui sinalização organizada para sistemas de IA.
 Avalia clareza, links prioritários, resumo institucional, páginas importantes e uso sem prometer garantia de citação.
+
+**Limite de interpretação (10/09/2026):** Recurso opcional para consumidores que o utilizem. A orientação atual do Google diz que Search ignora llms.txt para visibilidade e ranking; sua ausência não reprova elegibilidade na busca do Google.
 
 ---
 
@@ -202,6 +209,8 @@ Avalia LCP, CLS, INP, peso da página, CSS, JavaScript, imagens, fontes e carreg
 ### 35. Core Web Vitals
 Mede experiência real de carregamento e interação.
 Avalia Largest Contentful Paint, Cumulative Layout Shift e Interaction to Next Paint.
+
+**Limite de interpretação (10/09/2026):** Avaliar dados de campo no percentil 75: LCP até 2,5 s, INP até 200 ms e CLS até 0,1. Meta interna mais rigorosa e nota de laboratório são indicadores distintos.
 
 ### 36. Mobile
 Mede se o site funciona bem no celular.
@@ -255,6 +264,8 @@ Avalia HTTPS, conteúdo misto, headers básicos, exposição de dados, formulár
 Mede a distribuição de autoridade e navegação.
 Avalia links quebrados, links para páginas importantes, âncoras, profundidade e coerência temática.
 
+**Limite de interpretação (10/09/2026):** Avaliar descoberta e utilidade do destino, com âncora descritiva. Não existe quantidade ideal universal de links; inserir mais links não identifica um efeito causal.
+
 ### 46. Links externos
 Mede qualidade das referências e conexões.
 Avalia fontes confiáveis, links quebrados, excesso de links, links sem contexto e autoridade das fontes.
@@ -279,32 +290,110 @@ Avalia conteúdo, autoridade, GBP, estrutura, páginas locais, schema, velocidad
 Mede o que deve ser corrigido primeiro.
 Classifica problemas por impacto, urgência, dificuldade e potencial de ganho.
 
+**Limite de interpretação (10/09/2026):** Em pesquisa, priorizar validade do instrumento, identificabilidade, utilidade do resultado e viabilidade. Um coeficiente positivo ou um p-valor baixo não é meta de qualidade.
+
 ---
 
-## Tabela síntese — Mapeamento por uso
+## Extensão transversal: evidência, fidelidade e novas superfícies
 
-| Atividade | Conceitos-chave |
+Os conceitos seguintes são definições de trabalho. A relação com fonte, indicador, denominador e estado de implementação está detalhada no [guia científico](research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md).
+
+### 51. Information Gain
+
+Informação útil acrescentada em relação a um conjunto de comparação definido. Em pesquisa, explicitar o corpus de referência e a rubrica para reconhecer evidência nova, em vez de usar extensão textual como substituto. O conceito não prova a existência de um escore público do Google com esse nome.
+
+**Operação candidata:** anotação de informação original, acompanhada de teste de uso como fonte. Depende de novo estudo.
+
+### 52. Answer Capsule
+
+Resposta direta que preserva contexto suficiente para ser entendida isoladamente. Aprofunda o conceito 11 com população, condição e ressalva no próprio trecho.
+
+**Operação candidata:** comparar apresentações dos mesmos fatos, com avaliação cega de clareza e fidelidade. Quantidade fixa de palavras não é requisito do motor nem medida de qualidade.
+
+### 53. Compression Fidelity
+
+Preservação do significado quando uma fonte é resumida: números, datas, negações, exceções e grau de certeza precisam sobreviver ao recorte.
+
+**Operação candidata:** avaliação por par afirmação/fonte. Similaridade lexical ou vetorial não substitui verificação factual; não está medida por `absorption_status`.
+
+### 54. Citation Persistence
+
+Estabilidade da presença de uma fonte ou entidade ao longo de oportunidades repetidas sob condições declaradas.
+
+**Operação candidata:** frequência e transições por URL e entidade, estratificadas por consulta e versão. Reutilização de cache não conta como nova geração independente; falha de captura precisa de estado próprio.
+
+### 55. Multi-Source Consensus
+
+Concordância entre origens informacionais independentes. Pode ser objeto de anotação e hipótese explicativa; quantidade de URLs não demonstra independência.
+
+**Operação candidata:** grafo de origem e republicação das fontes. Publicação sindicada e release replicado devem conservar a origem compartilhada.
+
+### 56. Retrieval Fitness
+
+Adequação de um documento à recuperação para uma tarefa especificada. Desenvolve a recuperabilidade do conceito 25 com relevância julgada, acesso e unidade documental.
+
+**Operação candidata:** precisão e cobertura em um ambiente de recuperação controlado. Sem traços internos, métricas de terceiros não revelam o estado do índice do Google.
+
+### 57. Source Eligibility
+
+Atendimento aos requisitos públicos para que uma página possa aparecer em determinada superfície, na data avaliada.
+
+**Operação candidata:** inventário de acesso, indexação, snippets e controles aplicáveis. Elegível não significa exibida; exibição não significa clique. Exigências de um motor não são transferidas automaticamente a outro.
+
+### 58. Entity Boundary Drift
+
+Mudança ou confusão nos limites de identidade: marca, empresa, grupo, produto, subsidiária e homônimo passam a ser associados de outra maneira.
+
+**Operação candidata:** validação temporal de aliases e relações. Uma nova regra de normalização exige versão; não reatribuir o passado silenciosamente.
+
+### 59. Consensus Engine Theory
+
+Hipótese de trabalho segundo a qual convergência entre fontes e reputação ajuda a explicar respostas de certos sistemas. É uma teoria interna para organizar previsões testáveis.
+
+**Operação candidata:** comparar explicações concorrentes e independência das fontes. Não apresentar o nome como arquitetura oficial, consenso científico estabelecido ou fator de ranking confirmado.
+
+### 60. Query Fan-Out Readiness
+
+Capacidade de um conteúdo responder às subtarefas relevantes de uma pergunta. Em pesquisa, separar fan-out realmente exposto pelo sistema e decomposição criada pelo pesquisador.
+
+**Operação candidata:** cobertura de documentos em consultas originais e subtarefas declaradas. Não gerar páginas ou alterar prompts da série apenas para cobrir todas as variações imaginadas.
+
+### 61. Schema Authority Stack
+
+Organização coerente de dados estruturados sobre entidades, páginas, autoria e relações. O nome é interno e não designa um tipo especial de schema.org.
+
+**Operação candidata:** medir validade e coerência, isolando conteúdo e reputação em eventual intervenção. Não somar tipos de schema como se cada um acrescentasse uma unidade demonstrada de autoridade.
+
+### 62. B2A Readiness (Business-to-Agent)
+
+Preparação de informações e fluxos para que agentes realizem tarefas autorizadas de forma compreensível e verificável.
+
+**Operação candidata:** sucesso, erro e fidelidade em tarefas definidas, com registro da superfície. Não há avaliação B2A implementada pela presente integração; sucesso de agente não equivale a ranking.
+
+### 63. Earned Media Primacy
+
+Hipótese de que referências independentes conquistadas podem ter papel relevante na visibilidade de uma entidade. “Primacy” é parte do nome compartilhado, não uma conclusão antecipada.
+
+**Operação candidata:** presença em fontes independentes e associação com persistência ou menção, declarando seleção e confundidores. Correlação entre marcas conhecidas e citações não prova efeito de uma campanha.
+
+## Mapeamento por pergunta científica
+
+| Pergunta | Conceitos a considerar |
 |---|---|
-| Auditoria técnica inicial | 1, 2, 13, 14, 28, 29, 30, 34, 35, 36, 37 |
-| Auditoria de conteúdo | 4, 5, 6, 7, 8, 9, 10, 11, 12 |
-| Auditoria GEO/AISO | 11, 12, 13, 14, 15, 24, 25, 26, 27, 30 |
-| Auditoria local | 16, 17, 18, 19, 20 |
-| Auditoria de autoridade | 21, 22, 23, 47, 48 |
-| Auditoria de conversão | 38, 39, 40, 41, 42 |
-| Auditoria de governança | 27, 28, 29, 30, 43, 44 |
-| Priorização final | 49, 50 |
+| A página pode ser descoberta e exibida? | 1, 2, 3, 27, 28, 29, 57 |
+| O documento resolve a tarefa e acrescenta evidência? | 8, 9, 10, 21, 24, 25, 51, 56, 60 |
+| A resposta preserva a informação da fonte? | 11, 15, 22, 52, 53, 58 |
+| Atribuição e exposição persistem entre execuções? | 24, 54, 55, 59, 63 |
+| Schema ou formatação produzem efeito isolável? | 13, 14, 26, 52, 61 |
+| Um agente consegue concluir uma tarefa? | 37, 38, 40, 41, 44, 62 |
+| A conclusão respeita a evidência e o instrumento? | 26, 49, 50 |
 
-## Referências canônicas Brasil GEO 2026
+## Fontes e uso responsável
 
-- Papers: Aggarwal KDD 2024 ("GEO: Generative Engine Optimization"), AutoGEO ICLR 2026, AgenticGEO 2025, Bui et al. AISO 2026.
-- Ferramentas: Profound (Series C US$ 96M fev/2026), Ahrefs Brand Radar, Peec.ai, Otterly, iPullRank Generative Visibility Score.
-- Guias oficiais: Google AI Optimization Guide (15-mai-2026), Schema.org v30 (mai/2026), llms.txt spec.
-- KPIs internos: SoV-AI, AECR, RTAS, Anchor Coverage, CTAM (ver `CITATION_METRICS.md`).
+A base fundadora verificável é [Aggarwal et al., GEO, KDD 2024](https://arxiv.org/abs/2311.09735). Os limites públicos do Google estão no [guia de otimização para IA](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide), nas [orientações sobre conteúdo útil e E-E-A-T](https://developers.google.com/search/docs/fundamentals/creating-helpful-content), nos [Core Web Vitals](https://developers.google.com/search/docs/appearance/core-web-vitals), nas [atualizações de documentação](https://developers.google.com/search/updates) e nas [práticas de links rastreáveis](https://developers.google.com/search/docs/crawling-indexing/links-crawlable).
 
-## Anti-padrões proibidos (regra Brasil GEO)
+O [canônico de setembro-10](research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md) registra fontes recentes e estados de evidência. Nomes e percentuais de referências antigas não revalidadas deixaram de funcionar como endosso bibliográfico nesta versão.
 
-1. **Pseudo-GEO** — Prometer citação garantida em IA. Banido em copy, propostas e materiais comerciais.
-2. **Schema inflado** — JSON-LD com informações que não aparecem na página visível (viola Conceito 14).
-3. **llms.txt como talismã** — Tratar o arquivo como garantia de citação. É sinalização, não contrato.
-4. **Slugs com acento** — URLs sempre ASCII. Acentuação só em texto visível.
-5. **Pseudo-autoridade** — "#1", "líder", "especialista número um" sem evidência verificável (viola Conceito 26).
+## Erros que invalidam a aplicação
+
+Não prometer citação garantida, inventar dados em schema ou transformar `llms.txt` em requisito do Google. Não confundir teoria com arquitetura confirmada, correlação com efeito, menção com sustentação, campo existente com métrica validada ou checklist editorial com instrumento científico. Conteúdo e documentação permanecem em português do Brasil; IDs e caminhos conservam a grafia técnica.
