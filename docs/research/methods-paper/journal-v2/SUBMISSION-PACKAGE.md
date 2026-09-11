@@ -136,3 +136,34 @@ Three items from the manuscript's own limitations travel with any announcement.
 - Conformance is self-declared. The conformance test suite and the interlaboratory study do not exist, so the claim that the protocol produces comparability is a design argument and not a measured result.
 - The confirmatory window has not closed. Every finding in the book is descriptive; the projected close is 2026-10-15 at 90 collected days.
 - The refusal taxonomy is proposed, not validated: no inter-annotator agreement, no gold standard, no measured distribution across the three categories.
+
+---
+
+## 5. Submission record
+
+**SSRN, submitted 2026-09-11.**
+
+| Field | Value |
+|---|---|
+| SSRN Abstract ID | 7446519 |
+| Abstract page | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7446519 |
+| Content type | Preprint |
+| License | Creative Commons Attribution (CC BY) |
+| Author record | Alexandre Caramaschi, Independent AI Researcher, ORCID 0009-0004-9150-485X, contact author |
+| Classifications | Information Technology & Systems; Marketing: Consumer Decision Making & Search; Marketing: Marketing Other; Artificial Intelligence; Generative AI |
+| JEL | C81, C83, L86, M31 |
+| Date written | 2026-09-11 |
+| File | BRGEO-1-paper-v2.pdf, 183 pages, 2.23 MB |
+| Status | under completeness review by SSRN staff; the DOI is issued on acceptance |
+
+Two choices departed from the author's earlier deposit and both were deliberate.
+
+**The licence is CC BY, where the 2026 deposit of abstract 6460680 reserved all rights.** The manuscript states in its governance section that the specification is published under CC BY 4.0 and the reference implementation under Apache-2.0. Depositing under a more restrictive licence would have made the record contradict the document, and an open standard nobody may reuse is not a standard.
+
+**The affiliation reads Independent AI Researcher alone**, where the earlier deposit shows `Independent; Brasil GEO`. That string comes from the author profile rather than from the submission form, and changing it means editing the account. Brasil GEO appears inside the manuscript, on the custody line and throughout the competing-interest declaration, so nothing is concealed. Adding the second affiliation to the profile is a one-line change the author can make, and it applies to both papers at once.
+
+### Next in sequence
+
+1. Wait for the completeness review and the DOI, then register it with ORCID through the Crossref auto-import.
+2. Eliva Press: the same PDF already meets the editor's format instruction. Declare the SSRN deposit in the portal field on prior publication.
+3. Information Sciences: a condensed derivative under that journal's length cap, cover letter declaring both the preprint and the book.
