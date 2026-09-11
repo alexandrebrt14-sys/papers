@@ -167,3 +167,29 @@ Two choices departed from the author's earlier deposit and both were deliberate.
 1. Wait for the completeness review and the DOI, then register it with ORCID through the Crossref auto-import.
 2. Eliva Press: the same PDF already meets the editor's format instruction. Declare the SSRN deposit in the portal field on prior publication.
 3. Information Sciences: a condensed derivative under that journal's length cap, cover letter declaring both the preprint and the book.
+
+---
+
+## 6. Eliva Press book project
+
+**Book Project ID 15093**, created 2026-09-11 in the author portal at elivapress.com. Steps 1 to 3 are marked Complete; step 4, the publishing agreement, is left for the author.
+
+| Step | Field | Value |
+|---|---|---|
+| 1 | Title / Subtitle / Spine | as in §1 above, 47 / 51 / 47 characters |
+| 1 | Author | Alexandre Caramaschi |
+| 1 | Cover image | abstract wireframe from the publisher's image bank, cropped to the template |
+| 1 | Blurb / Biography | 1,288 / 387 characters, within the 2,200 and 500 limits |
+| 1 | Author photo | retrato-executivo-2026-fundo-claro.jpg, portrait, 71 KB |
+| 2 | Manuscript | BRGEO-1-paper-v2.pdf, 183 pages, 2.23 MB |
+| 2 | Language / Category | English / Information Technology |
+| 2 | Keywords | generative engine optimization, AI search visibility, measurement standard, entity citation, large language models, brand monitoring, research methodology, Brazil |
+| 2 | Previously published | **Yes**, declaring the SSRN deposit of 2026-09-11 (Abstract ID 7446519), its CC BY licence, its non-exclusive nature, the open repository, and that this book is an expanded derivative |
+| 3 | Package | Free Publishing, USD 0 |
+| 4 | Agreement | **not accepted**; the author signs |
+
+### Two things to settle before accepting
+
+**There are now two accounts.** The editor wrote on 2026-09-10 that an author account had already been created for this e-mail, with the Book Project attached. The account in use was registered separately and its project list was empty, so project 15093 was created from scratch. Tell the editor which account holds the project, or the two records will diverge.
+
+**Read clause 18 before signing.** Termination by the author lets the publisher seek compensation for its expenses and for the loss of non-exclusive rights, and disputes are settled under the law of the Republic of Moldova. Clause 15 sets royalties from 12% to 50% by volume sold, paid once a year between July and September, with a USD 500 minimum threshold before any payment is released.
