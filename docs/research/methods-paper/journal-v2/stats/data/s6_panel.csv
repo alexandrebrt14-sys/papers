@@ -1,0 +1,9 @@
+panel_rule,vertical,vertical_label,arms,n_arms,panel_observations,vertical_observations
+series,fintech,Fintech,ChatGPT;Claude;Gemini;Grok;Groq;Perplexity,6,17225,17225
+series,varejo,Retail,ChatGPT;Claude;Gemini;Grok;Groq;Perplexity,6,17204,17204
+series,saude,Health,ChatGPT;Claude;Gemini;Grok;Groq;Perplexity,6,17146,17146
+series,tecnologia,Technology,ChatGPT;Claude;Gemini;Grok;Groq;Perplexity,6,17049,17049
+recency,fintech,Fintech,ChatGPT;Claude;Gemini;Grok;Perplexity,5,13673,17225
+recency,varejo,Retail,ChatGPT;Claude;Gemini;Grok;Perplexity,5,13652,17204
+recency,saude,Health,ChatGPT;Claude;Gemini;Grok;Perplexity,5,13594,17146
+recency,tecnologia,Technology,ChatGPT;Claude;Gemini;Grok;Perplexity,5,13497,17049
