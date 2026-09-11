@@ -1,8 +1,8 @@
 # Status do Projeto — Papers
 
-**Gerado automaticamente em:** 2026-09-10 23:07 UTC
+**Gerado automaticamente em:** 2026-09-11 11:07 UTC
 **Branch:** main | **Commits:** 1
-**Último commit:** 3766b590c694030861d281ad8571ae34de948dff docs: integra 63 conceitos de SEO e IA 
+**Último commit:** 2ff613e74d6612c0ace42e98b37a6215821c5191 data: daily collection 2026-09-10 [skip
 
 ---
 
@@ -13,19 +13,19 @@
 | Código (linhas Python) | 27,159 | OK |
 | Testes unitários | 294 | OK |
 | Tabelas no banco | 22 | OK |
-| Citações coletadas | 90,482 | Coletando |
-| Taxa de citação | 36.2% | — |
-| Última coleta | 2026-09-10T23:07 | Ativo |
+| Citações coletadas | 91,392 | Coletando |
+| Taxa de citação | 36.3% | — |
+| Última coleta | 2026-09-11T11:07 | Ativo |
 
 ## FinOps — Gastos do Mês
 
 | Plataforma | Gasto (USD) |
 |-----------|------------|
 | OpenAI | $0.1957 |
-| Anthropic | $1.2647 |
+| Anthropic | $1.5754 |
 | Gemini | $0.0000 |
-| Perplexity | $0.2118 |
-| **Total** | **$1.6722** |
+| Perplexity | $0.2412 |
+| **Total** | **$2.0123** |
 
 ## Próximas Ações
 
@@ -37,7 +37,7 @@
 
 | Marco | Requisito | Status |
 |-------|-----------|--------|
-| Dados mínimos | 1.000 citações | 90,482/1.000 |
+| Dados mínimos | 1.000 citações | 91,392/1.000 |
 | Série temporal | 90 dias contínuos | Em progresso |
 | Grupo de controle | 15 concorrentes | 0 observações |
 | Análise estatística | p < 0.05 | Disponível |

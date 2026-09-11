@@ -34,5 +34,13 @@
     ],
     "reason": "ChatGPT: HTTP 429: {\n    \"error\": {\n        \"message\": \"You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.\",\n        \"type\": \"insufficient; Claude: HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_i",
     "source": "https://github.com/alexandrebrt14-sys/papers/actions/runs/34530577090"
+  },
+  {
+    "date": "2026-09-11",
+    "missingLLMs": [
+      "ChatGPT"
+    ],
+    "reason": "ChatGPT: HTTP 429: {\n    \"error\": {\n        \"message\": \"You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.\",\n        \"type\": \"insufficient",
+    "source": "https://github.com/alexandrebrt14-sys/papers/actions/runs/34582693858"
   }
 ]
