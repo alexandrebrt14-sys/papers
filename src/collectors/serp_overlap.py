@@ -9,6 +9,8 @@ Measures divergence between traditional search results and AI-generated response
 
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 from typing import Any
 
 from src.collectors.base import BaseCollector, BraveSearchClient
@@ -30,6 +32,7 @@ class SerpAIOverlap(BaseCollector):
         - Adicionalmente, sem `BRAVE_API_KEY`, o BraveSearchClient já
           retorna [] internamente e o loop encerra sem INSERTs.
         """
+        require_collection_open()
         import os
         enabled = os.getenv("ENABLE_SERP_OVERLAP", "false").lower() == "true"
         if not enabled:

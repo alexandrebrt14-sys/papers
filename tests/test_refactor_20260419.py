@@ -440,48 +440,21 @@ def test_base_py_split_preserves_backward_compat():
     assert BraveSearchClient is BS2
 
 
-def test_serp_overlap_skipped_when_toggle_off(monkeypatch):
-    """SERP overlap respeita ENABLE_SERP_OVERLAP=false (Onda 9).
-
-    Sem ativação explícita, retorna [] sem consumir cota Brave.
-    """
-    monkeypatch.delenv("ENABLE_SERP_OVERLAP", raising=False)
+@pytest.mark.parametrize("toggle", [None, "false", "true"])
+def test_serp_overlap_encerrado_independe_do_toggle(monkeypatch, toggle):
+    """A decisão de encerramento prevalece sobre a antiga flag de SERP."""
+    if toggle is None:
+        monkeypatch.delenv("ENABLE_SERP_OVERLAP", raising=False)
+    else:
+        monkeypatch.setenv("ENABLE_SERP_OVERLAP", toggle)
+    from src.collection_policy import CollectionClosedError
     from src.collectors.serp_overlap import SerpAIOverlap
     collector = SerpAIOverlap(vertical="fintech")
-    results = collector.collect()
-    collector.close()
-    assert results == []
-
-
-def test_serp_overlap_explicit_false_skips(monkeypatch):
-    monkeypatch.setenv("ENABLE_SERP_OVERLAP", "false")
-    from src.collectors.serp_overlap import SerpAIOverlap
-    collector = SerpAIOverlap(vertical="fintech")
-    results = collector.collect()
-    collector.close()
-    assert results == []
-
-
-def test_serp_overlap_without_brave_key_returns_empty(monkeypatch):
-    """Toggle ON mas BRAVE_API_KEY ausente → skip graceful, não tenta HTTP."""
-    monkeypatch.setenv("ENABLE_SERP_OVERLAP", "true")
-    monkeypatch.setenv("BRAVE_API_KEY", "")
-    # Força BraveSearchClient a ver key vazia
-    from src.collectors.serp_overlap import SerpAIOverlap
-    collector = SerpAIOverlap(vertical="fintech")
-    # Monkeypatch o atributo _key do cliente futuro para garantir
-    # o comportamento esperado sem depender de config cache
-    from src.collectors import brave_search as bs_mod
-    original_init = bs_mod.BraveSearchClient.__init__
-
-    def _empty_key_init(self, api_key: str = "") -> None:
-        original_init(self, api_key="")
-        self._key = ""
-    monkeypatch.setattr(bs_mod.BraveSearchClient, "__init__", _empty_key_init)
-
-    results = collector.collect()
-    collector.close()
-    assert results == []
+    try:
+        with pytest.raises(CollectionClosedError, match="11/09/2026"):
+            collector.collect()
+    finally:
+        collector.close()
 
 
 def test_db_client_auto_adds_fictional_columns(tmp_path: Path, monkeypatch):

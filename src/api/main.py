@@ -39,6 +39,7 @@ from src.api.models import (
     VerticalInfo,
     VerticalListResponse,
 )
+from src.collection_policy import CollectionClosedError, require_collection_open
 from src.config import VERTICALS, get_cohort, get_queries, list_verticals
 from src.db.client import DatabaseClient
 
@@ -481,7 +482,11 @@ def get_collections_status():
 
 @app.post("/api/collections/trigger", response_model=TaskStatus, dependencies=[Depends(verify_api_key)])
 def trigger_collection(body: CollectionTriggerRequest, background_tasks: BackgroundTasks):
-    """Trigger a background collection for a vertical."""
+    """Recusa novas coletas e mantém disponíveis as consultas históricas."""
+    try:
+        require_collection_open()
+    except CollectionClosedError as exc:
+        raise HTTPException(status_code=410, detail=str(exc)) from exc
     if body.vertical not in VERTICALS and body.vertical != "all":
         raise HTTPException(status_code=400, detail=f"Vertical '{body.vertical}' inválida.")
 
@@ -507,6 +512,7 @@ def _run_collection(task_id: str, vertical: str, modules: list[str]) -> None:
     task.progress_pct = 0.0
 
     try:
+        require_collection_open()
         from src.collectors.citation_tracker import CitationTracker
         from src.collectors.competitor import CompetitorBenchmark
         from src.collectors.serp_overlap import SerpAIOverlap

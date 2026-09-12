@@ -7,6 +7,8 @@ Schema.org, llms.txt, academic citations), then measure citation rate changes at
 
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import json
 import logging
 from datetime import datetime, timezone
@@ -25,6 +27,7 @@ class InterventionTracker(BaseCollector):
 
     def collect(self) -> list[dict[str, Any]]:
         """Check active interventions and measure current citation state."""
+        require_collection_open()
         # This module works differently: it reads registered interventions
         # from the database and runs citation checks for each one.
         # The `register_intervention` method adds new interventions.
@@ -110,6 +113,7 @@ class InterventionTracker(BaseCollector):
         Returns:
             List of measurement records created.
         """
+        require_collection_open()
         from src.collectors.base import LLMClient
         from src.config import config
 

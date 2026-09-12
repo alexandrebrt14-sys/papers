@@ -62,6 +62,8 @@ def _capture_body(monkeypatch: pytest.MonkeyPatch, env: str | None) -> dict[str,
     client = LLMClient()
     fake = _FakeHTTP()
     client._http = fake  # type: ignore[assignment]
+    # Exercita o payload histórico somente depois de instalar o transporte falso.
+    monkeypatch.setattr("src.collectors.llm_client.require_collection_open", lambda: None)
     client._query_xai(_grok(), "Melhores fintechs do Brasil?", datetime.now(timezone.utc))
     assert fake.body is not None
     return fake.body

@@ -4,6 +4,14 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [encerramento] 2026-09-11
+
+- Ciclo encerrado pelo autor após publicação do BRGEO-1. Coleta diária, benchmark e calibração semanal desativados; cron removido dos três workflows.
+- Trava permanente de novas consultas experimentais na CLI, API, coletores, adaptadores e preflight, preservando consulta e reanálise histórica.
+- Manifesto `data/project_status.json` com recortes científicos e snapshot operacional final. Nenhum banco histórico foi apagado ou regravado.
+- Registro `docs/ENCERRAMENTO_2026-09-11.md` com conclusões da revisão empírica no Zenodo, falhas documentadas, aprendizados e propostas de novas pesquisas sem agendamento.
+- README, estado e documentos de operação identificam o encerramento. Gerador automático preserva a documentação final.
+
 ## [integridade] — 2026-09-09 (dashboard público, preflight degradável, Agent API documentada)
 
 Resposta ao levantamento de 09/09: o `dashboard_data.json` publicado misturava

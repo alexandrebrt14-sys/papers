@@ -1,187 +1,19 @@
 name: Weekly Fictional Calibration
 
-# Roda 1x por semana com INCLUDE_FICTIONAL_ENTITIES=true para calibrar
-# o false-positive rate (specificity) do detector. Sem isso, todas as
-# 6.568 rows históricas têm fictional_hit=0 e 100% specificity reportado
-# sem replicação metodológica — crítico para revisor do Paper 1.
-#
-# Frequência: domingo 14h BRT (17:00 UTC). Custo: +~30 queries × 5 LLMs × 4
-# verticais = 600 calls extras/semana.
-#
-# 2026-06-15: movido de 13:00 -> 17:00 UTC. Antes batia no timeout de 60min e
-# era CANCELADO toda semana (~1h0m17s) desde >= 2026-05-17 — a calibração de
-# false-positive NUNCA persistia. Com timeout realista (120min), 13:00
-# colidiria com o weekly-benchmark (agora 13:00, teto 16:00) na escrita do
-# artifact compartilhado papers-db-latest. 17:00 inicia depois do benchmark e
-# termina <=19:00, antes do daily das 21:00 — serializacao por horario.
-
+# Encerramento definitivo autorizado em 11/09/2026.
+# O histórico executável anterior permanece nos commits anteriores.
 on:
-  schedule:
-    - cron: '0 17 * * 0'   # Domingo 14:00 BRT
-  workflow_dispatch: {}
+  workflow_dispatch:
 
-concurrency:
-  group: papers-calibration
-  cancel-in-progress: false
-
-permissions:
-  contents: write
-
-env:
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
-  PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-  XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-  # Ver daily-collect.yml: grok-4.6 raciocina por padrao e o reasoning e cobrado
-  # como output (73,7s/2.746 tokens sem o parametro; 19,7s/419 com "low").
-  XAI_REASONING_EFFORT: ${{ vars.XAI_REASONING_EFFORT || 'low' }}
-  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-  INCLUDE_FICTIONAL_ENTITIES: "true"     # ativa coorte fictícia no cohort
-  PAPERS_DB_PATH: data/papers.db
-  FINOPS_ALERT_EMAIL: ${{ secrets.FINOPS_ALERT_EMAIL }}
+permissions: {}
 
 jobs:
-  calibrate:
+  encerrado:
     runs-on: ubuntu-latest
-    # 2026-06-15: 60 -> 120. A coleta de calibração (4 verticais × ~600 calls
-    # com INCLUDE_FICTIONAL_ENTITIES=true) excede 60min; o job vinha sendo
-    # cancelado em ~1h0m17s toda semana, nunca persistindo a calibração.
-    timeout-minutes: 120
-
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip install -e .
-
-      # CRITICO (2026-06-11): restaura a base mais recente ANTES de coletar.
-      # Sem este restore, a calibracao rodava sobre um papers.db VAZIO (o
-      # binario saiu do git no #20/#21) e o "Persist calibration DB as artifact"
-      # abaixo sobrescrevia o artifact papers-db-latest COMPARTILHADO, zerando a
-      # serie historica para o proximo daily-collect. Mesmo contrato do daily:
-      # artifact (safety net) + R2 (source of truth), adotando a base MAIOR.
-      # CORRECAO 2026-08-09/10: a intencao descrita no comentario acima estava
-      # certa, a implementacao nao. Sem a chave `workflow:` o dawidd6 procurava
-      # o artifact no PROPRIO weekly-calibration, e `workflow_conclusion: ""`
-      # casa runs em qualquer estado, inclusive a que esta executando e ainda
-      # nao subiu nada. O restore nunca trouxe a base viva do daily, entao a
-      # calibracao seguiu rodando sobre base defasada desde junho e republicando
-      # a propria copia degenerada no ciclo seguinte — um laco fechado, medido
-      # em 864 citations contra as 63.940 do daily.
-      - name: Download previous DB (safety net)
-        uses: dawidd6/action-download-artifact@v6
-        with:
-          name: papers-db-latest
-          path: data/
-          workflow: daily-collect.yml
-          workflow_conclusion: success
-          if_no_artifact_found: ignore
-        continue-on-error: true
-
-      # ================================================================
-      # RESTORE DO R2 (source of truth) — reescrito 2026-08-10
-      # A versao anterior usava boto3 + 4 secrets S3 que NUNCA foram criados,
-      # entao caia no "skip silencioso" e o restore ficou inerte por dois meses.
-      # Resultado: os weeklies rodaram sobre uma base de 864 citations enquanto
-      # o daily tinha 63.940, e ninguem viu. Agora usa a REST API do R2, que
-      # autentica com o mesmo CLOUDFLARE_API_TOKEN do resto da automacao, e
-      # R2_REQUIRED=1 transforma secret ausente em falha visivel.
-      # ================================================================
-      - name: Restore DB from Cloudflare R2 (source of truth)
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          R2_REQUIRED: "1"
-        run: python scripts/r2_sync.py pull
-
-      # Barra base degenerada ANTES de coletar/analisar. Ver incidente
-      # 2026-08-09 em scripts/db_integrity_guard.py.
-      - name: Integrity guard — dataset nao pode encolher
-        run: python scripts/db_integrity_guard.py check
-
-      - name: Run calibration across verticals
+      - name: Informar o encerramento da coleta
         run: |
-          for V in fintech varejo saude tecnologia; do
-            echo ""
-            echo "=== Calibration ($V) — INCLUDE_FICTIONAL_ENTITIES=true ==="
-            python -m src.cli --vertical "$V" collect citation || true
-          done
-
-      # Portao de sanidade (2026-08-09): so publica se a calibracao de fato
-      # acrescentou linha. O `|| true` no loop acima engole falha de provedor,
-      # entao sem esta conferencia um run em que todos os quatro verticais
-      # falharam subiria um artifact identico ao de entrada, competindo a toa na
-      # adocao forward-only do daily.
-      - name: Sanity gate — a calibração acrescentou linhas?
-        run: |
-          python - <<'PY'
-          import os, sqlite3, sys
-
-          db = "data/papers.db"
-          if not os.path.exists(db):
-              sys.exit("ABORTADO: data/papers.db ausente. A calibracao rodou sem "
-                       "base e nao ha o que persistir.")
-
-          con = sqlite3.connect(db)
-          try:
-              total = con.execute("SELECT COUNT(*) FROM citations").fetchone()[0]
-              ficticias = con.execute(
-                  "SELECT COUNT(*) FROM citations WHERE fictional_hit = 1"
-              ).fetchone()[0]
-          except sqlite3.Error as e:
-              con.close()
-              sys.exit(f"ABORTADO: nao consegui ler citations em {db}: {e}")
-          con.close()
-
-          if total == 0:
-              sys.exit("ABORTADO: citations vazia depois da calibracao.")
-
-          print(f"citations={total}, das quais fictional_hit=1: {ficticias}")
-          PY
-
-      # Persistencia no R2, que e a source of truth compartilhada pelos tres
-      # workflows. O guard roda antes: push so acontece se a base nao encolheu,
-      # e r2_sync recusa sobrescrever um remoto maior. O artifact abaixo
-      # continua existindo como segunda via — as duas redundancias se somam.
-      - name: Persistir calibracao no R2 (guard + push)
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          R2_REQUIRED: "1"
-        run: |
-          python scripts/db_integrity_guard.py check
-          python scripts/r2_sync.py push
-
-      - name: Persist calibration DB as artifact
-        # Substitui git push do data/papers.db (binario >100MB nao versionavel em git).
-        # Esse artifact passa a ser a fonte de verdade entre weekly-calibration e o
-        # proximo daily-collect, que faz "Download previous DB (safety net)" lendo
-        # exatamente este nome.
-        #
-        # CORRECAO 2026-08-09: a intencao acima nunca se realizou. O daily lia
-        # `papers-db-latest` sem declarar `workflow:`, entao so enxergava os
-        # artifacts do proprio daily; o desta calibracao nunca era lido por
-        # ninguem. Somado a retencao de 7 dias, o resultado era coleta paga com
-        # entidades ficticias — o BRACO DE CONTROLE do estudo, de onde
-        # src/analysis/statistical.py tira taxa de falso-positivo e
-        # especificidade — expirando sem uso toda semana.
-        #
-        # O daily agora tem um step "Download calibration DB" que le este
-        # artifact e o compara na adocao forward-only. A retencao sobe de 7 para
-        # 90 dias, alinhada com a do daily e do recover: 7 dias nao cobre nem
-        # duas semanas de intervalo entre calibracoes.
-        uses: actions/upload-artifact@v4
-        with:
-          name: papers-db-latest
-          path: data/papers.db
-          retention-days: 90
-          overwrite: true
+          echo "O projeto papers encerrou as coletas em 11/09/2026."
+          echo "Os dados existentes permanecem disponíveis para consulta, exportação e análise."
+          exit 1

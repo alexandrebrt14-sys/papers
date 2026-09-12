@@ -1,5 +1,7 @@
 # ArXiv Submission Plan — cs.IR track
 
+> **Ciclo encerrado em 11/09/2026.** Este documento preserva planejamento e procedimentos históricos. Coletas, calibrações e consultas experimentais estão bloqueadas; datas futuras abaixo não são agendamentos vigentes. Consulte [o registro final](ENCERRAMENTO_2026-09-11.md) antes de reutilizar o acervo ou propor outro estudo.
+
 **Status:** Planning stage (endorsement pending)
 **Created:** 2026-04-22
 **Primary author:** Alexandre Caramaschi (ORCID 0009-0004-9150-485X)

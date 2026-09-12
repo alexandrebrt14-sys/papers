@@ -26,7 +26,6 @@ class ResponseCache:
 
     def __init__(self, cache_dir: Path = CACHE_DIR, ttl_hours: int = 20) -> None:
         self._dir = cache_dir
-        self._dir.mkdir(exist_ok=True)
         self._ttl = timedelta(hours=ttl_hours)
 
     def _key(self, provider: str, model: str, query: str, vertical: str = "") -> str:
@@ -54,6 +53,7 @@ class ResponseCache:
         """Store response in cache."""
         key = self._key(provider, model, query, vertical)
         path = self._dir / f"{key}.json"
+        self._dir.mkdir(parents=True, exist_ok=True)
         response["_cached_at"] = datetime.now(timezone.utc).isoformat()
         path.write_text(json.dumps(response, ensure_ascii=False), encoding="utf-8")
 

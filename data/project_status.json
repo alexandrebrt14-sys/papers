@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "status": "closed",
+  "closedOn": "2026-09-11",
+  "timezone": "America/Sao_Paulo",
+  "collectionEnabled": false,
+  "reason": "Ciclo de pesquisa encerrado pelo autor após publicação do preprint e documentação dos aprendizados.",
+  "snapshot": {
+    "sourceCommit": "a8810bee6896202dbd3aaa345f8cc6d16db0d065",
+    "sourcePath": "data/dashboard_data.json",
+    "sourceUrl": "https://github.com/alexandrebrt14-sys/papers/blob/a8810bee6896202dbd3aaa345f8cc6d16db0d065/data/dashboard_data.json",
+    "sha256": "ea9f7926c873b82192849734b3c84c7be2117b6d44dc2c67eb8677890eff3bb4",
+    "generatedAt": "2026-09-11T22:57:21.354750+00:00",
+    "totalQueries": 92064,
+    "totalCited": 33439,
+    "collectedDays": 56,
+    "interpretation": "Agregado operacional legado, preservado sem recalcular. Não equivale ao snapshot auditado do artigo nem a amostras independentes. A data projetada de fechamento no JSON é histórica e não agenda coletas."
+  },
+  "publications": {
+    "zenodo": {
+      "url": "https://zenodo.org/records/22711743",
+      "doi": "10.5281/zenodo.22711743",
+      "title": "BRGEO-1: A longitudinal audit of entity-mention measurement in generative engines",
+      "publishedOn": "2026-09-11",
+      "version": "Preprint empírico corrigido",
+      "pages": 41,
+      "peerReviewed": false,
+      "pdfUrl": "https://zenodo.org/records/22711743/files/BRGEO-1_Corrected_Empirical_Preprint_Zenodo.pdf?download=1",
+      "pdfMd5": "287922ff96429920583ee08245ac050f",
+      "license": "CC BY 4.0 (manuscrito)"
+    },
+    "ssrn": {
+      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7446519",
+      "doi": "10.2139/ssrn.7446519",
+      "title": "Measuring Entity Citation in Generative Engines: The BRGEO-1 Protocol and a Five-Month Field Record",
+      "publishedOn": "2026-09-11",
+      "version": "Versão anterior da mesma pesquisa, preservada no SSRN",
+      "pages": 183,
+      "peerReviewed": false
+    }
+  },
+  "paper": {
+    "startDate": "2026-04-23",
+    "endDate": "2026-09-11",
+    "totalResponses": 91392,
+    "canonicalResponses": 72145,
+    "probeResponses": 19247,
+    "observedUtcDates": 56,
+    "historicalCutoffExclusiveUtc": "2026-09-01T00:00:00Z",
+    "historicalResponses": 83486,
+    "historicalCanonicalResponses": 66399,
+    "historicalProbeResponses": 17087,
+    "historicalObservedUtcDates": 50,
+    "primaryPairedResponses": 7436,
+    "retainedTextDetectionRate": 75.73,
+    "prefix200DetectionRate": 51.95,
+    "prefixMinusRetainedPercentagePoints": -23.78,
+    "positivesLostByPrefix": 1768,
+    "commonQueryDateCells": 272,
+    "rowLevelDataPublishedWithPreprint": false,
+    "dataAccess": "O depósito publica o manuscrito. O pacote de auditoria em nível de resposta permanece sob custódia do autor.",
+    "interpretation": "Auditoria retrospectiva e exploratória. Menção lexical não comprova recomendação, sustentação factual, qualidade de provedor ou efeito causal de GEO."
+  },
+  "futureResearch": {
+    "status": "proposals_only",
+    "requiresNewProjectAndAuthorization": true,
+    "automaticRestart": false,
+    "minimumCalendarMonths": 3,
+    "pilotAndPrecisionAssessmentRequired": true,
+    "budgetCheckedBeforeEveryCall": true,
+    "preserveCompleteCapturedResponses": true,
+    "noSilentModelSubstitution": true
+  },
+  "collectionWorkflows": [
+    {
+      "path": ".github/workflows/daily-collect.yml",
+      "state": "disabled_manually"
+    },
+    {
+      "path": ".github/workflows/weekly-benchmark.yml",
+      "state": "disabled_manually"
+    },
+    {
+      "path": ".github/workflows/weekly-calibration.yml",
+      "state": "disabled_manually"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Manual do Sistema — Papers
 
+> **Ciclo encerrado em 11/09/2026.** Este documento preserva planejamento e procedimentos históricos. Coletas, calibrações e consultas experimentais estão bloqueadas; datas futuras abaixo não são agendamentos vigentes. Consulte [o registro final](ENCERRAMENTO_2026-09-11.md) antes de reutilizar o acervo ou propor outro estudo.
+
 ## 1. Visão Geral
 
 O **Papers** é uma plataforma de coleta automatizada de dados para pesquisa empírica sobre **como LLMs citam bancos e fintechs brasileiras**. Projetado para gerar datasets longitudinais de 6 a 12 meses que suportem publicação acadêmica peer-reviewed.

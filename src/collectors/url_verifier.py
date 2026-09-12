@@ -7,6 +7,8 @@ real citations from fabricated ones.
 """
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import logging
 from typing import Any
 from urllib.parse import urlparse
@@ -28,6 +30,7 @@ class URLVerifier:
 
     def verify_url(self, url: str) -> dict[str, Any]:
         """Send HEAD request to verify URL exists."""
+        require_collection_open()
         try:
             parsed = urlparse(url)
             if not parsed.scheme or not parsed.netloc:
@@ -54,6 +57,7 @@ class URLVerifier:
 
     def verify_batch(self, urls: list[str], llm: str = "", query: str = "") -> list[dict[str, Any]]:
         """Verify a batch of URLs and add metadata."""
+        require_collection_open()
         results = []
         seen = set()
         for url in urls:

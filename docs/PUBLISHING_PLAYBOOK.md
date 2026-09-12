@@ -1,5 +1,7 @@
 # Publishing Playbook — GEO Papers
 
+> **Ciclo encerrado em 11/09/2026.** Este documento preserva planejamento e procedimentos históricos. Coletas, calibrações e consultas experimentais estão bloqueadas; datas futuras abaixo não são agendamentos vigentes. Consulte [o registro final](ENCERRAMENTO_2026-09-11.md) antes de reutilizar o acervo ou propor outro estudo.
+
 Documento mestre de publicação acadêmica para a linha de pesquisa sobre Generative Engine Optimization (GEO) conduzida por Alexandre Caramaschi. Consolida canais-alvo, políticas de cross-posting, metadata canônica e playbook de submissão.
 
 **Versão:** 1.0 (2026-04-21)

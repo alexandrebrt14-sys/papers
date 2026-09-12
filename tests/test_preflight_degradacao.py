@@ -129,6 +129,8 @@ def test_main_em_degrade_grava_dia_parcial_sem_rede(tmp_path, monkeypatch):
     monkeypatch.setattr(pf, "check_google", fake("gemini", True))
     monkeypatch.setattr(pf, "check_perplexity", fake("perplexity", True))
     monkeypatch.setattr(pf, "check_grok", fake("grok", True))
+    # Todos os provedores acima são falsos; este teste preserva a regra histórica.
+    monkeypatch.setattr(pf, "require_collection_open", lambda: None)
     partial = tmp_path / "partial_days.json"
     monkeypatch.setenv("PAPERS_PARTIAL_DAYS_PATH", str(partial))
     monkeypatch.setenv("PAPERS_PREFLIGHT_MODE", "degrade")

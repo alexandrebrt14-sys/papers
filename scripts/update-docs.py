@@ -323,6 +323,13 @@ def generate_status(stats, db_stats, git_stats):
 
 
 def main():
+    # O documento final é editorial e não deve voltar a prometer novas coletas.
+    print("Projeto encerrado em 11/09/2026. Documentação final preservada; "
+          "consulte docs/ENCERRAMENTO_2026-09-11.md.")
+    return
+
+
+def _historical_update_docs():
     print(f"{'='*50}")
     print(f"  Atualizando documentação — Papers")
     print(f"  {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
