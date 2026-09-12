@@ -2,6 +2,9 @@
 
 Proposta registrada em 11/09/2026. **Proposta metodológica: não aprovada para execução, não agendada e sem chamadas experimentais realizadas.** O ciclo papers encerrado permanece fechado.
 
+
+**Aprofundamento baseado no repositório e na literatura recente:** leia o [protocolo de execução, validação humana e orçamento](PROTOCOLO_FUTURO_BASEADO_NO_SITE_2026.md) e o [mapa factual do site](MAPA_SITE_PESQUISA_FUTURA_2026.md). Eles complementam este desenho; não reabrem a coleta.
+
 ## Decisão de desenho
 
 Um próximo estudo deve coletar durante **pelo menos três meses completos de calendário**, com duração exata definida no protocolo. Cumprir o calendário não demonstra suficiência estatística: o piloto e a simulação precisam verificar a precisão pretendida para cada contraste principal. Se o orçamento não sustentar esse padrão, reduzir o escopo de perguntas antes de iniciar, estender o estudo mediante nova decisão ou declarar os resultados inconclusivos; não truncar respostas, omitir falhas ou escolher apenas efeitos favoráveis.

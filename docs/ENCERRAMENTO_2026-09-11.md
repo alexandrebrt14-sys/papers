@@ -103,3 +103,8 @@ Para reutilizar o trabalho, comece pelo manuscrito corrigido e declare o recorte
 - Caramaschi, Alexandre. *Measuring Entity Citation in Generative Engines: The BRGEO-1 Protocol and a Five-Month Field Record*. Versão anterior, 11/09/2026. [SSRN](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7446519).
 - [Snapshot operacional do papers no commit a8810be](https://github.com/alexandrebrt14-sys/papers/tree/a8810bee6896202dbd3aaa345f8cc6d16db0d065), gerado em 11/09/2026.
 - [Manifesto de encerramento](../data/project_status.json), com estado, fontes, recortes e integridade da cópia final.
+
+
+## Aprofundamento para outro estudo
+
+A leitura do `landing-page-geo` e a revisão adicional de fontes primárias fundamentam o [protocolo futuro baseado no site](PROTOCOLO_FUTURO_BASEADO_NO_SITE_2026.md). A proposta transforma recomendações em artefatos e critérios de avanço: coleta principal de pelo menos três meses completos, referência humana retida, orçamento com reserva transacional, resposta preservada e análise de versões. O [mapa do código](MAPA_SITE_PESQUISA_FUTURA_2026.md) separa componentes reutilizáveis de lacunas ainda não implementadas. Não foi iniciada nova coleta.

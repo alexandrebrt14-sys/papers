@@ -14,6 +14,9 @@ A referência empírica é o [preprint corrigido no Zenodo](https://zenodo.org/r
 
 Leia o [registro de conclusões, falhas e próximas pesquisas](docs/ENCERRAMENTO_2026-09-11.md), o [estado final](docs/STATUS.md) e o [manifesto de encerramento](data/project_status.json). As propostas futuras exigem novo projeto e autorização, sem retomada automática deste ciclo. O [próximo estudo longitudinal proposto](docs/PROPOSTA_PESQUISA_PROSPECTIVA_2026.md) terá no mínimo três meses completos, planejamento de precisão e limite de custo antes de cada chamada.
 
+
+O [protocolo aprofundado baseado no site](docs/PROTOCOLO_FUTURO_BASEADO_NO_SITE_2026.md) liga pesquisas recentes à infraestrutura real: referência humana, versões, arquivo completo, critérios de avanço e orçamento transacional proposto. O [mapa de capacidades e lacunas](docs/MAPA_SITE_PESQUISA_FUTURA_2026.md) distingue código existente de melhorias ainda não implementadas.
+
 ## Descrição histórica do projeto
 
 Platform for collection, persistence, and statistical analysis of **how LLMs cite Brazilian companies** across 4 economic sectors.
