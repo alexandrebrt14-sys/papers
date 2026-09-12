@@ -14,6 +14,8 @@ Responsabilidades:
 
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import json
 import logging
 import os
@@ -174,6 +176,7 @@ class LLMClient:
 
     def query(self, llm: LLMConfig, prompt: str, category: str = "") -> LLMResponse | None:
         """Query an LLM with all optimizations applied."""
+        require_collection_open()
         if llm.requires_scraping or not llm.api_key:
             return None
 
@@ -278,6 +281,7 @@ class LLMClient:
 
     def _dispatch(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse | None:
         """Route to the correct provider."""
+        require_collection_open()
         dispatch = {
             "openai": self._query_openai,
             "anthropic": self._query_anthropic,
@@ -295,6 +299,7 @@ class LLMClient:
 
     def _query_openai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """OpenAI query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        require_collection_open()
         messages: list[dict[str, str]] = []
         if self._json_mode:
             messages.append({"role": "system", "content": SYSTEM_PROMPT})
@@ -337,6 +342,7 @@ class LLMClient:
 
     def _query_anthropic(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """Anthropic query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        require_collection_open()
         body: dict[str, Any] = {
             "model": llm.model,
             "max_tokens": llm.max_output_tokens,
@@ -377,6 +383,7 @@ class LLMClient:
 
     def _query_google(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """Google Gemini query. Uses natural free-text by default; JSON mode only if json_mode=True."""
+        require_collection_open()
         if self._json_mode:
             prompt_text = f"{SYSTEM_PROMPT}\n\nQuery: {prompt}"
         else:
@@ -456,6 +463,7 @@ class LLMClient:
 
     def _query_groq(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """Groq query (OpenAI-compatible endpoint). Fast inference, open-weight models."""
+        require_collection_open()
         messages: list[dict[str, str]] = []
         if self._json_mode:
             messages.append({"role": "system", "content": SYSTEM_PROMPT})
@@ -492,6 +500,7 @@ class LLMClient:
     def _query_xai(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """xAI Grok (endpoint OpenAI-compatible). Motor de resposta de consumidor;
         grok-4.6 raciocina por padrão e o reasoning é cobrado como output."""
+        require_collection_open()
         messages: list[dict[str, str]] = []
         if self._json_mode:
             messages.append({"role": "system", "content": SYSTEM_PROMPT})
@@ -545,6 +554,7 @@ class LLMClient:
 
     def _query_perplexity(self, llm: LLMConfig, prompt: str, start: datetime) -> LLMResponse:
         """Perplexity with built-in citations (no JSON mode needed)."""
+        require_collection_open()
         if pplx_agent_api_enabled():
             return self._query_perplexity_agent(llm, prompt, start)
         resp = self._http.post(
@@ -603,6 +613,7 @@ class LLMClient:
           * usage.cost.total_cost e o custo FATURADO: search_web US$ 0,0025
             por chamada, contra US$ 0,005 de request_cost na rota legada.
         """
+        require_collection_open()
         body = {
             "model": f"perplexity/{llm.model}",
             "instructions": PERPLEXITY_SYSTEM,

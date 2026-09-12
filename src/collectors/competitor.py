@@ -7,6 +7,8 @@ entity consistency comparison.
 
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import re
 from typing import Any
 
@@ -22,6 +24,7 @@ class CompetitorBenchmark(BaseCollector):
 
     def collect(self) -> list[dict[str, Any]]:
         """Query LLMs and check which cohort entities are cited."""
+        require_collection_open()
         results: list[dict[str, Any]] = []
 
         if not self.cohort:

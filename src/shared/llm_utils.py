@@ -19,6 +19,8 @@ Uso:
     results = query_all_llms("Best digital banks in Brazil 2026")
 """
 
+from src.collection_policy import require_collection_open
+
 import hashlib
 import json
 import os
@@ -34,7 +36,6 @@ load_dotenv(Path(__file__).parent / ".env")
 # === Cache ===
 
 CACHE_DIR = Path(__file__).parent.parent.parent / "Logss" / "llm_cache"
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_TTL_HOURS = int(os.environ.get("CACHE_TTL_HOURS", "20"))
 
 
@@ -61,6 +62,7 @@ def _cache_get(provider: str, query: str) -> dict | None:
 
 def _cache_put(provider: str, query: str, data: dict) -> None:
     path = CACHE_DIR / f"{_cache_key(provider, query)}.json"
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
     data["_cached_at"] = datetime.utcnow().isoformat()
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
@@ -126,6 +128,7 @@ def _extract_urls(text: str) -> list[str]:
 
 def query_openai(query: str, api_key: str) -> dict | None:
     """OpenAI gpt-4o-mini + JSON mode + max_tokens=250."""
+    require_collection_open()
     cached = _cache_get("openai", query)
     if cached:
         return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
@@ -179,6 +182,7 @@ def query_openai(query: str, api_key: str) -> dict | None:
 
 def query_anthropic(query: str, api_key: str) -> dict | None:
     """Anthropic haiku-4.5 + system prompt caching + max_tokens=250."""
+    require_collection_open()
     cached = _cache_get("anthropic", query)
     if cached:
         return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
@@ -239,6 +243,7 @@ def query_anthropic(query: str, api_key: str) -> dict | None:
 
 def query_gemini(query: str, api_key: str) -> dict | None:
     """Gemini 2.0 Flash + JSON mode + max_tokens=250 (grátis)."""
+    require_collection_open()
     cached = _cache_get("gemini", query)
     if cached:
         return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
@@ -292,6 +297,7 @@ def query_gemini(query: str, api_key: str) -> dict | None:
 
 def query_perplexity(query: str, api_key: str) -> dict | None:
     """Perplexity sonar + built-in citations + max_tokens=300."""
+    require_collection_open()
     cached = _cache_get("perplexity", query)
     if cached:
         return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
@@ -348,6 +354,7 @@ def query_grok(query: str, api_key: str) -> dict | None:
     Substituiu query_groq em 2026-08-19 (Groq aposentou o
     llama-3.3-70b-versatile e o braço saiu do painel). grok-4.6 raciocina
     por padrão; max_tokens não corta o content."""
+    require_collection_open()
     cached = _cache_get("grok", query)
     if cached:
         return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
@@ -400,6 +407,7 @@ def query_grok(query: str, api_key: str) -> dict | None:
 
 def query_groq(query: str, api_key: str) -> dict | None:
     """Groq Llama 3.3 70B — ultra-fast inference via OpenAI-compatible API."""
+    require_collection_open()
     cached = _cache_get("groq", query)
     if cached:
         return {**cached, "from_cache": True, "latency_ms": 0, "tokens": 0}
@@ -478,6 +486,7 @@ def get_available_llms(filter_llm: str | None = None) -> dict:
 
 def query_all_llms(query: str, filter_llm: str | None = None) -> dict[str, dict | None]:
     """Query all available LLMs with a single query. Returns {llm_name: response}."""
+    require_collection_open()
     available = get_available_llms(filter_llm)
     results = {}
     for name, adapter in available.items():
@@ -488,6 +497,7 @@ def query_all_llms(query: str, filter_llm: str | None = None) -> dict[str, dict 
 
 def query_single_llm(llm_name: str, query: str) -> dict | None:
     """Query a specific LLM by name."""
+    require_collection_open()
     available = get_available_llms(llm_name)
     if llm_name not in available:
         return None

@@ -1,5 +1,7 @@
 # Plano de Desenvolvimento — Papers
 
+> **Ciclo encerrado em 11/09/2026.** Este documento preserva planejamento e procedimentos históricos. Coletas, calibrações e consultas experimentais estão bloqueadas; datas futuras abaixo não são agendamentos vigentes. Consulte [o registro final](ENCERRAMENTO_2026-09-11.md) antes de reutilizar o acervo ou propor outro estudo.
+
 **Versão:** 1.0
 **Data:** 2026-03-24
 **Repositório:** github.com/alexandrebrt14-sys/papers

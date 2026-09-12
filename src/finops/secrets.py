@@ -23,6 +23,8 @@ from typing import Any
 
 import httpx
 
+from src.collection_policy import CollectionClosedError, require_collection_open
+
 logger = logging.getLogger("finops.secrets")
 
 ALERT_EMAIL = os.getenv("FINOPS_ALERT_EMAIL", "")
@@ -60,6 +62,15 @@ def validate_key_health(platform: str, api_key: str) -> dict[str, Any]:
     Uses lightweight endpoints (models list, billing check) that
     don't consume quota.
     """
+    # A sonda Anthropic gera tokens; o monitor não pode reiniciar a coleta.
+    if platform == "anthropic":
+        try:
+            require_collection_open()
+        except CollectionClosedError as exc:
+            return {
+                "platform": platform, "status": "skipped_project_closed",
+                "active": False, "reason": str(exc),
+            }
     if not api_key:
         return {"platform": platform, "status": "missing", "active": False}
 

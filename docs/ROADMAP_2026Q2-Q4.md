@@ -1,5 +1,7 @@
 # Roadmap 2026 Q2-Q3-Q4 — papers
 
+> **Ciclo encerrado em 11/09/2026.** Este documento preserva planejamento e procedimentos históricos. Coletas, calibrações e consultas experimentais estão bloqueadas; datas futuras abaixo não são agendamentos vigentes. Consulte [o registro final](ENCERRAMENTO_2026-09-11.md) antes de reutilizar o acervo ou propor outro estudo.
+
 > Fonte: [`.cto/review-2026-05-04-masterplan-15-repos.md`](.cto/review-2026-05-04-masterplan-15-repos.md) e `planoCTO.html` (913 linhas).
 > Próxima revisão CTO: **2026-08-01**.
 > Owner: **Alexandre Caramaschi**.

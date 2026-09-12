@@ -1,5 +1,7 @@
 # Perplexity: virada da Sonar Chat Completions para a Agent API
 
+> **Ciclo encerrado em 11/09/2026.** Este documento preserva planejamento e procedimentos históricos. Coletas, calibrações e consultas experimentais estão bloqueadas; datas futuras abaixo não são agendamentos vigentes. Consulte [o registro final](ENCERRAMENTO_2026-09-11.md) antes de reutilizar o acervo ou propor outro estudo.
+
 **Data**: 2026-09-09 · **Status**: implementado atrás de flag, desligado por padrão · **Prazo externo**: 27/09/2026
 
 ## Por que existe

@@ -7,6 +7,8 @@ agreement between original and reformulated queries.
 """
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import logging
 from typing import Any
 
@@ -80,6 +82,7 @@ class PromptSensitivityAnalyzer(BaseCollector):
         return "prompt_sensitivity"
 
     def collect(self) -> list[dict[str, Any]]:
+        require_collection_open()
         results = []
 
         for llm_cfg in self.config.llms:

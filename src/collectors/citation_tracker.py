@@ -13,6 +13,8 @@ Optimizations:
 
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import hashlib
 import json
 import re
@@ -30,6 +32,7 @@ class CitationTracker(BaseCollector):
         return "citation_tracker"
 
     def collect(self) -> list[dict[str, Any]]:
+        require_collection_open()
         results: list[dict[str, Any]] = []
         cache_hits = 0
         # Onda 8: structured_logger emite 1 evento por query + summary.

@@ -19,6 +19,7 @@ import click
 from rich.console import Console
 from rich.table import Table
 
+from src.collection_policy import CollectionClosedError, require_collection_open
 from src.config import config, list_verticals, get_queries, get_cohort, VERTICALS
 from src.db.client import DatabaseClient
 from src.collectors.citation_tracker import CitationTracker
@@ -37,6 +38,13 @@ logging.basicConfig(
 )
 
 VERTICAL_CHOICES = list_verticals() + ["all"]
+
+
+def _require_collection_open() -> None:
+    try:
+        require_collection_open()
+    except CollectionClosedError as exc:
+        raise click.ClickException(str(exc)) from exc
 
 
 def get_db() -> DatabaseClient:
@@ -81,6 +89,7 @@ def collect(ctx: click.Context) -> None:
 @click.pass_context
 def collect_all(ctx: click.Context) -> None:
     """Rodar todos os coletores disponíveis."""
+    _require_collection_open()
     db = get_db()
     verticals = resolve_verticals(ctx)
 
@@ -163,6 +172,7 @@ def collect_citation(ctx: click.Context) -> None:
     Isso previne o bug silencioso onde keys 401 fazem o run aparecer
     como "success" sem dados gravados (incidente 2026-04-07).
     """
+    _require_collection_open()
     db = get_db()
     verticals = resolve_verticals(ctx)
     total_collected = 0
@@ -281,6 +291,7 @@ def collect_validate_run(ctx: click.Context, since_minutes: int) -> None:
 @click.pass_context
 def collect_competitor(ctx: click.Context) -> None:
     """Rodar apenas o Competitor Benchmark (Módulo 2)."""
+    _require_collection_open()
     db = get_db()
     verticals = resolve_verticals(ctx)
 
@@ -350,6 +361,7 @@ def collect_context(ctx: click.Context, limit: int) -> None:
 @click.pass_context
 def collect_serp(ctx: click.Context) -> None:
     """Rodar apenas o SERP vs AI Overlap (Módulo 3)."""
+    _require_collection_open()
     db = get_db()
     verticals = resolve_verticals(ctx)
 
@@ -603,6 +615,7 @@ def intervention_add(slug: str, itype: str, desc: str, url: str) -> None:
 @intervention.command("check")
 def intervention_check() -> None:
     """Verificar intervenções ativas e registrar medições (dia +7, +14, +30)."""
+    _require_collection_open()
     db = get_db()
     results = InterventionTracker.check_active_interventions(db)
     if results:

@@ -9,7 +9,11 @@ de alerta e de falha descreve o artefato que quebrou e o movimento de saída na
 mesma linha, sem cobrar nada de ninguém: "a etiqueta de origem não chegou ao
 cadastro" em vez de "você configurou errado". Número em alerta vem com a base.
 
-Uso:
+Encerramento em 11/09/2026: a execução normal informa o estado fechado e não
+sonda provedores, consulta banco nem envia alertas. As verificações individuais
+de arquivo, esquema e detector permanecem disponíveis para reanálise explícita.
+
+Uso histórico (as opções permanecem aceitas, sem reativar a coleta):
     python scripts/health_check.py                              # full check
     python scripts/health_check.py --no-alert                   # sem disparar alertas
     python scripts/health_check.py --site https://...           # custom site URL
@@ -37,6 +41,12 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+from src.collection_policy import (
+    COLLECTION_CLOSED_ON,
+    CollectionClosedError,
+    require_collection_open,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +131,7 @@ def check_api_keys_loadable() -> Check:
 
 def check_api_keys_valid() -> Check:
     """Faz uma chamada minima a cada provider para validar key. Custo total ~$0.0001."""
+    require_collection_open()
     c = Check("API keys ainda validas (smoke test)")
     import urllib.request
 
@@ -551,6 +562,10 @@ def check_dual_response_capture() -> Check:
 
 def send_alert(checks: list[Check], context: dict) -> bool:
     """Envia WhatsApp + email com sumario dos checks que falharam."""
+    try:
+        require_collection_open()
+    except CollectionClosedError:
+        return False
     failed = [c for c in checks if not c.passed and c.severity == "error"]
     warnings = [c for c in checks if not c.passed and c.severity == "warning"]
     if not failed and not warnings:
@@ -655,6 +670,22 @@ def main():
                         help="nao envia WhatsApp/email mesmo se houver falha")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+
+    # A ausência de novas observações passou a ser o estado esperado do projeto.
+    # O retorno normal evita alertas de indisponibilidade sobre uma coleta encerrada.
+    try:
+        require_collection_open()
+    except CollectionClosedError as exc:
+        if args.json:
+            print(json.dumps({
+                "status": "closed", "closed_on": COLLECTION_CLOSED_ON,
+                "collection_enabled": False, "alerts_sent": False,
+                "passed": 0, "total": 0, "failed": 0, "warnings": 0,
+                "checks": [], "message": str(exc),
+            }, ensure_ascii=False))
+        else:
+            print(str(exc))
+        return 0
 
     # Carrega .env do papers se existir
     env_file = ROOT / ".env"

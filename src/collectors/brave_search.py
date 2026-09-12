@@ -9,6 +9,8 @@ respostas generativas.
 
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import logging
 
 import httpx
@@ -29,6 +31,7 @@ class BraveSearchClient:
 
     def search(self, query: str, count: int = 10) -> list[dict[str, str]]:
         """Return top N organic results as [{title, url, domain}]."""
+        require_collection_open()
         if not self._key:
             logger.warning("[brave] No API key — returning empty SERP")
             return []

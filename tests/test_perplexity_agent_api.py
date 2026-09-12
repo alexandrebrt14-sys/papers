@@ -107,6 +107,8 @@ def test_gate_ligado_usa_v1_agent_com_o_mesmo_modelo(monkeypatch: pytest.MonkeyP
     client = LLMClient(cohort=["Nubank", "Cora"])
     http = _Http(AGENT_PAYLOAD)
     client._http = http  # type: ignore[assignment]
+    # Transporte falso instalado: preserva o teste do contrato histórico.
+    monkeypatch.setattr("src.collectors.llm_client.require_collection_open", lambda: None)
 
     start = datetime.now(timezone.utc)
     resp = client._query_perplexity(_llm(), "Quais fintechs PJ?", start)
@@ -146,6 +148,8 @@ def test_gate_desligado_mantem_rota_legada(monkeypatch: pytest.MonkeyPatch) -> N
     client = LLMClient(cohort=["Nubank"])
     http = _Http(legacy)
     client._http = http  # type: ignore[assignment]
+    # Transporte falso instalado: preserva o teste do contrato histórico.
+    monkeypatch.setattr("src.collectors.llm_client.require_collection_open", lambda: None)
     resp = client._query_perplexity(_llm(), "q", datetime.now(timezone.utc))
     assert http.calls[0]["url"] == "https://api.perplexity.ai/chat/completions"
     assert resp.sources == ["https://d.example/4"]
@@ -155,6 +159,8 @@ def test_resposta_sem_message_falha_alto(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "1")
     client = LLMClient(cohort=["Nubank"])
     client._http = _Http({"status": "completed", "output": [], "usage": {}})  # type: ignore[assignment]
+    # Transporte falso instalado: preserva o teste do contrato histórico.
+    monkeypatch.setattr("src.collectors.llm_client.require_collection_open", lambda: None)
     with pytest.raises(RuntimeError, match="sem item message"):
         client._query_perplexity(_llm(), "q", datetime.now(timezone.utc))
 
@@ -174,6 +180,8 @@ def test_erro_http_do_v1_agent_propaga_para_o_circuit_breaker(monkeypatch: pytes
     monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "1")
     client = LLMClient(cohort=["Nubank"])
     client._http = _HttpErro({})  # type: ignore[assignment]
+    # Transporte falso instalado: preserva o teste do contrato histórico.
+    monkeypatch.setattr("src.collectors.llm_client.require_collection_open", lambda: None)
     with pytest.raises(RuntimeError, match="insufficient_quota"):
         client._query_perplexity(_llm(), "q", datetime.now(timezone.utc))
 
@@ -202,6 +210,7 @@ def test_preflight_sonda_a_rota_que_a_coleta_vai_usar(monkeypatch: pytest.Monkey
         return r
 
     monkeypatch.setattr(pf.httpx, "post", fake_post)
+    monkeypatch.setattr(pf, "require_collection_open", lambda: None)
     monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "1")
     assert pf.check_perplexity("pplx-test").ok
     monkeypatch.setenv("PAPERS_PPLX_AGENT_API", "0")

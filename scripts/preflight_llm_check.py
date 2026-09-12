@@ -40,6 +40,11 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 
 import httpx
+from pathlib import Path
+
+# Permite a execução direta, inclusive sem instalar o pacote papers.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.collection_policy import CollectionClosedError, require_collection_open
 
 
 @dataclass
@@ -55,6 +60,7 @@ def _post_with_retry(name: str, do_post: Callable[[], httpx.Response]) -> Provid
     # 4xx NUNCA retenta — sao bugs nossos (payload invalido, auth, quota) e
     # retry apenas atrasa diagnostico. Boundary com APIs externas justifica
     # essa tolerancia para preservar a janela do paper (julho/2026).
+    require_collection_open()
     attempts = 2
     last_err: Optional[str] = None
     last_latency = 0
@@ -84,6 +90,7 @@ def _post_with_retry(name: str, do_post: Callable[[], httpx.Response]) -> Provid
 # (Anthropic exige >=1) e prompt curto. O objetivo e exercitar o auth +
 # billing path sem gerar payload significativo.
 def check_openai(key: str) -> ProviderCheck:
+    require_collection_open()
     if not key:
         return ProviderCheck("chatgpt", False, 0, "OPENAI_API_KEY ausente")
     return _post_with_retry("chatgpt", lambda: httpx.post(
@@ -100,6 +107,7 @@ def check_openai(key: str) -> ProviderCheck:
 
 
 def check_anthropic(key: str) -> ProviderCheck:
+    require_collection_open()
     if not key:
         return ProviderCheck("claude", False, 0, "ANTHROPIC_API_KEY ausente")
     return _post_with_retry("claude", lambda: httpx.post(
@@ -119,6 +127,7 @@ def check_anthropic(key: str) -> ProviderCheck:
 
 
 def check_google(key: str) -> ProviderCheck:
+    require_collection_open()
     if not key:
         return ProviderCheck("gemini", False, 0, "GOOGLE_AI_API_KEY ausente")
     # Gemini 2.5 Pro thinking consome 1000-3000 tokens internos. maxOutputTokens
@@ -136,6 +145,7 @@ def check_google(key: str) -> ProviderCheck:
 
 
 def check_perplexity(key: str) -> ProviderCheck:
+    require_collection_open()
     if not key:
         return ProviderCheck("perplexity", False, 0, "PERPLEXITY_API_KEY ausente")
     # Mesma chave do coletor: com PAPERS_PPLX_AGENT_API=1 o preflight sonda a
@@ -169,6 +179,7 @@ def check_perplexity(key: str) -> ProviderCheck:
 def check_grok(key: str) -> ProviderCheck:
     # grok-4.6 raciocina por padrão: max_tokens baixo não corta o content,
     # mas 16 dá folga e o custo do probe segue desprezível.
+    require_collection_open()
     if not key:
         return ProviderCheck("grok", False, 0, "XAI_API_KEY ausente")
     return _post_with_retry("grok", lambda: httpx.post(
@@ -303,6 +314,12 @@ def export_env(remaining_mandatory: list[str], degraded: list[str]) -> None:
 
 
 def main() -> int:
+    try:
+        require_collection_open()
+    except CollectionClosedError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
     from datetime import datetime, timezone
 
     print("=== preflight LLM check ===")

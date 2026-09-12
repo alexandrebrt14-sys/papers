@@ -10,6 +10,8 @@ Also classifies citations as:
 """
 from __future__ import annotations
 
+from src.collection_policy import require_collection_open
+
 import json
 import logging
 import re
@@ -41,6 +43,7 @@ class DualCollector(BaseCollector):
         return "dual_collector"
 
     def collect(self) -> list[dict[str, Any]]:
+        require_collection_open()
         results = []
         queries = [q for q in self.queries if q["category"] in ("concept", "technical") or q["category"].startswith(self.vertical)][:10]
 

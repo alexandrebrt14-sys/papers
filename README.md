@@ -2,9 +2,19 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Status: Collecting](https://img.shields.io/badge/Status-Collecting-yellow)
-![Tests](https://img.shields.io/badge/tests-78%2F78%20passing-brightgreen)
+![Coleta encerrada](https://img.shields.io/badge/coleta-encerrada-blue)
+![Tests](https://img.shields.io/badge/tests-360%20passing-brightgreen)
 ![Version](https://img.shields.io/badge/version-v2.0.0--reboot-blue)
+
+## Coleta encerrada em 11 de setembro de 2026
+
+O ciclo de coleta foi encerrado pelo autor. Novas consultas experimentais, benchmarks e calibrações estão bloqueados. O acervo permanece disponível para consulta e reanálise; os cronogramas e comandos de coleta descritos nas seções históricas abaixo não estão mais ativos.
+
+A referência empírica é o [preprint corrigido no Zenodo](https://zenodo.org/records/22711743), de 11/09/2026. O [SSRN](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7446519) preserva a versão anterior da mesma pesquisa. Os depósitos são preprints, sem revisão por periódico. O artigo corrigido audita 91.392 respostas persistidas; o dashboard final registra 92.064 consultas em outro recorte. Essas quantidades não representam observações independentes.
+
+Leia o [registro de conclusões, falhas e próximas pesquisas](docs/ENCERRAMENTO_2026-09-11.md), o [estado final](docs/STATUS.md) e o [manifesto de encerramento](data/project_status.json). As propostas futuras exigem novo projeto e autorização, sem retomada automática deste ciclo. O [próximo estudo longitudinal proposto](docs/PROPOSTA_PESQUISA_PROSPECTIVA_2026.md) terá no mínimo três meses completos, planejamento de precisão e limite de custo antes de cada chamada.
+
+## Descrição histórica do projeto
 
 Platform for collection, persistence, and statistical analysis of **how LLMs cite Brazilian companies** across 4 economic sectors.
 
@@ -56,7 +66,7 @@ Canonical pillars:
 | Observations collected | 63,940 queries, 22,527 citations, 25,134 contexts, 240 runs (as of 2026-06-23; live: [alexandrecaramaschi.com/research](https://alexandrecaramaschi.com/research)) |
 | Code | 7,010 lines Python, 35 files |
 | Schema | 21 tables (citations, contexts, finops, interventions, snapshots, model_versions) |
-| Collection | Automated daily (GitHub Actions, 06:00 UTC) |
+| Collection | Encerrada em 11/09/2026; três workflows de coleta desativados |
 | Persistence | SQLite WAL (canonical ledger) + Supabase (read projection) |
 | Publication target | 3 papers (ArXiv, SIGIR/WWW, Information Sciences Q1) |
 
@@ -70,7 +80,7 @@ decoys de calibração ficam só em `calibration`, `coverage` é limitada ao ros
 `partialDays` lista os dias coletados com menos braços que `MANDATORY_LLMS`.
 Para reaplicar sem banco: `python scripts/generate_dashboard_json.py --from-json`.
 
-O preflight roda em modo `degrade` por padrão (`PAPERS_PREFLIGHT_MODE`): provedor
+Antes do encerramento, o preflight operava em modo `degrade` por padrão (`PAPERS_PREFLIGHT_MODE`): provedor
 sem saldo vira dia parcial em vez de dia perdido. Virada da Perplexity para a
 Agent API: `docs/PERPLEXITY_AGENT_API.md`.
 
