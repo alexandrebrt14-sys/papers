@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T12:18:57.813383+00:00",
+  "generated_at": "2026-09-21T12:20:24.618487+00:00",
   "budgets": [
     {
       "platform": "openai",
@@ -2120,22 +2120,22 @@
     "platforms": {
       "openai": {
         "last_activity": "2026-09-10T10:46:02.879277+00:00",
-        "hours_ago": 241.5,
+        "hours_ago": 265.6,
         "stale": true
       },
       "anthropic": {
         "last_activity": "2026-09-10T23:07:03.228274+00:00",
-        "hours_ago": 229.2,
+        "hours_ago": 253.2,
         "stale": true
       },
       "google": {
         "last_activity": "2026-09-10T23:07:07.008350+00:00",
-        "hours_ago": 229.2,
+        "hours_ago": 253.2,
         "stale": true
       },
       "perplexity": {
         "last_activity": "2026-09-10T23:07:10.679478+00:00",
-        "hours_ago": 229.2,
+        "hours_ago": 253.2,
         "stale": true
       }
     }
