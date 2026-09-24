@@ -37,10 +37,11 @@ User-agent: GPTBot
 Disallow: /
 User-agent: ClaudeBot
 Disallow: /
-# Google-Extended: registrar decisão EXPLÍCITA por cliente (não deixar implícito):
+# Google-Extended: nesta opção restritiva ("sem ceder treino"), o coerente é bloquear:
 User-agent: Google-Extended
-Allow: /
-# (trocar por Disallow: / apenas se o cliente aceitar reduzir presença no ecossistema Gemini)
+Disallow: /
+# (trocar por Allow: / se o cliente preferir manter presença no ecossistema Gemini
+#  MESMO cedendo treino — registrar a decisão; ver condição (c) abaixo sobre o custo)
 ```
 Condições de aplicação: (a) **default Brasil GEO = liberar tudo, inclusive treino** — presença no corpus paramétrico é ativo (Existence Gap, wave julho-22); a opção restritiva acima é para cliente com conteúdo proprietário sensível; (b) o snippet pressupõe que NÃO há regras globais conflitantes no robots.txt existente (`User-agent: *` com Disallow, paths sensíveis) — sempre auditar o arquivo inteiro antes de colar, ou o efeito real pode ser o oposto do pretendido; (c) Google-Extended: registrar a decisão em linha explícita (acima) para ficar auditável; segundo a doc oficial do Google, o token controla uso em treino de futuras gerações Gemini e em grounding (Gemini Apps / Grounding with Google Search no Vertex) [citação da doc; verificar redação vigente antes de aconselhar, pois o escopo do token já mudou historicamente]; (d) fetchers de usuário: a doc da OpenAI diz que para ChatGPT-User as regras de robots "podem não se aplicar" e a da Perplexity diz que Perplexity-User "generally ignores robots.txt" (textos oficiais) — robots.txt continua sendo o sinal correto a publicar; bloqueio efetivo desses fetchers, quando necessário, é via WAF/CDN.
 
