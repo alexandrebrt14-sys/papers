@@ -21,7 +21,7 @@ O [protocolo aprofundado baseado no site](docs/PROTOCOLO_FUTURO_BASEADO_NO_SITE_
 
 Os nove workflows do repositório (coleta diária, alerta de falha, FinOps Monitor, benchmark e calibração semanais, recuperação do banco, sync de teste com o Supabase, `tests` e scan de segurança) estão desativados manualmente no GitHub. As últimas execuções agendadas foram o FinOps Monitor e o scan de segurança de 21/09/2026; desde então nenhum job roda sozinho, e o CI não confere PR novo. A suíte local coleta 360 testes.
 
-Dois PRs seguem abertos e fora da `main`: o #64 (manuscrito BRGEO-1 v2.0 em formato de periódico, aberto em 11/09) e o #67 (juiz de menção, citação por URL e saúde dos motores, aberto em 30/09). Depois do encerramento entraram na `main` o #66 (protocolo futuro baseado no site, 11/09), os checkpoints automáticos do FinOps Monitor até 21/09 e o #42, de 24/09, com correções de revisão nas waves GEO 22 e 22B em `docs/research/`.
+Dois PRs seguem abertos e fora da `main`: o #64 (manuscrito BRGEO-1 v2.0 em formato de periódico, aberto em 11/09) e o #37, em rascunho desde 30/06 (roteamento do alerta de falha da coleta diária). Depois do encerramento entraram na `main` o #66 (protocolo futuro baseado no site, 11/09), os checkpoints automáticos do FinOps Monitor até 21/09, o #42, de 24/09, com correções de revisão nas waves GEO 22 e 22B em `docs/research/`, e o #67 (juiz de menção, citação por URL e saúde dos motores), mesclado em 30/09.
 
 ## Descrição histórica do projeto
 
