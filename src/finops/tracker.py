@@ -94,6 +94,10 @@ DEFAULT_BUDGETS: dict[str, dict[str, float]] = {
     # xai: braço Grok desde 2026-08-19. 70 chamadas/dia × (~1k in + ~1k out com
     # reasoning) ≈ $0.56/dia — teto com folga ~2x.
     "xai":        {"monthly": 25.0, "daily": 1.20, "alert_pct": 0.75, "hard_stop_pct": 0.95},
+    # cloro: braço opcional de interface (desligado por padrão, 30/09/2026).
+    # Cobrado por crédito (US$ 0,0004 no plano Hobby, 6 a 9 créditos por
+    # resposta); o custo vem do header X-Credits-Charged, não de tokens.
+    "cloro":      {"monthly": 5.0,  "daily": 0.50, "alert_pct": 0.70, "hard_stop_pct": 0.95},
     "global":     {"monthly": 100.0, "daily": 5.00, "alert_pct": 0.70, "hard_stop_pct": 0.95},
 }
 
@@ -373,11 +377,14 @@ class FinOpsTracker:
         query: str = "",
         run_id: str = "",
         raw_response: dict[str, Any] | None = None,
+        cost_usd: float | None = None,
     ) -> UsageRecord:
         """Record a single API call. Runs all checks post-hoc.
 
         If raw_response is provided, extracts real token counts
-        (overriding any passed values).
+        (overriding any passed values). ``cost_usd`` records a cost measured
+        by the provider itself (credit-billed APIs such as Cloro, whose charge
+        comes in a response header) instead of computing it from tokens.
         """
         # Prefer real token counts from API response
         if raw_response:
@@ -385,7 +392,10 @@ class FinOpsTracker:
             if real_in > 0 or real_out > 0:
                 input_tokens, output_tokens = real_in, real_out
 
-        cost = self.calculate_cost(platform, model, input_tokens, output_tokens)
+        if cost_usd is not None:
+            cost = round(max(0.0, float(cost_usd)), 8)
+        else:
+            cost = self.calculate_cost(platform, model, input_tokens, output_tokens)
         total = input_tokens + output_tokens
         ts = datetime.now(timezone.utc).isoformat()
 
