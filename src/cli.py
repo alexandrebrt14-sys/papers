@@ -442,6 +442,42 @@ def analyze_report(ctx: click.Context) -> None:
     db.close()
 
 
+@analyze.command("engine-health")
+@click.option("--since", default=None, help="Data ISO inicial (ex.: 2026-10-01).")
+@click.option("--arm", type=click.Choice(["api", "interface"]), default=None)
+@click.option("--max-failure-rate", default=0.20, show_default=True, type=float)
+@click.option("--min-calls", default=100, show_default=True, type=int)
+def analyze_engine_health(since: str | None, arm: str | None, max_failure_rate: float, min_calls: int) -> None:
+    """Taxa de falha por motor e recomendação de manter ou retirar (engine_call_outcomes)."""
+    from src.persistence.engine_health import failure_rates, retirement_advice
+
+    db = get_db()
+    try:
+        rates = failure_rates(db._conn, since=since, arm=arm)
+    finally:
+        db.close()
+    if not rates:
+        console.print("[yellow]Nenhuma chamada registrada em engine_call_outcomes.[/yellow]")
+        return
+    advice = {(a.engine, a.arm): a for a in retirement_advice(rates, max_failure_rate, min_calls)}
+    rotulos = {"keep": "manter", "watch": "observar", "retire": "retirar",
+               "insufficient_data": "amostra insuficiente"}
+    table = Table(title="Saúde dos motores")
+    for col in ("Motor", "Braço", "Sucesso", "Falha", "Tempo esgotado", "Ignorado",
+                "Taxa de falha", "Mediana (ms)", "Recomendação"):
+        table.add_column(col)
+    for r in rates:
+        a = advice[(r.engine, r.arm)]
+        table.add_row(
+            r.engine, r.arm, str(r.success), str(r.failure), str(r.timeout), str(r.skipped),
+            f"{r.failure_rate:.1%} ({r.failure + r.timeout}/{r.attempted})",
+            str(r.p50_latency_ms or "-"), rotulos[a.verdict],
+        )
+    console.print(table)
+    for a in advice.values():
+        console.print(f"- {a.engine} ({a.arm}): {a.reason}")
+
+
 @analyze.command("visualize")
 @click.option("--output-dir", "-o", default="output", help="Diretório de saída para gráficos.")
 @click.pass_context

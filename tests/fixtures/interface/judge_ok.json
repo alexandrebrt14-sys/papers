@@ -1,0 +1,7 @@
+{
+  "_nota": "Fixture sintética de resposta da API de chat da OpenAI para o juiz de menção. Nenhuma chamada real.",
+  "id": "chatcmpl-fixture",
+  "model": "gpt-4o-mini-2024-07-18",
+  "choices": [{"index": 0, "message": {"role": "assistant", "content": "{\"n0\": {\"p\": 0.96, \"why\": \"Stone citada como adquirente de maquininhas\"}, \"n1\": {\"p\": 0.05, \"why\": \"linear aparece como adjetivo, não como empresa\"}}"}, "finish_reason": "stop"}],
+  "usage": {"prompt_tokens": 412, "completion_tokens": 38, "total_tokens": 450}
+}

@@ -58,6 +58,20 @@ class DatabaseClient:
         # 'no such table: citations', que o except transforma em log DEBUG —
         # o skip fica invisivel e a coluna nunca aparece num DB novo.
         self._migrate_add_full_response_columns()
+        self._migrate_add_engine_call_outcomes()
+
+    def _migrate_add_engine_call_outcomes(self) -> None:
+        """Cria engine_call_outcomes (Migration 0011 inline).
+
+        Um registro por chamada a motor (success/failure/timeout/skipped), base
+        para decidir retirar um braço com dado, como o treg fez com a
+        Perplexity. Idempotente.
+        """
+        try:
+            from src.db import migrate_0011_engine_call_outcomes
+            migrate_0011_engine_call_outcomes.apply(self._conn)
+        except Exception as exc:
+            logger.debug("engine_call_outcomes migration skipped: %s", exc)
 
     def _migrate_add_vertical(self) -> None:
         """Add vertical column to existing tables if not present."""

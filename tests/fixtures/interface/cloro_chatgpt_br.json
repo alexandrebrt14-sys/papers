@@ -1,0 +1,20 @@
+{
+  "_nota": "Fixture sintética no formato de resposta de /v1/monitor/chatgpt da Cloro (catálogo treg, verificado em 07/09/2026). Texto e fontes inventados para teste; nenhuma chamada real.",
+  "success": true,
+  "result": {
+    "model": "gpt-5-6",
+    "text": "1. Nubank: conta digital sem tarifa e cartão sem anuidade.\n2. Banco Inter: conta completa com investimentos.\n3. C6 Bank: conta global em dólar.\n4. PicPay: carteira digital com pagamentos por Pix.\n5. Mercado Pago: conta integrada ao comércio eletrônico.",
+    "markdown": "1. **Nubank**: conta digital sem tarifa e cartão sem anuidade.\n2. **Banco Inter**: conta completa com investimentos.",
+    "sources": [
+      {"position": 1, "label": "Conta do Nubank", "url": "https://www.nubank.com.br/conta/?utm_source=chatgpt.com", "description": "", "footnote": false},
+      {"position": 2, "label": "Inter", "url": "https://www.google.com/url?q=https://blog.bancointer.com.br/conta-digital&sa=U", "description": "", "footnote": false},
+      {"position": 3, "label": "Gemini grounding", "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AbC123", "description": "", "footnote": false}
+    ],
+    "citationPills": [
+      {"url": "https://www.nubank.com.br/conta/?utm_source=chatgpt.com", "label": "Nubank", "domain": "nubank.com.br", "type": "groupedWebpage", "citationPillId": 0, "position": 1},
+      {"url": "https://c6bank.com.br/conta-global", "label": "C6", "domain": "c6bank.com.br", "type": "groupedWebpage", "citationPillId": 1, "position": 2}
+    ],
+    "entities": [],
+    "ads": []
+  }
+}

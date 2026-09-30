@@ -4,6 +4,19 @@ Formato [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ---
 
+## [reanálise] 2026-09-30 (juiz de menção, citação por URL, braço de interface desligado e saúde dos motores)
+
+A série encerrada em 11/09 media menção por palavra inteira. Esse critério não separa a Stone adquirente de "stone" como material, nem o Inter banco de "internacional", e por isso a taxa de citação carrega um erro de instrumento que ninguém quantificou. As peças abaixo, aprendidas com a receita `ai-visibility` do fork treg, permitem reanalisar as respostas já gravadas com um juiz e medir quanto a palavra inteira erra, sem reabrir a coleta.
+
+### Added
+
+- `src/analysis/mention_judge.py`: juiz LLM por marca, com probabilidade e justificativa curta; só conta como menção p >= 0,7 (`PAPERS_MENTION_THRESHOLD`). Uma chamada por resposta com todas as marcas, cache por (texto lido, marca, modelo, versão do prompt `mj-2026-09-30`) e retorno determinístico (NER v2 mais passagem sem acentos nos dois lados) quando o juiz falha. Cada veredito diz quem decidiu (`judged`, `cache`, `text_match`). O juiz de rede só liga com `PAPERS_MENTION_JUDGE=1` e `OPENAI_API_KEY`, usa `gpt-4o-mini-2024-07-18`, consulta o teto FinOps antes e registra os tokens reais depois.
+- `src/analysis/citation_match.py`: citação do site por URL, sem juiz. Normaliza host, `www`, porta e punycode, aceita subdomínio por rótulo (`notnubank.com.br` não casa `nubank.com.br`), remove `utm_*` e rastreadores, desembrulha `google.com/url`, Bing, Facebook e DuckDuckGo. Redirecionador cifrado (Vertex AI, Google `/goto`) fica como não resolvido, nunca adivinhado.
+- `src/collectors/interface_adapter.py`: braço opcional de interface pela Cloro (ChatGPT, Gemini, Copilot e AI Mode; Perplexity catalogada e fora da lista padrão). Desligado sem `PAPERS_INTERFACE_ARM=cloro` e `CLORO_API_KEY`. A política de encerramento roda primeiro, então neste repositório toda chamada é recusada antes de rede ou disco; um estudo novo passa a própria política. Custo pelo header `X-Credits-Charged`, teto FinOps `cloro` e teto por execução, falha ruidosa para motor listado em `MANDATORY_LLMS`, tempo limite de 75 s.
+- `src/persistence/engine_health.py` e Migration 0011 (`engine_call_outcomes`): um registro por chamada com sucesso, falha, tempo esgotado ou ignorado, taxa de falha com intervalo de Wilson e recomendação de manter, observar ou retirar. Comando `python -m src.cli analyze engine-health`.
+- `FinOpsTracker.record(cost_usd=...)` para custo medido pelo provedor; orçamento `cloro` (US$ 5 por mês, US$ 0,50 por dia).
+- 72 testes novos, sem rede, com fixtures sintéticas em `tests/fixtures/interface/`.
+
 ## [encerramento] 2026-09-11
 
 - Ciclo encerrado pelo autor após publicação do BRGEO-1. Coleta diária, benchmark e calibração semanal desativados; cron removido dos três workflows.
