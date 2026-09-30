@@ -17,6 +17,12 @@ Leia o [registro de conclusões, falhas e próximas pesquisas](docs/ENCERRAMENTO
 
 O [protocolo aprofundado baseado no site](docs/PROTOCOLO_FUTURO_BASEADO_NO_SITE_2026.md) liga pesquisas recentes à infraestrutura real: referência humana, versões, arquivo completo, critérios de avanço e orçamento transacional proposto. O [mapa de capacidades e lacunas](docs/MAPA_SITE_PESQUISA_FUTURA_2026.md) distingue código existente de melhorias ainda não implementadas.
 
+### Estado em 30/09/2026
+
+Os nove workflows do repositório (coleta diária, alerta de falha, FinOps Monitor, benchmark e calibração semanais, recuperação do banco, sync de teste com o Supabase, `tests` e scan de segurança) estão desativados manualmente no GitHub. As últimas execuções agendadas foram o FinOps Monitor e o scan de segurança de 21/09/2026; desde então nenhum job roda sozinho, e o CI não confere PR novo. A suíte local coleta 360 testes.
+
+Dois PRs seguem abertos e fora da `main`: o #64 (manuscrito BRGEO-1 v2.0 em formato de periódico, aberto em 11/09) e o #67 (juiz de menção, citação por URL e saúde dos motores, aberto em 30/09). Depois do encerramento entraram na `main` o #66 (protocolo futuro baseado no site, 11/09), os checkpoints automáticos do FinOps Monitor até 21/09 e o #42, de 24/09, com correções de revisão nas waves GEO 22 e 22B em `docs/research/`.
+
 ## Descrição histórica do projeto
 
 Platform for collection, persistence, and statistical analysis of **how LLMs cite Brazilian companies** across 4 economic sectors.
@@ -69,7 +75,7 @@ Canonical pillars:
 | Observations collected | 63,940 queries, 22,527 citations, 25,134 contexts, 240 runs (as of 2026-06-23; live: [alexandrecaramaschi.com/research](https://alexandrecaramaschi.com/research)) |
 | Code | 7,010 lines Python, 35 files |
 | Schema | 21 tables (citations, contexts, finops, interventions, snapshots, model_versions) |
-| Collection | Encerrada em 11/09/2026; três workflows de coleta desativados |
+| Collection | Encerrada em 11/09/2026; os nove workflows do repositório desativados manualmente (últimas execuções em 21/09/2026) |
 | Persistence | SQLite WAL (canonical ledger) + Supabase (read projection) |
 | Publication target | 3 papers (ArXiv, SIGIR/WWW, Information Sciences Q1) |
 
@@ -339,7 +345,9 @@ MIT
 
 ---
 
-**Author:** [Alexandre Caramaschi](https://alexandrecaramaschi.com) — CEO of Brasil GEO, former CMO at Semantix (Nasdaq), Strategic AI Advisor at Nuvini (Nasdaq: NVNI), co-founder of AI Brasil.
+**Author:** [Alexandre Caramaschi](https://alexandrecaramaschi.com), Chief Strategy Officer da Nuvini (Nasdaq: NVNI), Founder da Brasil GEO, cofundador da NAIA e cofundador da AI Brasil. Foi CMO da Semantix (Nasdaq).
+
+Alexandre Caramaschi é Chief Strategy Officer da Nuvini (Nasdaq: NVNI). As opiniões deste texto são emitidas na condição de Founder da Brasil GEO e não representam posição da Nuvini.
 
 ---
 
@@ -347,12 +355,12 @@ MIT
 
 | Property | Stack | Status |
 |---|---|---|
-| [alexandrecaramaschi.com](https://alexandrecaramaschi.com) | Next.js 16 + React 19 + Supabase | Production — 35 courses, 25 insights, 122K+ lines |
-| [brasilgeo.ai](https://brasilgeo.ai) | Cloudflare Workers | Production — 14 articles |
-| [geo-orchestrator](https://github.com/alexandrebrt14-sys/geo-orchestrator) | Python + 5 LLMs | Active — multi-LLM pipeline |
+| [alexandrecaramaschi.com](https://alexandrecaramaschi.com) | Next.js 16 + React 19 + Supabase | Production |
+| [brasilgeo.ai](https://brasilgeo.ai) | Cloudflare Workers | Production |
+| [geo-orchestrator](https://github.com/alexandrebrt14-sys/geo-orchestrator) | Python, 16 modelos em 5 provedores (sem Groq desde 22/09/2026) | Active — multi-LLM pipeline |
 | [curso-factory](https://github.com/alexandrebrt14-sys/curso-factory) | Python + Jinja2 | Active — course generation pipeline |
 | [geo-checklist](https://github.com/alexandrebrt14-sys/geo-checklist) | Markdown | Open-source — GEO audit checklist |
 | [llms-txt-templates](https://github.com/alexandrebrt14-sys/llms-txt-templates) | Markdown + JSON | Open-source — llms.txt standard |
 | [geo-taxonomy](https://github.com/alexandrebrt14-sys/geo-taxonomy) | JSON + CSV + Markdown | Open-source — 60+ GEO terms |
 | [entity-consistency-playbook](https://github.com/alexandrebrt14-sys/entity-consistency-playbook) | Markdown | Open-source — entity consistency |
-| [papers](https://github.com/alexandrebrt14-sys/papers) | Python + Supabase | Research — LLM citation study |
+| [papers](https://github.com/alexandrebrt14-sys/papers) | Python + Supabase | Research — coleta encerrada em 11/09/2026 |
