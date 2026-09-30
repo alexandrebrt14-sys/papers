@@ -9,7 +9,7 @@ O ciclo de coleta foi encerrado em **11 de setembro de 2026**, no fuso de São P
 | Calibração semanal | Desativada no GitHub; nenhum novo controle fictício coletado |
 | CLI, API e adaptadores de coleta | Bloqueio explícito antes de rede e persistência; sem variável de retomada |
 | Consulta e reanálise | Preservadas para o acervo histórico |
-| FinOps e segurança | Manutenção separada da coleta; chaves compartilhadas preservadas |
+| FinOps e segurança | Chaves compartilhadas preservadas. O FinOps Monitor e o scan de segurança rodaram até 21/09/2026; em 30/09/2026 os nove workflows do repositório, inclusive `tests`, estão desativados manualmente no GitHub |
 
 ## Publicações
 

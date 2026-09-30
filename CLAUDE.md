@@ -115,11 +115,11 @@ papers/
 │   ├── update-docs.py             # Atualiza docs/STATUS.md
 │   └── calibrate_score.py         # Fine-tune de detecção (exploratório)
 ├── tests/
-├── .github/workflows/
-│   ├── daily-collect.yml          # 06:00 e 18:00 BRT, job único sequencial
-│   ├── weekly-benchmark.yml       # Domingo 05:00 BRT, análise agregada
-│   ├── finops-monitor.yml         # Budget check
-│   └── security-scan.yml          # Bandit + gitleaks
+├── .github/workflows/             # os nove estão desativados manualmente no GitHub (30/09/2026)
+│   ├── daily-collect.yml          # coleta encerrada em 11/09/2026 (cron removido)
+│   ├── weekly-benchmark.yml       # encerrado em 11/09/2026
+│   ├── finops-monitor.yml         # Budget check; última execução em 21/09/2026
+│   └── security-scan.yml          # Bandit + gitleaks; última execução em 21/09/2026
 └── docs/
     ├── ARCHITECTURE.md            # Fluxograma completo (Onda 5)
     ├── METHODOLOGY.md             # Desenho estatístico (auditado)
