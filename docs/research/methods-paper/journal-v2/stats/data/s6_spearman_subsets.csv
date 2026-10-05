@@ -1,0 +1,9 @@
+panel_rule,subset,rho,n
+series,All entities,0.9819214248307683,66
+series,Excluding each vertical's leader,0.9785937370530217,62
+series,Coverage between 0.1% and 5%,0.9493132376820899,42
+series,Coverage below 1%,0.9555844017285868,42
+recency,All entities,0.9830802163589144,66
+recency,Excluding each vertical's leader,0.9796391220291915,62
+recency,Coverage between 0.1% and 5%,0.9571529245947852,44
+recency,Coverage below 1%,0.9556959494845648,41

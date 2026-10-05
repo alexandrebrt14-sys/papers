@@ -1,0 +1,11 @@
+key,value
+series_first_day,2026-04-23
+series_last_day,2026-09-08
+canonical_observations,68624
+window_chars,200
+days_active,14
+min_obs_rule,not applied
+identity_rows_checked,61189
+identity_rows_failed,0
+cohort,"v2, anchors and decoys included"
+stratum,"COALESCE(is_probe,0)=0"

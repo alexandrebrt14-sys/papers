@@ -1,0 +1,7 @@
+engine,n_entities_union,spearman_rho,p,top10_overlap,top5_even,top5_odd
+ChatGPT,11,0.9611872146118722,2.474511422891516e-06,1.0,Magazine Luiza > Nubank > Totvs > Involves > Raia Drogasil,Magazine Luiza > Nubank > Totvs > Involves > EMS Pharma
+Claude,17,0.9778627374785109,1.333893476036772e-11,1.0,Nubank > Mercado Livre > Walmart > Hypera Pharma > Americanas,Nubank > Mercado Livre > Walmart > Hypera Pharma > Microsoft
+Gemini,6,0.942857142857143,0.004804664723032055,1.0,Nubank > Magazine Luiza > Mercado Livre > Involves > Target,Nubank > Magazine Luiza > Mercado Livre > Involves > iFood
+Grok,13,0.9352295035422861,2.7251539714736127e-06,1.0,Nubank > Mercado Livre > Magazine Luiza > EMS Pharma > Totvs,Nubank > Mercado Livre > Magazine Luiza > EMS Pharma > Totvs
+Perplexity,37,0.8546556200141824,1.6879333701112853e-11,1.0,Nubank > Mercado Livre > EMS Pharma > Totvs > Accenture,Nubank > Mercado Livre > EMS Pharma > Totvs > Accenture
+Groq,9,0.9958246164193105,1.5424463831959075e-08,1.0,Nubank > Magazine Luiza > Hypera Pharma > Involves > Mercado Livre,Nubank > Magazine Luiza > Hypera Pharma > Involves > Mercado Livre

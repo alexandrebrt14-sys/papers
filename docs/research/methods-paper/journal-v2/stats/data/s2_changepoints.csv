@@ -1,0 +1,12 @@
+engine,method,status,index,last_day_before,first_day_after,gap_across_days,located,rate_before_pct,rate_after_pct,delta_pp,lr,p_perm,n_before,n_after
+ChatGPT,binomial-binseg,run; no change point at alpha=0.05,,,,,,,,,,,,
+Claude,binomial-binseg,run; no change point at alpha=0.05,,,,,,,,,,,,
+Gemini,binomial-binseg,run,34.0,2026-06-04,2026-06-06,2.0,day boundary,1.2923397602918187,2.795138888888889,1.5027991285970703,42.88404902718048,0.001,9595.0,5760.0
+Perplexity,binomial-binseg,run,24.0,2026-05-24,2026-05-25,1.0,day boundary,56.48809523809524,48.619036749600546,-7.86905848849469,47.256747537065166,0.001,3360.0,4381.0
+Perplexity,binomial-binseg,run,27.0,2026-05-27,2026-05-28,1.0,day boundary,41.40625,47.172619047619044,5.766369047619047,4.337455293595667,0.008,384.0,2016.0
+Perplexity,binomial-binseg,run,40.0,2026-08-08,2026-08-10,2.0,day boundary,46.25,51.48914689550732,5.239146895507318,11.927781940432396,0.001,2400.0,1981.0
+Groq,binomial-binseg,run,39.0,2026-06-09,2026-08-08,60.0,anywhere inside a 60-day hole,8.174435028248588,9.86111111111111,1.6866760828625234,8.109756451938665,0.001,11328.0,2880.0
+Grok,binomial-binseg,NOT RUN (5 days),,,,,,,,,,,,
+Gemini,ruptures-pelt-l2-logit,run,35.0,2026-06-06,2026-06-07,1.0,,1.3327988776430504,2.8273809523809526,,,,9979.0,5376.0
+Perplexity,ruptures-pelt-l2-logit,run,20.0,2026-05-20,2026-05-21,1.0,,57.105654761904766,49.33702750841085,,,,2688.0,5053.0
+Groq,ruptures-pelt-l2-logit,run,40.0,2026-08-08,2026-08-10,2.0,,8.203125,9.858630952380953,,,,11520.0,2688.0
