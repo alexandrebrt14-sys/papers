@@ -1,0 +1,366 @@
+# papers — Empirical Multi-Vertical Research on LLM Citations of Brazilian Companies
+
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Coleta encerrada](https://img.shields.io/badge/coleta-encerrada-blue)
+![Tests](https://img.shields.io/badge/tests-360%20passing-brightgreen)
+![Version](https://img.shields.io/badge/version-v2.0.0--reboot-blue)
+
+## Coleta encerrada em 11 de setembro de 2026
+
+O ciclo de coleta foi encerrado pelo autor. Novas consultas experimentais, benchmarks e calibrações estão bloqueados. O acervo permanece disponível para consulta e reanálise; os cronogramas e comandos de coleta descritos nas seções históricas abaixo não estão mais ativos.
+
+A referência empírica é o [preprint corrigido no Zenodo](https://zenodo.org/records/22711743), de 11/09/2026. O [SSRN](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7446519) preserva a versão anterior da mesma pesquisa. Os depósitos são preprints, sem revisão por periódico. O artigo corrigido audita 91.392 respostas persistidas; o dashboard final registra 92.064 consultas em outro recorte. Essas quantidades não representam observações independentes.
+
+Leia o [registro de conclusões, falhas e próximas pesquisas](docs/ENCERRAMENTO_2026-09-11.md), o [estado final](docs/STATUS.md) e o [manifesto de encerramento](data/project_status.json). As propostas futuras exigem novo projeto e autorização, sem retomada automática deste ciclo. O [próximo estudo longitudinal proposto](docs/PROPOSTA_PESQUISA_PROSPECTIVA_2026.md) terá no mínimo três meses completos, planejamento de precisão e limite de custo antes de cada chamada.
+
+
+O [protocolo aprofundado baseado no site](docs/PROTOCOLO_FUTURO_BASEADO_NO_SITE_2026.md) liga pesquisas recentes à infraestrutura real: referência humana, versões, arquivo completo, critérios de avanço e orçamento transacional proposto. O [mapa de capacidades e lacunas](docs/MAPA_SITE_PESQUISA_FUTURA_2026.md) distingue código existente de melhorias ainda não implementadas.
+
+### Estado em 30/09/2026
+
+Os nove workflows do repositório (coleta diária, alerta de falha, FinOps Monitor, benchmark e calibração semanais, recuperação do banco, sync de teste com o Supabase, `tests` e scan de segurança) estão desativados manualmente no GitHub. As últimas execuções agendadas foram o FinOps Monitor e o scan de segurança de 21/09/2026; desde então nenhum job roda sozinho, e o CI não confere PR novo. A suíte local coleta 360 testes.
+
+Dois PRs seguem abertos e fora da `main`: o #64 (manuscrito BRGEO-1 v2.0 em formato de periódico, aberto em 11/09) e o #37, em rascunho desde 30/06 (roteamento do alerta de falha da coleta diária). Depois do encerramento entraram na `main` o #66 (protocolo futuro baseado no site, 11/09), os checkpoints automáticos do FinOps Monitor até 21/09, o #42, de 24/09, com correções de revisão nas waves GEO 22 e 22B em `docs/research/`, e o #67 (juiz de menção, citação por URL e saúde dos motores), mesclado em 30/09.
+
+## Descrição histórica do projeto
+
+Platform for collection, persistence, and statistical analysis of **how LLMs cite Brazilian companies** across 4 economic sectors.
+
+Longitudinal study (target: 90+ days, ~25,920 observations) focused on citation patterns, visibility, and source attribution by generative search engines (Generative Engine Optimization — GEO).
+
+---
+
+## Aprendizados de SEO e busca com IA (10/09/2026)
+
+A [integração científica de setembro-10](docs/research/geo-wave-setembro-10-2026/GEO_WAVE_SETEMBRO_10_2026_CANONICAL.md) adapta a pesquisa da Zyppy e as evidências recentes ao que este pipeline realmente observa.
+
+- [Guia científico aprofundado](docs/research/geo-wave-setembro-10-2026/GUIA_CONCEITOS_SEO_IA_PESQUISA.md): seleção, absorção, fidelidade, fan-out, amostra, causalidade e desenhos novos.
+- [Dicionário de 63 conceitos](docs/GEO_50_CONCEITOS_CANONICAL.md), [base de conhecimento](docs/GEO_KNOWLEDGE_BASE_2026.md) e [sistema operacional](docs/GEO_OPERATING_SYSTEM.md): referências vigentes para agentes e pesquisadores.
+- [Relatório com 30 fontes](docs/research/geo-wave-setembro-10-2026/relatorio-seo-ia-query-fan-out.md) e [24 consultas da investigação original](docs/research/geo-wave-setembro-10-2026/registro-query-fan-out.md): evidências, datas e limites.
+- [Paper 2 revisado](docs/outlines/PAPER_2_GEO_VS_SEO.md): comparação de domínios de Brave e fontes de APIs, com extensões ainda propostas.
+
+A seção 13 da [metodologia v2](docs/METHODOLOGY_V2.md) esclarece as proxies locais e preserva H1 a H5, prompts, janela e dados. Nenhuma coleta, integração de GSC ou novo experimento foi executado nesta atualização. Os números datados nas seções históricas abaixo permanecem retratos das respectivas datas; não representam progresso recalculado em setembro.
+
+## v2.0.0-reboot (2026-04-23)
+
+Following Paper 4 ("Three Ways to Fail to Conclude", [doi.org/10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)), which documented a triple methodological failure of v1 (H1 RAG underpower, H2 fictitious-probe design-null, H3 asymmetric instrumentation), the codebase was rebooted across 5 waves. The v2 infrastructure closes each failure mode with hardened algorithms, a balanced 127-entity cohort (79 Brazilian + 32 international anchors + 16 fictional decoys), a 192-query balanced battery, and a pre-registered decision rule. **217/217 tests passing.**
+
+Canonical pillars:
+
+1. **NER v2** — NFC+NFKD dual-pass, word-boundary matching, alias and stop-context tables. Dry-run on 2,000 rows: -45% false positives. [`src/analysis/entity_extraction.py`](src/analysis/entity_extraction.py) (24 tests)
+2. **Cluster-robust CR1** — sandwich estimator with cross-group covariance. [`src/analysis/cluster_robust.py`](src/analysis/cluster_robust.py) (6 tests)
+3. **Null simulation (Monte Carlo)** — empirical null distribution replaces the arbitrary Jaccard 0.30 threshold. [`src/analysis/null_simulation.py`](src/analysis/null_simulation.py) (8 tests)
+4. **Power analysis** — Rule-of-3 inverse, Cohen's h, design effect, `reboot_roadmap()`. [`src/analysis/power_analysis.py`](src/analysis/power_analysis.py) (10 tests)
+5. **Mixed-effects GLMM** — `BinomialBayesMixedGLM` with random intercepts per entity and per query. [`src/analysis/mixed_effects.py`](src/analysis/mixed_effects.py)
+6. **Cohort v2** — 79 Brazilian entities + 32 international anchors + 16 fictional decoys (127 total). [`src/config_v2.py`](src/config_v2.py) (16 tests)
+7. **Query battery v2** — 192 balanced queries across verticals, framings, and directives.
+8. **Hypothesis engine** — BH-FDR correction with a pre-registered decision rule. [`src/analysis/hypothesis_engine.py`](src/analysis/hypothesis_engine.py) (14 tests)
+9. **Forward-only migrations** — `0005` NER v2 columns, `0006` SHA-256 response hashes, `0007` fictitious-probe flag.
+10. **Reproducibility** — [`Dockerfile`](Dockerfile), [`requirements-lock.txt`](requirements-lock.txt), [`scripts/reproduce.sh`](scripts/reproduce.sh).
+11. **Pipeline** — `collect validate-run --since-minutes N` standalone, fail-loud per mandatory LLM, `routed_out` vs `api_failure` distinction, updated `daily-collect.yml`.
+12. **Canonical docs** — [`docs/METHODOLOGY_V2.md`](docs/METHODOLOGY_V2.md) (source of truth) and [`CHANGELOG.md`](CHANGELOG.md).
+
+---
+
+## Study Design
+
+| Dimension | Value |
+|---|---|
+| Verticals | 4 (Fintech, Retail, Healthcare, Technology) |
+| Entities | 127 (79 Brazilian real + 32 international anchors + 16 fictional decoys) |
+| LLM Models | 5 (GPT-4o-mini, Claude Haiku 4.5, Gemini 2.5 Pro, Perplexity Sonar, xAI Grok 4.6 — até 16-08-2026 o 5º braço era Groq Llama 3.3 70B; ver CHANGELOG 2026-08-19) |
+| Queries per vertical | 48 balanced (battery v2 = 192 canonical) |
+| Daily observations | ~1,420/day measured (5 models x query battery x 4 verticals) |
+| Observations collected | 63,940 queries, 22,527 citations, 25,134 contexts, 240 runs (as of 2026-06-23; live: [alexandrecaramaschi.com/research](https://alexandrecaramaschi.com/research)) |
+| Code | 7,010 lines Python, 35 files |
+| Schema | 21 tables (citations, contexts, finops, interventions, snapshots, model_versions) |
+| Collection | Encerrada em 11/09/2026; os nove workflows do repositório desativados manualmente (últimas execuções em 21/09/2026) |
+| Persistence | SQLite WAL (canonical ledger) + Supabase (read projection) |
+| Publication target | 3 papers (ArXiv, SIGIR/WWW, Information Sciences Q1) |
+
+---
+
+## Integridade do dashboard público e dias parciais (2026-09-09)
+
+`data/dashboard_data.json` passa pelas regras de `src/analysis/dashboard_public.py`:
+decoys de calibração ficam só em `calibration`, `coverage` é limitada ao roster,
+`windowEnd` é o fechamento projetado da janela de 90 dias coletados e
+`partialDays` lista os dias coletados com menos braços que `MANDATORY_LLMS`.
+Para reaplicar sem banco: `python scripts/generate_dashboard_json.py --from-json`.
+
+Antes do encerramento, o preflight operava em modo `degrade` por padrão (`PAPERS_PREFLIGHT_MODE`): provedor
+sem saldo vira dia parcial em vez de dia perdido. Virada da Perplexity para a
+Agent API: `docs/PERPLEXITY_AGENT_API.md`.
+
+## Verticals and Cohorts
+
+Cohort canonical source: [`src/config_v2.py`](src/config_v2.py). Each vertical = real Brazilian entities + international anchors + 4 fictional decoys.
+
+### Fintech (31 entities)
+**Real BR (19):** Nubank, PagBank, Cielo, Stone Co, Banco Inter, Mercado Pago, Itau, Bradesco, C6 Bank, PicPay, Banco Neon, Banco Safra, BTG Pactual, XP Investimentos, Dock, CloudWalk, Will Bank, Swap, Agibank
+**International anchors (8):** Revolut, Monzo, N26, Chime, Wise, Klarna, Robinhood, SoFi
+**Fictional (4):** Banco Floresta Digital, FinPay Solutions, Banco Aurora, PagFast
+
+### Retail (32 entities)
+**Real BR (20):** Magazine Luiza, Casas Bahia, Americanas, Amazon Brasil, Mercado Livre, Shopee Brasil, Renner, Riachuelo, C&A Brasil, Leroy Merlin Brasil, Centauro, Netshoes, Grupo Pao de Acucar, Petz, Dafiti, Madeira Madeira, M Dias Branco, Grupo Boticario, Netfarma, Mobly
+**International anchors (8):** Amazon, Walmart, AliExpress, Shein, Zalando, IKEA, Target, eBay
+**Fictional (4):** MegaStore Brasil, ShopNova Digital, MercadoPlus Brasil, VareJo Express
+
+### Healthcare (32 entities)
+**Real BR (20):** Dasa, Hapvida, Unimed, Fleury, Rede D'Or, Hospital Einstein, Sirio-Libanes, Raia Drogasil, Eurofarma, Ache Laboratorios, EMS Pharma, Hypera Pharma, NotreDame Intermedica, SulAmerica Saude, Amil, Prevent Senior, Porto Saude, Alliar, Oncoclinicas, Hermes Pardini
+**International anchors (8):** Pfizer, Novartis, Kaiser Permanente, UnitedHealth, Roche, Mayo Clinic, NHS, HCA Healthcare
+**Fictional (4):** HealthTech Brasil, Clinica Horizonte Digital, SaudeAgora, ClinicaVita
+
+### Technology (32 entities)
+**Real BR (20):** Totvs, Stefanini, Tivit, CI&T, Locaweb, Movile, iFood, Vtex, RD Station, Conta Azul, Involves, Accenture Brasil, IBM Brasil, Linx S.A., NeuralMed, Semantix, SambaTech, Mandic, Sinqia, Globant Brasil
+**International anchors (8):** Microsoft, Google, Salesforce, SAP, Oracle, Infosys, Accenture, TCS
+**Fictional (4):** TechNova Solutions, DataBridge Brasil, TechBridge BR, DataCore Brasil
+
+---
+
+## Collection Status (updated 2026-06-23)
+
+| Criterion | Target | Current |
+|---|---|---|
+| Total observations | >= 25,920 (v1 target) | 63,940 queries / 22,527 citations (247% of v1 target) |
+| Collection window (v2) | 90 days (2026-04-23 -> 2026-07-21) | day 62/90 |
+| N per LLM | >= 1,000 | 5,760 (Perplexity) - 14,720 (ChatGPT/Groq) |
+| Collection days (distinct) | >= 90 continuous | 41 |
+| Pre-registered hypotheses | >= 3 | 0 |
+| A/B experiments | >= 2 | 0 |
+| Fictional entity validation | 16 decoys (false positive rate) | 12,623 probes collected, 0 false positives (100% specificity over 51,317 responses) |
+
+### Known Limitations
+
+1. **Effective N < Gross N**: a fraction of observations are cache hits (identical responses reused), so the effective N is below the gross 63,940.
+2. **Sample imbalance**: Perplexity Sonar is underrepresented (5,760 vs ~14,500 for the other four models) due to search-call cost throttling.
+3. **Directive queries**: Categories like "fintech_trust" produce 100% citation rate by design — do not represent spontaneous citation
+4. **Non-stationarity**: LLMs update models without notice. `model_versions` table is now populated (5 model fingerprints) but updates between fingerprints remain untracked.
+5. **Non-independent observations**: Similar queries to the same model in the same session share internal state
+
+---
+
+## Statistical Methodology
+
+> **Source of truth:** [`docs/METHODOLOGY_V2.md`](docs/METHODOLOGY_V2.md) (v2.0.0-reboot, 2026-04-23).
+> The legacy [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) is preserved as historical reference for v1 and Paper 4's failure analysis.
+
+### Test Framework
+
+| Test | Use | Implementation |
+|---|---|---|
+| **Chi-squared** | Association between query category and citation | `scipy.stats.chi2_contingency` + Cramer's V |
+| **Kruskal-Wallis** | Comparison of rates across 4+ LLM models (non-parametric) | `scipy.stats.kruskal` + eta-squared |
+| **ANOVA one-way** | Group comparison (when Levene p > 0.05) | `scipy.stats.f_oneway` + eta-squared |
+| **Mann-Whitney U** | Citation position (ordinal, non-normal) | `scipy.stats.mannwhitneyu` + rank-biserial r |
+| **T-test** (ind/paired) | Mean comparison pre/post intervention | `scipy.stats.ttest_ind/rel` + Cohen's d |
+| **Logistic regression** | Citation predictors (schema, word count, etc.) | `statsmodels.Logit` + pseudo R-squared, AIC, BIC, odds ratios |
+| **Correlation** | Spearman (default) / Pearson | `scipy.stats.spearmanr/pearsonr` |
+
+### Multiple Testing Correction
+
+| Method | Application |
+|---|---|
+| **Bonferroni** | Family-wise comparisons (across verticals) |
+| **Benjamini-Hochberg FDR** | Per-entity tests (controls false discovery rate) |
+
+### Effect Sizes
+
+| Metric | Associated Test | Classification |
+|---|---|---|
+| Cohen's d | t-test | 0.2 small, 0.5 medium, 0.8 large |
+| Cramer's V | chi-squared | sqrt(chi2 / (n * (min_dim-1))) |
+| Eta-squared | ANOVA/KW | SS_between / SS_total |
+| Rank-biserial r | Mann-Whitney | 1 - (2U)/(n1*n2) |
+| Pseudo R-squared | Logistic | McFadden |
+
+### Context Analysis (Module 7)
+
+Each detected citation undergoes analysis of:
+
+| Field | Method |
+|---|---|
+| **Sentiment** | Regex against 16 positive + 12 negative signals (PT-BR + EN), 200-char window |
+| **Attribution** | Hierarchy: linked (URL present) > named (entity in text) > paraphrased |
+| **Factual accuracy** | Verification against canonical facts (founding year, CEO, HQ) for 5 key entities |
+| **Hedging** | 16 regular patterns ("according to", "reportedly", "possivelmente") |
+| **Position** | Tertile: 1 (first third), 2 (middle), 3 (last third) of response |
+
+---
+
+## Papers
+
+| # | Title | Venue | Status | Main Methodology |
+|---|---|---|---|---|
+| 1 | How LLMs Cite Entities Across Industry Verticals | ArXiv | planned | Multi-vertical tracking, ANOVA/KW across models, time series |
+| 2 | GEO vs SEO: Source Divergence | SIGIR/WWW | planned | Weekly Jaccard index (top-10 Google vs LLM sources), 12+ weeks |
+| 3 | Industry-Specific Patterns in AI Citation | Information Sciences (Q1) | planned | Fisher exact test, odds ratios, 95% CI, 2 A/B experiments |
+| 4 | Three Ways to Fail to Conclude: A Null-Triad Post-Mortem | SSRN / arXiv / SIGIR 2027 | **submitted** ([10.5281/zenodo.19712217](https://doi.org/10.5281/zenodo.19712217)) | Null-triad decomposition: H1 underpower, H2 design-null, H3 instrumentation asymmetry |
+| 5 | (in preparation) | Elsevier (target) | **in preparation** — v2 infrastructure operational, 90-day collection window pending OSF preregistration v2 | Balanced 127-entity cohort, 192-query battery, cluster-robust CR1, Monte Carlo null, GLMM, BH-FDR |
+
+---
+
+## Architecture
+
+```
+src/
+  config.py               # Central configuration, cohorts per vertical, LLM configs
+  cli.py                  # Main CLI (click)
+  collectors/
+    base.py               # Multi-provider LLM client + cache + FinOps tracking
+    citation_tracker.py   # Module 1: Citation Tracker (4 LLMs x 4 verticals)
+    competitor.py         # Module 2: Multi-Vertical Benchmark
+    serp_overlap.py       # Module 3: SERP vs AI Overlap
+    intervention.py       # Module 4: A/B Testing
+    context_analyzer.py   # Module 7: Sentiment, attribution, accuracy
+  db/
+    schema.sql            # Complete schema (21 tables)
+    client.py             # SQLite/Supabase persistence
+  persistence/
+    timeseries.py         # Module 5: Daily snapshots
+  analysis/
+    statistical.py        # Module 6: 7 tests + corrections + effect sizes
+    visualization.py      # Charts with 95% CI (matplotlib/seaborn)
+  finops/
+    tracker.py            # Cost per token, 4 providers, budget control
+    monitor.py            # Dashboard, alerts, security audit
+    secrets.py            # Key rotation, leak scanning, health checks
+  api/
+    main.py               # FastAPI (endpoints per vertical)
+.github/workflows/
+  daily-collect.yml       # Daily collection 06:00 UTC
+  weekly-benchmark.yml    # Weekly benchmark (Sunday 08:00 UTC)
+```
+
+---
+
+## FinOps
+
+| Provider | Model | Cost/MTok (in/out) | Monthly Budget |
+|---|---|---|---|
+| OpenAI | gpt-4o-mini-2024-07-18 | $0.15 / $0.60 | $10 |
+| Anthropic | claude-haiku-4-5 | $0.80 / $4.00 | $10 |
+| Google | gemini-2.5-flash | $0.15 / $0.60 | $5 |
+| Perplexity | sonar | $1.00 / $1.00 | $10 |
+| **Global** | | | **$70** (hard stop 95%) |
+
+---
+
+## Setup
+
+```bash
+pip install -e ".[dev]"
+cp .env.example .env  # Configure API keys
+python -m src.cli db migrate
+python -m src.cli collect all
+```
+
+## Commands
+
+```bash
+# Collection
+python -m src.cli collect all                         # All verticals
+python -m src.cli collect all --vertical fintech      # Fintech only
+python -m src.cli collect citation                    # Citation Tracker only
+
+# Analysis
+python -m src.cli analyze --report                    # Full report
+python -m src.cli analyze --report --vertical saude   # Healthcare only
+python -m src.cli analyze --visualize                 # Charts per vertical
+
+# Database
+python -m src.cli db migrate                          # Apply schema
+python -m src.cli db export --format csv              # Export data
+python -m src.cli db health                           # Health per vertical
+
+# Migrations (one-time, idempotent)
+python -m src.db.migrate_normalize_models              # Normalize GPT model strings
+python -m src.db.migrate_cited_entity                  # Backfill cited_entity
+python -m src.db.migrate_0003_eficacia_consistencia    # query_type, composite indexes, backfills
+
+# Consolidated export (replaces data/extract_*.py — Onda 4 refactor 2026-04-19)
+python scripts/export_data.py --format text
+python scripts/export_data.py --format json --output data/dashboard.json
+python scripts/export_data.py --format csv --vertical fintech
+python scripts/export_data.py --format html
+```
+
+---
+
+## Refactor 2026-04-19 — Quality guards
+
+- **`query_type`** (`directive` vs `exploratory`) isolates framing bias in Paper 1 ANOVA
+- **Fictional entities** (`FICTIONAL_ENTITIES` in `src/config.py`) calibrate false-positive rate — 8 entities, activatable via env `INCLUDE_FICTIONAL_ENTITIES=true`
+- **Mandatory LLMs** (env `MANDATORY_LLMS`) enforce balanced cohort — pipeline fails loud if any mandatory provider drops
+- **5 composite indexes** on `citations(vertical, cited)`, `(vertical, llm)`, `(timestamp, vertical)`, `(llm, model_version)`, `(query_type)` prevent table scans at N > 10K
+- **Backfills applied** on 940 legacy rows (model_version NULL → model)
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full flow and [docs/audits/2026-03-26/](docs/audits/2026-03-26/) for historical audit context.
+
+---
+
+## Reproducibility
+
+The v2.0.0-reboot ships a fully pinned, container-reproducible environment:
+
+```bash
+# One-shot container build + test suite + sample analysis
+./scripts/reproduce.sh
+
+# Or, manual Docker workflow
+docker build -t papers-v2 .
+docker run --rm -v "$PWD":/workspace papers-v2 pytest -q
+```
+
+| Artifact | Purpose |
+|---|---|
+| [`Dockerfile`](Dockerfile) | Python 3.11 image with system deps and pinned requirements |
+| [`requirements-lock.txt`](requirements-lock.txt) | Fully pinned dependency set (hashes) used by CI and Docker |
+| [`scripts/reproduce.sh`](scripts/reproduce.sh) | End-to-end: build, migrate, run 78-test suite, emit analysis sample |
+| [`CHANGELOG.md`](CHANGELOG.md) | Version history from v1 through v2.0.0-reboot |
+
+---
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [docs/METHODOLOGY_V2.md](docs/METHODOLOGY_V2.md) | **Current** statistical methodology (v2.0.0-reboot) — source of truth |
+| [CHANGELOG.md](CHANGELOG.md) | Top-level version history (v1 through v2.0.0-reboot) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Full pipeline flow, schema layers (core vs future), operational commands |
+| [docs/METHODOLOGY.md](docs/METHODOLOGY.md) | Historical methodology (v1, pre-reboot) — kept for Paper 4 context |
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Formal specification (functional/non-functional) |
+| [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Spending policies, ADRs, roadmap |
+| [docs/MANUAL.md](docs/MANUAL.md) | Operational manual |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Legacy per-docs change log |
+| [docs/audits/2026-03-26/](docs/audits/2026-03-26/) | Archived statistical audit (N=397 snapshot) |
+| [output/critica_estatistica_panel.md](output/critica_estatistica_panel.md) | Critical review by panel of 7 specialists |
+
+---
+
+## License
+
+MIT
+
+---
+
+**Author:** [Alexandre Caramaschi](https://alexandrecaramaschi.com), Chief Strategy Officer da Nuvini (Nasdaq: NVNI), Founder da Brasil GEO, cofundador da NAIA e cofundador da AI Brasil. Foi CMO da Semantix (Nasdaq).
+
+Alexandre Caramaschi é Chief Strategy Officer da Nuvini (Nasdaq: NVNI). As opiniões deste texto são emitidas na condição de Founder da Brasil GEO e não representam posição da Nuvini.
+
+---
+
+## Ecosystem
+
+| Property | Stack | Status |
+|---|---|---|
+| [alexandrecaramaschi.com](https://alexandrecaramaschi.com) | Next.js 16 + React 19 + Supabase | Production |
+| [brasilgeo.ai](https://brasilgeo.ai) | Cloudflare Workers | Production |
+| [geo-orchestrator](https://github.com/alexandrebrt14-sys/geo-orchestrator) | Python, 16 modelos em 5 provedores (sem Groq desde 22/09/2026) | Active — multi-LLM pipeline |
+| [curso-factory](https://github.com/alexandrebrt14-sys/curso-factory) | Python + Jinja2 | Active — course generation pipeline |
+| [geo-checklist](https://github.com/alexandrebrt14-sys/geo-checklist) | Markdown | Open-source — GEO audit checklist |
+| [llms-txt-templates](https://github.com/alexandrebrt14-sys/llms-txt-templates) | Markdown + JSON | Open-source — llms.txt standard |
+| [geo-taxonomy](https://github.com/alexandrebrt14-sys/geo-taxonomy) | JSON + CSV + Markdown | Open-source — 60+ GEO terms |
+| [entity-consistency-playbook](https://github.com/alexandrebrt14-sys/entity-consistency-playbook) | Markdown | Open-source — entity consistency |
+| [papers](https://github.com/alexandrebrt14-sys/papers) | Python + Supabase | Research — coleta encerrada em 11/09/2026 |
